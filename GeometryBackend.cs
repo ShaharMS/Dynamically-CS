@@ -203,7 +203,6 @@ namespace GeometryBackend
             onMoved.Add((double _, double _, double mx, double my) => {
                 Margin = new Thickness(0, 0, 0, 0);
                 distanceSum = new Point(focal1.x, focal1.y).distanceTo(new Point(mx, my)) + new Point(focal2.x, focal2.y).distanceTo(new Point(mx, my));
-                Log.Write(distanceSum);
                 InvalidateVisual();
             });
 

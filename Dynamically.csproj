@@ -32,4 +32,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="\Shapes" />
+	</ItemGroup>
 </Project>
