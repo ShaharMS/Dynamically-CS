@@ -2,6 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using GeometryBackend;
 using Dynamically.Shapes;
+using Dynamically.Math;
+using MathNet.Symbolics;
+using System.Collections.Generic;
 
 namespace Dynamically;
 
@@ -25,6 +28,9 @@ public partial class MainWindow : Window
             ca.Children.Add(i);
         foreach (var i in Joint.all)
             ca.Children.Add(i);
+
+        var e = new Equation("x * x + y * y - 100", new Dictionary<string, FloatingPoint>());
+        Log.Write(e.SolveForX(5));
 
         //ca.Children.Add(c);
         //ca.Children.Add(c2);

@@ -57,6 +57,10 @@
               "target": "Package",
               "version": "[0.10.21, )"
             },
+            "MathNet.Symbolics": {
+              "target": "Package",
+              "version": "[0.24.0, )"
+            },
             "XamlNameReferenceGenerator": {
               "target": "Package",
               "version": "[1.6.1, )"
