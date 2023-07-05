@@ -83,4 +83,9 @@ public class CircleFormula : ChangeListener, Formula
         double aY = centerY + vY / magV * radius;
         return new Point(aX, aY);
     }
+
+    public Point? GetClosestOnFormula(Point point)
+    {
+        return GetClosestOnFormula(point.X, point.Y);
+    }
 }

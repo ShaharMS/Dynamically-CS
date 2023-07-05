@@ -5,4 +5,24 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Dynamically.MainWindow"
         Title="Dynamically">
-</Window>
+
+	<DockPanel>
+		<Menu DockPanel.Dock="Top">
+			<MenuItem Header="_File">
+				<MenuItem Header="_New"/>
+				<MenuItem IsEnabled="False" Header="_Open..."/>
+				<Separator/>
+				<MenuItem Header="_Exit"/>
+			</MenuItem>
+			<MenuItem Header="_Edit">
+				<MenuItem Header="Copy"/>
+				<MenuItem Header="Paste"/>
+			</MenuItem>
+			<MenuItem Header="_Create">
+				<MenuItem Header="Point" Icon="ava://Dynamically/Assets/Light/Menu/point.png"/>
+				<MenuItem Header="Line"/>
+				<MenuItem Header="Joint"/>
+			</MenuItem>
+		</Menu>
+		<Canvas Name="Screen"></Canvas>
+	</DockPanel></Window>

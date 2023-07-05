@@ -31,13 +31,6 @@ class Tools
 
             // The segments intersect if t1 and t2 are between 0 and 1.
             segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
-
-            // Find the closest points on the segments.
-            if (t1 < 0) t1 = 0;
-            else if (t1 > 1) t1 = 1;
-
-            if (t2 < 0) t2 = 0;
-            else if (t2 > 1) t2 = 1;
         }
 
         // Get the perpendicular bisector of (x1, y1) and (x2, y2).
@@ -62,7 +55,7 @@ class Tools
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
         Circle circle = new Circle(new Joint(center.X, center.Y), radius);
-        foreach(var joint in new Joint[] { joint1, joint2, joint3 })
+        foreach(var joint in new[] { joint1, joint2, joint3 })
         {
             joint.geometricPosition.Add(circle.formula);
             joint.geometricPosition = joint.geometricPosition; // Trigger setter

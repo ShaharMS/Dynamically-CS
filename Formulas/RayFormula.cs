@@ -1,10 +1,12 @@
 ﻿using Avalonia;
+using StaticExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace Dynamically.Formulas;
 
@@ -112,15 +114,39 @@ public class RayFormula : ChangeListener, Formula
         this.slope = slope;
     }
 
-    public Point? GetClosestOnFormula(double x, double y)
+    public Point? Intersect(RayFormula formula)
     {
-        var nSlope = -1 / slope;
-        var nFormula = new RayFormula(new Point(x, y), nSlope);
+        if (formula == null) return null;
+        if (formula.slope == slope) return null;
 
-        var X = (yIntercept - nFormula._yIntercept) / (nSlope / slope);
+        var X = (yIntercept - formula._yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
 
         return new Point(X, Y[0]);
+    }
+
+    public double DistanceTo(Point point)
+    {
+        // Get the closest point on the ray to the given point
+        Point? closestPoint = GetClosestOnFormula(point);
+        if (!closestPoint.HasValue) return -1;
+        // Calculate the distance between the closest point and the given point
+        double dx = closestPoint.Value.X - point.X;
+        double dy = closestPoint.Value.Y - point.Y;
+        double distance = Math.Sqrt(dx * dx + dy * dy);
+
+        return distance;
+    }
+    public Point? GetClosestOnFormula(double x, double y)
+    {
+        double nSlope = -1 / slope;
+        var nRay = new RayFormula(new Point(x, y), nSlope);
+        return Intersect(nRay);
+    }
+
+    public Point? GetClosestOnFormula(Point point)
+    {
+        return GetClosestOnFormula(point.X, point.Y);
     }
 
     public double[] SolveForX(double y)

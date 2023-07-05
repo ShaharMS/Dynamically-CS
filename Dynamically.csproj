@@ -39,4 +39,10 @@
 		<Folder Include="\Backend" />
 		<Folder Include="\Math" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<Content Include="Assets\**">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>

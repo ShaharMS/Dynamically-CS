@@ -17,6 +17,7 @@ namespace GraphicsBackend
 
     public class DraggableGraphic : Canvas
     {
+        public bool draggable = true;
         public bool currentlyDragging;
         private Point _startPosition;
         private Point _startMousePosition;
@@ -52,8 +53,8 @@ namespace GraphicsBackend
         protected override void OnPointerEnter(PointerEventArgs e)
         {
             base.OnPointerEnter(e);
-            Cursor = new Cursor(StandardCursorType.SizeAll);
-
+            if (draggable) Cursor = new Cursor(StandardCursorType.SizeAll);
+            else Cursor = new Cursor(StandardCursorType.No);
         }
 
         protected override void OnPointerLeave(PointerEventArgs e)
@@ -67,7 +68,7 @@ namespace GraphicsBackend
         {
             base.OnPointerPressed(e);
 
-            if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            if (draggable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
                 currentlyDragging = true;
                 _startPosition = new Point(x, y);

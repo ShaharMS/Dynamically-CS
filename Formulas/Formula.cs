@@ -13,6 +13,7 @@ public interface Formula
     public double[] SolveForY(double x);
 
     public Point? GetClosestOnFormula(double x, double y);
+    public Point? GetClosestOnFormula(Point point);
 }
 
 public class ChangeListener

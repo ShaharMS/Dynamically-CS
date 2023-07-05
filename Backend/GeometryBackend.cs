@@ -40,6 +40,7 @@ public class Joint : DraggableGraphic, IDrawable
                     {
                         x = newPos.Value.X;
                         y = newPos.Value.Y;
+                        foreach (var l in onMoved) l(x, y, x, y);
                     }
 
                     foreach (Connection c in Connection.all) c.InvalidateVisual();
@@ -49,6 +50,7 @@ public class Joint : DraggableGraphic, IDrawable
                 {
                     x = x - preX + curX;
                     y = y - preY + curY;
+                    foreach (var l in onMoved) l(x, y, x, y);
                     foreach (Connection c in Connection.all) c.InvalidateVisual();
                 });
             }
@@ -148,6 +150,11 @@ public class Joint : DraggableGraphic, IDrawable
         }
         return this;
     }
+
+
+
+    public static implicit operator Point(Joint joint) { return new Point(joint.x, joint.y); }
+    public static implicit operator Joint(Point point) { return new Joint(point.X, point.Y); }
 }
 
 public class Connection : DraggableGraphic, IDrawable
@@ -185,8 +192,8 @@ public class Connection : DraggableGraphic, IDrawable
             joint2.y = org2Y + y;
             this.x = 0;
             this.y = 0;
-            joint1.onMoved[0](0, 0, 0, 0);
-            joint2.onMoved[0](0, 0, 0, 0);
+            foreach (var l in joint1.onMoved) l(joint1.x, joint1.y, mx, my);
+            foreach (var l in joint2.onMoved) l(joint2.x, joint2.y, mx, my);
             InvalidateVisual();
         });
 
@@ -248,7 +255,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
         onMoved.Add((double _, double _, double mx, double my) =>
         {
             Margin = new Thickness(0, 0, 0, 0);
-            distanceSum = new Point(focal1.x, focal1.y).distanceTo(new Point(mx, my)) + new Point(focal2.x, focal2.y).distanceTo(new Point(mx, my));
+            distanceSum = new Point(focal1.x, focal1.y).DistanceTo(new Point(mx, my)) + new Point(focal2.x, focal2.y).DistanceTo(new Point(mx, my));
             onDistanceSumChange();
             InvalidateVisual();
         });

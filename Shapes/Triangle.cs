@@ -31,59 +31,57 @@ public class Triangle : DraggableGraphic
         joint2.Connect(joint3);
     }
 
-    public Circle GenerateCircleAroundTriangle()
+    public Circle GenerateCircumCircle()
     {
         return Tools.CircleFrom3Joints(joint1, joint2, joint3);
     }
 
-    public Circle GenerateCircleInsideTriangle()
+    public Circle GenerateInscribedCircle()
     {
-        Joint j1, j2;
-        Point p1, p2;
+        Stats GetCircleStats()
+        {
+            // Calculate the lengths of the triangle sides
+            double a = joint2.DistanceTo(joint3);
+            double b = joint1.DistanceTo(joint3);
+            double c = joint1.DistanceTo(joint2);
 
-        /*  I'll use the angle bisector theorem to find the point on the side opposing the angle
-        
-         (c - connection/side length, c3 - current opposer)
-         (r - point of seperation in the opposing side)
-         c1/r = c2/c3-r
-         c2*r = c1*c3 - c1*r
-         r = (c1*c3)/(c1 + c2)
+            // Calculate the semiperimeter of the triangle
+            double s = (a + b + c) / 2;
 
-         After finding the point at which the bisector collides with its opposing side,
-         I'll create two rays from 2 bisectors, and find their collision.
-         For radius, ill dinf the distance from the center to a side on the triangle.
-        */
-        var pairs = new Joint[][] { new Joint[] { joint3, joint1 }, new Joint[] { joint2, joint3 }};
-        double ratio;
-        double l1 = pairs[0][0].distanceTo(pairs[0][1]);
-        double l2 = pairs[1][0].distanceTo(pairs[1][1]);
-        double l3 = pairs[2][0].distanceTo(pairs[2][1]);
+            // Calculate the radius of the inscribed circle
+            double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
 
-        
-        var r1 = (l3*l1)/(l2+l3); // Opposer - l1
-        var r2 = (l1*l2)/(l1+l3); // Opposer - l2
-        var r3 = (l2*l3)/(l2+l1); // Opposer - l3
+            // Calculate the coordinates of the center of the inscribed circle
+            double centerX = (a * joint1.x + b * joint2.x + c * joint3.x) / (a + b + c);
+            double centerY = (a * joint1.y + b * joint2.y + c * joint3.y) / (a + b + c);
 
-        var x1 = (r1 * pairs[0][0].x + (l1 - r1) * pairs[0][1].x) / l1;
-        var y1 = (r1 * pairs[0][0].y + (l1 - r1) * pairs[0][1].y) / l1;
-        p1 = new Point(x1, y1);
+            return new Stats
+            {
+                x = centerX,
+                y = centerY,
+                r = radius
+            };
+        }
+        var stats = GetCircleStats();
 
-        var x2 = (r2 * pairs[1][0].x + (l2 - r2) * pairs[1][1].x) / l2;
-        var y2 = (r2 * pairs[1][0].y + (l2 - r2) * pairs[1][1].y) / l2;
-        p2 = new Point(x2, y2);
+        Circle circle = new Circle(new Joint(stats.x, stats.y), stats.r);
+        circle.center.draggable = false;
+        circle.draggable = false;
 
-        var circle = Tools.CircleFrom3Joints(j1, j2, j3);
-        
-        var ray1 = new RayFormula(p1, p2);
-        var ray2 = new RayFormula(p2, p3);
-        var ray3 = new RayFormula(p3, p1);
-        
-        joint1.geometricPosition.Add(ray1);
-        joint2.geometricPosition.Add(ray2);
-        joint3.geometricPosition.Add(ray3);
-        
+        foreach (var j in new[] {joint1, joint2, joint3})
+        {
+            j.onMoved.Add((double _, double _, double _, double _) =>
+            {
+                var stats = GetCircleStats();
+                circle.center.x = stats.x;
+                circle.center.y = stats.y;
+                circle.radius = stats.r;
+                circle.updateFormula();
+                circle.InvalidateVisual();
+            });
+        }
+
         return circle;
-        //return null;
     }
     TriangleType ChangeType(TriangleType type)
     {
@@ -97,4 +95,9 @@ public enum TriangleType
     ISOSCELES,
     RIGHT,
     SCALENE,
+}
+
+public struct Stats
+{
+    public double x, y, r;
 }
