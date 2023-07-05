@@ -57,9 +57,9 @@
               "target": "Package",
               "version": "[0.10.21, )"
             },
-            "MathNet.Symbolics": {
+            "MathosParser": {
               "target": "Package",
-              "version": "[0.24.0, )"
+              "version": "[2.0.0, )"
             },
             "XamlNameReferenceGenerator": {
               "target": "Package",
