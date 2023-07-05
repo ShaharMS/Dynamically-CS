@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "LIbFtXgUCcEl9Pyd0UY158EF4xU4G08JpDFqUbnCXdemDN0xciw/V+0FW85+lSMAk2j0kxoUkhWAV5bCyf00lA==",
+  "dgSpecHash": "C9R8Z8WUp6WrCdVJ88+ZQdKlitPyDDkNgaBh2IiUIU02K9DKlqis6+wpEO4v4HtScWy0RKvK6MHkRSBZJiSWFg==",
   "success": true,
   "projectFilePath": "C:\\Users\\shaha\\Desktop\\Github\\Dynamically-CS\\Dynamically.csproj",
   "expectedPackageFiles": [
@@ -22,7 +22,6 @@
     "C:\\Users\\shaha\\.nuget\\packages\\harfbuzzsharp.nativeassets.webassembly\\2.8.2.1-preview.108\\harfbuzzsharp.nativeassets.webassembly.2.8.2.1-preview.108.nupkg.sha512",
     "C:\\Users\\shaha\\.nuget\\packages\\harfbuzzsharp.nativeassets.win32\\2.8.2.1-preview.108\\harfbuzzsharp.nativeassets.win32.2.8.2.1-preview.108.nupkg.sha512",
     "C:\\Users\\shaha\\.nuget\\packages\\jetbrains.annotations\\10.3.0\\jetbrains.annotations.10.3.0.nupkg.sha512",
-    "C:\\Users\\shaha\\.nuget\\packages\\mathosparser\\2.0.0\\mathosparser.2.0.0.nupkg.sha512",
     "C:\\Users\\shaha\\.nuget\\packages\\microsoft.codeanalysis.analyzers\\2.9.6\\microsoft.codeanalysis.analyzers.2.9.6.nupkg.sha512",
     "C:\\Users\\shaha\\.nuget\\packages\\microsoft.codeanalysis.common\\3.4.0\\microsoft.codeanalysis.common.3.4.0.nupkg.sha512",
     "C:\\Users\\shaha\\.nuget\\packages\\microsoft.codeanalysis.csharp\\3.4.0\\microsoft.codeanalysis.csharp.3.4.0.nupkg.sha512",

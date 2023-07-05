@@ -438,15 +438,6 @@
           }
         }
       },
-      "MathosParser/2.0.0": {
-        "type": "package",
-        "compile": {
-          "lib/netstandard2.0/MathParser.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard2.0/MathParser.dll": {}
-        }
-      },
       "Microsoft.CodeAnalysis.Analyzers/2.9.6": {
         "type": "package",
         "build": {
@@ -1879,25 +1870,6 @@
         "lib/portable-net4+sl4+wp7+netcore45/JetBrains.Annotations.xml",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.dll",
         "lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/JetBrains.Annotations.xml"
-      ]
-    },
-    "MathosParser/2.0.0": {
-      "sha512": "HwL4w5Eljn2aT8AouCHzllteLdSq8IBnNzfcK2ttDkfFM3S/vpSWl85SNUJbABpybDL65vSiQ1kR4JQJxiGUvw==",
-      "type": "package",
-      "path": "mathosparser/2.0.0",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net40/MathParser.dll",
-        "lib/net46/MathParser.dll",
-        "lib/net461/MathParser.dll",
-        "lib/net462/MathParser.dll",
-        "lib/net47/MathParser.dll",
-        "lib/net471/MathParser.dll",
-        "lib/netstandard1.4/MathParser.dll",
-        "lib/netstandard2.0/MathParser.dll",
-        "mathosparser.2.0.0.nupkg.sha512",
-        "mathosparser.nuspec"
       ]
     },
     "Microsoft.CodeAnalysis.Analyzers/2.9.6": {
@@ -4424,7 +4396,6 @@
       "Avalonia >= 0.10.21",
       "Avalonia.Desktop >= 0.10.21",
       "Avalonia.Diagnostics >= 0.10.21",
-      "MathosParser >= 2.0.0",
       "XamlNameReferenceGenerator >= 1.6.1"
     ]
   },
@@ -4484,10 +4455,6 @@
           "Avalonia.Diagnostics": {
             "target": "Package",
             "version": "[0.10.21, )"
-          },
-          "MathosParser": {
-            "target": "Package",
-            "version": "[2.0.0, )"
           },
           "XamlNameReferenceGenerator": {
             "target": "Package",
