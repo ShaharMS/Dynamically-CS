@@ -32,7 +32,8 @@ namespace GraphicsBackend
             get => GetValue(XProperty);
             set
             {
-                Margin = new Thickness(value, Margin.Top, 0, 0);
+                SetLeft(this, value);
+                //Margin = new Thickness(value, Margin.Top, 0, 0);
                 SetValue(XProperty, value);
             }
         }
@@ -45,7 +46,8 @@ namespace GraphicsBackend
             get => GetValue(YProperty);
             set 
             {
-                Margin = new Thickness(Margin.Left, value, 0, 0);
+                SetTop(this, value);
+                //Margin = new Thickness(Margin.Left, value, 0, 0);
                 SetValue(YProperty, value);
             }
         }

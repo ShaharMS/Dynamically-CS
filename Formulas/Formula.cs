@@ -1,6 +1,4 @@
 using Avalonia;
-using Mathos;
-using Mathos.Parser;
 using System;
 using System.Collections.Generic;
 using System.Linq;

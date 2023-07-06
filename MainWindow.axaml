@@ -7,7 +7,7 @@
         Title="Dynamically">
 
 	<DockPanel>
-		<Menu DockPanel.Dock="Top">
+		<Menu DockPanel.Dock="Top" Name="TopMenu">
 			<MenuItem Header="_File">
 				<MenuItem Header="_New"/>
 				<MenuItem IsEnabled="False" Header="_Open..."/>
@@ -19,9 +19,71 @@
 				<MenuItem Header="Paste"/>
 			</MenuItem>
 			<MenuItem Header="_Create">
-				<MenuItem Header="Point" Icon="ava://Dynamically/Assets/Light/Menu/point.png"/>
-				<MenuItem Header="Line"/>
-				<MenuItem Header="Joint"/>
+				<MenuItem Header="Point">
+					<MenuItem.Icon>
+						<Image Source="avares://Dynamically/Assets/Light/Menu/point.png"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<MenuItem Header="Line">
+					<MenuItem.Icon>
+						<Image Source="avares://Dynamically/Assets/Light/Menu/line.png"/>
+					</MenuItem.Icon>
+				</MenuItem>
+				<Separator/>
+				<MenuItem Header="_Triangles">
+					<MenuItem Header="Equilateral">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/equilateral.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Isoceles">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/isoceles.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Right">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/right.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Triangle">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/triangle.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
+				<MenuItem Header="_Quadrilaterals">
+					<MenuItem Header="Square">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/square.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Rectangle">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/rectangle.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Parallelogram">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/parallelogram.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Rhombus">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/rhombus.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Kite">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/kite.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+					<MenuItem Header="Trapezoid">
+						<MenuItem.Icon>
+							<Image Source="avares://Dynamically/Assets/Light/Menu/quadrilateral.png"/>
+						</MenuItem.Icon>
+					</MenuItem>
+				</MenuItem>
 			</MenuItem>
 		</Menu>
 		<Canvas Name="Screen"></Canvas>

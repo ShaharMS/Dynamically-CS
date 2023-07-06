@@ -127,6 +127,3 @@ C:\Users\shaha\Desktop\Github\Dynamically-CS\obj\Debug\net6.0\ref\Dynamically.dl
 C:\Users\shaha\Desktop\Github\Dynamically-CS\obj\Debug\net6.0\Dynamically.pdb
 C:\Users\shaha\Desktop\Github\Dynamically-CS\obj\Debug\net6.0\Dynamically.genruntimeconfig.cache
 C:\Users\shaha\Desktop\Github\Dynamically-CS\obj\Debug\net6.0\refint\Dynamically.dll
-C:\Users\shaha\Desktop\Github\Dynamically-CS\bin\Debug\net6.0\MathParser.dll
-C:\Users\shaha\Desktop\Github\Dynamically-CS\bin\Debug\net6.0\Assets\Light\Menu\line.png
-C:\Users\shaha\Desktop\Github\Dynamically-CS\bin\Debug\net6.0\Assets\Light\Menu\point.png

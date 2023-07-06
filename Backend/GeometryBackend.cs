@@ -254,7 +254,10 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
         onMoved.Add((double _, double _, double mx, double my) =>
         {
-            Margin = new Thickness(0, 0, 0, 0);
+            var parentOffset = this.GetPosition();
+            mx -= parentOffset.X;
+            my -= parentOffset.Y;
+            this.SetPosition(0, 0);
             distanceSum = new Point(focal1.x, focal1.y).DistanceTo(new Point(mx, my)) + new Point(focal2.x, focal2.y).DistanceTo(new Point(mx, my));
             onDistanceSumChange();
             InvalidateVisual();

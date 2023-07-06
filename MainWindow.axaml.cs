@@ -4,25 +4,32 @@ using GeometryBackend;
 using Dynamically.Shapes;
 using System.Collections.Generic;
 using Dynamically.Formulas;
+using Menus;
 
 namespace Dynamically;
 
 public partial class MainWindow : Window
 {
+
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+    public static MainWindow Instance { get; private set; }
+    public static Canvas BigScreen { get; private set; }
+
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainWindow()
     {
         InitializeComponent();
+        Instance = this;
 
+        Menus.TopMenu.applyDefaultStyling();
 
         var j = new Joint(30, 30, 'A').Connect(new Joint(130, 30, 'B'));
         var j11 = new Joint(120, 60, 'C');
-        var c = new EllipseBase(new Joint(250, 250, 'D'), new Joint(350, 250, 'E'), 150);
-        var c2 = new EllipseBase(new Joint(400, 400, 'F'), new Joint(400, 400, 'F'), 100);
         var t = new Triangle(new Joint(670, 320, 'G'), new Joint(850, 280, 'H'), new Joint(960, 520, 'I'));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInscribedCircle();
-        var circ3 = new Circle(new Joint(300, 300, 'J'), 200);
         var ca = this.Find<Canvas>("Screen");
+        BigScreen = ca;
         //var j1 = new Joint(100, 500);
         //j1.geometricPosition.Add(new RayFormula(500, 0));
         //j1.geometricPosition.Add(new CircleFormula(50, 120, 500));

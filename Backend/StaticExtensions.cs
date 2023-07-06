@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.VisualTree;
 using GeometryBackend;
 using System;
 using System.Collections.Generic;
@@ -39,5 +41,32 @@ public static class StaticExtensions
     public static double Pow(this double b, double exponent)
     {
         return Math.Pow(b, exponent);
+    }
+
+
+    public static Point GetPosition(this Control element)
+    {
+        Point position = new Point(0, 0);
+
+        if (element != null)
+        {
+            IVisual visual = (IVisual)element;
+            IVisual rootVisual = visual.GetVisualRoot();
+
+            if (rootVisual != null)
+            {
+#pragma warning disable CS8629 // Nullable value type may be null.
+                position = visual.TranslatePoint(new Point(0, 0), rootVisual).Value; // Must be non-null here
+#pragma warning restore CS8629 // Nullable value type may be null.
+            }
+        }
+
+        return position;
+    }
+
+    public static void SetPosition(this Control element, double x, double y)
+    {
+        Canvas.SetLeft(element, x);
+        Canvas.SetTop(element, y);
     }
 }

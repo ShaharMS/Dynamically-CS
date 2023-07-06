@@ -108,10 +108,7 @@ public class Circle : EllipseBase
     }
     void center_OnChange(object? sender, AvaloniaPropertyChangedEventArgs e)
     {
-        if (e.Property.Name == nameof(center.Margin))
-        {
-            updateFormula();
-        }
+        updateFormula();
     }
 }
 
