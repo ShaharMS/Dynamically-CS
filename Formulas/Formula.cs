@@ -14,8 +14,3 @@ public interface Formula
     public Point? GetClosestOnFormula(Point point);
 }
 
-public class ChangeListener
-{
-    public List<Action<double, double, double, double>> onMove = new List<Action<double, double, double, double>>();
-    public List<Action> onChange = new List<Action>();
-}

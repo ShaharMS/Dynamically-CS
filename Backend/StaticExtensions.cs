@@ -1,14 +1,14 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
-using GeometryBackend;
+using Dynamically.Backend.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StaticExtensions;
+namespace Dynamically.Backend;
 
 public static class StaticExtensions
 {
@@ -21,8 +21,8 @@ public static class StaticExtensions
 
     public static double DistanceTo(this Joint from, Joint to)
     {
-        double x = from.x - to.x;
-        double y = from.y - to.y;
+        double x = from.X - to.X;
+        double y = from.Y - to.Y;
         return Math.Sqrt(x * x + y * y);
     }
     public static double DegreesTo(this Point from, Point to)

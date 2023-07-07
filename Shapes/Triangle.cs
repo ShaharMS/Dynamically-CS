@@ -1,8 +1,8 @@
 using Avalonia;
 using Dynamically.Formulas;
-using GeometryBackend;
-using GraphicsBackend;
-using StaticExtensions;
+using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
+using Dynamically.Backend;
 using System;
 
 namespace Dynamically.Shapes;
@@ -12,6 +12,10 @@ public class Triangle : DraggableGraphic
     public Joint joint1;
     public Joint joint2;
     public Joint joint3;
+
+    public Connection con12;
+    public Connection con13;
+    public Connection con23;
 
     TriangleType _type = TriangleType.SCALENE;
 
@@ -27,8 +31,9 @@ public class Triangle : DraggableGraphic
         joint2 = j2;
         joint3 = j3;
 
-        joint1.Connect(joint2, joint3);
-        joint2.Connect(joint3);
+        con12 = joint1.Connect(joint2);
+        con13 = joint1.Connect(joint3);
+        con23 = joint2.Connect(joint3);
     }
 
     public Circle GenerateCircumCircle()
@@ -52,8 +57,8 @@ public class Triangle : DraggableGraphic
             double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
 
             // Calculate the coordinates of the center of the inscribed circle
-            double centerX = (a * joint1.x + b * joint2.x + c * joint3.x) / (a + b + c);
-            double centerY = (a * joint1.y + b * joint2.y + c * joint3.y) / (a + b + c);
+            double centerX = (a * joint1.X + b * joint2.X + c * joint3.X) / (a + b + c);
+            double centerY = (a * joint1.Y + b * joint2.Y + c * joint3.Y) / (a + b + c);
 
             return new Stats
             {
@@ -65,16 +70,16 @@ public class Triangle : DraggableGraphic
         var stats = GetCircleStats();
 
         Circle circle = new Circle(new Joint(stats.x, stats.y), stats.r);
-        circle.center.draggable = false;
-        circle.draggable = false;
+        circle.center.Draggable = false;
+        circle.Draggable = false;
 
         foreach (var j in new[] {joint1, joint2, joint3})
         {
-            j.onMoved.Add((double _, double _, double _, double _) =>
+            j.OnMoved.Add((double _, double _, double _, double _) =>
             {
                 var stats = GetCircleStats();
-                circle.center.x = stats.x;
-                circle.center.y = stats.y;
+                circle.center.X = stats.x;
+                circle.center.Y = stats.y;
                 circle.radius = stats.r;
                 circle.updateFormula();
                 circle.InvalidateVisual();
@@ -85,7 +90,20 @@ public class Triangle : DraggableGraphic
     }
     TriangleType ChangeType(TriangleType type)
     {
-        return type;
+        switch (type) {
+            case TriangleType.EQUILATERAL:
+                var a123 = Tools.GetDegreesBetween3Points(joint1, joint2, joint3);
+                var a132 = Tools.GetDegreesBetween3Points(joint1, joint3, joint2);
+                var a213 = Tools.GetDegreesBetween3Points(joint2, joint1, joint3);
+                break;
+            case TriangleType.ISOSCELES:
+                break;
+            case TriangleType.RIGHT:
+                break;
+            case TriangleType.SCALENE:
+                break;
+        }
+        return _type = type;
     }
 }
 

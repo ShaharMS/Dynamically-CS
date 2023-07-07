@@ -1,5 +1,6 @@
 ﻿using Avalonia;
-using StaticExtensions;
+using Dynamically.Backend;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ public class RayFormula : ChangeListener, Formula
         {
             var prev = _yIntercept;
             _yIntercept = value;
-            foreach (var l in onMove) l(0, value, 0, prev);
+            foreach (var l in OnMove) l(0, value, 0, prev);
         }
     }
     double _slope;
@@ -30,7 +31,7 @@ public class RayFormula : ChangeListener, Formula
         set
         {
             _slope = value;
-            foreach (var l in onChange) l();
+            foreach (var l in OnChange) l();
         }
     }
 
@@ -136,6 +137,12 @@ public class RayFormula : ChangeListener, Formula
         double distance = Math.Sqrt(dx * dx + dy * dy);
 
         return distance;
+    }
+
+    public Point[] GetPointsByDistanceFrom(Point start, double distance)
+    {
+        var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
+        return new[] { new Point(start.X + dx, SolveForY(start.X + dx)[0]), new Point(start.X - dx, SolveForY(start.X - dx)[0]) };
     }
     public Point? GetClosestOnFormula(double x, double y)
     {

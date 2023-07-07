@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using StaticExtensions;
+using Dynamically.Backend;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ public class CircleFormula : ChangeListener, Formula
         set
         {
             _radius = value;
-            foreach (var l in onChange) l();
+            foreach (var l in OnChange) l();
         }
     }
     double _centerX;
@@ -27,7 +27,7 @@ public class CircleFormula : ChangeListener, Formula
         {
             var prev = _centerX;
             _centerX = value;
-            foreach (var l in onMove) l(value, _centerY, prev, _centerY);
+            foreach (var l in OnMove) l(value, _centerY, prev, _centerY);
         }
     }
 
@@ -39,7 +39,7 @@ public class CircleFormula : ChangeListener, Formula
         {
             var prev = _centerY;
             _centerY = value;
-            foreach (var l in onMove) l(_centerX, value, _centerX, prev);
+            foreach (var l in OnMove) l(_centerX, value, _centerX, prev);
         }
     }
 

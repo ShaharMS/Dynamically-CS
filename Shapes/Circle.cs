@@ -1,7 +1,8 @@
 ﻿using Avalonia;
+using Avalonia.Media;
 using Dynamically.Formulas;
-using GeometryBackend;
-using GraphicsBackend;
+using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ public class Circle : EllipseBase
     {
         this.radius = radius;
         this.center = center;
-        formula = new CircleFormula(radius, center.x, center.y);
+        formula = new CircleFormula(radius, center.X, center.Y);
         this.center.PropertyChanged += center_OnChange;
         onDistanceSumChange = updateFormula;
     }
@@ -75,24 +76,24 @@ public class Circle : EllipseBase
         }
 
         // Get the perpendicular bisector of (x1, y1) and (x2, y2).
-        double x1 = (joint2.x + joint1.x) / 2;
-        double y1 = (joint2.y + joint1.y) / 2;
-        double dy1 = joint2.x - joint1.x;
-        double dx1 = -(joint2.y - joint1.y);
+        double x1 = (joint2.X + joint1.X) / 2;
+        double y1 = (joint2.Y + joint1.Y) / 2;
+        double dy1 = joint2.X - joint1.X;
+        double dx1 = -(joint2.Y - joint1.Y);
 
         // Get the perpendicular bisector of (x2, y2) and (x3, y3).
-        double x2 = (joint3.x + joint2.x) / 2;
-        double y2 = (joint3.y + joint2.y) / 2;
-        double dy2 = joint3.x - joint2.x;
-        double dx2 = -(joint3.y - joint2.y);
+        double x2 = (joint3.X + joint2.X) / 2;
+        double y2 = (joint3.Y + joint2.Y) / 2;
+        double dy2 = joint3.X - joint2.X;
+        double dx2 = -(joint3.Y - joint2.Y);
 
         // See where the lines intersect.
         Point intersection;
         FindIntersection(new Point(x1, y1), new Point(x1 + dx1, y1 + dy1), new Point(x2, y2), new Point(x2 + dx2, y2 + dy2), out _, out intersection);
 
         var center = intersection;
-        double dx = center.X - joint1.x;
-        double dy = center.Y - joint1.y;
+        double dx = center.X - joint1.X;
+        double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
         this.center = center;
@@ -102,8 +103,8 @@ public class Circle : EllipseBase
 
     public void updateFormula()
     {
-        formula.centerX = center.x;
-        formula.centerY = center.y;
+        formula.centerX = center.X;
+        formula.centerY = center.Y;
         formula.radius = radius;
     }
     void center_OnChange(object? sender, AvaloniaPropertyChangedEventArgs e)

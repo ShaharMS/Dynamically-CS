@@ -1,5 +1,6 @@
-﻿using GeometryBackend;
-using GraphicsBackend;
+﻿
+using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

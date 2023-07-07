@@ -4,7 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Dynamically;
 
-namespace Menus;
+namespace Dynamically.Menus;
 
 public class TopMenu
 {

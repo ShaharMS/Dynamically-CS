@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net6.0</TargetFramework>
@@ -34,12 +34,13 @@
   </ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Design\" />
 		<Folder Include="\Shapes" />
 		<Folder Include="\Backend" />
 		<Folder Include="\Math" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<AvaloniaResource Include="Assets\**"/>
+		<AvaloniaResource Include="Assets\**" />
 	</ItemGroup>
 </Project>
