@@ -92,9 +92,18 @@ public class Triangle : DraggableGraphic
     {
         switch (type) {
             case TriangleType.EQUILATERAL:
-                var a123 = Tools.GetDegreesBetween3Points(joint1, joint2, joint3);
-                var a132 = Tools.GetDegreesBetween3Points(joint1, joint3, joint2);
-                var a213 = Tools.GetDegreesBetween3Points(joint2, joint1, joint3);
+                var a123ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a132ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a213ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                if (a123ClosenessTo60Deg < a132ClosenessTo60Deg && a123ClosenessTo60Deg < a213ClosenessTo60Deg) {
+
+                } 
+                else if (a132ClosenessTo60Deg < a123ClosenessTo60Deg && a123ClosenessTo60Deg < a213ClosenessTo60Deg) {
+
+                } 
+                else {
+
+                }
                 break;
             case TriangleType.ISOSCELES:
                 break;
