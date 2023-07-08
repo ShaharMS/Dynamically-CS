@@ -5,5 +5,9 @@
         "comments": "off",
         "strings": "off"
     },
-    "editor.suggestOnTriggerCharacters": true
+    "editor.suggestOnTriggerCharacters": true,
+    "cSpell.words": [
+        "Avalonia",
+        "semiperimeter"
+    ]
 }

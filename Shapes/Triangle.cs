@@ -19,7 +19,7 @@ public class Triangle : DraggableGraphic
 
     TriangleType _type = TriangleType.SCALENE;
 
-    public TriangleType type
+    public TriangleType Type
     {
         get => _type;
         set => ChangeType(value);
@@ -73,7 +73,7 @@ public class Triangle : DraggableGraphic
         circle.center.Draggable = false;
         circle.Draggable = false;
 
-        foreach (var j in new[] {joint1, joint2, joint3})
+        foreach (var j in new[] { joint1, joint2, joint3 })
         {
             j.OnMoved.Add((double _, double _, double _, double _) =>
             {
@@ -90,20 +90,67 @@ public class Triangle : DraggableGraphic
     }
     TriangleType ChangeType(TriangleType type)
     {
-        switch (type) {
+        switch (type)
+        {
             case TriangleType.EQUILATERAL:
-                var a123ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-                var a132ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-                var a213ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-                if (a123ClosenessTo60Deg < a132ClosenessTo60Deg && a123ClosenessTo60Deg < a213ClosenessTo60Deg) {
+                void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
+                {
+                    // ∠ABC is the most similar to 60deg, therefore it should be preserved.
+                    // We'll do this by averaging AB and BC, resetting their length, and BC will 
+                    // automatically be the same length as AC, because of equilateral definition.
 
-                } 
-                else if (a132ClosenessTo60Deg < a123ClosenessTo60Deg && a123ClosenessTo60Deg < a213ClosenessTo60Deg) {
+                    // To "Fix" the angle, we'll calculate four points, which create the angle of 60, or, PI/3:
+                    // First, find the angle of AB with the X axis:
+                    double radians = Math.Atan2(A.Y - B.Y, A.X - B.X);
 
-                } 
-                else {
+                    // Then, find the candidates: (x: +-d*cos(radians + PI/3), y: +-d*sin(radians + PI/3))
+                    // To find d, we'll average AB and BC:
+                    double averageDistance = (A.DistanceTo(B) + B.DistanceTo(C)) / 2;
+                    Point[] potentialPositions = new Point[4];
+                    int currentIndex = 0;
+                    foreach (int sinSign in new[] { 1, -1 })
+                    {
+                        foreach (int cosSign in new[] { 1, -1 })
+                        {
+                            potentialPositions[currentIndex] = new Point(
+                                cosSign * averageDistance * Math.Cos(radians + Math.PI / 3),
+                                sinSign * averageDistance * Math.Sin(radians + Math.PI / 3)
+                            );
+                            currentIndex++;
+                        }
+                    }
+                    // The candidate who's distance to point C is the shortest, is the expected one:
+                    double minDistance = double.PositiveInfinity;
+                    Point chosen = new Point(-1, -1); // just a filler
+                    foreach (Point candidate in potentialPositions)
+                    {
+                        var d = candidate.DistanceTo(C);
+                        if (d < minDistance)
+                        {
+                            minDistance = d;
+                            chosen = candidate;
+                        }
+                    }
+                    // Now, set C:
+                    C.X = chosen.X;
+                    C.Y = chosen.Y;
 
+                    // After translating C to the correct position, we need to reevaluate AB's length, since it needs to match (AB + BC) / 2
+                    // Since B is the origin, we need to make sure the length manipulation happens to A, not B:
+                    con12.joint1 = B;
+                    con12.joint2 = A;
+                    con12.Length = averageDistance;
+
+                    // Now, because one angle is 60deg, and its incased in two sides of the same length, we must have an equilateral
+                    // (isosceles with its head angle = 60deg)
+                    // Were pretty much done :)
                 }
+                var a_ABC_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a_ACB_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a_BAC_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                if (a_ABC_ClosenessTo60Deg < a_ACB_ClosenessTo60Deg && a_ABC_ClosenessTo60Deg < a_BAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint2, joint3);
+                else if (a_ACB_ClosenessTo60Deg < a_ABC_ClosenessTo60Deg && a_ACB_ClosenessTo60Deg < a_BAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint3, joint2);
+                else MakeEquilateralRelativeToABC(joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES:
                 break;

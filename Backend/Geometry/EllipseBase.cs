@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using Dynamically.Backend;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -55,14 +54,14 @@ public class EllipseBase : DraggableGraphic, IDrawable
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared
-        var info = ConvertFocalsToEllipse(focal1.X, focal1.Y, focal2.X, focal2.Y);
+        var info = ConvertFociToEllipse(focal1.X, focal1.Y, focal2.X, focal2.Y);
 
         var pen = new Pen(new SolidColorBrush(Colors.Black), 4);
         context.DrawEllipse(null, pen, new Point(info.X + info.Width / 2, info.Y + info.Height / 2), info.Width / 2, info.Height / 2);
     }
     public void reposition() { }
 
-    EllipseData ConvertFocalsToEllipse(double focus1X, double focus1Y, double focus2X, double focus2Y)
+    EllipseData ConvertFociToEllipse(double focus1X, double focus1Y, double focus2X, double focus2Y)
     {
         var distance = Math.Sqrt(Math.Pow(focus2X - focus1X, 2) + Math.Pow(focus2Y - focus1Y, 2));
         var semiMajorAxis = distanceSum / 2;
