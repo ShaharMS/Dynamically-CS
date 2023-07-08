@@ -1,0 +1,9 @@
+{
+    "dotnet.defaultSolution": "Dynamically.sln",
+    "editor.quickSuggestions": {
+        "other": "on",
+        "comments": "off",
+        "strings": "off"
+    },
+    "editor.suggestOnTriggerCharacters": true
+}
