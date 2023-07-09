@@ -53,7 +53,8 @@ public class Connection : DraggableGraphic, IDrawable
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
-            foreach (Connection c in Connection.all) c.reposition();
+            joint1.jointMenu.EvaluateSuggestions();
+            joint2.jointMenu.EvaluateSuggestions();
         });
 
         all.Add(this);

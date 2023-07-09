@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Dynamically.Backend.Geometry;
@@ -12,20 +13,73 @@ public class JointContextMenu : ContextMenu
 {
     public Joint Subject;
 
-    public List<MenuItem> CurrentItems = new();
+    AvaloniaList<MenuItem> menuItems = new();
 
-    public JointContextMenu(Joint subject) {
+    public JointContextMenu(Joint subject) : base() {
         Subject = subject;
-        ContextMenuOpening += EvaluateSuggestions;
+        List<object> menuItems = new List<object>();
+
+        MenuItem menuItem1 = new MenuItem
+        {
+            Header = "Option 1"
+        };
+        menuItems.Add(menuItem1);
+
+        MenuItem submenuItem = new MenuItem
+        {
+            Header = "Submenu"
+        };
+
+        MenuItem subMenuItem1 = new MenuItem
+        {
+            Header = "Sub-option 1"
+        };
+        submenuItem.Items = new List<object> { subMenuItem1 };
+
+        MenuItem subMenuItem2 = new MenuItem
+        {
+            Header = "Sub-option 2"
+        };
+        submenuItem.Items = new List<object> { subMenuItem2 };
+
+        menuItems.Add(submenuItem);
+
+        this.Items = menuItems;
+
     }
 
-    public void EvaluateSuggestions(object? sender, EventArgs e) {
+    public void EvaluateSuggestions() {
         // First, Basics:
-        CurrentItems.Clear();
+        menuItems.Clear();
 
-        CurrentItems.Add(Generate_Rename());
+        //menuItems.Add(Generate_Rename());
 
-        Items = CurrentItems;
+        MenuItem menuItem1 = new MenuItem
+        {
+            Header = "Option 1"
+        };
+        menuItems.Add(menuItem1);
+
+        MenuItem submenuItem = new MenuItem
+        {
+            Header = "Submenu"
+        };
+
+        MenuItem subMenuItem1 = new MenuItem
+        {
+            Header = "Sub-option 1"
+        };
+        submenuItem.Items = new List<object> { subMenuItem1 };
+
+        MenuItem subMenuItem2 = new MenuItem
+        {
+            Header = "Sub-option 2"
+        };
+        submenuItem.Items = new List<object> { subMenuItem2 };
+
+        menuItems.Add(submenuItem);
+
+        Items = menuItems;
 
         InvalidateVisual();
     }
@@ -65,8 +119,7 @@ public class JointContextMenu : ContextMenu
         {
             Header = "Rename..."
         };
-        var parts = new[] {vBar};
-        item.Items = parts;
+        item.Items = new AvaloniaList<Control> { item };
 
         return item;
     }
