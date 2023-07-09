@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
+using Dynamically.Menus.ContextMenus;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -69,6 +70,8 @@ public class Joint : DraggableGraphic, IDrawable
 
         X = x;
         Y = y;
+
+        ContextMenu = new JointContextMenu(this);
 
         OnMoved.Add((double _, double _, double _, double _) =>
         {

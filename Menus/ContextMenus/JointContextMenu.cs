@@ -16,16 +16,21 @@ public class JointContextMenu : ContextMenu
 
     public JointContextMenu(Joint subject) {
         Subject = subject;
-        Subject.ContextMenu = this;
         ContextMenuOpening += EvaluateSuggestions;
     }
 
     public void EvaluateSuggestions(object? sender, EventArgs e) {
         // First, Basics:
+        CurrentItems.Clear();
 
+        CurrentItems.Add(Generate_Rename());
+
+        Items = CurrentItems;
+
+        InvalidateVisual();
     }
 
-    void Generate_Rename() {
+    MenuItem Generate_Rename() {
         var field = new TextBox
         {
             NewLine = "",
@@ -42,5 +47,27 @@ public class JointContextMenu : ContextMenu
                 field.Text = e.Key.ToString().ToUpper()[..1];
             }
         };
+
+        var hBar = new DockPanel 
+        {
+            LastChildFill = true
+        };
+        DockPanel.SetDock(hBar, Dock.Left);
+        hBar.Children.Add(new Label {Content = "New Name:"});
+        hBar.Children.Add(field);
+
+        var vBar = new DockPanel();
+        DockPanel.SetDock(vBar, Dock.Top);
+        vBar.Children.Add(hBar);
+        vBar.Children.Add(new Label {Content = "(Press `enter` to confirm)"});
+
+        var item = new MenuItem
+        {
+            Header = "Rename..."
+        };
+        var parts = new[] {vBar};
+        item.Items = parts;
+
+        return item;
     }
 }
