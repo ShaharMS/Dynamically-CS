@@ -13,15 +13,23 @@ namespace Dynamically.Backend.Geometry;
 
 public class Joint : DraggableGraphic, IDrawable
 {
-    public static List<Joint> all = new List<Joint>();
+    public static List<Joint> all = new();
 
     public char id = ' ';
-    public List<Connection> connections = new List<Connection>();
+    public List<Connection> connections = new();
+
+    /// <summary>
+    /// This is used to associate joints with the shapes they're inside. <br/>
+    /// for example, given a circle, and a triangle formed with one joint being the center, 
+    /// the joint's <c>partOf</c> array would contain the circle and the triangle. <br />
+    /// When working together with geometric position, can provide a nice suggestions UI for what to do next.
+    /// </summary>
+    public List<DraggableGraphic> PartOf = new();
 
     public Color outlineColor;
     public Color fillColor;
 
-    List<Formula> _geometricPosition = new List<Formula>();
+    List<Formula> _geometricPosition = new();
     public List<Formula> geometricPosition
     {
         get => _geometricPosition;
@@ -59,26 +67,26 @@ public class Joint : DraggableGraphic, IDrawable
 
         this.id = id;
 
-        this.X = x;
-        this.Y = y;
+        X = x;
+        Y = y;
 
-        OnMoved.Add((double px, double py, double mx, double my) =>
+        OnMoved.Add((double _, double _, double _, double _) =>
         {
             if (geometricPosition.Count != 0)
             {
                 foreach (var position in geometricPosition)
                 {
-                    var newPos = position.GetClosestOnFormula(this.X, this.Y);
+                    var newPos = position.GetClosestOnFormula(X, Y);
                     if (newPos.HasValue)
                     {
-                        this.X = newPos.Value.X;
-                        this.Y = newPos.Value.Y;
+                        X = newPos.Value.X;
+                        Y = newPos.Value.Y;
                     }
                 }
             }
             foreach (Connection c in Connection.all) c.InvalidateVisual();
         });
-        OnDragged.Add((double cx, double cy, double prx, double pry) =>
+        OnDragged.Add((double _, double _, double _, double _) =>
         {
             foreach (Connection c in Connection.all) c.reposition();
         });
@@ -98,7 +106,7 @@ public class Joint : DraggableGraphic, IDrawable
 
     public Connection Connect(Joint to, string connectionText = "")
     {
-        // Dont connect something twice
+        // Don't connect something twice
         foreach (Connection c in connections.Concat(to.connections))
         {
             if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
@@ -116,7 +124,7 @@ public class Joint : DraggableGraphic, IDrawable
         foreach (Joint joint in joints)
         {
             var doNothing = false;
-            // Dont connect something twice
+            // Don't connect something twice
             foreach (Connection c in connections.Concat(joint.connections))
             {
                 if ((c.joint1 == this && c.joint2 == joint) || (c.joint2 == this && c.joint1 == joint))
@@ -136,7 +144,7 @@ public class Joint : DraggableGraphic, IDrawable
 
     public void Disconnect(Joint joint)
     {
-        foreach (Connection c in this.connections)
+        foreach (Connection c in connections)
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 connections.Remove(c);
