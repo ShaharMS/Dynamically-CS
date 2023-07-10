@@ -52,7 +52,7 @@ public class CircleFormula : ChangeListener, Formula
 
     public double[] SolveForX(double y)
     {
-        if (y > centerY + radius || y < centerY - radius) return new double[0];
+        if (y > centerY + radius || y < centerY - radius) return Array.Empty<double>();
         var x1 = centerX - Math.Sqrt(-(centerY - y).Pow(2) + radius.Pow(2));
         var x2 = centerX + Math.Sqrt(-(centerY - y).Pow(2) + radius.Pow(2));
         return new[] { x1, x2 };
@@ -60,7 +60,7 @@ public class CircleFormula : ChangeListener, Formula
 
     public double[] SolveForY(double x)
     {
-        if (x > centerX + radius || x < centerX - radius) return new double[0];
+        if (x > centerX + radius || x < centerX - radius) return Array.Empty<double>();
         var y1 = centerY - Math.Sqrt(-(centerX - x).Pow(2) + radius.Pow(2));
         var y2 = centerY + Math.Sqrt(-(centerX - x).Pow(2) + radius.Pow(2));
         return new[] { y1, y2 };

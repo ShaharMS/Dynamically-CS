@@ -64,7 +64,7 @@ public class Joint : DraggableGraphic, IDrawable
         }
     }
 
-    public JointContextMenu jointMenu;
+    public JointContextMenuProvider Provider;
     public Joint(double x, double y, char id = 'A')
     {
         all.Add(this);
@@ -73,9 +73,10 @@ public class Joint : DraggableGraphic, IDrawable
 
         X = x;
         Y = y;
-
-        jointMenu = new JointContextMenu(this);
-        ContextMenu = jointMenu;
+        ContextMenu = new ContextMenu();
+        Provider = new JointContextMenuProvider(this);
+        ContextMenu.Items = Provider.Items;
+        
 
         OnMoved.Add((double _, double _, double _, double _) =>
         {
@@ -99,8 +100,6 @@ public class Joint : DraggableGraphic, IDrawable
         });
 
         InvalidateVisual();
-
-        this.ContextMenu = new JointContextMenu(this);
     }
 
     public override void Render(DrawingContext context)

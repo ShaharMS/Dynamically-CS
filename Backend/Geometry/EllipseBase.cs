@@ -14,7 +14,7 @@ namespace Dynamically.Backend.Geometry;
 public class EllipseBase : DraggableGraphic, IDrawable
 {
 
-    public static List<EllipseBase> all = new List<EllipseBase>();
+    public static List<EllipseBase> all = new();
 
     public Joint focal1;
     public Joint focal2;

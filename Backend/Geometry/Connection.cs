@@ -53,8 +53,8 @@ public class Connection : DraggableGraphic, IDrawable
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
-            joint1.jointMenu.EvaluateSuggestions();
-            joint2.jointMenu.EvaluateSuggestions();
+            joint1.Provider.EvaluateSuggestions();
+            joint2.Provider.EvaluateSuggestions();
         });
 
         all.Add(this);

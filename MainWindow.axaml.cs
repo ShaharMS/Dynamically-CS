@@ -31,8 +31,10 @@ public partial class MainWindow : Window
         var t = new Triangle(new Joint(570, 120, 'G'), new Joint(750, 80, 'H'), new Joint(860, 320, 'I'));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInscribedCircle();
-        var ca = new BigScreen();
-        ca.Name = "BigScreen";
+        var ca = new BigScreen
+        {
+            Name = "BigScreen"
+        };
         BigScreen = ca;
 
         MainDisplay.Children.Add(BigScreen);

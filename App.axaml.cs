@@ -19,7 +19,7 @@ public partial class App : Application
             desktop.MainWindow = new MainWindow();
 
             Log.current.Show();
-            Log.Write("Application start!\n-----------------");
+            Log.Write("Application start!\n--------------------------");
         }
 
         base.OnFrameworkInitializationCompleted();
