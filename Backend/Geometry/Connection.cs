@@ -36,7 +36,7 @@ public class Connection : DraggableGraphic, IDrawable
         org2X = t.X;
         org2Y = t.Y;
         this.dataText = dataText;
-        text = "" + f.id + t.id;
+        text = "" + f.Id + t.Id;
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
@@ -55,6 +55,7 @@ public class Connection : DraggableGraphic, IDrawable
         {
             joint1.Provider.EvaluateSuggestions();
             joint2.Provider.EvaluateSuggestions();
+            reposition();
         });
 
         all.Add(this);

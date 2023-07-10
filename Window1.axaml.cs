@@ -1,5 +1,7 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Avalonia.Media;
 using System.Collections.Generic;
 
 namespace Dynamically
@@ -12,11 +14,21 @@ namespace Dynamically
         public Log()
         {
             InitializeComponent();
-            consoleTextBlock = new TextBlock();
-            consoleTextBlock.Width = this.Width;
-            consoleTextBlock.Height = this.Height;
-            consoleTextBlock.FontSize = 16;
-            Content = consoleTextBlock;
+            consoleTextBlock = new TextBlock
+            {
+                Width = this.Width,
+                Height = this.Height,
+                FontSize = 16
+            };
+
+            ScrollViewer scrollViewer = new ScrollViewer
+            {
+                Content = consoleTextBlock,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+            };
+
+            Content = scrollViewer;
         }
 
         private void InitializeComponent()

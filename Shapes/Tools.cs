@@ -57,8 +57,8 @@ class Tools
         Circle circle = new Circle(new Joint(center.X, center.Y), radius);
         foreach(var joint in new[] { joint1, joint2, joint3 })
         {
-            joint.geometricPosition.Add(circle.formula);
-            joint.geometricPosition = joint.geometricPosition; // Trigger setter
+            joint.GeometricPosition.Add(circle.formula);
+            joint.GeometricPosition = joint.GeometricPosition; // Trigger setter
         }
 
         return circle;

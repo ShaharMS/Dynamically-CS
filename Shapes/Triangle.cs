@@ -75,7 +75,7 @@ public class Triangle : DraggableGraphic
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Add((double _, double _, double _, double _) =>
+            j.OnMoved.Add((double _, double _, double mx, double my) =>
             {
                 var stats = GetCircleStats();
                 circle.center.X = stats.x;
@@ -83,6 +83,7 @@ public class Triangle : DraggableGraphic
                 circle.radius = stats.r;
                 circle.updateFormula();
                 circle.InvalidateVisual();
+                foreach (var listener in circle.center.OnMoved) listener(circle.center.X, circle.center.Y, mx, my);
             });
         }
 

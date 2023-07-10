@@ -38,7 +38,7 @@ public class JointContextMenuProvider
             NewLine = "",
             AcceptsTab = false,
             AcceptsReturn = false,
-            Text = Subject.id.ToString(),
+            Text = Subject.Id.ToString(),
             Watermark = "Letter",
             MaxLength = 1
         };
@@ -47,7 +47,7 @@ public class JointContextMenuProvider
         {
             if (e.Text == "\n" || e.Text == "\n\r")
             {
-                Subject.id = field.Text.ToCharArray()[0];
+                Subject.Id = field.Text.ToCharArray()[0];
                 //Hide hack
                 var prev = Subject.ContextMenu;
                 Subject.ContextMenu = null;
@@ -60,7 +60,7 @@ public class JointContextMenuProvider
         {
             if (e.Key == Key.Enter)
             {
-                Subject.id = field.Text.ToCharArray()[0];
+                Subject.Id = field.Text.ToCharArray()[0];
                 //Hide hack
                 var prev = Subject.ContextMenu;
                 Subject.ContextMenu = null;
@@ -171,13 +171,13 @@ public class JointContextMenuProvider
 //             NewLine = "",
 //             AcceptsTab = false,
 //             AcceptsReturn = false,
-//             Text = Subject.id.ToString(),
+//             Text = Subject.Id.ToString(),
 //             Watermark = "Letter"
 //         };
 //         field.SelectAll();
 //         field.KeyDown += (sender, e) => {
 //             if (e.Key == Key.Enter) {
-//                 Subject.id = field.Text.ToCharArray()[0];
+//                 Subject.Id = field.Text.ToCharArray()[0];
 //             } else if (field.Text.Length > 1) {
 //                 field.Text = e.Key.ToString().ToUpper()[..1];
 //             }
