@@ -1,5 +1,4 @@
 ﻿using Avalonia;
-using Dynamically.Backend;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -11,7 +10,7 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace Dynamically.Formulas;
 
-public class RayFormula : ChangeListener, Formula
+public class RayFormula : FormulaBase, Formula
 {
     double _yIntercept;
     public double yIntercept
@@ -144,24 +143,24 @@ public class RayFormula : ChangeListener, Formula
         var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
         return new[] { new Point(start.X + dx, SolveForY(start.X + dx)[0]), new Point(start.X - dx, SolveForY(start.X - dx)[0]) };
     }
-    public Point? GetClosestOnFormula(double x, double y)
+    public override Point? GetClosestOnFormula(double x, double y)
     {
         double nSlope = -1 / slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
         return Intersect(nRay);
     }
 
-    public Point? GetClosestOnFormula(Point point)
+    public override Point? GetClosestOnFormula(Point point)
     {
         return GetClosestOnFormula(point.X, point.Y);
     }
 
-    public double[] SolveForX(double y)
+    public override double[] SolveForX(double y)
     {
         return new double[] {(y - yIntercept) / slope};
     }
 
-    public double[] SolveForY(double x)
+    public override double[] SolveForY(double x)
     {
         return new double[] {slope * x + yIntercept};
     }

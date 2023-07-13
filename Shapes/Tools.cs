@@ -57,7 +57,9 @@ class Tools
         Circle circle = new Circle(new Joint(center.X, center.Y), radius);
         foreach(var joint in new[] { joint1, joint2, joint3 })
         {
-            joint.GeometricPosition.Add(circle.formula);
+#pragma warning disable CS8604 // Possible null reference argument.
+            joint.GeometricPosition.Add(circle.Formula); // Cannot be null here
+#pragma warning restore CS8604 // Possible null reference argument.
             joint.GeometricPosition = joint.GeometricPosition; // Trigger setter
         }
 

@@ -1,4 +1,5 @@
-﻿using Dynamically.Backend.Graphics;
+﻿using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,5 +10,5 @@ namespace Dynamically.Menus.ContextMenus;
 
 public interface IContextMenuSupporter
 {
-    public List<DraggableGraphic> PartOf { get; set; }
+    public Dictionary<Role, List<DraggableGraphic>> PartOf { get; set; }
 }

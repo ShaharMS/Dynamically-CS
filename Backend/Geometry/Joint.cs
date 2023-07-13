@@ -11,14 +11,13 @@ using Avalonia;
 using Dynamically.Menus.ContextMenus;
 using Avalonia.Controls;
 using Dynamically.Shapes;
-using Dynamically.Backend;
 using System.Runtime.CompilerServices;
 using Avalonia.Styling;
 using Dynamically.Screens;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Joint : DraggableGraphic, IDrawable
+public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 {
     public static List<Joint> all = new();
 
@@ -35,20 +34,33 @@ public class Joint : DraggableGraphic, IDrawable
 
     public List<Connection> Connections = new();
 
+    public List<Action<double, double>> OnRemoved = new();
+
     /// <summary>
     /// This is used to associate joints with the shapes they're inside. <br/>
     /// for example, given a circle, and a triangle formed with one joint being the center, 
     /// the joint's <c>partOf</c> array would contain the circle and the triangle. <br />
     /// When working together with geometric position, can provide a nice suggestions UI for what to do next.
     /// </summary>
-    public List<DraggableGraphic> PartOf = new();
+    public Dictionary<Role, List<DraggableGraphic>> PartOf
+    {
+        get => _partOf;
+        set => _partOf = value;
+    }
+    Dictionary<Role, List<DraggableGraphic>> _partOf = new();
+
 
     public JointContextMenuProvider Provider;
 
     public Label IdDisplay;
 
-    List<Formula> _geometricPosition = new();
-    public List<Formula> GeometricPosition
+    public bool GotRemoved
+    {
+        get => !MainWindow.BigScreen.Children.Contains(this);
+    }
+
+    List<FormulaBase> _geometricPosition = new();
+    public List<FormulaBase> GeometricPosition
     {
         get => _geometricPosition;
         set
@@ -56,7 +68,7 @@ public class Joint : DraggableGraphic, IDrawable
             _geometricPosition = value;
             foreach (var position in value)
             {
-                ((ChangeListener)position).OnChange.Add(() =>
+                ((FormulaBase)position).OnChange.Add(() =>
                 {
                     var newPos = position.GetClosestOnFormula(X, Y);
                     if (newPos.HasValue)
@@ -69,7 +81,7 @@ public class Joint : DraggableGraphic, IDrawable
                     foreach (Connection c in Connection.all) c.InvalidateVisual();
                 });
 
-                ((ChangeListener)position).OnMove.Add((curX, curY, preX, preY) =>
+                ((FormulaBase)position).OnMove.Add((curX, curY, preX, preY) =>
                 {
                     X = X - preX + curX;
                     Y = Y - preY + curY;
@@ -112,8 +124,14 @@ public class Joint : DraggableGraphic, IDrawable
             // Validate position
             if (GeometricPosition.Count != 0)
             {
+                var removeQueue = new List<FormulaBase>();
                 foreach (var position in GeometricPosition)
                 {
+                    if (position.queueRemoval)
+                    {
+                        removeQueue.Add(position);
+                        continue;
+                    }
                     var newPos = position.GetClosestOnFormula(X, Y);
                     if (newPos.HasValue)
                     {
@@ -121,6 +139,7 @@ public class Joint : DraggableGraphic, IDrawable
                         Y = newPos.Value.Y;
                     }
                 }
+                foreach (var item in removeQueue) GeometricPosition.Remove(item);
             }
             // Position is validated, now redraw connections & place text
             // text is placed in the middle of the biggest angle at the distance of fontSize + 4
@@ -128,7 +147,7 @@ public class Joint : DraggableGraphic, IDrawable
             {
                 c.InvalidateVisual();
                 if (c.joint1 == this) c.joint2.RepositionText();
-                else  c.joint1.RepositionText();
+                else c.joint1.RepositionText();
             }
             RepositionText();
         });
@@ -241,20 +260,106 @@ public class Joint : DraggableGraphic, IDrawable
 
     public void Disconnect(Joint joint)
     {
-        foreach (Connection c in Connections)
+        var past = Connections.ToList();
+        foreach (Connection c in past)
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+            {
                 Connections.Remove(c);
+                MainWindow.BigScreen.Children.Remove(c);
+            }
         }
-
-        foreach (Connection c in joint.Connections)
+        var past2 = joint.Connections.ToList();
+        foreach (Connection c in past2)
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+            {
                 joint.Connections.Remove(c);
+                MainWindow.BigScreen.Children.Remove(c);
+            }
         }
     }
 
+    public void Disconnect(params Joint[] joints)
+    {
+        foreach (Joint joint in joints)
+        {
+            var past = Connections.ToList();
+            foreach (Connection c in past)
+            {
+                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+                {
+                    Connections.Remove(c);
+                    MainWindow.BigScreen.Children.Remove(c);
+                }
+            }
 
+            var past2 = joint.Connections.ToList();
+            foreach (Connection c in past2)
+            {
+                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+                {
+                    joint.Connections.Remove(c);
+                    MainWindow.BigScreen.Children.Remove(c);
+                }
+            }
+        }
+
+    }
+
+    public void DisconnectAll()
+    {
+
+        foreach (Connection c in Connections)
+        {
+            MainWindow.BigScreen.Children.Remove(c);
+            if (c.joint1 != this) c.joint1.Connections.Remove(c);
+            else c.joint2.Connections.Remove(c);
+            if (c.joint1 != this) c.joint1.RepositionText();
+            else c.joint2.RepositionText();
+        }
+        Connections.Clear();
+        RepositionText();
+    }
+
+    public void RemoveFromBoard()
+    {
+        double sx = X, sy = Y;
+        DisconnectAll();
+
+        MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.BigScreen.Children.Remove(IdDisplay);
+
+        foreach (var pair in PartOf)
+        {
+            foreach (var draggable in pair.Value)
+            {
+                switch (pair.Key)
+                {
+                    case Role.TRIANGLE_Joint:
+                        if (draggable is Triangle)
+                        {
+                            ((Triangle)draggable).Dismantle();
+                        }
+                        break;
+                    case Role.CIRCLE_Center:
+                        if (draggable is Circle)
+                        {
+                            ((Circle)draggable).Dismantle();
+                        }
+                        break;
+                    default:
+                        Log.Write($"{pair.Key.ToString()} Unimplemented");
+                        break;
+                } 
+            }
+        }
+
+        foreach (var r in OnRemoved)
+        {
+            r(sx, sy);
+        }
+    }
 
     public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }
     public static implicit operator Joint(Point point) { return new Joint(point.X, point.Y); }

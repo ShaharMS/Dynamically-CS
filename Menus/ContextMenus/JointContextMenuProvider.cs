@@ -31,8 +31,24 @@ public class JointContextMenuProvider
 
     public void GenerateDefaults()
     {
-        Defaults = new List<Control>();
+        Defaults = new List<Control>
+        {
+            defaults_Rename(),
+            defaults_Remove()
+        };
+    }
 
+    public void EvaluateSuggestions()
+    {
+
+    }
+
+
+    // --------------------------------------
+    // Defaults
+    // --------------------------------------
+    MenuItem defaults_Rename()
+    {
         var field = new TextBox
         {
             NewLine = "",
@@ -56,7 +72,7 @@ public class JointContextMenuProvider
             if (e.Text == null) return;
             field.Text = e.Text.ToUpper();
         };
-        field.KeyDown += (sender, e) => 
+        field.KeyDown += (sender, e) =>
         {
             if (e.Key == Key.Enter)
             {
@@ -75,18 +91,26 @@ public class JointContextMenuProvider
         DockPanel.SetDock(hBar, Dock.Left);
         hBar.Children.Add(new Label { Content = "New Name:" });
         hBar.Children.Add(field);
-        
+
         var rename = new MenuItem
         {
             Header = "Rename...",
-            Items = new Control[] {hBar, new Label { Content = "(Press `enter` to confirm)" }}
-        };  
-        Defaults.Add(rename);
+            Items = new Control[] { hBar, new Label { Content = "(Press `enter` to confirm)" } }
+        };
+
+        return rename;
     }
-
-    public void EvaluateSuggestions()
+    MenuItem defaults_Remove()
     {
-
+        var remove = new MenuItem
+        {
+            Header = "Remove"
+        };
+        remove.Click += (sender, e) =>
+        {
+            Subject.RemoveFromBoard();
+        };
+        return remove;
     }
 }
 

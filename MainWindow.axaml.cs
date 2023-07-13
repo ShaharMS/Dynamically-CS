@@ -35,7 +35,7 @@ public partial class MainWindow : Window
         var j11 = new Joint(120, 60, 'C');
         var t = new Triangle(new Joint(570, 120, 'G'), new Joint(750, 80, 'H'), new Joint(860, 320, 'I'));
         var circ = t.GenerateCircumCircle();
-        var circ2 = t.GenerateInscribedCircle();
+        var circ2 = t.GenerateInCircle();
         
 
         MainDisplay.Children.Add(BigScreen);
@@ -46,5 +46,6 @@ public partial class MainWindow : Window
             ca.Children.Add(i);
         foreach (var i in Joint.all)
             ca.Children.Add(i);
+        Log.Write(j.joint1.GotRemoved);
     }
 }

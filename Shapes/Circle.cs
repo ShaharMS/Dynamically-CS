@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase
+public class Circle : EllipseBase, IDismantable
 {
     public Joint center;
 
@@ -27,15 +27,25 @@ public class Circle : EllipseBase
         }
     }
 
-    public CircleFormula formula;
+    public CircleFormula Formula;
 
     public Circle(Joint center, double radius) : base(center, center, radius * 2)
     {
         this.radius = radius;
         this.center = center;
-        formula = new CircleFormula(radius, center.X, center.Y);
+        Formula = new CircleFormula(radius, center.X, center.Y);
         this.center.PropertyChanged += center_OnChange;
         onDistanceSumChange = updateFormula;
+
+
+        if (center.PartOf.ContainsKey(Role.CIRCLE_Center)) center.PartOf[Role.CIRCLE_Center].Add(this);
+        else center.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { this });
+    }
+    public void Dismantle()
+    {
+        Formula.queueRemoval = true;
+        onResize.Clear();
+        MainWindow.BigScreen.Children.Remove(this);
     }
 
     public void Set(Joint center, double radius)
@@ -45,7 +55,7 @@ public class Circle : EllipseBase
         updateFormula();
     }
 
-    public void Set(Joint joint1, Joint joint2, Joint joint3) 
+    public void Set(Joint joint1, Joint joint2, Joint joint3)
     {
         void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
         {
@@ -103,9 +113,10 @@ public class Circle : EllipseBase
 
     public void updateFormula()
     {
-        formula.centerX = center.X;
-        formula.centerY = center.Y;
-        formula.radius = radius;
+        if (Formula == null) return;
+        Formula.centerX = center.X;
+        Formula.centerY = center.Y;
+        Formula.radius = radius;
     }
     void center_OnChange(object? sender, AvaloniaPropertyChangedEventArgs e)
     {

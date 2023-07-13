@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Dynamically.Formulas;
-public class CircleFormula : ChangeListener, Formula
+public class CircleFormula : FormulaBase, Formula
 {
     double _radius;
     public double radius
@@ -50,7 +50,7 @@ public class CircleFormula : ChangeListener, Formula
         this.centerY = centerY;
     }
 
-    public double[] SolveForX(double y)
+    public override double[] SolveForX(double y)
     {
         if (y > centerY + radius || y < centerY - radius) return Array.Empty<double>();
         var x1 = centerX - Math.Sqrt(-(centerY - y).Pow(2) + radius.Pow(2));
@@ -58,7 +58,7 @@ public class CircleFormula : ChangeListener, Formula
         return new[] { x1, x2 };
     }
 
-    public double[] SolveForY(double x)
+    public override double[] SolveForY(double x)
     {
         if (x > centerX + radius || x < centerX - radius) return Array.Empty<double>();
         var y1 = centerY - Math.Sqrt(-(centerX - x).Pow(2) + radius.Pow(2));
@@ -72,7 +72,7 @@ public class CircleFormula : ChangeListener, Formula
     /// <param name="px"></param>
     /// <param name="py"></param>
     /// <returns></returns>
-    public Point? GetClosestOnFormula(double px, double py)
+    public override Point? GetClosestOnFormula(double px, double py)
     {
         //Avoid divide by 0 error:
         if (px == centerX && py == centerY) return null;
@@ -84,7 +84,7 @@ public class CircleFormula : ChangeListener, Formula
         return new Point(aX, aY);
     }
 
-    public Point? GetClosestOnFormula(Point point)
+    public override Point? GetClosestOnFormula(Point point)
     {
         return GetClosestOnFormula(point.X, point.Y);
     }

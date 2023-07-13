@@ -4,10 +4,11 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend;
 using System;
+using System.Collections.Generic;
 
 namespace Dynamically.Shapes;
 
-public class Triangle : DraggableGraphic
+public class Triangle : DraggableGraphic, IDismantable
 {
     public Joint joint1;
     public Joint joint2;
@@ -16,6 +17,8 @@ public class Triangle : DraggableGraphic
     public Connection con12;
     public Connection con13;
     public Connection con23;
+
+    private Circle? incircle;
 
     TriangleType _type = TriangleType.SCALENE;
 
@@ -34,6 +37,30 @@ public class Triangle : DraggableGraphic
         con12 = joint1.Connect(joint2);
         con13 = joint1.Connect(joint3);
         con23 = joint2.Connect(joint3);
+
+        foreach (var j in new[] { joint1, joint2, joint3 })
+        {
+            if (j.PartOf.ContainsKey(Role.TRIANGLE_Joint)) j.PartOf[Role.TRIANGLE_Joint].Add(this);
+            else j.PartOf.Add(Role.TRIANGLE_Joint, new List<DraggableGraphic> { this });
+        }
+    }
+
+    public void Dismantle()
+    {
+        if (joint1.GotRemoved) joint1.Disconnect(joint2, joint3);
+        if (joint2.GotRemoved) joint2.Disconnect(joint1, joint3);
+        if (joint3.GotRemoved) joint3.Disconnect(joint2, joint1);
+
+        foreach (var j in new[] { joint1, joint2, joint3 })
+        {
+            j.OnMoved.Remove(RecalcuateInCircle);
+        }
+        if (incircle != null)
+        {
+            incircle.Draggable = true;
+            incircle.center.Draggable = true;
+        }
+
     }
 
     public Circle GenerateCircumCircle()
@@ -41,53 +68,58 @@ public class Triangle : DraggableGraphic
         return Tools.CircleFrom3Joints(joint1, joint2, joint3);
     }
 
-    public Circle GenerateInscribedCircle()
+    public Circle GenerateInCircle()
     {
-        Stats GetCircleStats()
-        {
-            // Calculate the lengths of the triangle sides
-            double a = joint2.DistanceTo(joint3);
-            double b = joint1.DistanceTo(joint3);
-            double c = joint1.DistanceTo(joint2);
-
-            // Calculate the semiperimeter of the triangle
-            double s = (a + b + c) / 2;
-
-            // Calculate the radius of the inscribed circle
-            double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
-
-            // Calculate the coordinates of the center of the inscribed circle
-            double centerX = (a * joint1.X + b * joint2.X + c * joint3.X) / (a + b + c);
-            double centerY = (a * joint1.Y + b * joint2.Y + c * joint3.Y) / (a + b + c);
-
-            return new Stats
-            {
-                x = centerX,
-                y = centerY,
-                r = radius
-            };
-        }
         var stats = GetCircleStats();
 
         Circle circle = new Circle(new Joint(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
         circle.Draggable = false;
+        incircle = circle;
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Add((double _, double _, double mx, double my) =>
-            {
-                var stats = GetCircleStats();
-                circle.center.X = stats.x;
-                circle.center.Y = stats.y;
-                circle.radius = stats.r;
-                circle.updateFormula();
-                circle.InvalidateVisual();
-                foreach (var listener in circle.center.OnMoved) listener(circle.center.X, circle.center.Y, mx, my);
-            });
+            j.OnMoved.Add(RecalcuateInCircle);
         }
 
         return circle;
+    }
+
+    Stats GetCircleStats()
+    {
+        // Calculate the lengths of the triangle sides
+        double a = joint2.DistanceTo(joint3);
+        double b = joint1.DistanceTo(joint3);
+        double c = joint1.DistanceTo(joint2);
+
+        // Calculate the semiperimeter of the triangle
+        double s = (a + b + c) / 2;
+
+        // Calculate the radius of the inscribed circle
+        double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
+
+        // Calculate the coordinates of the center of the inscribed circle
+        double centerX = (a * joint1.X + b * joint2.X + c * joint3.X) / (a + b + c);
+        double centerY = (a * joint1.Y + b * joint2.Y + c * joint3.Y) / (a + b + c);
+
+        return new Stats
+        {
+            x = centerX,
+            y = centerY,
+            r = radius
+        };
+    }
+
+    void RecalcuateInCircle(double ux, double uy, double mouseX, double mouseY)
+    {
+        var stats = GetCircleStats();
+        if (incircle == null) return;
+        incircle.center.X = stats.x;
+        incircle.center.Y = stats.y;
+        incircle.radius = stats.r;
+        incircle.updateFormula();
+        incircle.InvalidateVisual();
+        foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, mouseX, mouseY);
     }
     TriangleType ChangeType(TriangleType type)
     {

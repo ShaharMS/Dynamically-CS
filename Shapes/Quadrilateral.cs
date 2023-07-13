@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public class Quadrilateral : DraggableGraphic
+public class Quadrilateral : DraggableGraphic, IDismantable
 {
     public Joint joint1;
     public Joint joint2;
@@ -35,7 +35,11 @@ public class Quadrilateral : DraggableGraphic
         joint4.Connect(joint2, joint3);
     }
 
-
+    public void Dismantle()
+    {
+        joint1.Disconnect(joint2, joint3);
+        joint4.Disconnect(joint2, joint3);
+    }
 
 
     QuadrilateralType ChangeType(QuadrilateralType type)
