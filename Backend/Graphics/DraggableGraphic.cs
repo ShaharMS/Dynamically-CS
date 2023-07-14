@@ -19,6 +19,9 @@ public class DraggableGraphic : Canvas
     public List<Action<double, double, double, double>> OnMoved = new List<Action<double, double, double, double>>();
     public List<Action<double, double, double, double>> OnDragged = new List<Action<double, double, double, double>>();
 
+    public Cursor MouseOverCursor = new Cursor(StandardCursorType.SizeAll);
+    public Cursor MouseOverDisabledCursor = new Cursor(StandardCursorType.No);
+
     public static readonly StyledProperty<double> XProperty =
         AvaloniaProperty.Register<DraggableGraphic, double>(nameof(X));
 
@@ -47,37 +50,25 @@ public class DraggableGraphic : Canvas
         }
     }
 
-    public new bool IsFocused
-    {
-        get => MainWindow.BigScreen.FocusedObject == this;
-        set => MainWindow.BigScreen.FocusedObject = this;
-    }
-
-    public virtual void DecideFocus(Point mousePos)
-    {
-        var pos = this.GetPosition();
-        if (mousePos.X > pos.X && mousePos.X < pos.X + Width && mousePos.Y > pos.Y && mousePos.Y < pos.Y + Height) MainWindow.BigScreen.FocusedObject = this;
-    }
+    public new bool IsFocused { get; set; }
 
     protected override void OnPointerEnter(PointerEventArgs e)
     {
         base.OnPointerEnter(e);
-        if (Draggable) Cursor = new Cursor(StandardCursorType.SizeAll);
-        else Cursor = new Cursor(StandardCursorType.No);
+        if (Draggable) Cursor = MouseOverCursor;
+        else Cursor = MouseOverDisabledCursor;
     }
 
     protected override void OnPointerLeave(PointerEventArgs e)
     {
         base.OnPointerEnter(e);
-        Cursor = new Cursor(StandardCursorType.Arrow);
+        Cursor = Cursor.Default;
 
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-
-        DecideFocus(e.GetPosition(null));
 
         if (Draggable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {

@@ -38,6 +38,11 @@ public class JointContextMenuProvider
         };
     }
 
+    public void GeneratePerShapeDefaults()
+    {
+
+    }
+
     public void EvaluateSuggestions()
     {
 

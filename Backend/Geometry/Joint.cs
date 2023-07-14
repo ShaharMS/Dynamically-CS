@@ -17,7 +17,7 @@ using Dynamically.Screens;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
+public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
 {
     public static List<Joint> all = new();
 
@@ -68,7 +68,7 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             _geometricPosition = value;
             foreach (var position in value)
             {
-                ((FormulaBase)position).OnChange.Add(() =>
+                position.OnChange.Add(() =>
                 {
                     var newPos = position.GetClosestOnFormula(X, Y);
                     if (newPos.HasValue)
@@ -81,7 +81,7 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
                     foreach (Connection c in Connection.all) c.InvalidateVisual();
                 });
 
-                ((FormulaBase)position).OnMove.Add((curX, curY, preX, preY) =>
+                position.OnMove.Add((curX, curY, preX, preY) =>
                 {
                     X = X - preX + curX;
                     Y = Y - preY + curY;

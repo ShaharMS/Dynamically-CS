@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Connection : DraggableGraphic, IDrawable
+public class Connection : DraggableWithContextInfo, IDrawable
 {
     public static List<Connection> all = new List<Connection>();
 

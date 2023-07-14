@@ -11,7 +11,7 @@ using Avalonia;
 
 namespace Dynamically.Backend.Geometry;
 
-public class EllipseBase : DraggableGraphic, IDrawable
+public class EllipseBase : DraggableWithContextInfo, IDrawable
 {
 
     public static List<EllipseBase> all = new();
