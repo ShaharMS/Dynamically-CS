@@ -115,7 +115,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         X = x;
         Y = y;
         ContextMenu = new ContextMenu();
-        Provider = new JointContextMenuProvider(this);
+        Provider = new JointContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
 

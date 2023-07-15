@@ -3,6 +3,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Dynamically
 {
@@ -29,6 +30,7 @@ namespace Dynamically
             };
 
             Content = scrollViewer;
+
         }
 
         private void InitializeComponent()
@@ -36,9 +38,9 @@ namespace Dynamically
             AvaloniaXamlLoader.Load(this);
         }
 
-        public static void Write(object text)
+        public static void Write(params object[] text)
         {
-            current.consoleTextBlock.Text += text + "\n";
+            current.consoleTextBlock.Text += string.Join(", ", text) + "\n";
         }
     }
 }

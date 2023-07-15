@@ -16,18 +16,28 @@ public class JointContextMenuProvider
 {
     public List<Control> Items
     {
-        get => Defaults.Concat(new List<Control> { new TextSeparator("Suggestions") }).Concat(Suggestions).ToList();
+        get => Defaults.Concat(new List<Control> { getSep("Suggestions") }).Concat(Suggestions).ToList();
+    }
+
+    public MenuItem getSep(string text)
+    {
+        var m = new MenuItem();
+        var s = new TextSeparator(text, Menu, m);
+        return m;
     }
 
     public List<Control> Defaults = new();
     public List<Control> Suggestions = new();
 
     public Joint Subject;
-    public JointContextMenuProvider(Joint joint)
+    public ContextMenu Menu;
+    public JointContextMenuProvider(Joint joint, ContextMenu menu)
     {
         Subject = joint;
+        Menu = menu;
         GenerateDefaults();
         EvaluateSuggestions();
+        
     }
 
     public void GenerateDefaults()
