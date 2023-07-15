@@ -8,6 +8,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -15,7 +16,7 @@ public class JointContextMenuProvider
 {
     public List<Control> Items
     {
-        get => Defaults.Concat(Suggestions).ToList();
+        get => Defaults.Concat(new List<Control> { new TextSeparator("Suggestions") }).Concat(Suggestions).ToList();
     }
 
     public List<Control> Defaults = new();
@@ -40,7 +41,10 @@ public class JointContextMenuProvider
 
     public void GeneratePerShapeDefaults()
     {
-
+        Suggestions = new List<Control> 
+        {
+            defaults_Remove()
+        };
     }
 
     public void EvaluateSuggestions()
@@ -64,6 +68,7 @@ public class JointContextMenuProvider
             MaxLength = 1
         };
         field.SelectAll();
+        field.Focus();
         field.TextInput += (sender, e) =>
         {
             if (e.Text == "\n" || e.Text == "\n\r")

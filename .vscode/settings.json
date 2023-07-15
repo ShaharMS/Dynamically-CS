@@ -1,5 +1,4 @@
 {
-    "dotnet.defaultSolution": "Dynamically.sln",
     "editor.quickSuggestions": {
         "other": "on",
         "comments": "off",
@@ -9,5 +8,6 @@
     "cSpell.words": [
         "Avalonia",
         "semiperimeter"
-    ]
+    ],
+    "dotnet.defaultSolution": "Dynamically.sln"
 }
