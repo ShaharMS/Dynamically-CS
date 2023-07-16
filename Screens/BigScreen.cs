@@ -15,6 +15,10 @@ namespace Dynamically.Screens;
 
 public class BigScreen : DraggableWithContextInfo
 {
+
+    public double MouseX = -1;
+    public double MouseY = -1;
+
     private DraggableWithContextInfo _focused;
     public DraggableWithContextInfo FocusedObject
     {
@@ -45,6 +49,13 @@ public class BigScreen : DraggableWithContextInfo
         MouseOverCursor = Cursor.Default;
 
         AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, SetMousePos, RoutingStrategies.Tunnel);
+    }
+
+    private void SetMousePos(object? sender, PointerEventArgs e)
+    {
+        MouseX = e.GetPosition(this).X;
+        MouseY = e.GetPosition(this).Y;
     }
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
@@ -69,6 +80,7 @@ public class BigScreen : DraggableWithContextInfo
         else if (FocusedObject is EllipseBase) Log.Write($"Ellipse {((EllipseBase)FocusedObject).focal1.Id}{((EllipseBase)FocusedObject).focal2.Id} Is Focused");
     }
 
+    
     public override void Render(DrawingContext context)
     {
 

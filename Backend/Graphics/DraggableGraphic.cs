@@ -52,6 +52,13 @@ public class DraggableGraphic : Canvas
 
     public new bool IsFocused { get; set; }
 
+    public void ForceStartDrag()
+    {
+        CurrentlyDragging = true;
+        _startPosition = new Point(X, Y);
+        _startMousePosition = new Point(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.MouseY);
+    }
+
     protected override void OnPointerEnter(PointerEventArgs e)
     {
         base.OnPointerEnter(e);

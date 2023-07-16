@@ -53,8 +53,8 @@ public class Connection : DraggableWithContextInfo, IDrawable
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
-            joint1.Provider.EvaluateSuggestions();
-            joint2.Provider.EvaluateSuggestions();
+            joint1.Provider.EvaluateRecommendations();
+            joint2.Provider.EvaluateRecommendations();
             reposition();
         });
 

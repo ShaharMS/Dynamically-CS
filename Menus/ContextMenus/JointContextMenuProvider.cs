@@ -9,6 +9,8 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
+using Dynamically.Shapes;
+using Avalonia;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -16,18 +18,21 @@ public class JointContextMenuProvider
 {
     public List<Control> Items
     {
-        get => Defaults.Concat(new List<Control> { getSep("Suggestions") }).Concat(Suggestions).ToList();
-    }
+        get
+        {
+            var list = Defaults.ToList();
+            new TextSeparator("Suggestions", Menu, list);
+            list.Concat(Suggestions.ToList());
+            new TextSeparator("Recommended", Menu, list);
+            list.Concat(Recommendations.ToList());
 
-    public MenuItem getSep(string text)
-    {
-        var m = new MenuItem();
-        var s = new TextSeparator(text, Menu, m);
-        return m;
+            return list;
+        }
     }
 
     public List<Control> Defaults = new();
     public List<Control> Suggestions = new();
+    public List<Control> Recommendations = new();
 
     public Joint Subject;
     public ContextMenu Menu;
@@ -36,7 +41,8 @@ public class JointContextMenuProvider
         Subject = joint;
         Menu = menu;
         GenerateDefaults();
-        EvaluateSuggestions();
+        GeneratePerShapeSuggestions();
+        EvaluateRecommendations();
         
     }
 
@@ -49,23 +55,30 @@ public class JointContextMenuProvider
         };
     }
 
-    public void GeneratePerShapeDefaults()
+    public void GeneratePerShapeSuggestions()
     {
-        Suggestions = new List<Control> 
+        Log.Write("Eval");
+        Suggestions = new List<Control>();
+
+        if (Subject.PartOf.ContainsKey(Role.CIRCLE_Center))
         {
-            defaults_Remove()
-        };
+            Log.Write("Circ");
+            if (Subject.PartOf[Role.CIRCLE_Center].Count == 1)
+            {
+                Suggestions.Add(shapedefaults_CrateRadius(Subject.PartOf[Role.CIRCLE_Center].ElementAt(0) as Circle));
+            }
+        }
     }
 
-    public void EvaluateSuggestions()
+    public void EvaluateRecommendations()
     {
 
     }
 
 
-    // --------------------------------------
-    // Defaults
-    // --------------------------------------
+    // -------------------------------------------------------
+    // ------------------------Defaults-----------------------
+    // -------------------------------------------------------
     MenuItem defaults_Rename()
     {
         var field = new TextBox
@@ -132,120 +145,27 @@ public class JointContextMenuProvider
         };
         return remove;
     }
+
+    // -------------------------------------------------------
+    // -----------------------Suggestions---------------------
+    // -------------------------------------------------------
+
+    MenuItem shapedefaults_CrateRadius(Circle circle, string circleName = "")
+    {
+        var text = "Create Radius";
+        if (circleName.Length > 0) text += " At " + circleName;
+
+        var item = new MenuItem
+        {
+            Header = text,
+        };
+        item.Click += (sender, e) =>
+        {
+            var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
+            j.GeometricPosition.Add(circle.Formula);
+            j.ForceStartDrag();
+        };
+
+        return item;
+    }
 }
-
-// public class JointContextMenu : ContextMenu
-// {
-//     public Joint Subject;
-
-//     AvaloniaList<MenuItem> menuItems = new();
-
-//     public JointContextMenu(Joint subject) : base() {
-//         Subject = subject;
-//         List<object> menuItems = new();
-
-//         MenuItem menuItem1 = new()
-//         {
-//             Header = "Option 1"
-//         };
-//         menuItems.Add(menuItem1);
-
-//         MenuItem submenuItem = new()
-//         {
-//             Header = "Submenu"
-//         };
-
-//         MenuItem subMenuItem1 = new MenuItem
-//         {
-//             Header = "Sub-option 1"
-//         };
-//         submenuItem.Items = new List<object> { subMenuItem1 };
-
-//         MenuItem subMenuItem2 = new MenuItem
-//         {
-//             Header = "Sub-option 2"
-//         };
-//         submenuItem.Items = new List<object> { subMenuItem2 };
-
-//         menuItems.Add(submenuItem);
-
-//         this.Items = menuItems;
-
-//     }
-
-//     public void EvaluateSuggestions() {
-//         // First, Basics:
-//         menuItems.Clear();
-
-//         //menuItems.Add(Generate_Rename());
-
-//         MenuItem menuItem1 = new MenuItem
-//         {
-//             Header = "Option 1"
-//         };
-//         menuItems.Add(menuItem1);
-
-//         MenuItem submenuItem = new MenuItem
-//         {
-//             Header = "Submenu"
-//         };
-
-//         MenuItem subMenuItem1 = new MenuItem
-//         {
-//             Header = "Sub-option 1"
-//         };
-//         submenuItem.Items = new List<object> { subMenuItem1 };
-
-//         MenuItem subMenuItem2 = new MenuItem
-//         {
-//             Header = "Sub-option 2"
-//         };
-//         submenuItem.Items = new List<object> { subMenuItem2 };
-
-//         menuItems.Add(submenuItem);
-
-//         Items = menuItems;
-
-//         InvalidateVisual();
-//     }
-
-//     MenuItem Generate_Rename() {
-//         var field = new TextBox
-//         {
-//             NewLine = "",
-//             AcceptsTab = false,
-//             AcceptsReturn = false,
-//             Text = Subject.Id.ToString(),
-//             Watermark = "Letter"
-//         };
-//         field.SelectAll();
-//         field.KeyDown += (sender, e) => {
-//             if (e.Key == Key.Enter) {
-//                 Subject.Id = field.Text.ToCharArray()[0];
-//             } else if (field.Text.Length > 1) {
-//                 field.Text = e.Key.ToString().ToUpper()[..1];
-//             }
-//         };
-
-//         var hBar = new DockPanel 
-//         {
-//             LastChildFill = true
-//         };
-//         DockPanel.SetDock(hBar, Dock.Left);
-//         hBar.Children.Add(new Label {Content = "New Name:"});
-//         hBar.Children.Add(field);
-
-//         var vBar = new DockPanel();
-//         DockPanel.SetDock(vBar, Dock.Top);
-//         vBar.Children.Add(hBar);
-//         vBar.Children.Add(new Label {Content = "(Press `enter` to confirm)"});
-
-//         var item = new MenuItem
-//         {
-//             Header = "Rename..."
-//         };
-//         item.Items = new AvaloniaList<Control> { item };
-
-//         return item;
-//     }
-// }

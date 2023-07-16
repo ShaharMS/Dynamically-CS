@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Xml.Linq;
 using Avalonia;
+using Avalonia.Collections;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
@@ -11,106 +13,55 @@ using Avalonia.Media;
 using Avalonia.VisualTree;
 
 namespace Dynamically.Backend.Graphics;
-public class TextSeparator : DockPanel
+public class TextSeparator
 {
-    public string Text { get; set; }
-
-    private Label label;
-
-    private ContextMenu Menu;
-    public TextSeparator(string text, ContextMenu menu, MenuItem posDeterminer)
+    private string _text = "";
+    public string Text
     {
-        Text = text;
-        Menu = menu;
-        label = new Label
+        get => _text;
+        set
         {
-            FontWeight = FontWeight.Thin,
-            FontSize = 8,
-            FontFamily = new FontFamily("Consolas"),
-            Foreground = new SolidColorBrush(Colors.Black),
-            Content = "― " + Text + ": ",
-            BorderBrush = new SolidColorBrush(Colors.Black),
-            BorderThickness = new Thickness(2)
-        };
-        Height = double.NaN;
-        Width = double.NaN;
-        IsEnabled = false;
-        SetDock(this, Dock.Left);
-
-        Background = new SolidColorBrush(Colors.Red);
-
-        EventHandler UpdatePos = (object? s, EventArgs e) =>
-        {
-            var p = posDeterminer.PointToScreen(new Point(-100, -300));
-            Log.Write(p.X, p.Y);
-            Canvas.SetLeft(label, p.X);
-            Canvas.SetTop(label, p.Y);
-        };
-
-        posDeterminer.LayoutUpdated += UpdatePos;
-
-        Menu.ContextMenuOpening += (s, e) =>
-        {
-            MainWindow.BigScreen.Children.Add(label);
-        };
-        Menu.ContextMenuClosing += (s, e) =>
-        {
-            MainWindow.BigScreen.Children.Remove(label);
-        };
-        
+            _text = value;
+        }
     }
 
-    bool once = true;
-    protected override Size ArrangeOverride(Size arrangeSize)
+    public double GuessedTextWidth
     {
-        if (!once)
-        {
-            return base.ArrangeOverride(arrangeSize);
-        }
-        var b = base.ArrangeOverride(arrangeSize);
-        if (Menu == null)
-        {
-            Log.Write("menuItem is null");
-        }
-        else if (Menu.Bounds.Width == 0)
-        {
-            Log.Write("menuItem Width not yet calculated");
-            Menu.PropertyChanged += ElementPropertyChanged;
+        get => Text.Length * 8 * 0.833;
+    }
 
-            // Event handler for PropertyChanged event
-            void ElementPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
-            {
-                if (!once) return;
-                if (e.Property == Control.BoundsProperty)
-                {
-                    // Bounds property has changed
-                    var newBounds = (Rect)e.NewValue;
-                    label.Width = newBounds.Width;
-                    double lineWidth = 4;
+    static readonly double ContextMenuWidth = 133 - 20; //Rename arrow width subtracted
 
-                    double spaceLeft = newBounds.Width - label.Bounds.Width;
-                    int fittingLines = (int)(spaceLeft / lineWidth);
-                    Log.Write(newBounds.Width, label.Bounds.Width);
-                    Log.Write($"{fittingLines} {spaceLeft} {lineWidth}");
-                    if (fittingLines > 0) label.Content += new string('―', fittingLines);
+    private ContextMenu Menu;
+    private List<Control> List;
+    public TextSeparator(string text, ContextMenu menu, List<Control> list)
+    {
+        Text = "― " + text + ": ";
+        Menu = menu;
+        List = list;
 
-                    once = false;
-                }
-            }
-        }
-        else
+        string getText()
         {
-            label.Width = Menu.Bounds.Width;
+            // Bounds property has changed
             double lineWidth = 4;
-            double spaceLeft = Menu.Bounds.Width - label.Bounds.Width;
-            int fittingLines = (int)(spaceLeft / lineWidth);
-            Log.Write(Menu.Bounds.Width, label.Bounds.Width);
-            Log.Write($"{fittingLines} {spaceLeft} {lineWidth}");
-            if (fittingLines > 0) label.Content += new string('―', fittingLines);
 
-            once = false;
+            double spaceLeft = ContextMenuWidth - GuessedTextWidth;
+            int fittingLines = (int)(spaceLeft / lineWidth);
+            Log.Write(ContextMenuWidth, GuessedTextWidth);
+            Log.Write($"{fittingLines} {spaceLeft} {lineWidth}");
+            if (fittingLines > 0) Text += new string('―', fittingLines);
+            Log.Write(Text);
+            return Text;
         }
 
-        return b;
+        List.Add(new MenuItem
+        {
+            Header = getText(),
+            FontSize = 8,
+            FontWeight = FontWeight.Thin,
+            FontFamily = new FontFamily("Consolas"),
+            IsEnabled = false,
+            Height = 20
+        });
     }
 }

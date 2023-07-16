@@ -53,9 +53,11 @@ class Tools
         double dx = center.X - joint1.X;
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
-
-        Circle circle = new Circle(new Joint(center.X, center.Y), radius);
-        foreach(var joint in new[] { joint1, joint2, joint3 })
+        var c = new Joint(center.X, center.Y);
+        Circle circle = new Circle(c , radius);
+        if (c.PartOf.ContainsKey(Role.CIRCLE_Center)) c.PartOf[Role.CIRCLE_Center].Add(circle);
+        else c.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { circle });
+        foreach (var joint in new[] { joint1, joint2, joint3 })
         {
 #pragma warning disable CS8604 // Possible null reference argument.
             joint.GeometricPosition.Add(circle.Formula); // Cannot be null here
@@ -117,7 +119,12 @@ class Tools
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
-        return new Circle(new Joint(center.X, center.Y), radius);
+        var c = new Joint(center.X, center.Y);
+        Circle circle = new Circle(c, radius);
+        if (c.PartOf.ContainsKey(Role.CIRCLE_Center)) c.PartOf[Role.CIRCLE_Center].Add(circle);
+        else c.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { circle });
+
+        return circle;
     }
 
     public static double GetDegreesBetween3Points(Point p1, Point center, Point p2) 
