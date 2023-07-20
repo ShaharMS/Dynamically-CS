@@ -59,13 +59,13 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         get => !MainWindow.BigScreen.Children.Contains(this);
     }
 
-    List<FormulaBase> _geometricPosition = new();
-    public List<FormulaBase> GeometricPosition
+    List<FormulaBase> _locus = new();
+    public List<FormulaBase> Locus
     {
-        get => _geometricPosition;
+        get => _locus;
         set
         {
-            _geometricPosition = value;
+            _locus = value;
             foreach (var position in value)
             {
                 position.OnChange.Add(() =>
@@ -122,10 +122,10 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         OnMoved.Add((double _, double _, double _, double _) =>
         {
             // Validate position
-            if (GeometricPosition.Count != 0)
+            if (Locus.Count != 0)
             {
                 var removeQueue = new List<FormulaBase>();
-                foreach (var position in GeometricPosition)
+                foreach (var position in Locus)
                 {
                     if (position.queueRemoval)
                     {
@@ -139,7 +139,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
                         Y = newPos.Value.Y;
                     }
                 }
-                foreach (var item in removeQueue) GeometricPosition.Remove(item);
+                foreach (var item in removeQueue) Locus.Remove(item);
             }
             // Position is validated, now redraw connections & place text
             // text is placed in the middle of the biggest angle at the distance of fontSize + 4
@@ -336,7 +336,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
             {
                 switch (pair.Key)
                 {
-                    case Role.TRIANGLE_Joint:
+                    case Role.TRIANGLE_Corner:
                         if (draggable is Triangle)
                         {
                             ((Triangle)draggable).Dismantle();

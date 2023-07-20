@@ -40,8 +40,8 @@ public class Triangle : DraggableGraphic, IDismantable
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            if (j.PartOf.ContainsKey(Role.TRIANGLE_Joint)) j.PartOf[Role.TRIANGLE_Joint].Add(this);
-            else j.PartOf.Add(Role.TRIANGLE_Joint, new List<DraggableGraphic> { this });
+            if (j.PartOf.ContainsKey(Role.TRIANGLE_Corner)) j.PartOf[Role.TRIANGLE_Corner].Add(this);
+            else j.PartOf.Add(Role.TRIANGLE_Corner, new List<DraggableGraphic> { this });
         }
     }
 

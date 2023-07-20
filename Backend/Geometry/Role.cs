@@ -9,11 +9,11 @@ namespace Dynamically.Backend.Geometry;
 
 public enum Role
 {
-    GENERAL_OnConnection,
+    RAY_On,
+    SEGMENT_On,
 
     CIRCLE_Center,
     CIRCLE_Contact,
-    CIRCLE_Tangent,
 
-    TRIANGLE_Joint
+    TRIANGLE_Corner
 }

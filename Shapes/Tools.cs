@@ -60,9 +60,9 @@ class Tools
         foreach (var joint in new[] { joint1, joint2, joint3 })
         {
 #pragma warning disable CS8604 // Possible null reference argument.
-            joint.GeometricPosition.Add(circle.Formula); // Cannot be null here
+            joint.Locus.Add(circle.Formula); // Cannot be null here
 #pragma warning restore CS8604 // Possible null reference argument.
-            joint.GeometricPosition = joint.GeometricPosition; // Trigger setter
+            joint.Locus = joint.Locus; // Trigger setter
         }
 
         return circle;

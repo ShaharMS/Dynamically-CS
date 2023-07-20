@@ -162,7 +162,7 @@ public class JointContextMenuProvider
         item.Click += (sender, e) =>
         {
             var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
-            j.GeometricPosition.Add(circle.Formula);
+            j.Locus.Add(circle.Formula);
             j.ForceStartDrag();
         };
 
