@@ -5,6 +5,7 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,16 +28,21 @@ public class Connection : DraggableWithContextInfo, IDrawable
     double org2X;
     double org2Y;
 
+    public SegmentFormula Formula { get; set; }
+
     public Connection(Joint f, Joint t, string dataText = "")
     {
         joint1 = f;
         joint2 = t;
+        joint1.Roles.AddToRole(Role.SEGMENT_Corner, this);
+        joint2.Roles.AddToRole(Role.SEGMENT_Corner, this);
         org1X = f.X;
         org1Y = f.Y;
         org2X = t.X;
         org2Y = t.Y;
         this.dataText = dataText;
         text = "" + f.Id + t.Id;
+        Formula = new SegmentFormula(f, t);
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
@@ -55,12 +61,20 @@ public class Connection : DraggableWithContextInfo, IDrawable
         {
             joint1.Provider.EvaluateRecommendations();
             joint2.Provider.EvaluateRecommendations();
-            reposition();
+            foreach (var c in joint1.Connections) c.reposition();
+            foreach (var c in joint2.Connections) c.reposition();
         });
 
         all.Add(this);
 
         InvalidateVisual();
+    }
+
+    public void updateFormula()
+    {
+        if (Formula == null) return;
+        Formula.p1 = joint1;
+        Formula.p2 = joint2;
     }
 
     public double Length
@@ -100,5 +114,17 @@ public class Connection : DraggableWithContextInfo, IDrawable
         org1Y = joint1.Y;
         org2X = joint2.X;
         org2Y = joint2.Y;
+    }
+
+
+
+    public void __updateFormula(double z, double x, double c, double v)
+    {
+        updateFormula();
+    }
+
+    public void __reposition(double z, double x, double c, double v)
+    {
+        reposition();
     }
 }

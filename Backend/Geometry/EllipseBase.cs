@@ -20,9 +20,6 @@ public class EllipseBase : DraggableWithContextInfo, IDrawable
     public Joint focal2;
 
     public double distanceSum;
-
-    public Action onDistanceSumChange = () => { };
-
     public EllipseBase(Joint f1, Joint f2, double dSum)
     {
         focal1 = f1;
@@ -37,14 +34,14 @@ public class EllipseBase : DraggableWithContextInfo, IDrawable
         focal2.OnDragged.Add((double _, double _, double _, double _) => { reposition(); });
 
 
-        OnMoved.Add((double _, double _, double mx, double my) =>
+        OnMoved.Add((double _, double _, double _, double _) =>
         {
+            double mx = MainWindow.BigScreen.MouseX, my = MainWindow.BigScreen.MouseY;
             var parentOffset = this.GetPosition();
             mx -= parentOffset.X;
             my -= parentOffset.Y;
             this.SetPosition(0, 0);
             distanceSum = new Point(focal1.X, focal1.Y).DistanceTo(new Point(mx, my)) + new Point(focal2.X, focal2.Y).DistanceTo(new Point(mx, my));
-            onDistanceSumChange();
             InvalidateVisual();
         });
 

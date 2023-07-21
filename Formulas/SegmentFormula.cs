@@ -1,7 +1,7 @@
-﻿using Dynamically.Shapes;
+﻿using Avalonia;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,11 +23,10 @@ public class SegmentFormula : FormulaBase, Formula
             }
             else
             {
-                yIntercept = p1.Y + (slope * p1.X);
+                return p1.Y + (slope * p1.X);
             }
         }
     }
-    double _slope;
     public double slope
     {
         get => (p2.Y - p1.Y) / (p2.X - p1.X);
@@ -39,52 +38,15 @@ public class SegmentFormula : FormulaBase, Formula
         this.p2 = p2;
     }
 
-    /// <summary>
-    /// Keeps slope
-    /// </summary>
-    /// <param name="point"></param>
-    public void ChangePositionByPoint(Point point)
+    public Point? Intersect(SegmentFormula formula)
     {
-        if (point.X > 0)
-        {
-            yIntercept = point.Y - (slope * point.X);
-        }
-        else
-        {
-            yIntercept = point.Y + (slope * point.X);
-        }
-    }
+        if (formula == null) return null;
+        if (formula.slope == slope) return null;
 
-    public void Set(Point p1, Point p2)
-    {
-        slope = (p2.Y - p1.Y) / (p2.X - p2.X);
-        if (p1.X > 0)
-        {
-            yIntercept = p1.Y - (slope * p1.X);
-        }
-        else
-        {
-            yIntercept = p1.Y + (slope * p1.X);
-        }
-    }
-
-    public void Set(double yIntercept, double slope)
-    {
-        this.yIntercept = yIntercept;
-        this.slope = slope;
-    }
-
-    public void Set(Point pointOnRay, double slope)
-    {
-        if (pointOnRay.X > 0)
-        {
-            yIntercept = pointOnRay.Y - (slope * pointOnRay.X);
-        }
-        else
-        {
-            yIntercept = pointOnRay.Y + (slope * pointOnRay.X);
-        }
-        this.slope = slope;
+        var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
+        var Y = SolveForY(X);
+        if ((X > p1.X || X < p2.X) || ((p2.X > p1.X) && (X > p2.X || X < p1.X))) return null;
+        return new Point(X, Y[0]);
     }
 
     public Point? Intersect(RayFormula formula)
@@ -92,9 +54,9 @@ public class SegmentFormula : FormulaBase, Formula
         if (formula == null) return null;
         if (formula.slope == slope) return null;
 
-        var X = (yIntercept - formula._yIntercept) / (formula.slope - slope);
+        var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
-
+        if ((X > p1.X || X < p2.X) || ((p2.X > p1.X) && (X > p2.X || X < p1.X))) return null;
         return new Point(X, Y[0]);
     }
 
@@ -118,9 +80,20 @@ public class SegmentFormula : FormulaBase, Formula
     }
     public override Point? GetClosestOnFormula(double x, double y)
     {
+        Point potentialIntersect(RayFormula formula)
+        {
+            var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
+            var Y = SolveForY(X);
+            return new Point(X, Y[0]);
+        }
         double nSlope = -1 / slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
-        return Intersect(nRay);
+        var potential = potentialIntersect(nRay);
+        if ((potential.X > p1.X && potential.X < p2.X) || (potential.X > p2.X && potential.X < p1.X)) return potential;
+        if ((p1.X > p2.X && potential.X > p1.X) || (p1.X < p2.X && potential.X < p1.X)) return new Point(p1.X, p1.Y);
+        if ((p2.X > p1.X && potential.X > p2.X) || (p2.X < p1.X && potential.X < p2.X)) return new Point(p2.X, p2.Y);
+        return null;
+
     }
 
     public override Point? GetClosestOnFormula(Point point)
@@ -130,12 +103,13 @@ public class SegmentFormula : FormulaBase, Formula
 
     public override double[] SolveForX(double y)
     {
+        if ((p1.Y > p2.Y && (y > p1.Y || y < p2.Y)) || (p1.Y < p2.Y && (y < p1.Y || y > p2.Y))) return Array.Empty<double>();
         return new double[] { (y - yIntercept) / slope };
     }
 
     public override double[] SolveForY(double x)
     {
+        if ((p1.X > p2.X && (x > p1.X || x < p2.X)) || (p1.X < p2.X && (x < p1.X || x > p2.X))) return Array.Empty<double>();
         return new double[] { slope * x + yIntercept };
     }
-}
 }

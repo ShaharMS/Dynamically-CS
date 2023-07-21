@@ -20,7 +20,7 @@ public class RayFormula : FormulaBase, Formula
         {
             var prev = _yIntercept;
             _yIntercept = value;
-            foreach (var l in OnMove) l(0, value, 0, prev);
+            foreach (var l in OnChange) l();
         }
     }
     double _slope;
@@ -55,7 +55,7 @@ public class RayFormula : FormulaBase, Formula
 
     public RayFormula(Point p1, Point p2)
     {
-        slope = (p2.Y - p1.Y) / (p2.X - p2.X);
+        slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)
         {
             yIntercept = p1.Y - (slope * p1.X);
@@ -84,7 +84,7 @@ public class RayFormula : FormulaBase, Formula
 
     public void Set(Point p1, Point p2)
     {
-        slope = (p2.Y - p1.Y) / (p2.X - p2.X);
+        slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)
         {
             yIntercept = p1.Y - (slope * p1.X);
@@ -141,6 +141,7 @@ public class RayFormula : FormulaBase, Formula
     public Point[] GetPointsByDistanceFrom(Point start, double distance)
     {
         var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
+        Log.Write(dx, slope);
         return new[] { new Point(start.X + dx, SolveForY(start.X + dx)[0]), new Point(start.X - dx, SolveForY(start.X - dx)[0]) };
     }
     public override Point? GetClosestOnFormula(double x, double y)

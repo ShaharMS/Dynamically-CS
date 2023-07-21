@@ -54,8 +54,8 @@ public class BigScreen : DraggableWithContextInfo
 
     private void SetMousePos(object? sender, PointerEventArgs e)
     {
-        MouseX = e.GetPosition(this).X;
-        MouseY = e.GetPosition(this).Y;
+        MouseX = e.GetPosition(null).X;
+        MouseY = e.GetPosition(null).Y;
     }
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)

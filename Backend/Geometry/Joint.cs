@@ -14,6 +14,7 @@ using Dynamically.Shapes;
 using System.Runtime.CompilerServices;
 using Avalonia.Styling;
 using Dynamically.Screens;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -37,18 +38,11 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
     public List<Action<double, double>> OnRemoved = new();
 
     /// <summary>
-    /// This is used to associate joints with the shapes they're inside. <br/>
+    /// This is used to associate joints with the shapes & formulas they're on. <br/>
     /// for example, given a circle, and a triangle formed with one joint being the center, 
-    /// the joint's <c>partOf</c> array would contain the circle and the triangle. <br />
-    /// When working together with geometric position, can provide a nice suggestions UI for what to do next.
+    /// the joint's <c>Roles</c> map would contain the circle and the triangle. <br />
     /// </summary>
-    public Dictionary<Role, List<DraggableGraphic>> PartOf
-    {
-        get => _partOf;
-        set => _partOf = value;
-    }
-    Dictionary<Role, List<DraggableGraphic>> _partOf = new();
-
+    public RoleMap Roles { get; set; }
 
     public JointContextMenuProvider Provider;
 
@@ -57,39 +51,6 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
     public bool GotRemoved
     {
         get => !MainWindow.BigScreen.Children.Contains(this);
-    }
-
-    List<FormulaBase> _locus = new();
-    public List<FormulaBase> Locus
-    {
-        get => _locus;
-        set
-        {
-            _locus = value;
-            foreach (var position in value)
-            {
-                position.OnChange.Add(() =>
-                {
-                    var newPos = position.GetClosestOnFormula(X, Y);
-                    if (newPos.HasValue)
-                    {
-                        X = newPos.Value.X;
-                        Y = newPos.Value.Y;
-                        foreach (var l in OnMoved) l(X, Y, X, Y);
-                    }
-
-                    foreach (Connection c in Connection.all) c.InvalidateVisual();
-                });
-
-                position.OnMove.Add((curX, curY, preX, preY) =>
-                {
-                    X = X - preX + curX;
-                    Y = Y - preY + curY;
-                    foreach (var l in OnMoved) l(X, Y, X, Y);
-                    foreach (Connection c in Connection.all) c.InvalidateVisual();
-                });
-            }
-        }
     }
 
     public Joint(double x, double y, char id = 'A')
@@ -106,7 +67,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         };
 
         this.Id = id;
-
+        Roles = new RoleMap(this);
 
 
 
@@ -119,42 +80,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         ContextMenu.Items = Provider.Items;
 
 
-        OnMoved.Add((double _, double _, double _, double _) =>
-        {
-            // Validate position
-            if (Locus.Count != 0)
-            {
-                var removeQueue = new List<FormulaBase>();
-                foreach (var position in Locus)
-                {
-                    if (position.queueRemoval)
-                    {
-                        removeQueue.Add(position);
-                        continue;
-                    }
-                    var newPos = position.GetClosestOnFormula(X, Y);
-                    if (newPos.HasValue)
-                    {
-                        X = newPos.Value.X;
-                        Y = newPos.Value.Y;
-                    }
-                }
-                foreach (var item in removeQueue) Locus.Remove(item);
-            }
-            // Position is validated, now redraw connections & place text
-            // text is placed in the middle of the biggest angle at the distance of fontSize + 4
-            foreach (Connection c in Connections)
-            {
-                c.InvalidateVisual();
-                if (c.joint1 == this) c.joint2.RepositionText();
-                else c.joint1.RepositionText();
-            }
-            RepositionText();
-        });
-        OnDragged.Add((double _, double _, double _, double _) =>
-        {
-            foreach (Connection c in Connections) c.reposition();
-        });
+        OnMoved.Add((double _, double _, double _, double _) => reposition());
 
         InvalidateVisual();
         RepositionText();
@@ -212,7 +138,18 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         context.DrawEllipse(brush, pen, new Point(0, 0), 10, 10);
     }
 
-    public void reposition() { }
+    public void reposition()
+    {
+        // Position is validated, now redraw connections & place text
+        // text is placed in the middle of the biggest angle at the distance of fontSize + 4
+        foreach (Connection c in Connections)
+        {
+            c.InvalidateVisual();
+            if (c.joint1 == this) c.joint2.RepositionText();
+            else c.joint1.RepositionText();
+        }
+        RepositionText();
+    }
 
     public Connection Connect(Joint to, string connectionText = "")
     {
@@ -248,8 +185,8 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
             if (!doNothing)
             {
                 var connection = new Connection(this, joint);
-                Connections.Add(connection);
                 cons.Add(connection);
+                Connections.Add(connection);
                 joint.Connections.Add(connection);
                 joint.RepositionText();
             }
@@ -330,7 +267,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Children.Remove(IdDisplay);
 
-        foreach (var pair in PartOf)
+        foreach (var pair in Roles)
         {
             foreach (var draggable in pair.Value)
             {
@@ -351,7 +288,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
                     default:
                         Log.Write($"{pair.Key.ToString()} Unimplemented");
                         break;
-                } 
+                }
             }
         }
 

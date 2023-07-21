@@ -47,10 +47,10 @@ public class TextSeparator
 
             double spaceLeft = ContextMenuWidth - GuessedTextWidth;
             int fittingLines = (int)(spaceLeft / lineWidth);
-            Log.Write(ContextMenuWidth, GuessedTextWidth);
-            Log.Write($"{fittingLines} {spaceLeft} {lineWidth}");
+            //Log.Write(ContextMenuWidth, GuessedTextWidth);
+            //Log.Write($"{fittingLines} {spaceLeft} {lineWidth}");
             if (fittingLines > 0) Text += new string('―', fittingLines);
-            Log.Write(Text);
+            //Log.Write(Text);
             return Text;
         }
 

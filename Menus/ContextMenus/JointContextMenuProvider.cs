@@ -57,15 +57,15 @@ public class JointContextMenuProvider
 
     public void GeneratePerShapeSuggestions()
     {
-        Log.Write("Eval");
+        //Log.Write("Eval");
         Suggestions = new List<Control>();
 
-        if (Subject.PartOf.ContainsKey(Role.CIRCLE_Center))
+        if (Subject.Roles.Has(Role.CIRCLE_Center))
         {
-            Log.Write("Circ");
-            if (Subject.PartOf[Role.CIRCLE_Center].Count == 1)
+            //Log.Write("Circ");
+            if (Subject.Roles[Role.CIRCLE_Center].Count == 1)
             {
-                Suggestions.Add(shapedefaults_CrateRadius(Subject.PartOf[Role.CIRCLE_Center].ElementAt(0) as Circle));
+                Suggestions.Add(shapedefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
             }
         }
     }
@@ -162,7 +162,7 @@ public class JointContextMenuProvider
         item.Click += (sender, e) =>
         {
             var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
-            j.Locus.Add(circle.Formula);
+            j.Roles.AddToRole(Role.CIRCLE_Contact, circle);
             j.ForceStartDrag();
         };
 

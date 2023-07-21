@@ -23,23 +23,22 @@ public class Circle : EllipseBase, IDismantable
         {
             double prev = distanceSum / 2;
             distanceSum = value * 2;
+            updateFormula();
             foreach (var l in onResize) l(value, prev);
         }
     }
 
-    public CircleFormula Formula;
+    public CircleFormula Formula { get; set; }
 
     public Circle(Joint center, double radius) : base(center, center, radius * 2)
     {
         this.radius = radius;
         this.center = center;
         Formula = new CircleFormula(radius, center.X, center.Y);
-        this.center.PropertyChanged += center_OnChange;
-        onDistanceSumChange = updateFormula;
 
+        OnMoved.Add(__circle_OnChange); 
 
-        if (center.PartOf.ContainsKey(Role.CIRCLE_Center)) center.PartOf[Role.CIRCLE_Center].Add(this);
-        else center.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { this });
+        center.Roles.AddToRole(Role.CIRCLE_Center, this);
     }
     public void Dismantle()
     {
@@ -116,9 +115,14 @@ public class Circle : EllipseBase, IDismantable
         if (Formula == null) return;
         Formula.centerX = center.X;
         Formula.centerY = center.Y;
-        Formula.radius = radius;
+        if (radius != Formula.radius)
+        {        
+            Formula.radius = radius;
+            Formula.UpdateFollowers();
+        }
+
     }
-    void center_OnChange(object? sender, AvaloniaPropertyChangedEventArgs e)
+    public void __circle_OnChange(double z, double x, double c, double v)
     {
         updateFormula();
     }

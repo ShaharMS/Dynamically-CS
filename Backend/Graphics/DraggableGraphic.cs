@@ -114,12 +114,13 @@ public class DraggableGraphic : Canvas
         {
             var currentPosition = e.GetPosition(null);
             var offset = currentPosition - _startMousePosition;
+            var before = new Point(X, Y);
             X = _startPosition.X + offset.X;
             Y = _startPosition.Y + offset.Y;
 
             foreach (var listener in OnMoved)
             {
-                listener(X, Y, currentPosition.X, currentPosition.Y);
+                listener(X, Y, before.X, before.Y);
             }
         }
     }

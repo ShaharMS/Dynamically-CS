@@ -10,7 +10,10 @@ namespace Dynamically.Backend.Geometry;
 public enum Role
 {
     RAY_On,
+
+    SEGMENT_Corner,
     SEGMENT_On,
+    SEGMENT_Split,
 
     CIRCLE_Center,
     CIRCLE_Contact,

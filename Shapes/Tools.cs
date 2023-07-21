@@ -55,14 +55,10 @@ class Tools
         var radius = Math.Sqrt(dx * dx + dy * dy);
         var c = new Joint(center.X, center.Y);
         Circle circle = new Circle(c , radius);
-        if (c.PartOf.ContainsKey(Role.CIRCLE_Center)) c.PartOf[Role.CIRCLE_Center].Add(circle);
-        else c.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { circle });
+        c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
         {
-#pragma warning disable CS8604 // Possible null reference argument.
-            joint.Locus.Add(circle.Formula); // Cannot be null here
-#pragma warning restore CS8604 // Possible null reference argument.
-            joint.Locus = joint.Locus; // Trigger setter
+            joint.Roles.AddToRole(Role.CIRCLE_Contact, circle);
         }
 
         return circle;
@@ -121,8 +117,7 @@ class Tools
 
         var c = new Joint(center.X, center.Y);
         Circle circle = new Circle(c, radius);
-        if (c.PartOf.ContainsKey(Role.CIRCLE_Center)) c.PartOf[Role.CIRCLE_Center].Add(circle);
-        else c.PartOf.Add(Role.CIRCLE_Center, new List<DraggableGraphic> { circle });
+        c.Roles.AddToRole(Role.CIRCLE_Center, circle);
 
         return circle;
     }

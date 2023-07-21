@@ -33,7 +33,7 @@ public partial class MainWindow : Window
 
         var j = new Joint(30, 30, 'A').Connect(new Joint(130, 30, 'B'));
         var j11 = new Joint(120, 60, 'C');
-        var t = new Triangle(new Joint(570, 120, 'G'), new Joint(750, 80, 'H'), new Joint(860, 320, 'I'));
+        var t = new Triangle(new Joint(570, 120, '1'), new Joint(750, 80, '2'), new Joint(860, 320, '3'));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
         

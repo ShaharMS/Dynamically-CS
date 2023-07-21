@@ -38,10 +38,11 @@ public class Triangle : DraggableGraphic, IDismantable
         con13 = joint1.Connect(joint3);
         con23 = joint2.Connect(joint3);
 
+        Log.Write(j1.Connections.Count, j2.Connections.Count, j3.Connections.Count);
+
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            if (j.PartOf.ContainsKey(Role.TRIANGLE_Corner)) j.PartOf[Role.TRIANGLE_Corner].Add(this);
-            else j.PartOf.Add(Role.TRIANGLE_Corner, new List<DraggableGraphic> { this });
+            j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
         }
     }
 
@@ -74,6 +75,7 @@ public class Triangle : DraggableGraphic, IDismantable
 
         Circle circle = new Circle(new Joint(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
+        circle.center.Roles.AddToRole(Role.CIRCLE_Center, circle);
         circle.Draggable = false;
         incircle = circle;
 
