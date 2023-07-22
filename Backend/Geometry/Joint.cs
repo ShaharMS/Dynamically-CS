@@ -18,7 +18,7 @@ using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
+public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 {
     public static List<Joint> all = new();
 
@@ -53,7 +53,9 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         get => !MainWindow.BigScreen.Children.Contains(this);
     }
 
-    public Joint(double x, double y, char id = 'A')
+
+    public Joint(Point p) : this(p.X, p.Y) { }
+    public Joint(double x, double y, char id = '_')
     {
         all.Add(this);
 
@@ -65,8 +67,10 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
             BorderThickness = new Thickness(0, 0, 0, 0),
             Width = 20
         };
+        
+        if (id == '_') IDGenerator.GenerateFor(this);
+        else this.Id = id;
 
-        this.Id = id;
         Roles = new RoleMap(this);
 
 
@@ -84,6 +88,8 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
 
         InvalidateVisual();
         RepositionText();
+
+        MainWindow.BigScreen.Children.Add(this);
     }
 
     public void RepositionText()
@@ -149,6 +155,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
             else c.joint1.RepositionText();
         }
         RepositionText();
+        Provider.Regenerate();
     }
 
     public Connection Connect(Joint to, string connectionText = "")
@@ -163,8 +170,8 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         Connections.Add(connection);
         to.Connections.Add(connection);
 
-        RepositionText();
-        to.RepositionText();
+        reposition();
+        to.reposition();
 
         return connection;
     }
@@ -188,10 +195,10 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
                 cons.Add(connection);
                 Connections.Add(connection);
                 joint.Connections.Add(connection);
-                joint.RepositionText();
+                joint.reposition();
             }
         }
-        RepositionText();
+        reposition();
         return cons;
     }
 
@@ -267,30 +274,7 @@ public class Joint : DraggableWithContextInfo, IDrawable, IContextMenuSupporter
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Children.Remove(IdDisplay);
 
-        foreach (var pair in Roles)
-        {
-            foreach (var draggable in pair.Value)
-            {
-                switch (pair.Key)
-                {
-                    case Role.TRIANGLE_Corner:
-                        if (draggable is Triangle)
-                        {
-                            ((Triangle)draggable).Dismantle();
-                        }
-                        break;
-                    case Role.CIRCLE_Center:
-                        if (draggable is Circle)
-                        {
-                            ((Circle)draggable).Dismantle();
-                        }
-                        break;
-                    default:
-                        Log.Write($"{pair.Key.ToString()} Unimplemented");
-                        break;
-                }
-            }
-        }
+        Roles.Clear();
 
         foreach (var r in OnRemoved)
         {

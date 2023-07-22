@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Graphics;
 
-public class DraggableGraphic : Canvas
+public partial class DraggableGraphic : Canvas
 {
     public bool Draggable = true;
     public bool CurrentlyDragging;
@@ -49,14 +49,12 @@ public class DraggableGraphic : Canvas
             SetValue(YProperty, value);
         }
     }
-
-    public new bool IsFocused { get; set; }
-
-    public void ForceStartDrag()
+    public void ForceStartDrag(dynamic args)
     {
         CurrentlyDragging = true;
         _startPosition = new Point(X, Y);
-        _startMousePosition = new Point(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.MouseY);
+        _startMousePosition = args.GetPosition(null);
+        args.Pointer.Capture(this);
     }
 
     protected override void OnPointerEnter(PointerEventArgs e)

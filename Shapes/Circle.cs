@@ -8,9 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase, IDismantable
+public class Circle : EllipseBase, IDismantable, IRoleMapAddable
 {
     public Joint center;
 
@@ -39,6 +40,7 @@ public class Circle : EllipseBase, IDismantable
         OnMoved.Add(__circle_OnChange); 
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
+        center.reposition();
     }
     public void Dismantle()
     {

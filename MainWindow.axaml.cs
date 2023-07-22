@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using Dynamically.Formulas;
 using Dynamically.Menus;
 using Dynamically.Screens;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 
 namespace Dynamically;
 
@@ -16,11 +18,18 @@ public partial class MainWindow : Window
     public static MainWindow Instance { get; private set; }
 
     public static DockPanel MainDisplay { get; private set; }
+
     public static BigScreen BigScreen { get; private set; }
+
+    public static bool Debug { get; set; }
+
+    public static PointerEventArgs Mouse { get; set; }
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainWindow()
     {
+        Debug = true;
+
         InitializeComponent();
         Instance = this;
         MainDisplay = Instance.Find<DockPanel>("Display");
@@ -31,21 +40,15 @@ public partial class MainWindow : Window
         BigScreen = ca;
         Menus.TopMenu.applyDefaultStyling();
 
-        var j = new Joint(30, 30, 'A').Connect(new Joint(130, 30, 'B'));
-        var j11 = new Joint(120, 60, 'C');
+        var j = new Joint(30, 30).Connect(new Joint(130, 30));
+        var j11 = new Joint(120, 60);
         var t = new Triangle(new Joint(570, 120, '1'), new Joint(750, 80, '2'), new Joint(860, 320, '3'));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
-        
+
+
+        AddHandler(PointerMovedEvent, (o, a) => { Mouse = a; }, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
-        
-        foreach (var i in Connection.all)
-            ca.Children.Add(i);
-        foreach (var i in EllipseBase.all)
-            ca.Children.Add(i);
-        foreach (var i in Joint.all)
-            ca.Children.Add(i);
-        Log.Write(j.joint1.GotRemoved);
     }
 }

@@ -2,6 +2,7 @@
 using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Helpers;
 using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Connection : DraggableWithContextInfo, IDrawable
+public class Connection : DraggableGraphic, IDrawable, IRoleMapAddable
 {
     public static List<Connection> all = new List<Connection>();
 
@@ -67,6 +68,7 @@ public class Connection : DraggableWithContextInfo, IDrawable
 
         all.Add(this);
 
+        MainWindow.BigScreen.Children.Insert(0, this);
         InvalidateVisual();
     }
 

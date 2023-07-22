@@ -13,14 +13,14 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Screens;
 
-public class BigScreen : DraggableWithContextInfo
+public class BigScreen : DraggableGraphic
 {
 
     public double MouseX = -1;
     public double MouseY = -1;
 
-    private DraggableWithContextInfo _focused;
-    public DraggableWithContextInfo FocusedObject
+    private DraggableGraphic _focused;
+    public DraggableGraphic FocusedObject
     {
         get => _focused;
         set
@@ -63,9 +63,9 @@ public class BigScreen : DraggableWithContextInfo
         FocusedObject = this;
         foreach (var child in Children)
         {
-            if (child is DraggableWithContextInfo)
+            if (child is DraggableGraphic)
             {
-                var draggable = child as DraggableWithContextInfo;
+                var draggable = child as DraggableGraphic;
                 
                 if (draggable != null && draggable.IsHovered)
                 {

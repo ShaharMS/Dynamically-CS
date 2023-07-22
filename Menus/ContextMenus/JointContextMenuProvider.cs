@@ -25,6 +25,11 @@ public class JointContextMenuProvider
             list = list.Concat(Suggestions.ToList()).ToList();
             new TextSeparator("Recommended", list);
             list = list.Concat(Recommendations.ToList()).ToList();
+            if (MainWindow.Debug)
+            {
+                new TextSeparator("Debug", list);
+                list = list.Concat(Debugging.ToList()).ToList();
+            }
 
             return list;
         }
@@ -33,6 +38,7 @@ public class JointContextMenuProvider
     public List<Control> Defaults = new();
     public List<Control> Suggestions = new();
     public List<Control> Recommendations = new();
+    public List<Control> Debugging = new();
 
     public Joint Subject;
     public ContextMenu Menu;
@@ -43,7 +49,7 @@ public class JointContextMenuProvider
         GenerateDefaults();
         GeneratePerShapeSuggestions();
         EvaluateRecommendations();
-        
+        if (MainWindow.Debug) AddDebugInfo();
     }
 
     public void GenerateDefaults()
@@ -51,7 +57,8 @@ public class JointContextMenuProvider
         Defaults = new List<Control>
         {
             defaults_Rename(),
-            defaults_Remove()
+            defaults_Remove(),
+            defaults_Connect()
         };
     }
 
@@ -59,13 +66,11 @@ public class JointContextMenuProvider
     {
         //Log.Write("Eval");
         Suggestions = new List<Control>();
-
         if (Subject.Roles.Has(Role.CIRCLE_Center))
         {
             //Log.Write("Circ");
             if (Subject.Roles.CountOf(Role.CIRCLE_Center) == 1)
             {
-                Log.Write("Add Circle");
                 Suggestions.Add(shapedefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
             }
         }
@@ -76,6 +81,24 @@ public class JointContextMenuProvider
 
     }
 
+    public void AddDebugInfo()
+    {
+        Debugging = new List<Control>
+        {
+            debug_DisplayRoles()
+        };
+    }
+
+    public void Regenerate()
+    {
+        GenerateDefaults();
+        GeneratePerShapeSuggestions();
+        EvaluateRecommendations();
+        if (MainWindow.Debug) AddDebugInfo();
+
+        Subject.ContextMenu = new ContextMenu();
+        Subject.ContextMenu.Items = Items;
+    }
 
     // -------------------------------------------------------
     // ------------------------Defaults-----------------------
@@ -146,6 +169,22 @@ public class JointContextMenuProvider
         };
         return remove;
     }
+    MenuItem defaults_Connect()
+    {
+        var connect = new MenuItem
+        {
+            Header = "Connect to..."
+        };
+
+        connect.PointerReleased += (s, args) =>
+        {
+            var dummy = new Joint(args.GetPosition(null));
+            dummy.ForceStartDrag(args);
+            Subject.Connect(dummy);
+        };
+
+        return connect;
+    }
 
     // -------------------------------------------------------
     // -----------------------Suggestions---------------------
@@ -160,13 +199,47 @@ public class JointContextMenuProvider
         {
             Header = text,
         };
-        item.Click += (sender, e) =>
+        item.PointerReleased += (sender, e) =>
         {
             var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            j.ForceStartDrag();
+            j.Connect(Subject);
+            j.ForceStartDrag(e);
         };
 
         return item;
+    }
+
+
+    // -------------------------------------------------------
+    // ----------------------Recommended----------------------
+    // -------------------------------------------------------
+
+
+
+    // -------------------------------------------------------
+    // -------------------------Debug-------------------------
+    // -------------------------------------------------------
+
+    MenuItem debug_DisplayRoles()
+    {
+        string Keys()
+        {
+            var s = "";
+            foreach (var role in Subject.Roles.underlying.Keys)
+            {
+                s += role.ToString();
+                s += $" ({Subject.Roles.CountOf(role)})\n\r";
+            }
+
+            return s;
+        }
+        var roles = new MenuItem
+        {
+            Header = "Display Roles",
+            Items = new Control[] { new Label { Content = Keys() }}
+        };
+
+        return roles;
     }
 }

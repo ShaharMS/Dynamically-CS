@@ -27,7 +27,7 @@ public class TextSeparator
 
     public double GuessedTextWidth
     {
-        get => Text.Length * 8 * 0.833;
+        get => Text.Length * 8 * 0.533;
     }
 
     static readonly double ContextMenuWidth = 133 - 20; //Rename arrow width subtracted

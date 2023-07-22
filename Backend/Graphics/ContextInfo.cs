@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Graphics;
 
-public class DraggableWithContextInfo : DraggableGraphic
+public partial class DraggableGraphic
 {
     public bool IsHovered { get; set; }
     public bool IsPressed { get; set; }
@@ -18,7 +18,7 @@ public class DraggableWithContextInfo : DraggableGraphic
         set => MainWindow.BigScreen.FocusedObject = this;
     }
 
-    public DraggableWithContextInfo() : base()
+    public DraggableGraphic()
     {
         PointerEnter += MouseInfo_PointerHover;
         PointerLeave += MouseInfo_PointerOut;

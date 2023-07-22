@@ -1,5 +1,5 @@
 ﻿using Dynamically.Backend.Geometry;
-using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Helpers;
 using Dynamically.Shapes;
 using System;
 using System.Collections;
@@ -11,9 +11,14 @@ using System.Threading.Tasks;
 namespace Dynamically.Backend.Helpers;
 #pragma warning disable CS8602
 #pragma warning disable CS8604
-public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
+public class RoleMap
 {
     public Dictionary<Role, List<object>> underlying = new();
+
+    public Dictionary<Role, List<object>>.Enumerator GetEnumerator()
+    {
+        return underlying.GetEnumerator();
+    }
 
     public Joint Subject;
 
@@ -27,11 +32,11 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
 
     public List<T> Access<T>(Role role)
     {
-        if (underlying.ContainsKey(role)) return underlying[role] as List<T> ?? new List<T>();
+        if (underlying.ContainsKey(role)) return underlying[role].Cast<T>().ToList();
         else
         {
             underlying[role] = new List<object>();
-            return underlying[role] as List<T> ?? new List<T>();
+            return underlying[role].Cast<T>().ToList();
         }
     }
 
@@ -92,6 +97,14 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
         return list;
     }
 
+    public void Clear()
+    {
+        foreach (var role in underlying.Keys)
+        {
+            ClearRole<object>(role);
+        }
+    }
+
     public T AddToRole<T>(Role role, T item)
     {
         if (Has(role ,item)) return item;
@@ -118,17 +131,6 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
 
         return item;
     }
-
-    public IEnumerator<KeyValuePair<Role, List<object>>> GetEnumerator()
-    {
-        return ((IEnumerable<KeyValuePair<Role, List<object>>>)underlying).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return ((IEnumerable)underlying).GetEnumerator();
-    }
-
     public List<object> this[Role role]
     {
         get => Access<object>(role);

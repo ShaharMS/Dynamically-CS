@@ -1,6 +1,7 @@
 ﻿
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public class Quadrilateral : DraggableGraphic, IDismantable
+public class Quadrilateral : DraggableGraphic, IDismantable, IRoleMapAddable
 {
     public Joint joint1;
     public Joint joint2;

@@ -5,10 +5,11 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Backend;
 using System;
 using System.Collections.Generic;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Shapes;
 
-public class Triangle : DraggableGraphic, IDismantable
+public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
 {
     public Joint joint1;
     public Joint joint2;
@@ -43,6 +44,7 @@ public class Triangle : DraggableGraphic, IDismantable
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
             j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
+            j.reposition();
         }
     }
 

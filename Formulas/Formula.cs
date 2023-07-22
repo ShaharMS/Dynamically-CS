@@ -1,12 +1,13 @@
 using Avalonia;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Dynamically.Formulas;
 
-public abstract class Formula
+public abstract class Formula : IRoleMapAddable
 {
     public List<Action> OnChange = new();
     public List<Action<double, double, double, double>> OnMoved = new();

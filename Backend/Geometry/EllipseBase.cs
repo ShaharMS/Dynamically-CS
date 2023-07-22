@@ -11,7 +11,7 @@ using Avalonia;
 
 namespace Dynamically.Backend.Geometry;
 
-public class EllipseBase : DraggableWithContextInfo, IDrawable
+public class EllipseBase : DraggableGraphic, IDrawable
 {
 
     public static List<EllipseBase> all = new();
@@ -45,6 +45,7 @@ public class EllipseBase : DraggableWithContextInfo, IDrawable
             InvalidateVisual();
         });
 
+        MainWindow.BigScreen.Children.Insert(0, this);
         InvalidateVisual();
     }
 
