@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Formulas;
 
-public class RatioOnSegmentFormula : FormulaBase, Formula
+public class RatioOnSegmentFormula : Formula
 {
     SegmentFormula SegmentFormula { get; set; }
 
     public double ratio;
     public Point pointOnRatio {
-        get => new Point(ratio * (SegmentFormula.p2.X - SegmentFormula.p1.X), ratio * (SegmentFormula.p2.Y - SegmentFormula.p1.Y));
+        get => new Point(ratio * (SegmentFormula.x2 - SegmentFormula.x1), ratio * (SegmentFormula.y2 - SegmentFormula.y1));
     }
 
     public RatioOnSegmentFormula(SegmentFormula Formula, double ratio)
@@ -45,5 +45,10 @@ public class RatioOnSegmentFormula : FormulaBase, Formula
         var p = pointOnRatio; // Prevent using getter twice;
         if (x != p.X) return Array.Empty<double>();
         return new double[1] { p.Y };
+    }
+
+    public override void Move(double x, double y)
+    {
+        SegmentFormula.Move(x, y);
     }
 }

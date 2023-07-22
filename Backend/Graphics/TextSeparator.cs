@@ -32,12 +32,10 @@ public class TextSeparator
 
     static readonly double ContextMenuWidth = 133 - 20; //Rename arrow width subtracted
 
-    private ContextMenu Menu;
-    private List<Control> List;
-    public TextSeparator(string text, ContextMenu menu, List<Control> list)
+    private readonly List<Control> List;
+    public TextSeparator(string text, List<Control> list)
     {
         Text = "― " + text + ": ";
-        Menu = menu;
         List = list;
 
         string getText()

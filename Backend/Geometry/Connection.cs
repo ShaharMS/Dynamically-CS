@@ -73,8 +73,10 @@ public class Connection : DraggableWithContextInfo, IDrawable
     public void updateFormula()
     {
         if (Formula == null) return;
-        Formula.p1 = joint1;
-        Formula.p2 = joint2;
+        Formula.x1 = joint1.X;
+        Formula.y1 = joint1.Y;
+        Formula.x2 = joint2.X;
+        Formula.y2 = joint2.Y;
     }
 
     public double Length

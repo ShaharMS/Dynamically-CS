@@ -21,10 +21,10 @@ public class JointContextMenuProvider
         get
         {
             var list = Defaults.ToList();
-            new TextSeparator("Suggestions", Menu, list);
-            list.Concat(Suggestions.ToList());
-            new TextSeparator("Recommended", Menu, list);
-            list.Concat(Recommendations.ToList());
+            new TextSeparator("Suggestions", list);
+            list = list.Concat(Suggestions.ToList()).ToList();
+            new TextSeparator("Recommended", list);
+            list = list.Concat(Recommendations.ToList()).ToList();
 
             return list;
         }

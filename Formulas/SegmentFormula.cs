@@ -8,34 +8,46 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Formulas;
 
-public class SegmentFormula : FormulaBase, Formula
+public class SegmentFormula : Formula
 {
-    public Point p1 { get; set; }
-    public Point p2 { get; set; }
+    public double x1;
+    public double y1;
+    public double x2;
+    public double y2;
 
     double yIntercept
     {
         get
         {
-            if (p1.X > 0)
+            if (x1 > 0)
             {
-                return p1.Y - (slope * p1.X);
+                return y1 - (slope * x1);
             }
             else
             {
-                return p1.Y + (slope * p1.X);
+                return y1 + (slope * x1);
             }
         }
     }
     public double slope
     {
-        get => (p2.Y - p1.Y) / (p2.X - p1.X);
+        get => (y2 - y1) / (x2 - x1);
     }
 
     public SegmentFormula(Point p1, Point p2)
     {
-        this.p1 = p1;
-        this.p2 = p2;
+        this.x1 = p1.X;
+        this.y1 = p1.Y;
+        this.x2 = p2.X;
+        this.y2 = p2.Y;
+    }
+
+    public SegmentFormula(double x1, double y1, double x2, double y2) 
+    {
+        this.x1 = x1;
+        this.y1 = y1;
+        this.x2 = x2;
+        this.y2 = y2;
     }
 
     public Point? Intersect(SegmentFormula formula)
@@ -45,7 +57,7 @@ public class SegmentFormula : FormulaBase, Formula
 
         var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
-        if ((X > p1.X || X < p2.X) || ((p2.X > p1.X) && (X > p2.X || X < p1.X))) return null;
+        if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
         return new Point(X, Y[0]);
     }
 
@@ -56,7 +68,7 @@ public class SegmentFormula : FormulaBase, Formula
 
         var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
-        if ((X > p1.X || X < p2.X) || ((p2.X > p1.X) && (X > p2.X || X < p1.X))) return null;
+        if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
         return new Point(X, Y[0]);
     }
 
@@ -89,27 +101,34 @@ public class SegmentFormula : FormulaBase, Formula
         double nSlope = -1 / slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
         var potential = potentialIntersect(nRay);
-        if ((potential.X > p1.X && potential.X < p2.X) || (potential.X > p2.X && potential.X < p1.X)) return potential;
-        if ((p1.X > p2.X && potential.X > p1.X) || (p1.X < p2.X && potential.X < p1.X)) return new Point(p1.X, p1.Y);
-        if ((p2.X > p1.X && potential.X > p2.X) || (p2.X < p1.X && potential.X < p2.X)) return new Point(p2.X, p2.Y);
+        if ((potential.X > x1 && potential.X < x2) || (potential.X > x2 && potential.X < x1)) return potential;
+        if ((x1 > x2 && potential.X > x1) || (x1 < x2 && potential.X < x1)) return new Point(x1, y1);
+        if ((x2 > x1 && potential.X > x2) || (x2 < x1 && potential.X < x2)) return new Point(x2, y2);
         return null;
 
     }
 
-    public override Point? GetClosestOnFormula(Point point)
-    {
-        return GetClosestOnFormula(point.X, point.Y);
-    }
-
     public override double[] SolveForX(double y)
     {
-        if ((p1.Y > p2.Y && (y > p1.Y || y < p2.Y)) || (p1.Y < p2.Y && (y < p1.Y || y > p2.Y))) return Array.Empty<double>();
+        if ((y1 > y2 && (y > y1 || y < y2)) || (y1 < y2 && (y < y1 || y > y2))) return Array.Empty<double>();
         return new double[] { (y - yIntercept) / slope };
     }
 
     public override double[] SolveForY(double x)
     {
-        if ((p1.X > p2.X && (x > p1.X || x < p2.X)) || (p1.X < p2.X && (x < p1.X || x > p2.X))) return Array.Empty<double>();
+        if ((x1 > x2 && (x > x1 || x < x2)) || (x1 < x2 && (x < x1 || x > x2))) return Array.Empty<double>();
         return new double[] { slope * x + yIntercept };
+    }
+
+    public override void Move(double x, double y)
+    {
+        var rectX = Math.Min(x1, x2);
+        var rectY = Math.Min(y1, y2);
+        double offsetX = x - rectX, offsetY = y - rectY;
+
+        x1 += offsetX;
+        x2 += offsetX;
+        y1 += offsetY;
+        y2 += offsetX;
     }
 }

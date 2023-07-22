@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Dynamically.Shapes;
+using Dynamically.Backend.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using static System.Formats.Asn1.AsnWriter;
 
 namespace Dynamically.Formulas;
 
-public class RayFormula : FormulaBase, Formula
+public class RayFormula : Formula
 {
     double _yIntercept;
     public double yIntercept
@@ -151,11 +152,6 @@ public class RayFormula : FormulaBase, Formula
         return Intersect(nRay);
     }
 
-    public override Point? GetClosestOnFormula(Point point)
-    {
-        return GetClosestOnFormula(point.X, point.Y);
-    }
-
     public override double[] SolveForX(double y)
     {
         return new double[] {(y - yIntercept) / slope};
@@ -164,5 +160,43 @@ public class RayFormula : FormulaBase, Formula
     public override double[] SolveForY(double x)
     {
         return new double[] {slope * x + yIntercept};
+    }
+
+    public override void Move(double x, double y)
+    {
+        var pYI = _yIntercept;
+        if (x > 0)
+        {
+            _yIntercept = y - (slope * x);
+        }
+        else
+        {
+            _yIntercept = y + (slope * x);
+        }
+        foreach (var l in OnMoved) l(0, pYI, 0, _yIntercept);
+        foreach (var l in OnChange) l();
+    }
+
+    public override void AddFollower(Joint joint)
+    {
+        OnMoved.Add((curX, curY, preX, preY) =>
+        {
+            joint.Y = joint.Y - preY + curY;
+            joint.X = SolveForX(joint.Y)[0];
+            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
+            foreach (Connection c in Connection.all) c.InvalidateVisual();
+        });
+        base.AddFollower(joint);
+    }
+    public override void RemoveFollower(Joint joint)
+    {
+        OnMoved.Remove((curX, curY, preX, preY) =>
+        {
+            joint.Y = joint.Y - preY + curY;
+            joint.X = SolveForX(joint.Y)[0];
+            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
+            foreach (Connection c in Connection.all) c.InvalidateVisual();
+        });
+        base.RemoveFollower(joint);
     }
 }
