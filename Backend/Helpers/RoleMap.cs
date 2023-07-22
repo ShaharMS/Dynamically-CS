@@ -17,9 +17,12 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
 
     public Joint Subject;
 
+    public int Count {get; private set;}
+
     public RoleMap(Joint subject) : base()
     {
         Subject = subject;
+        Count = 0;
     }
 
     public List<T> Access<T>(Role role)
@@ -47,10 +50,16 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
         return Access<object>(role).Contains(item);
     }
 
+    public int CountOf(Role role) {
+        return Access<object>(role).Count;
+    }
+
     public T RemoveFromRole<T>(Role role, T item)
     {
         var list = Access<T>(role);
         if (list.Count == 0 || !list.Contains(item)) return item; 
+        if (list.Count == 1) Count--;
+        underlying[role].Remove(item);
         switch (role)
         {
             case Role.SEGMENT_Corner:
@@ -59,7 +68,7 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
                 Subject.OnDragged.Remove(s1.__reposition);
                 break;
 
-            case Role.CIRCLE_Contact:
+            case Role.CIRCLE_On:
                 (item as Circle).Formula.RemoveFollower(Subject);
                 break;
             case Role.CIRCLE_Center:
@@ -79,7 +88,7 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
         {
             list.Add(RemoveFromRole(role, item));
         }
-
+        Count--;
         return list;
     }
 
@@ -87,10 +96,8 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
     {
         if (Has(role ,item)) return item;
         if (underlying.ContainsKey(role)) underlying[role].Add(item);
-        else
-        {
-            underlying[role] = new List<object> { item };
-        }
+        else underlying[role] = new List<object> { item };
+        if (underlying[role].Count == 1) Count++;
 
         switch (role)
         {
@@ -100,7 +107,7 @@ public class RoleMap : IEnumerable<KeyValuePair<Role, List<object>>>
                 Subject.OnDragged.Add(s1.__reposition);
                 break;
 
-            case Role.CIRCLE_Contact:
+            case Role.CIRCLE_On:
                 (item as Circle).Formula.AddFollower(Subject);
                 break;
             case Role.CIRCLE_Center:

@@ -16,7 +16,7 @@ public enum Role
     SEGMENT_Split,
 
     CIRCLE_Center,
-    CIRCLE_Contact,
+    CIRCLE_On,
 
     TRIANGLE_Corner
 }

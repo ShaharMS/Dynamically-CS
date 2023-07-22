@@ -58,7 +58,7 @@ class Tools
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
         {
-            joint.Roles.AddToRole(Role.CIRCLE_Contact, circle);
+            joint.Roles.AddToRole(Role.CIRCLE_On, circle);
         }
 
         return circle;

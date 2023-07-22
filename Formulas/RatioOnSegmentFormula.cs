@@ -13,7 +13,7 @@ public class RatioOnSegmentFormula : Formula
 
     public double ratio;
     public Point pointOnRatio {
-        get => new Point(ratio * (SegmentFormula.x2 - SegmentFormula.x1), ratio * (SegmentFormula.y2 - SegmentFormula.y1));
+        get => new(ratio * (SegmentFormula.x2 - SegmentFormula.x1), ratio * (SegmentFormula.y2 - SegmentFormula.y1));
     }
 
     public RatioOnSegmentFormula(SegmentFormula Formula, double ratio)

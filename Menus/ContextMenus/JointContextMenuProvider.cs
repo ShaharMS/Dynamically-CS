@@ -63,8 +63,9 @@ public class JointContextMenuProvider
         if (Subject.Roles.Has(Role.CIRCLE_Center))
         {
             //Log.Write("Circ");
-            if (Subject.Roles[Role.CIRCLE_Center].Count == 1)
+            if (Subject.Roles.CountOf(Role.CIRCLE_Center) == 1)
             {
+                Log.Write("Add Circle");
                 Suggestions.Add(shapedefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
             }
         }
@@ -162,7 +163,7 @@ public class JointContextMenuProvider
         item.Click += (sender, e) =>
         {
             var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
-            j.Roles.AddToRole(Role.CIRCLE_Contact, circle);
+            j.Roles.AddToRole(Role.CIRCLE_On, circle);
             j.ForceStartDrag();
         };
 
