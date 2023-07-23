@@ -19,6 +19,8 @@ public class BigScreen : DraggableGraphic
     public double MouseX = -1;
     public double MouseY = -1;
 
+    public PointerEventArgs Mouse;
+
     private DraggableGraphic _focused;
     public DraggableGraphic FocusedObject
     {
@@ -47,6 +49,7 @@ public class BigScreen : DraggableGraphic
         _focused = this;
         Draggable = false;
         MouseOverCursor = Cursor.Default;
+        Mouse = MainWindow.Mouse;
 
         AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
         AddHandler(PointerMovedEvent, SetMousePos, RoutingStrategies.Tunnel);
@@ -54,6 +57,7 @@ public class BigScreen : DraggableGraphic
 
     private void SetMousePos(object? sender, PointerEventArgs e)
     {
+        Mouse = e;
         MouseX = e.GetPosition(null).X;
         MouseY = e.GetPosition(null).Y;
     }

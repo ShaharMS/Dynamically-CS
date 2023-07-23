@@ -47,7 +47,7 @@ public partial class MainWindow : Window
         var circ2 = t.GenerateInCircle();
 
 
-        AddHandler(PointerMovedEvent, (o, a) => { Mouse = a; }, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, (o, a) => {Log.Write(a.GetPosition(null).ToString()); Mouse = a; }, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
     }

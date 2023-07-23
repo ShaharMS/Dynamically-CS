@@ -52,7 +52,7 @@ public partial class DraggableGraphic : Canvas
     public void ForceStartDrag(dynamic args)
     {
         CurrentlyDragging = true;
-        _startPosition = new Point(X, Y);
+        _startPosition = new Point(args.GetPosition(null).X, args.GetPosition(null).Y - MainWindow.BigScreen.GetPosition().Y);
         _startMousePosition = args.GetPosition(null);
         args.Pointer.Capture(this);
     }

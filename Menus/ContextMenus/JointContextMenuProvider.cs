@@ -176,11 +176,50 @@ public class JointContextMenuProvider
             Header = "Connect to..."
         };
 
-        connect.PointerReleased += (s, args) =>
+        connect.Click += (s, args) =>
         {
-            var dummy = new Joint(args.GetPosition(null));
-            dummy.ForceStartDrag(args);
+            var dummy = new Joint(MainWindow.Mouse.GetPosition(null));
+            dummy.ForceStartDrag(MainWindow.Mouse);
             Subject.Connect(dummy);
+
+            void EvalConnection(object? sender, PointerEventArgs args) {
+                var pos = args.GetPosition(null);
+                bool justBroken = false, calced = false;
+                Joint? current = null;
+                foreach(Joint j in Joint.all) {
+                    Log.Write(j.Id, j.Overlaps(pos));
+                    if (j.Overlaps(pos) && j != dummy && j != Subject) {
+                        Log.Write(j.Id);
+                        dummy.Hidden = true;
+                        Subject.Disconnect(dummy);
+                        Subject.Connect(j);
+                        justBroken = true;
+                        calced = false;
+                        current = j;
+                        break;
+                    }
+                }
+                Log.Write(dummy.Hidden);
+                if (!justBroken && !calced) 
+                {
+                    dummy.Hidden = false;
+                    if (current != null) Subject.Disconnect(current);
+                    Subject.Connect(dummy);
+                    calced = true;
+                }
+            }
+
+            void Finish(object? sender, PointerReleasedEventArgs args) {
+                if (dummy.Hidden) {
+                    dummy.RemoveFromBoard();
+                }
+
+                MainWindow.Instance.PointerMoved -= EvalConnection;
+                MainWindow.Instance.PointerReleased -= Finish;
+            }
+
+            MainWindow.Instance.PointerMoved += EvalConnection;
+            MainWindow.Instance.PointerReleased += Finish;
         };
 
         return connect;
@@ -199,12 +238,12 @@ public class JointContextMenuProvider
         {
             Header = text,
         };
-        item.PointerReleased += (sender, e) =>
+        item.Click += (sender, e) =>
         {
-            var j = new Joint(MainWindow.BigScreen.MouseX, MainWindow.BigScreen.Y);
+            var j = new Joint(MainWindow.BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             j.Connect(Subject);
-            j.ForceStartDrag(e);
+            j.ForceStartDrag(MainWindow.BigScreen.Mouse);
         };
 
         return item;

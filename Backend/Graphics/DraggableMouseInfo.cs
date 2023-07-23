@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,10 @@ public partial class DraggableGraphic
         PointerPressed += MouseInfo_PointerPressed;
         PointerReleased += MouseInfo_PointerReleased;
         // IsFocused handled in BigScreen
+    }
+
+    public bool Overlaps(Point point) {
+        return new Rect(X, Y - MainWindow.BigScreen.GetPosition().Y, Width, Height).Contains(point);
     }
 
     private void MouseInfo_PointerHover(object? sender, PointerEventArgs e)

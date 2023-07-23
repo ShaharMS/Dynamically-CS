@@ -53,6 +53,12 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         get => !MainWindow.BigScreen.Children.Contains(this);
     }
 
+    public bool Hidden {
+        get => !IsVisible;
+        set {
+            IdDisplay.IsVisible = IsVisible = !value;
+        }
+    }
 
     public Joint(Point p) : this(p.X, p.Y) { }
     public Joint(double x, double y, char id = '_')

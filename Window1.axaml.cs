@@ -12,7 +12,7 @@ namespace Dynamically
     {
         public static Log current = new Log();
         private TextBlock consoleTextBlock;
-
+        private ScrollViewer scrollViewer;
         public Log()
         {
             InitializeComponent();
@@ -23,7 +23,7 @@ namespace Dynamically
                 FontSize = 16
             };
 
-            ScrollViewer scrollViewer = new ScrollViewer
+            scrollViewer = new ScrollViewer
             {
                 Content = consoleTextBlock,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
@@ -42,6 +42,7 @@ namespace Dynamically
         public static void Write(params object[] text)
         {
             current.consoleTextBlock.Text += StringifyCollection(text) + "\n";
+            current.scrollViewer.ScrollToEnd();
         }
 
         public static string StringifyCollection(IEnumerable collection)
@@ -51,7 +52,7 @@ namespace Dynamically
             { 
                 var itemS = item.ToString();
                 if (item.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
-                s.Add(itemS);
+                s.Add(itemS ?? "Value");
             }
 
             return string.Join(", ", s);

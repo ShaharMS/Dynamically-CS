@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using System;
 
 namespace Dynamically;
@@ -17,6 +18,33 @@ class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
     {
-        return AppBuilder.Configure<App>().UsePlatformDetect().LogToTrace();
+        if (!MainWindow.Debug) 
+            return AppBuilder.Configure<App>().UsePlatformDetect().LogToTrace();
+        
+        return AppBuilder.Configure<App>()
+                .UsePlatformDetect()
+                .AfterSetup((_) =>
+                {
+                    var mainWindow = new MainWindow();
+                    var logWindow = Log.current;
+
+                    var screen = mainWindow.Screens.Primary; // Get the primary screen
+
+                    // Calculate the width and height of each window
+                    var windowWidth = screen.WorkingArea.Width;
+                    var windowHeight = screen.WorkingArea.Height;
+
+                    // Set the size and position of the MainWindow
+                    logWindow.Width = windowWidth / 4;
+                    logWindow.Height = windowHeight;
+                    logWindow.Position = new PixelPoint(screen.WorkingArea.TopLeft.X, screen.WorkingArea.TopLeft.Y);
+
+                    // Set the size and position of the LogWindow
+                    mainWindow.Width = windowWidth / 4 * 3;
+                    mainWindow.Height = windowHeight;
+                    mainWindow.Position = new PixelPoint(screen.WorkingArea.TopLeft.X + windowWidth / 4, screen.WorkingArea.TopLeft.Y);
+
+                    logWindow.Show();
+                }).LogToTrace();
     }
 }
