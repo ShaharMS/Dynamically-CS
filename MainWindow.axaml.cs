@@ -21,16 +21,15 @@ public partial class MainWindow : Window
 
     public static BigScreen BigScreen { get; private set; }
 
-    public static bool Debug { get; set; }
+    public static bool Debug = true;
 
     public static PointerEventArgs Mouse { get; set; }
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainWindow()
     {
-        Debug = true;
-
         InitializeComponent();
+        Debug = true;
         Instance = this;
         MainDisplay = Instance.Find<DockPanel>("Display");
         var ca = new BigScreen
@@ -38,16 +37,18 @@ public partial class MainWindow : Window
             Name = "BigScreen"
         };
         BigScreen = ca;
+
+        
         Menus.TopMenu.applyDefaultStyling();
 
         var j = new Joint(30, 30).Connect(new Joint(130, 30));
         var j11 = new Joint(120, 60);
-        var t = new Triangle(new Joint(570, 120, '1'), new Joint(750, 80, '2'), new Joint(860, 320, '3'));
+        var t = new Triangle(new Joint(570, 120), new Joint(750, 80), new Joint(860, 320));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 
 
-        AddHandler(PointerMovedEvent, (o, a) => {Log.Write(a.GetPosition(null).ToString()); Mouse = a; }, RoutingStrategies.Tunnel);
+        AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
     }

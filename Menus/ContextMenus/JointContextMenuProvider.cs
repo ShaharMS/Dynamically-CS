@@ -11,6 +11,8 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Shapes;
 using Avalonia;
+using Dynamically.Screens;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -20,6 +22,7 @@ public class JointContextMenuProvider
     {
         get
         {
+#pragma warning disable CA1806
             var list = Defaults.ToList();
             new TextSeparator("Suggestions", list);
             list = list.Concat(Suggestions.ToList()).ToList();
@@ -30,6 +33,7 @@ public class JointContextMenuProvider
                 new TextSeparator("Debug", list);
                 list = list.Concat(Debugging.ToList()).ToList();
             }
+#pragma warning restore CA1806
 
             return list;
         }
@@ -58,7 +62,8 @@ public class JointContextMenuProvider
         {
             defaults_Rename(),
             defaults_Remove(),
-            defaults_Connect()
+            defaults_Connect(),
+            defaults_Disconnect()
         };
     }
 
@@ -96,10 +101,13 @@ public class JointContextMenuProvider
         EvaluateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
 
-        Subject.ContextMenu = new ContextMenu();
-        Subject.ContextMenu.Items = Items;
+        Subject.ContextMenu = new ContextMenu
+        {
+            Items = Items
+        };
     }
 
+#pragma warning disable IDE1006
     // -------------------------------------------------------
     // ------------------------Defaults-----------------------
     // -------------------------------------------------------
@@ -178,51 +186,39 @@ public class JointContextMenuProvider
 
         connect.Click += (s, args) =>
         {
-            var dummy = new Joint(MainWindow.Mouse.GetPosition(null));
-            dummy.ForceStartDrag(MainWindow.Mouse);
-            Subject.Connect(dummy);
-
-            void EvalConnection(object? sender, PointerEventArgs args) {
-                var pos = args.GetPosition(null);
-                bool justBroken = false, calced = false;
-                Joint? current = null;
-                foreach(Joint j in Joint.all) {
-                    Log.Write(j.Id, j.Overlaps(pos));
-                    if (j.Overlaps(pos) && j != dummy && j != Subject) {
-                        Log.Write(j.Id);
-                        dummy.Hidden = true;
-                        Subject.Disconnect(dummy);
-                        Subject.Connect(j);
-                        justBroken = true;
-                        calced = false;
-                        current = j;
-                        break;
-                    }
-                }
-                Log.Write(dummy.Hidden);
-                if (!justBroken && !calced) 
-                {
-                    dummy.Hidden = false;
-                    if (current != null) Subject.Disconnect(current);
-                    Subject.Connect(dummy);
-                    calced = true;
-                }
-            }
-
-            void Finish(object? sender, PointerReleasedEventArgs args) {
-                if (dummy.Hidden) {
-                    dummy.RemoveFromBoard();
-                }
-
-                MainWindow.Instance.PointerMoved -= EvalConnection;
-                MainWindow.Instance.PointerReleased -= Finish;
-            }
-
-            MainWindow.Instance.PointerMoved += EvalConnection;
-            MainWindow.Instance.PointerReleased += Finish;
+            var potential = new Joint(MainWindow.Mouse.GetPosition(null));
+            MainWindow.BigScreen.HandleCreateConnection(Subject, potential);
         };
 
         return connect;
+    }
+
+    MenuItem defaults_Disconnect()
+    {
+        var options = new List<MenuItem>();
+
+        foreach (var c in Subject.Connections)
+        {
+            var item = new MenuItem();
+            if (c.joint1 == Subject) item.Header = c.joint2 + $" ({c})";
+            else item.Header = c.joint2 + $" ({c})";
+
+            item.Click += (sender, e) =>
+            {
+                c.joint1.Disconnect(c.joint2);
+            };
+
+            options.Add(item);
+        }
+
+        var dis = new MenuItem
+        {
+            Header = "Disconnect From...",
+            IsEnabled = Subject.Connections.Count > 0,
+            Items = options
+        };
+
+        return dis;
     }
 
     // -------------------------------------------------------
@@ -240,10 +236,9 @@ public class JointContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Joint(MainWindow.BigScreen.Mouse.GetPosition(null));
+            var j = new Joint(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            j.Connect(Subject);
-            j.ForceStartDrag(MainWindow.BigScreen.Mouse);
+            MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
 
         return item;
@@ -267,11 +262,12 @@ public class JointContextMenuProvider
             var s = "";
             foreach (var role in Subject.Roles.underlying.Keys)
             {
+                if (Subject.Roles.CountOf(role) == 0) continue;
                 s += role.ToString();
-                s += $" ({Subject.Roles.CountOf(role)})\n\r";
+                s += $" ({Subject.Roles.CountOf(role)}) ({Log.StringifyCollection(Subject.Roles.Access<dynamic>(role))})\n\r";
             }
-
-            return s;
+            if (s == "") return s;
+            return s.Substring(0, s.Length - 2);
         }
         var roles = new MenuItem
         {
@@ -281,4 +277,5 @@ public class JointContextMenuProvider
 
         return roles;
     }
+#pragma warning restore IDE1006
 }

@@ -10,9 +10,9 @@ namespace Dynamically
 {
     public partial class Log : Window
     {
-        public static Log current = new Log();
-        private TextBlock consoleTextBlock;
-        private ScrollViewer scrollViewer;
+        public static readonly Log current = new();
+        private readonly TextBlock consoleTextBlock;
+        private readonly ScrollViewer scrollViewer;
         public Log()
         {
             InitializeComponent();
@@ -42,6 +42,13 @@ namespace Dynamically
         public static void Write(params object[] text)
         {
             current.consoleTextBlock.Text += StringifyCollection(text) + "\n";
+            if (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+            {
+                while (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+                {
+                    current.consoleTextBlock.Text = current.consoleTextBlock.Text.Remove(0, 1);
+                }
+            }
             current.scrollViewer.ScrollToEnd();
         }
 

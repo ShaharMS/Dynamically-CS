@@ -13,6 +13,17 @@ namespace Dynamically.Backend.Helpers;
 #pragma warning disable CS8604
 public class RoleMap
 {
+
+    public static Dictionary<Role, List<object>> QuickCreateMap(params (Role, dynamic[])[] elements)
+    {
+        var m = new Dictionary<Role, List<object>>();
+        foreach (var element in elements)
+        {
+            m[element.Item1] = element.Item2.ToList();
+        }
+        return m;
+    }
+
     public Dictionary<Role, List<object>> underlying = new();
 
     public Dictionary<Role, List<object>>.Enumerator GetEnumerator()
@@ -23,6 +34,16 @@ public class RoleMap
     public Joint Subject;
 
     public int Count {get; private set;}
+    public List<object> this[Role role]
+    {
+        get => Access<object>(role);
+        set
+        {
+            if (!Has(role) && value.Count > 0) Count++;
+            else if (Has(role) && value.Count == 0) Count--;
+            underlying[role] = value;
+        }
+    }
 
     public RoleMap(Joint subject) : base()
     {
@@ -53,6 +74,20 @@ public class RoleMap
     public bool Has(Role role, object item)
     {
         return Access<object>(role).Contains(item);
+    }
+
+    public bool Has(Dictionary<Role, List<object>> group)
+    {
+        foreach (var pair in group)
+        {
+            if (!Has(pair.Key) && pair.Value.Count > 0) return false;
+            foreach (var item in pair.Value)
+            {
+                if (!Has(pair.Key, item)) return false;
+            }
+        }
+
+        return true;
     }
 
     public int CountOf(Role role) {
@@ -88,7 +123,7 @@ public class RoleMap
 
     public List<T> ClearRole<T>(Role role)
     {
-        List<T> list = new List<T>();
+        List<T> list = new();
         foreach (var item in Access<T>(role))
         {
             list.Add(RemoveFromRole(role, item));
@@ -130,11 +165,6 @@ public class RoleMap
         }
 
         return item;
-    }
-    public List<object> this[Role role]
-    {
-        get => Access<object>(role);
-        set => underlying[role] = value;
     }
 }
 #pragma warning restore CS8602

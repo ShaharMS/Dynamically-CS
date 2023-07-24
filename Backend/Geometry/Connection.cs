@@ -3,6 +3,7 @@ using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
@@ -13,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Connection : DraggableGraphic, IDrawable, IRoleMapAddable
+public class Connection : DraggableGraphic, IDrawable
 {
-    public static List<Connection> all = new List<Connection>();
+    public static readonly List<Connection> all = new();
 
     public Joint joint1;
     public Joint joint2;
@@ -72,7 +73,7 @@ public class Connection : DraggableGraphic, IDrawable, IRoleMapAddable
         InvalidateVisual();
     }
 
-    public void updateFormula()
+    public void UpdateFormula()
     {
         if (Formula == null) return;
         Formula.x1 = joint1.X;
@@ -120,15 +121,27 @@ public class Connection : DraggableGraphic, IDrawable, IRoleMapAddable
         org2Y = joint2.Y;
     }
 
+    public override string ToString()
+    {
+        return ((char)Math.Min(joint1.Id, joint2.Id)).ToString() + ((char)Math.Max(joint1.Id, joint2.Id)).ToString();
+    }
 
+    public override double Area()
+    {
+        return 1;
+    }
 
+#pragma warning disable IDE1006
     public void __updateFormula(double z, double x, double c, double v)
     {
-        updateFormula();
+        _ = z; _ = x; _ = c; _ = v; // Supress unused params warning
+        UpdateFormula();
     }
 
     public void __reposition(double z, double x, double c, double v)
     {
+        _ = z; _ = x; _ = c; _ = v; // Supress unused params warning
         reposition();
     }
+#pragma warning restore IDE1006
 }

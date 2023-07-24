@@ -6,10 +6,12 @@ using Dynamically.Backend;
 using System;
 using System.Collections.Generic;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
+using Dynamically.Screens;
 
 namespace Dynamically.Shapes;
 
-public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
+public class Triangle : DraggableGraphic, IDismantable
 {
     public Joint joint1;
     public Joint joint2;
@@ -75,7 +77,7 @@ public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
     {
         var stats = GetCircleStats();
 
-        Circle circle = new Circle(new Joint(stats.x, stats.y), stats.r);
+        var circle = new Circle(new Joint(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
         circle.center.Roles.AddToRole(Role.CIRCLE_Center, circle);
         circle.Draggable = false;
@@ -121,7 +123,7 @@ public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
         incircle.center.X = stats.x;
         incircle.center.Y = stats.y;
         incircle.radius = stats.r;
-        incircle.updateFormula();
+        incircle.UpdateFormula();
         incircle.InvalidateVisual();
         foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, mouseX, mouseY);
     }
@@ -158,7 +160,7 @@ public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
                     }
                     // The candidate who's distance to point C is the shortest, is the expected one:
                     double minDistance = double.PositiveInfinity;
-                    Point chosen = new Point(-1, -1); // just a filler
+                    var chosen = new Point(-1, -1); // just a filler
                     foreach (Point candidate in potentialPositions)
                     {
                         var d = candidate.DistanceTo(C);
@@ -197,6 +199,17 @@ public class Triangle : DraggableGraphic, IDismantable, IRoleMapAddable
                 break;
         }
         return _type = type;
+    }
+
+
+    public override string ToString()
+    {
+        return $"△{joint1.Id}{joint2.Id}{joint3.Id}";
+    }
+
+    public override double Area()
+    {
+        return con12.Length * con12.Formula.DistanceTo(joint3) * 2;
     }
 }
 

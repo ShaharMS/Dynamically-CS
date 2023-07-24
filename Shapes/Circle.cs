@@ -9,13 +9,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
+using Dynamically.Backend;
+using Dynamically.Screens;
+using Dynamically.Menus;
+using Dynamically.Design;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase, IDismantable, IRoleMapAddable
+public class Circle : EllipseBase, IDismantable, IShape
 {
     public Joint center;
 
-    public List<Action<double, double>> onResize = new List<Action<double, double>>();
+    public List<Action<double, double>> onResize = new();
 
     public double radius
     {
@@ -24,7 +29,7 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
         {
             double prev = distanceSum / 2;
             distanceSum = value * 2;
-            updateFormula();
+            UpdateFormula();
             foreach (var l in onResize) l(value, prev);
         }
     }
@@ -53,12 +58,12 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
     {
         this.center = center;
         this.radius = radius;
-        updateFormula();
+        UpdateFormula();
     }
 
     public void Set(Joint joint1, Joint joint2, Joint joint3)
     {
-        void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
+        Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
         {
             // Get the segments' parameters.
             double dx12 = p2.X - p1.X;
@@ -70,20 +75,8 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
             double denominator = (dy12 * dx34 - dx12 * dy34);
 
             double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
-            double t2 = ((p3.X - p1.X) * dy12 + (p1.Y - p3.Y) * dx12) / -denominator;
-
             // Find the point of intersection.
-            intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
-
-            // The segments intersect if t1 and t2 are between 0 and 1.
-            segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
-
-            // Find the closest points on the segments.
-            if (t1 < 0) t1 = 0;
-            else if (t1 > 1) t1 = 1;
-
-            if (t2 < 0) t2 = 0;
-            else if (t2 > 1) t2 = 1;
+            return new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
         }
 
         // Get the perpendicular bisector of (x1, y1) and (x2, y2).
@@ -99,8 +92,7 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
         double dx2 = -(joint3.Y - joint2.Y);
 
         // See where the lines intersect.
-        Point intersection;
-        FindIntersection(new Point(x1, y1), new Point(x1 + dx1, y1 + dy1), new Point(x2, y2), new Point(x2 + dx2, y2 + dy2), out _, out intersection);
+        Point intersection = FindIntersection(new Point(x1, y1), new Point(x1 + dx1, y1 + dy1), new Point(x2, y2), new Point(x2 + dx2, y2 + dy2));
 
         var center = intersection;
         double dx = center.X - joint1.X;
@@ -109,10 +101,10 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
 
         this.center = center;
         this.radius = radius;
-        updateFormula();
+        UpdateFormula();
     }
 
-    public void updateFormula()
+    public void UpdateFormula()
     {
         if (Formula == null) return;
         Formula.centerX = center.X;
@@ -124,9 +116,43 @@ public class Circle : EllipseBase, IDismantable, IRoleMapAddable
         }
 
     }
+
     public void __circle_OnChange(double z, double x, double c, double v)
     {
-        updateFormula();
+        UpdateFormula();
+    }
+
+
+
+
+
+
+
+    public override string ToString()
+    {
+        return $"●{center.Id}";
+    }
+
+    public override bool Overlaps(Point point)
+    {
+        return center.DistanceTo(point.X, point.Y) < radius;
+    }
+
+    public override double Area()
+    {
+        return radius * radius * Math.PI;
+    }
+    public override void Render(DrawingContext context)
+    {
+        if (MainWindow.BigScreen.HoveredObject == this)
+        {
+            context.DrawEllipse(UIColors.ShapeHoverFill, null, center, radius, radius);
+        }
+        else
+        {
+            context.DrawEllipse(UIColors.ShapeFill, null, center, radius, radius);
+        }
+        base.Render(context);
     }
 }
 

@@ -8,13 +8,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
+using Dynamically.Screens;
+using Dynamically.Backend.Interfaces;
 
 namespace Dynamically.Backend.Geometry;
 
 public class EllipseBase : DraggableGraphic, IDrawable
 {
 
-    public static List<EllipseBase> all = new();
+    public static readonly List<EllipseBase> all = new();
 
     public Joint focal1;
     public Joint focal2;
@@ -36,7 +38,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
         OnMoved.Add((double _, double _, double _, double _) =>
         {
-            double mx = MainWindow.BigScreen.MouseX, my = MainWindow.BigScreen.MouseY;
+            double mx = BigScreen.MouseX, my = BigScreen.MouseY;
             var parentOffset = this.GetPosition();
             mx -= parentOffset.X;
             my -= parentOffset.Y;

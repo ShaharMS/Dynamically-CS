@@ -25,6 +25,19 @@ public static class StaticExtensions
         double y = from.Y - to.Y;
         return Math.Sqrt(x * x + y * y);
     }
+
+    public static double DistanceTo(this Joint from, double X, double Y)
+    {
+        double x = from.X - X;
+        double y = from.Y - Y;
+        return Math.Sqrt(x * x + y * y);
+    }
+    public static double DistanceTo(this Point from, double X, double Y)
+    {
+        double x = from.X - X;
+        double y = from.Y - Y;
+        return Math.Sqrt(x * x + y * y);
+    }
     public static double DegreesTo(this Point from, Point to)
     {
         double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
@@ -48,11 +61,11 @@ public static class StaticExtensions
 
     public static Point GetPosition(this Control element)
     {
-        Point position = new Point(0, 0);
+        Point position = new(-1, -1);
 
         if (element != null)
         {
-            IVisual visual = (IVisual)element;
+            IVisual visual = element;
             IVisual rootVisual = visual.GetVisualRoot();
 
             if (rootVisual != null)

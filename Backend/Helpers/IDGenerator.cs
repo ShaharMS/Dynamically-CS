@@ -9,12 +9,12 @@ namespace Dynamically.Backend.Helpers;
 
 public class IDGenerator
 {
-    static List<Joint> ids = new();
+    static readonly List<Joint> ids = new();
 
     public static void GenerateFor(Joint j)
     {
         char letter = 'A';
-        bool changed = false;
+        bool changed;
         do
         {
             changed = false;
@@ -31,5 +31,10 @@ public class IDGenerator
         } while (changed);
         j.Id = letter;
         ids.Add(j);
+    }
+
+    public static void Remove(Joint j)
+    {
+        ids.Remove(j);
     }
 }

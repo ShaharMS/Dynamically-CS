@@ -16,11 +16,11 @@ public partial class DraggableGraphic : Canvas
     public bool CurrentlyDragging;
     private Point _startPosition;
     private Point _startMousePosition;
-    public List<Action<double, double, double, double>> OnMoved = new List<Action<double, double, double, double>>();
-    public List<Action<double, double, double, double>> OnDragged = new List<Action<double, double, double, double>>();
+    public List<Action<double, double, double, double>> OnMoved = new();
+    public List<Action<double, double, double, double>> OnDragged = new();
 
-    public Cursor MouseOverCursor = new Cursor(StandardCursorType.SizeAll);
-    public Cursor MouseOverDisabledCursor = new Cursor(StandardCursorType.No);
+    public Cursor MouseOverCursor = new (StandardCursorType.SizeAll);
+    public Cursor MouseOverDisabledCursor = new (StandardCursorType.No);
 
     public static readonly StyledProperty<double> XProperty =
         AvaloniaProperty.Register<DraggableGraphic, double>(nameof(X));

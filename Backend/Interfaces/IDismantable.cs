@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynamically.Backend.Helpers;
+namespace Dynamically.Backend.Interfaces;
 
-public interface IRoleMapAddable
+public interface IDismantable
 {
+    public void Dismantle();
 }

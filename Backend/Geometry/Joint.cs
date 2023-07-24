@@ -15,12 +15,15 @@ using System.Runtime.CompilerServices;
 using Avalonia.Styling;
 using Dynamically.Screens;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 
 namespace Dynamically.Backend.Geometry;
 
 public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 {
-    public static List<Joint> all = new();
+    public static readonly List<Joint> all = new();
+
+    public static readonly double GraphicalRadius = 10;
 
     public char _id = 'A';
     public char Id
@@ -141,13 +144,14 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         var finalAngle = degStart + biggestGap / 2;
         Canvas.SetLeft(IdDisplay, X + d * Math.Cos(finalAngle * (Math.PI / 180.0)) - 20 / 2);
         Canvas.SetTop(IdDisplay, Y + d * Math.Sin(finalAngle * (Math.PI / 180.0)) - 30 / 2);
+        Width = Height = GraphicalRadius * 2;
     }
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared
         var brush = new SolidColorBrush(Colors.White);
-        var pen = new Pen(new SolidColorBrush(Colors.Black), 4);
-        context.DrawEllipse(brush, pen, new Point(0, 0), 10, 10);
+        var pen = new Pen(new SolidColorBrush(Colors.Black), GraphicalRadius / 2.5);
+        context.DrawEllipse(brush, pen, new Point(0, 0), GraphicalRadius, GraphicalRadius);
     }
 
     public void reposition()
@@ -208,6 +212,18 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         return cons;
     }
 
+    public bool IsConnectedTo(Joint joint)
+    {
+        if (this == joint) return false;
+        Log.Write(Connections);
+        foreach (Connection c in Connections)
+        {
+            Joint[] js = new[] { c.joint1, c.joint2 };
+            if (js.Contains(joint) && js.Contains(this)) return true;
+        }
+        return false;
+    }
+
     public void Disconnect(Joint joint)
     {
         var past = Connections.ToList();
@@ -215,6 +231,7 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
             {
+                Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 Connections.Remove(c);
                 MainWindow.BigScreen.Children.Remove(c);
             }
@@ -224,6 +241,7 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
             {
+                joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 joint.Connections.Remove(c);
                 MainWindow.BigScreen.Children.Remove(c);
             }
@@ -239,6 +257,8 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             {
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
+                    this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
+                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     Connections.Remove(c);
                     MainWindow.BigScreen.Children.Remove(c);
                 }
@@ -249,6 +269,8 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             {
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
+                    this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
+                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     joint.Connections.Remove(c);
                     MainWindow.BigScreen.Children.Remove(c);
                 }
@@ -267,6 +289,9 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             else c.joint2.Connections.Remove(c);
             if (c.joint1 != this) c.joint1.RepositionText();
             else c.joint2.RepositionText();
+
+            c.joint1.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // One of them is `this`
+            c.joint2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
         }
         Connections.Clear();
         RepositionText();
@@ -275,17 +300,38 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     public void RemoveFromBoard()
     {
         double sx = X, sy = Y;
+        all.Remove(this);
         DisconnectAll();
+        IDGenerator.Remove(this);
 
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Children.Remove(IdDisplay);
 
         Roles.Clear();
+        OnMoved.Clear();
+        OnDragged.Clear();
 
         foreach (var r in OnRemoved)
         {
             r(sx, sy);
         }
+
+        OnRemoved.Clear();
+    }
+
+    public override string ToString()
+    {
+        return Id + "";
+    }
+
+    public override bool Overlaps(Point point)
+    {
+        return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.BigScreen.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.BigScreen.GetPosition().Y + Height / 2 > point.Y;
+    }
+
+    public override double Area()
+    {
+        return 0;
     }
 
     public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }

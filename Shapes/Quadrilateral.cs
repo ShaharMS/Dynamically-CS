@@ -2,6 +2,7 @@
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public class Quadrilateral : DraggableGraphic, IDismantable, IRoleMapAddable
+public class Quadrilateral : DraggableGraphic, IDismantable
 {
     public Joint joint1;
     public Joint joint2;
@@ -45,6 +46,7 @@ public class Quadrilateral : DraggableGraphic, IDismantable, IRoleMapAddable
 
     QuadrilateralType ChangeType(QuadrilateralType type)
     {
+        _type = type;
         return type;
     }
 }
