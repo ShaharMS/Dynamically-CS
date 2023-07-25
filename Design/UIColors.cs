@@ -10,5 +10,5 @@ namespace Dynamically.Design;
 public class UIColors
 {
     public static readonly IBrush ShapeHoverFill = new SolidColorBrush(Colors.LightGray);
-    public static readonly IBrush ShapeFill = new SolidColorBrush(Colors.White);
+    public static readonly IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0xFFFFFFFF));
 }

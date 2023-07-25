@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +72,24 @@ public class BigScreen : DraggableGraphic
 
         AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
+    }
+
+    public void Refresh()
+    {
+        foreach (var child in Children)
+        {
+            if (child is DraggableGraphic draggable)
+            {
+                double area = Math.Clamp(draggable.Area(), 0, short.MaxValue);
+                if (double.IsNaN(area))
+                {
+                    Log.Write(child);
+                    area = int.MaxValue;
+                }
+                draggable.ZIndex = -Convert.ToInt32(area);
+                draggable.InvalidateVisual();
+            }
+        }
     }
 
     public void HandleCreateConnection(Joint from, Joint potential, Dictionary<Role, List<object>>? requiresRoles = null)
@@ -159,6 +178,12 @@ public class BigScreen : DraggableGraphic
             if (child is DraggableGraphic draggable)
             {
                 double area = draggable.Area();
+                if (area < 0) { Log.Write(child, area); }
+                if (double.IsNaN(area))
+                {
+                    Log.Write(child);
+                    area = int.MaxValue;
+                }
                 draggable.ZIndex = -Convert.ToInt32(area);
                 if (draggable.Overlaps(new Point(MouseX, MouseY)) && HoveredObject.Area() > area) HoveredObject = draggable;
                 draggable.InvalidateVisual();
@@ -168,6 +193,7 @@ public class BigScreen : DraggableGraphic
         if (HoveredObject is BigScreen) Log.Write("No object is hovered");
         else if (HoveredObject is Joint joint) Log.Write($"{joint.Id} Is Hovered");
         else if (HoveredObject is Connection connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
+        else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
         else if (HoveredObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Hovered");
     }
 

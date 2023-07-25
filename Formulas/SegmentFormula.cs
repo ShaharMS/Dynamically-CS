@@ -95,7 +95,7 @@ public class SegmentFormula : Formula
         Point potentialIntersect(RayFormula formula)
         {
             var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
-            var Y = SolveForY(X);
+            var Y = new RayFormula(new Point(x1, y1), new Point(x2, y2)).SolveForY(X);
             return new Point(X, Y[0]);
         }
         double nSlope = -1 / slope;

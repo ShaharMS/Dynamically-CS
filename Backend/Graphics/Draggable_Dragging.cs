@@ -12,43 +12,33 @@ namespace Dynamically.Backend.Graphics;
 
 public partial class DraggableGraphic : Canvas
 {
-    public bool Draggable = true;
+    public virtual bool Draggable { get; set; }
     public bool CurrentlyDragging;
-    private Point _startPosition;
-    private Point _startMousePosition;
     public List<Action<double, double, double, double>> OnMoved = new();
     public List<Action<double, double, double, double>> OnDragged = new();
 
     public Cursor MouseOverCursor = new (StandardCursorType.SizeAll);
     public Cursor MouseOverDisabledCursor = new (StandardCursorType.No);
 
-    public static readonly StyledProperty<double> XProperty =
-        AvaloniaProperty.Register<DraggableGraphic, double>(nameof(X));
+    private Point _startPosition;
+    private Point _startMousePosition;
 
-    public double X
+    public void DispatchOnMovedEvents(double x, double y, double px, double py)
     {
-        get => GetValue(XProperty);
-        set
+        foreach (var listener in OnMoved)
         {
-            SetLeft(this, value);
-            //Margin = new Thickness(value, Margin.Top, 0, 0);
-            SetValue(XProperty, value);
+            listener(x, y, px, py);
         }
     }
 
-    public static readonly StyledProperty<double> YProperty =
-        AvaloniaProperty.Register<DraggableGraphic, double>(nameof(Y));
-
-    public double Y
+    public void DispatchOnDraggedEvents(double x, double y, double px, double py)
     {
-        get => GetValue(YProperty);
-        set
+        foreach (var listener in OnDragged)
         {
-            SetTop(this, value);
-            //Margin = new Thickness(Margin.Left, value, 0, 0);
-            SetValue(YProperty, value);
+            listener(x, y, px, py);
         }
     }
+
     public void ForceStartDrag(dynamic args)
     {
         CurrentlyDragging = true;
@@ -97,10 +87,8 @@ public partial class DraggableGraphic : Canvas
             var endX = X + (currentPosition.X - _startMousePosition.X);
             var endY = Y + (currentPosition.Y - _startMousePosition.Y);
 
-            foreach (var listener in OnDragged)
-            {
-                listener(_startPosition.X, _startPosition.Y, endX, endY);
-            }
+            DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
+
         }
     }
 
@@ -116,10 +104,7 @@ public partial class DraggableGraphic : Canvas
             X = _startPosition.X + offset.X;
             Y = _startPosition.Y + offset.Y;
 
-            foreach (var listener in OnMoved)
-            {
-                listener(X, Y, before.X, before.Y);
-            }
+            DispatchOnMovedEvents(X, Y, before.X, before.Y);
         }
     }
 

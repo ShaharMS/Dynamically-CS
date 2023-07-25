@@ -9,4 +9,5 @@ namespace Dynamically.Backend.Interfaces;
 
 public interface IShape
 {
+
 }

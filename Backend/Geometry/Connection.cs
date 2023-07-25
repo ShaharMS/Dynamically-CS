@@ -102,6 +102,27 @@ public class Connection : DraggableGraphic, IDrawable
         }
     }
 
+    public void SetLength(double len, bool isFirstStuck = true)
+    {
+        if (isFirstStuck)
+        {
+            Length = len; // First is stuck by default
+            return;
+        }
+        var ray = new RayFormula(joint1, joint2);
+        var p1Arr = ray.GetPointsByDistanceFrom(joint2, len);
+        if (p1Arr[0].DistanceTo(joint1) < p1Arr[1].DistanceTo(joint1))
+        {
+            joint1.X = p1Arr[0].X;
+            joint1.Y = p1Arr[0].Y;
+        }
+        else
+        {
+            joint1.X = p1Arr[1].X;
+            joint1.Y = p1Arr[1].Y;
+        }
+    }
+
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared

@@ -19,8 +19,9 @@ using Dynamically.Backend.Interfaces;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
+public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 {
+
     public static readonly List<Joint> all = new();
 
     public static readonly double GraphicalRadius = 10;
@@ -166,135 +167,6 @@ public class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         }
         RepositionText();
         Provider.Regenerate();
-    }
-
-    public Connection Connect(Joint to, string connectionText = "")
-    {
-        // Don't connect something twice
-        foreach (Connection c in Connections.Concat(to.Connections))
-        {
-            if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
-        }
-
-        var connection = new Connection(this, to, connectionText);
-        Connections.Add(connection);
-        to.Connections.Add(connection);
-
-        reposition();
-        to.reposition();
-
-        return connection;
-    }
-
-    public List<Connection> Connect(params Joint[] joints)
-    {
-        var cons = new List<Connection>();
-        foreach (Joint joint in joints)
-        {
-            var doNothing = false;
-            // Don't connect something twice
-            foreach (Connection c in Connections.Concat(joint.Connections))
-            {
-                if ((c.joint1 == this && c.joint2 == joint) || (c.joint2 == this && c.joint1 == joint))
-                    doNothing = true;
-            }
-
-            if (!doNothing)
-            {
-                var connection = new Connection(this, joint);
-                cons.Add(connection);
-                Connections.Add(connection);
-                joint.Connections.Add(connection);
-                joint.reposition();
-            }
-        }
-        reposition();
-        return cons;
-    }
-
-    public bool IsConnectedTo(Joint joint)
-    {
-        if (this == joint) return false;
-        Log.Write(Connections);
-        foreach (Connection c in Connections)
-        {
-            Joint[] js = new[] { c.joint1, c.joint2 };
-            if (js.Contains(joint) && js.Contains(this)) return true;
-        }
-        return false;
-    }
-
-    public void Disconnect(Joint joint)
-    {
-        var past = Connections.ToList();
-        foreach (Connection c in past)
-        {
-            if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
-            {
-                Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                Connections.Remove(c);
-                MainWindow.BigScreen.Children.Remove(c);
-            }
-        }
-        var past2 = joint.Connections.ToList();
-        foreach (Connection c in past2)
-        {
-            if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
-            {
-                joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                joint.Connections.Remove(c);
-                MainWindow.BigScreen.Children.Remove(c);
-            }
-        }
-    }
-
-    public void Disconnect(params Joint[] joints)
-    {
-        foreach (Joint joint in joints)
-        {
-            var past = Connections.ToList();
-            foreach (Connection c in past)
-            {
-                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
-                {
-                    this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    Connections.Remove(c);
-                    MainWindow.BigScreen.Children.Remove(c);
-                }
-            }
-
-            var past2 = joint.Connections.ToList();
-            foreach (Connection c in past2)
-            {
-                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
-                {
-                    this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    joint.Connections.Remove(c);
-                    MainWindow.BigScreen.Children.Remove(c);
-                }
-            }
-        }
-
-    }
-
-    public void DisconnectAll()
-    {
-
-        foreach (Connection c in Connections)
-        {
-            MainWindow.BigScreen.Children.Remove(c);
-            if (c.joint1 != this) c.joint1.Connections.Remove(c);
-            else c.joint2.Connections.Remove(c);
-            if (c.joint1 != this) c.joint1.RepositionText();
-            else c.joint2.RepositionText();
-
-            c.joint1.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // One of them is `this`
-            c.joint2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
-        }
-        Connections.Clear();
-        RepositionText();
     }
 
     public void RemoveFromBoard()

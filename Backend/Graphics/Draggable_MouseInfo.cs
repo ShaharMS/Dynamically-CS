@@ -22,6 +22,7 @@ public partial class DraggableGraphic
 
     public DraggableGraphic()
     {
+        Draggable = true;
         PointerEnter += MouseInfo_PointerHover;
         PointerLeave += MouseInfo_PointerOut;
         PointerPressed += MouseInfo_PointerPressed;

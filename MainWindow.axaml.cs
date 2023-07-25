@@ -47,9 +47,14 @@ public partial class MainWindow : Window
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 
+        var t2 = new Triangle(new Joint(70, 500), new Joint(160, 400), new Joint(250, 500));
+        t2.Type = TriangleType.ISOSCELES;
+        //var t3 = new Triangle(new Joint(70, 500), new Joint(160, 400), new Joint(250, 500));
+
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
+        BigScreen.Refresh();
     }
 }

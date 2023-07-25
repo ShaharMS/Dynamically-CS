@@ -42,6 +42,14 @@ public class Circle : EllipseBase, IDismantable, IShape
         this.center = center;
         Formula = new CircleFormula(radius, center.X, center.Y);
 
+        OnMoved.Add((x, y, px, py) =>
+        {
+            double pcx = center.X, pcy = center.Y;
+            center.X += x - px;
+            center.Y += y - py;
+            center.DispatchOnMovedEvents(center.X, center.Y, pcx, pcy);
+            this.SetPosition(0, 0);
+        });
         OnMoved.Add(__circle_OnChange); 
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
@@ -135,12 +143,17 @@ public class Circle : EllipseBase, IDismantable, IShape
 
     public override bool Overlaps(Point point)
     {
-        return center.DistanceTo(point.X, point.Y) < radius;
+        return center.GetPosition().DistanceTo(point.X, point.Y) < radius;
     }
 
     public override double Area()
     {
         return radius * radius * Math.PI;
+    }
+
+    public override double GetClosenessToCenter(Point point)
+    {
+        return point.DistanceTo(center);
     }
     public override void Render(DrawingContext context)
     {
