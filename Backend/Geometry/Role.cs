@@ -9,6 +9,7 @@ namespace Dynamically.Backend.Geometry;
 
 public enum Role
 {
+    // Joint
     RAY_On,
 
     SEGMENT_Corner,
@@ -18,5 +19,15 @@ public enum Role
     CIRCLE_Center,
     CIRCLE_On,
 
-    TRIANGLE_Corner
+    TRIANGLE_Corner,
+    
+    // Connection
+    CIRCLE_Radius,
+    CIRCLE_DIAMETER,
+    CIRCLE_CHORD,
+    CIRCLE_TANGENT,
+
+    TRIANGLE_SIDE,
+    TRIANGLE_ANGLE_BISECTOR,
+    TRIANGLE_PERPENDICULAR
 }

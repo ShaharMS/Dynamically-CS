@@ -16,6 +16,7 @@ using Avalonia.Styling;
 using Dynamically.Screens;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -151,8 +152,8 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     {
         // Graphic is cleared
         var brush = new SolidColorBrush(Colors.White);
-        var pen = new Pen(new SolidColorBrush(Colors.Black), GraphicalRadius / 2.5);
-        context.DrawEllipse(brush, pen, new Point(0, 0), GraphicalRadius, GraphicalRadius);
+        var pen = new Pen(new SolidColorBrush(Colors.Black), UIOptions.JointGraphicCircleRadius / 2.5);
+        context.DrawEllipse(brush, pen, new Point(0, 0), UIOptions.JointGraphicCircleRadius, UIOptions.JointGraphicCircleRadius);
     }
 
     public void reposition()

@@ -4,6 +4,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Design;
 using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
@@ -126,10 +127,10 @@ public class Connection : DraggableGraphic, IDrawable
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared
-        var pen = new Pen(new SolidColorBrush(Colors.Black), 4);
+        var pen = new Pen(new SolidColorBrush(Colors.Black), UIOptions.ConnectionGraphicWidth);
         context.DrawLine(pen, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
         // padding for easier dragging
-        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01));
+        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIOptions.ConnectionGraphicWidth * 1.5);
         context.DrawLine(pen2, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
 
     }
