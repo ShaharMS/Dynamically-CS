@@ -20,9 +20,9 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
     public Joint joint2;
     public Joint joint3;
 
-    public Connection con12;
-    public Connection con13;
-    public Connection con23;
+    public Segment con12;
+    public Segment con13;
+    public Segment con23;
 
     private Circle? incircle;
 
@@ -83,6 +83,10 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
             incircle.center.Draggable = true;
         }
 
+        foreach (var j in new[] { joint1, joint2, joint3 })
+        {
+            j.Roles.RemoveFromRole(Role.TRIANGLE_Corner, this);
+        }
     }
 
     public Circle GenerateCircumCircle()
@@ -153,7 +157,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
                 {
                     Log.Write(B);
-                    // ∠ABC is the most similar to 60deg, therefore it should be preserved.
+                    // AB and BC are the most similar to each other, so B was chosen. Now, reset the angle
                     // We'll do this by averaging AB and BC, resetting their length, and BC will 
                     // automatically be the same length as AC, because of equilateral definition.
 
@@ -164,6 +168,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                     if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
                     {
                         var rad = radBA + Math.PI / 3;
+                        if (radBA > radBC) rad -= Math.PI / 1.5;
                         Log.Write(rad * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI);
                         C.X = B.X + dist * Math.Cos(rad);
                         C.Y = B.Y + dist * -Math.Sin(rad);
@@ -176,6 +181,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                     else
                     {
                         var rad = radBC + Math.PI / 3;
+                        if (radBC > radBA) rad -= Math.PI / 1.5;
                         Log.Write(rad * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI);
                         A.X = B.X + dist * Math.Cos(rad);
                         A.Y = B.Y + dist * -Math.Sin(rad);
@@ -188,11 +194,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
 
                     EQ_temp_incircle_center = new Point(GetCircleStats().x, GetCircleStats().y);
                 }
-                var a_ABC_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-                var a_ACB_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-                var a_BAC_ClosenessTo60Deg = Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-                if (a_ABC_ClosenessTo60Deg < a_ACB_ClosenessTo60Deg && a_ABC_ClosenessTo60Deg < a_BAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint2, joint3);
-                else if (a_ACB_ClosenessTo60Deg < a_ABC_ClosenessTo60Deg && a_ACB_ClosenessTo60Deg < a_BAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint3, joint2);
+                var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
+                var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
+                var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
+                if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint2, joint3);
+                else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint3, joint2);
                 else MakeEquilateralRelativeToABC(joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES:
@@ -204,7 +210,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
 
                     // To correct the distances, we'll  make sure the moving joint when setting connection length is not A:
 
-                    var distance = (B.DistanceTo(A) + B.DistanceTo(A)) / 2;
+                    var distance = Math.Max(B.DistanceTo(A), B.DistanceTo(A));
                     var c1 = B.GetConnectionTo(A) ?? con12;
                     c1.SetLength(distance, c1.joint1 == B ? true : false);
                     var c2 = B.GetConnectionTo(C) ?? con23;

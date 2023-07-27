@@ -102,7 +102,7 @@ public class CircleFormula : Formula
             joint.X = joint.X - preX + curX;
             joint.Y = joint.Y - preY + curY;
             foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Connection c in Connection.all) c.InvalidateVisual();
+            foreach (Segment c in Segment.all) c.InvalidateVisual();
         });
         base.AddFollower(joint);
     }
@@ -113,7 +113,7 @@ public class CircleFormula : Formula
             joint.X = joint.X - preX + curX;
             joint.Y = joint.Y - preY + curY;
             foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Connection c in Connection.all) c.InvalidateVisual();
+            foreach (Segment c in Segment.all) c.InvalidateVisual();
         });
         base.RemoveFollower(joint);
     }

@@ -166,7 +166,7 @@ public class BigScreen : DraggableGraphic
 
         if (FocusedObject is BigScreen) Log.Write("No object is focused");
         else if (FocusedObject is Joint joint) Log.Write($"{joint.Id} Is Focused");
-        else if (FocusedObject is Connection connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Focused");
+        else if (FocusedObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Focused");
         else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
     }
 
@@ -192,7 +192,7 @@ public class BigScreen : DraggableGraphic
 
         if (HoveredObject is BigScreen) Log.Write("No object is hovered");
         else if (HoveredObject is Joint joint) Log.Write($"{joint.Id} Is Hovered");
-        else if (HoveredObject is Connection connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
+        else if (HoveredObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
         else if (HoveredObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Hovered");
     }

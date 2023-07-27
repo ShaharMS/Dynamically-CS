@@ -133,7 +133,7 @@ class Tools
         return angle;
     }
 
-    public static double GetDegreesBetweenConnections(Connection p1p2, Connection p1p3)
+    public static double GetDegreesBetweenConnections(Segment p1p2, Segment p1p3)
     {
         double angle1 = Math.Atan2(p1p2.joint2.Y - p1p2.joint1.Y, p1p2.joint2.X - p1p2.joint1.X);
         double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);
@@ -155,7 +155,7 @@ class Tools
         return angle;
     }
 
-    public static double GetRadiansBetweenConnections(Connection p1p2, Connection p1p3)
+    public static double GetRadiansBetweenConnections(Segment p1p2, Segment p1p3)
     {
         double angle1 = Math.Atan2(p1p2.joint2.Y - p1p2.joint1.Y, p1p2.joint2.X - p1p2.joint1.X);
         double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);

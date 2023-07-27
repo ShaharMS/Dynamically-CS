@@ -38,7 +38,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         }
     }
 
-    public List<Connection> Connections = new();
+    public List<Segment> Connections = new();
 
     public List<Action<double, double>> OnRemoved = new();
 
@@ -64,6 +64,20 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             IdDisplay.IsVisible = IsVisible = !value;
         }
     }
+
+    bool _anchored;
+    public bool Anchored
+    {
+        get => _anchored;
+        set
+        {
+            _anchored = value;
+            Draggable &= value;
+        }
+    }
+
+    public override double X { get => base.X; set { if (!Anchored) base.X = value; } }
+    public override double Y { get => base.Y; set { if (!Anchored) base.Y = value; } }
 
     public Joint(Point p) : this(p.X, p.Y) { }
     public Joint(double x, double y, char id = '_')
@@ -110,7 +124,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         var i = 0;
         if (Connections.Count >= 1)
         {
-            foreach (Connection c in Connections)
+            foreach (Segment c in Connections)
             {
                 if (c.joint1 == this)
                 {
@@ -152,15 +166,15 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     {
         // Graphic is cleared
         var brush = new SolidColorBrush(Colors.White);
-        var pen = new Pen(new SolidColorBrush(Colors.Black), UIOptions.JointGraphicCircleRadius / 2.5);
-        context.DrawEllipse(brush, pen, new Point(0, 0), UIOptions.JointGraphicCircleRadius, UIOptions.JointGraphicCircleRadius);
+        var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.JointGraphicCircleRadius / 2.5);
+        context.DrawEllipse(brush, pen, new Point(0, 0), UIDesign.JointGraphicCircleRadius, UIDesign.JointGraphicCircleRadius);
     }
 
     public void reposition()
     {
         // Position is validated, now redraw connections & place text
         // text is placed in the middle of the biggest angle at the distance of fontSize + 4
-        foreach (Connection c in Connections)
+        foreach (Segment c in Connections)
         {
             c.InvalidateVisual();
             if (c.joint1 == this) c.joint2.RepositionText();

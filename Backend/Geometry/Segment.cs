@@ -15,9 +15,9 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Connection : DraggableGraphic, IDrawable
+public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
 {
-    public static readonly List<Connection> all = new();
+    public static readonly List<Segment> all = new();
 
     public Joint joint1;
     public Joint joint2;
@@ -26,6 +26,8 @@ public class Connection : DraggableGraphic, IDrawable
     public string text = "";
     public string dataText = "";
 
+    public RoleMap Roles { get; set; }
+
     double org1X;
     double org1Y;
     double org2X;
@@ -33,7 +35,7 @@ public class Connection : DraggableGraphic, IDrawable
 
     public SegmentFormula Formula { get; set; }
 
-    public Connection(Joint f, Joint t, string dataText = "")
+    public Segment(Joint f, Joint t, string dataText = "")
     {
         joint1 = f;
         joint2 = t;
@@ -127,10 +129,10 @@ public class Connection : DraggableGraphic, IDrawable
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared
-        var pen = new Pen(new SolidColorBrush(Colors.Black), UIOptions.ConnectionGraphicWidth);
+        var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.ConnectionGraphicWidth);
         context.DrawLine(pen, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
         // padding for easier dragging
-        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIOptions.ConnectionGraphicWidth * 1.5);
+        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5);
         context.DrawLine(pen2, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
 
     }

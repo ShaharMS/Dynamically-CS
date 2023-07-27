@@ -9,15 +9,15 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Joint
 {
-    public Connection Connect(Joint to, bool updateRelations = true)
+    public Segment Connect(Joint to, bool updateRelations = true)
     {
         // Don't connect something twice
-        foreach (Connection c in Connections.Concat(to.Connections))
+        foreach (Segment c in Connections.Concat(to.Connections))
         {
             if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
         }
 
-        var connection = new Connection(this, to);
+        var connection = new Segment(this, to);
         Connections.Add(connection);
         to.Connections.Add(connection);
 
@@ -28,14 +28,14 @@ public partial class Joint
         return connection;
     }
 
-    public List<Connection> Connect(params Joint[] joints)
+    public List<Segment> Connect(params Joint[] joints)
     {
-        var cons = new List<Connection>();
+        var cons = new List<Segment>();
         foreach (Joint joint in joints)
         {
             var doNothing = false;
             // Don't connect something twice
-            foreach (Connection c in Connections.Concat(joint.Connections))
+            foreach (Segment c in Connections.Concat(joint.Connections))
             {
                 if ((c.joint1 == this && c.joint2 == joint) || (c.joint2 == this && c.joint1 == joint))
                     doNothing = true;
@@ -43,7 +43,7 @@ public partial class Joint
 
             if (!doNothing)
             {
-                var connection = new Connection(this, joint);
+                var connection = new Segment(this, joint);
                 cons.Add(connection);
                 Connections.Add(connection);
                 joint.Connections.Add(connection);
@@ -59,7 +59,7 @@ public partial class Joint
     {
         if (this == joint) return false;
         Log.Write(Connections);
-        foreach (Connection c in Connections)
+        foreach (Segment c in Connections)
         {
             Joint[] js = new[] { c.joint1, c.joint2 };
             if (js.Contains(joint) && js.Contains(this)) return true;
@@ -67,9 +67,9 @@ public partial class Joint
         return false;
     }
 
-    public Connection? GetConnectionTo(Joint to)
+    public Segment? GetConnectionTo(Joint to)
     {
-        foreach (Connection c in Connections.Concat(to.Connections))
+        foreach (Segment c in Connections.Concat(to.Connections))
         {
             if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
         }
@@ -79,7 +79,7 @@ public partial class Joint
     public void Disconnect(Joint joint)
     {
         var past = Connections.ToList();
-        foreach (Connection c in past)
+        foreach (Segment c in past)
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
             {
@@ -89,7 +89,7 @@ public partial class Joint
             }
         }
         var past2 = joint.Connections.ToList();
-        foreach (Connection c in past2)
+        foreach (Segment c in past2)
         {
             if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
             {
@@ -105,7 +105,7 @@ public partial class Joint
         foreach (Joint joint in joints)
         {
             var past = Connections.ToList();
-            foreach (Connection c in past)
+            foreach (Segment c in past)
             {
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
@@ -117,7 +117,7 @@ public partial class Joint
             }
 
             var past2 = joint.Connections.ToList();
-            foreach (Connection c in past2)
+            foreach (Segment c in past2)
             {
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
@@ -134,7 +134,7 @@ public partial class Joint
     public void DisconnectAll()
     {
 
-        foreach (Connection c in Connections)
+        foreach (Segment c in Connections)
         {
             MainWindow.BigScreen.Children.Remove(c);
             if (c.joint1 != this) c.joint1.Connections.Remove(c);
@@ -152,7 +152,7 @@ public partial class Joint
     public void CreateBoardRelationsWith(Joint joint)
     {
         // First case - connnecting a line and forming a triangle
-        foreach (Connection c in Connections)
+        foreach (Segment c in Connections)
         {
             var other = c.joint1 == this ? c.joint2 : c.joint1;
 

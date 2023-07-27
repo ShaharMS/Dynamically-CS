@@ -21,13 +21,13 @@ public enum Role
 
     TRIANGLE_Corner,
     
-    // Connection
+    // Segment
     CIRCLE_Radius,
-    CIRCLE_DIAMETER,
-    CIRCLE_CHORD,
-    CIRCLE_TANGENT,
+    CIRCLE_Diameter,
+    CIRCLE_Chord,
+    CIRCLE_Tangent,
 
-    TRIANGLE_SIDE,
-    TRIANGLE_ANGLE_BISECTOR,
-    TRIANGLE_PERPENDICULAR
+    TRIANGLE_Side,
+    TRIANGLE_AngleBisector,
+    TRIANGLE_Perpendicular
 }
