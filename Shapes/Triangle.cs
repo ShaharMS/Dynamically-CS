@@ -40,15 +40,13 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         joint2 = j2;
         joint3 = j3;
 
-        con12 = joint1.Connect(joint2, false);
-        con13 = joint1.Connect(joint3, false);
-        con23 = joint2.Connect(joint3, false);
+        foreach (var j in new[] { joint1, joint2, joint3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
 
-        foreach (var j in new[] { joint1, joint2, joint3 })
-        {
-            j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
-            j.reposition();
-        }
+        con12 = joint1.Connect(joint2);
+        con13 = joint1.Connect(joint3);
+        con23 = joint2.Connect(joint3);
+
+        foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
 
         OnMoved.Add((x, y, px, py) => {
             joint1.X += x - px;

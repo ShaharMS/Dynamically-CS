@@ -1,4 +1,5 @@
-﻿using Dynamically.Shapes;
+﻿using Dynamically.Formulas;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,7 +25,7 @@ public partial class Joint
         reposition();
         to.reposition();
 
-        if (updateRelations) CreateBoardRelationsWith(to);
+        if (updateRelations) CreateBoardRelationsWith(to, connection);
         return connection;
     }
 
@@ -48,7 +49,7 @@ public partial class Joint
                 Connections.Add(connection);
                 joint.Connections.Add(connection);
                 joint.reposition();
-                CreateBoardRelationsWith(joint);
+                CreateBoardRelationsWith(joint, connection);
             }
         }
         reposition();
@@ -149,12 +150,36 @@ public partial class Joint
         RepositionText();
     }
 
-    public void CreateBoardRelationsWith(Joint joint)
+    public void CreateBoardRelationsWith(Joint joint, Segment segment)
     {
-        // First case - connnecting a line and forming a triangle
+        // Basic connection info
+
+        //First check - radius
+        if ((joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_Center)) || joint.Roles.Has(Role.CIRCLE_Center) && Roles.Has(Role.CIRCLE_On)) {
+            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On)) {
+                if (Roles.Has(Role.CIRCLE_Center, circle)) {
+                    segment.Roles.AddToRole(Role.CIRCLE_Radius, circle);
+                }
+            }
+        }
+        // Second check - diameter & chord
+        if (joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_On)) {
+            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On)) {
+                if (Roles.Has(Role.CIRCLE_On, circle)) {
+                    if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this)) {
+                        segment.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
+                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, new RatioOnSegmentFormula(segment.Formula, 0.5))
+                    }
+                    segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
+                }
+            }
+        }
+
         foreach (Segment c in Connections)
         {
             var other = c.joint1 == this ? c.joint2 : c.joint1;
+
+            // First case - connecting a line and forming a triangle
 
             if (other.IsConnectedTo(joint) /* this.IsConnectedTo(joint) is `true` */) // this joint is connected to other, and the just connected joint is also connected to it -> potentially new triangle
             {

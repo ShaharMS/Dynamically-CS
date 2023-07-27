@@ -46,7 +46,22 @@ public static class StaticExtensions
         return angleInDegrees;
     }
 
+    public static double DegreesTo(this Joint from, Point to)
+    {
+        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
+        double angleInDegrees = angleInRadians * (180.0 / Math.PI);
+        if (angleInDegrees < 0) angleInDegrees += 360;
+        return angleInDegrees;
+    }
+    
     public static double RadiansTo(this Point from, Point to)
+    {
+        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
+        if (angleInRadians < 0) angleInRadians += Math.PI * 2;
+        return angleInRadians;
+    }
+
+    public static double RadiansTo(this Joint from, Point to)
     {
         double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
         if (angleInRadians < 0) angleInRadians += Math.PI * 2;

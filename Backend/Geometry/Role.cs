@@ -14,7 +14,7 @@ public enum Role
 
     SEGMENT_Corner,
     SEGMENT_On,
-    SEGMENT_Split,
+    SEGMENT_Center,
 
     CIRCLE_Center,
     CIRCLE_On,
