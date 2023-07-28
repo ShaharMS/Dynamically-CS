@@ -23,7 +23,7 @@ public partial class DraggableGraphic : Canvas
     private Point _startPosition;
     private Point _startMousePosition;
 
-    public void DispatchOnMovedEvents(double x, double y, double px, double py)
+    public virtual void DispatchOnMovedEvents(double x, double y, double px, double py)
     {
         foreach (var listener in OnMoved)
         {
@@ -31,7 +31,7 @@ public partial class DraggableGraphic : Canvas
         }
     }
 
-    public void DispatchOnDraggedEvents(double x, double y, double px, double py)
+    public virtual void DispatchOnDraggedEvents(double x, double y, double px, double py)
     {
         foreach (var listener in OnDragged)
         {

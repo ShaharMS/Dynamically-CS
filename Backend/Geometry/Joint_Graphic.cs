@@ -79,6 +79,11 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     public override double X { get => base.X; set { if (!Anchored) base.X = value; } }
     public override double Y { get => base.Y; set { if (!Anchored) base.Y = value; } }
 
+    public override void DispatchOnMovedEvents(double x, double y, double px, double py)
+    {
+        if (!Anchored) base.DispatchOnMovedEvents(x, y, px, py);
+    }
+
     public Joint(Point p) : this(p.X, p.Y) { }
     public Joint(double x, double y, char id = '_')
     {

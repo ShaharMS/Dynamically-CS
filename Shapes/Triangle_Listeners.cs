@@ -36,32 +36,83 @@ public partial class Triangle
 
         if (moved == R_origin)
         {
-            other1.X += moved.X - px;
-            other1.Y += moved.Y - py;
-            other2.X += moved.X - px;
-            other2.Y += moved.Y - py;
+            RayFormula optRay1 = new RayFormula(moved, other1), optRay2 = new RayFormula(moved, other2);
+
+            var pos = new Point(px, py);
+            var distOA = pos.DistanceTo(other1);
+            var distOB = pos.DistanceTo(other2);
+
+            if (other1.Anchored && other2.Anchored)
+            {
+                moved.X = px; moved.Y = py;
+                moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
+            }
+            foreach (var other in new[] { other1, other2 })
+            {
+                var ray = new RayFormula(other, pos);
+                if (other.Anchored)
+                {
+                    var p = ray.GetClosestOnFormula(moved);
+                    if (p != null)
+                    {
+                        moved.X = p.Value.X; moved.Y = p.Value.Y;
+                        moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
+                    }
+                }
+            }
+
+
+            other1.X = moved.X + distOA * Math.Cos(pos.RadiansTo(other1));
+            other1.Y = moved.Y + distOA * Math.Sin(pos.RadiansTo(other1));
+            other2.X = moved.X + distOB * Math.Cos(pos.RadiansTo(other2));
+            other2.Y = moved.Y + distOB * Math.Sin(pos.RadiansTo(other2));
             other1.DispatchOnMovedEvents(other1.X, other1.Y, other1.X, other1.Y);
             other2.DispatchOnMovedEvents(other2.X, other2.Y, other2.X, other2.Y);
+
         }
         else
         {
             var other = other1 == R_origin ? other2 : other1;
-            var radToOrigin = Math.Atan2(moved.Y - R_origin.Y, moved.X - R_origin.X);
-            var radToOther = Math.Atan2(other.Y - R_origin.Y, other.X - R_origin.X);
+
+            var radToMoved = R_origin.RadiansTo(moved);
+            var radToOther = R_origin.RadiansTo(other);
+            Log.Write(radToMoved.RadiansBetween(radToOther).ToDegrees(), radToMoved.ToDegrees(), radToOther.ToDegrees());
             var dist = other.DistanceTo(R_origin);
-            if (radToOrigin > radToOther)
+            if ((radToMoved + Math.PI / 2).RadiansBetween(radToOther) < (radToOther + Math.PI / 2).RadiansBetween(radToMoved))
             {
-                radToOrigin -= Math.PI / 2;
-                other.X = R_origin.X + dist * Math.Cos(radToOrigin);
-                other.Y = R_origin.Y + dist * Math.Sin(radToOrigin);
-                other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
+                if (other.Anchored)
+                {
+                    dist = moved.DistanceTo(R_origin);
+                    radToOther -= Math.PI / 2;
+                    moved.X = R_origin.X + dist * Math.Cos(radToOther);
+                    moved.Y = R_origin.Y + dist * Math.Sin(radToOther);
+                    moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
+                }
+                else
+                {
+                    radToMoved += Math.PI / 2;
+                    other.X = R_origin.X + dist * Math.Cos(radToMoved);
+                    other.Y = R_origin.Y + dist * Math.Sin(radToMoved);
+                    other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
+                }
             }
             else
             {
-                radToOrigin += Math.PI / 2;
-                other.X = R_origin.X + dist * Math.Cos(radToOrigin);
-                other.Y = R_origin.Y + dist * Math.Sin(radToOrigin);
-                other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
+                if (other.Anchored)
+                {
+                    dist = moved.DistanceTo(R_origin);
+                    radToOther += Math.PI / 2;
+                    moved.X = R_origin.X + dist * Math.Cos(radToOther);
+                    moved.Y = R_origin.Y + dist * Math.Sin(radToOther);
+                    moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
+                }
+                else
+                {
+                    radToMoved -= Math.PI / 2;
+                    other.X = R_origin.X + dist * Math.Cos(radToMoved);
+                    other.Y = R_origin.Y + dist * Math.Sin(radToMoved);
+                    other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
+                }
             }
 
         }

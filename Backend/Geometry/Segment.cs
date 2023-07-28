@@ -51,14 +51,19 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
+            if (joint1.Anchored || joint2.Anchored)
+            {
+                this.SetPosition(0, 0);
+                return;
+            }
             joint1.X = org1X + X;
             joint2.X = org2X + X;
             joint1.Y = org1Y + Y;
             joint2.Y = org2Y + Y;
-            this.X = 0;
-            this.Y = 0;
-            foreach (var l in joint1.OnMoved) l(joint1.X, joint1.Y, mx, my);
-            foreach (var l in joint2.OnMoved) l(joint2.X, joint2.Y, mx, my);
+            X = 0; Y = 0;
+            Log.Write(joint2.OnMoved.Count, joint2.OnMoved.Count);
+            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, mx, my);
+            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, mx, my);
             InvalidateVisual();
         });
 
@@ -86,8 +91,8 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     }
 
     public double Length
-    { 
-        get => Math.Sqrt(Math.Pow(joint2.X  - joint1.X, 2) + Math.Pow(joint2.Y - joint1.Y, 2));
+    {
+        get => Math.Sqrt(Math.Pow(joint2.X - joint1.X, 2) + Math.Pow(joint2.Y - joint1.Y, 2));
         set
         {
             var ray = new RayFormula(joint1, joint2);

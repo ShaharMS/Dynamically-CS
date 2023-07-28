@@ -189,12 +189,13 @@ public class BigScreen : DraggableGraphic
                 draggable.InvalidateVisual();
             }
         }
-
+        /*
         if (HoveredObject is BigScreen) Log.Write("No object is hovered");
         else if (HoveredObject is Joint joint) Log.Write($"{joint.Id} Is Hovered");
         else if (HoveredObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
         else if (HoveredObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Hovered");
+        */
     }
 
     public override double Area()

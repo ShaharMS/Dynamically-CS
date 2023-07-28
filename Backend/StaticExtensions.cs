@@ -73,6 +73,22 @@ public static class StaticExtensions
         return Math.Pow(b, exponent);
     }
 
+    public static double RadiansBetween(this double radBA, double radBC)
+    {
+        var a = (radBC - radBA);
+        if (a < 0) a += Math.PI * 2;
+        if (a > Math.PI) a = Math.PI * 2 - a;
+        return a;
+    }
+
+    public static double ToRadians(this double degs)
+    {
+        return degs * Math.PI / 180;
+    }
+    public static double ToDegrees(this double rads)
+    {
+        return rads * 180 / Math.PI;
+    }
 
     public static Point GetPosition(this Control element)
     {

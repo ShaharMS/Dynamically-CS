@@ -62,6 +62,7 @@ public class JointContextMenuProvider
         {
             defaults_Rename(),
             defaults_Remove(),
+            defaults_Anchored(),
             defaults_Connect(),
             defaults_Disconnect()
         };
@@ -192,7 +193,6 @@ public class JointContextMenuProvider
 
         return connect;
     }
-
     MenuItem defaults_Disconnect()
     {
         var options = new List<MenuItem>();
@@ -220,7 +220,22 @@ public class JointContextMenuProvider
 
         return dis;
     }
-
+    CheckBox defaults_Anchored()
+    {
+        var c = new CheckBox
+        {
+            Content = "Anchored"
+        };
+        c.Checked += (s, args) =>
+        {
+            Subject.Anchored = true;
+        };
+        c.Unchecked += (s, args) =>
+        {
+            Subject.Anchored = false;
+        };
+        return c;
+    }
     // -------------------------------------------------------
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------

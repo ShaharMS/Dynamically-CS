@@ -8,6 +8,8 @@ using Dynamically.Menus;
 using Dynamically.Screens;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using System;
+using Dynamically.Backend;
 
 namespace Dynamically;
 
@@ -38,6 +40,10 @@ public partial class MainWindow : Window
         };
         BigScreen = ca;
 
+        /*for (double a = 0; a < Math.PI * 2; a += Math.PI / 180)
+        {
+            Log.Write(a.RadiansBetween((a + Math.PI / 2) % (Math.PI * 2)) * 180 / Math.PI, a * 180 / Math.PI, ((a + Math.PI / 2) % (Math.PI * 2)) * 180 / Math.PI);
+        }*/
         
         Menus.TopMenu.applyDefaultStyling();
 
@@ -47,9 +53,9 @@ public partial class MainWindow : Window
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 
-        var t2 = new Triangle(new Joint(70, 500), new Joint(160, 400), new Joint(250, 570));
-        t2.Type = TriangleType.ISOSCELES;
-        var t3 = new Triangle(new Joint(70, 500), new Joint(160, 400), new Joint(250, 570));
+        var t2 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
+        t2.Type = TriangleType.RIGHT;
+        var t3 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
 
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);

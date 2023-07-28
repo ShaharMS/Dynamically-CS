@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend;
+
 namespace Dynamically.Shapes;
 
 class Tools
@@ -124,11 +126,12 @@ class Tools
 
     public static double GetDegreesBetween3Points(Point p1, Point center, Point p2) 
     {
-        double angle1 = Math.Atan2(p1.Y - center.Y, p1.X - center.X);
-        double angle2 = Math.Atan2(p2.Y - center.Y, p2.X - center.X);
+        double angle1 = center.DegreesTo(p1);
+        double angle2 = center.DegreesTo(p2);
 
-        double angle = (angle2 - angle1) * (180.0 / Math.PI);
-        if (angle < 0) angle += 360;
+        double angle = angle2 - angle1;
+        if (angle < 0) return -angle;
+        if (angle > 180) return 360 - angle;
 
         return angle;
     }
@@ -139,18 +142,20 @@ class Tools
         double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);
 
         double angle = (angle2 - angle1) * (180.0 / Math.PI);
-        if (angle < 0) angle += 360;
+        if (angle < 0) angle = -angle;
+        if (angle > 180) return 360 - angle;
 
         return angle;
     }
 
     public static double GetRadiansBetween3Points(Point p1, Point center, Point p2)
     {
-        double angle1 = Math.Atan2(p1.Y - center.Y, p1.X - center.X);
-        double angle2 = Math.Atan2(p2.Y - center.Y, p2.X - center.X);
+        double angle1 = center.RadiansTo(p1);
+        double angle2 = center.RadiansTo(p2);
 
-        double angle = (angle2 - angle1);
-        if (angle < 0) angle += Math.PI * 2;
+        double angle = angle2 - angle1;
+        if (angle < 0) angle = -angle;
+        if (angle > 180) return Math.PI * 2 - angle;
 
         return angle;
     }
@@ -161,7 +166,8 @@ class Tools
         double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);
 
         double angle = (angle2 - angle1);
-        if (angle < 0) angle += Math.PI;
+        if (angle < 0) angle = -angle;
+        if (angle > 180) return Math.PI * 2 - angle;
 
         return angle;
     }

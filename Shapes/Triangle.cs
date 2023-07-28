@@ -49,6 +49,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
 
         OnMoved.Add((x, y, px, py) => {
+            if (joint1.Anchored || joint2.Anchored || joint3.Anchored)
+            {
+                this.SetPosition(0, 0);
+                return;
+            }
             joint1.X += x - px;
             joint2.X += x - px;
             joint3.X += x - px;
@@ -59,6 +64,9 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
             joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, joint1.X, joint1.Y);
             joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, joint2.X, joint2.Y);
             joint3.DispatchOnMovedEvents(joint3.X, joint3.Y, joint3.X, joint3.Y);
+            con12.reposition();
+            con13.reposition();
+            con23.reposition();
             this.SetPosition(0, 0);
         });
 
@@ -208,11 +216,13 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
 
                     // To correct the distances, we'll  make sure the moving joint when setting connection length is not A:
 
-                    var distance = Math.Max(B.DistanceTo(A), B.DistanceTo(A));
-                    var c1 = B.GetConnectionTo(A) ?? con12;
-                    c1.SetLength(distance, c1.joint1 == B ? true : false);
-                    var c2 = B.GetConnectionTo(C) ?? con23;
-                    c2.SetLength(distance, c2.joint1 == B ? true : false);
+                    var distance = Math.Max(B.DistanceTo(A), B.DistanceTo(C));
+                    var radBA = B.RadiansTo(A);
+                    A.X = B.X + distance * Math.Cos(radBA);
+                    A.Y = B.Y + distance * Math.Sin(radBA);
+                    var radBC = B.RadiansTo(C);
+                    C.X = B.X + distance * Math.Cos(radBC);
+                    C.Y = B.Y + distance * Math.Sin(radBC);
 
                     ISO_origin = B;
                     // Now, After equating the two sides, we're pretty much dones - we've reached teh definition of an isoceles triangle
@@ -230,22 +240,22 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                     // ∠ABC is the most similar to 90deg, therefore it should be preserved.
 
                     // Fixing the angle is easy, its just editing either A or C
-                    // But, for user comfort, we'll modify the point which creates the angle with y = 0 least similar to 0/90
-                    var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
-                    var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
-                    if (Math.Abs(radBA % Math.PI / 2) < Math.Abs(radBC % Math.PI / 2)) // BA should be preserved
+                    // But, for user comfort, we'll modify the point which creates the angle with y = 0 least similar to 0/180
+                    var radBA = B.RadiansTo(A);
+                    var radBC = B.RadiansTo(C);
+                    if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
                     {
                         var dist = B.DistanceTo(C);
-                        var XPosOffset = dist * Math.Cos(radBA + Math.PI / 2);
-                        var YPosOffset = dist * -Math.Sin(radBA + Math.PI / 2);
+                        var XPosOffset = dist * Math.Cos(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
+                        var YPosOffset = dist * Math.Sin(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
                         C.X = B.X + XPosOffset;
                         C.Y = B.Y + YPosOffset;
                     }
                     else
                     {
                         var dist = B.DistanceTo(A);
-                        var XPosOffset = dist * Math.Cos(radBC + Math.PI / 2);
-                        var YPosOffset = dist * -Math.Sin(radBC + Math.PI / 2);
+                        var XPosOffset = dist * Math.Cos(radBC + ( radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
+                        var YPosOffset = dist * Math.Sin(radBC + ( radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
                         A.X = B.X + XPosOffset;
                         A.Y = B.Y + YPosOffset;
                     }
@@ -255,8 +265,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 }
 
                 var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
                 var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
                 if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint2, joint3);
                 else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint3, joint2);
                 else MakeRightRelativeToABC(joint2, joint1, joint3);

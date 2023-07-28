@@ -168,7 +168,7 @@ public partial class Joint
                 if (Roles.Has(Role.CIRCLE_On, circle)) {
                     if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this)) {
                         segment.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
-                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, new RatioOnSegmentFormula(segment.Formula, 0.5))
+                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, new RatioOnSegmentFormula(segment.Formula, 0.5));
                     }
                     segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
                 }

@@ -1,5 +1,6 @@
 ﻿using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
+using Dynamically.Formulas;
 using Dynamically.Shapes;
 using System;
 using System.Collections;
@@ -33,7 +34,7 @@ public class RoleMap
 
     public Joint Subject;
 
-    public int Count {get; private set;}
+    public int Count { get; private set; }
     public List<object> this[Role role]
     {
         get => Access<object>(role);
@@ -90,41 +91,12 @@ public class RoleMap
         return true;
     }
 
-    public int CountOf(Role role) {
+    public int CountOf(Role role)
+    {
         return Access<object>(role).Count;
     }
 
-    public T RemoveFromRole<T>(Role role, T item)
-    {
-        var list = Access<T>(role);
-        if (list.Count == 0 || !list.Contains(item)) return item; 
-        if (list.Count == 1) Count--;
-        underlying[role].Remove(item);
-        switch (role)
-        {
-            // Segment
-            case Role.SEGMENT_Corner:
-                var s1 = item as Segment;
-                Subject.OnMoved.Remove(s1.__updateFormula);
-                Subject.OnDragged.Remove(s1.__reposition);
-                break;
-            // Circle
-            case Role.CIRCLE_On:
-                (item as Circle).Formula.RemoveFollower(Subject);
-                break;
-            case Role.CIRCLE_Center:
-                var circ = item as Circle;
-                circ.center.OnMoved.Remove(circ.__circle_OnChange);
-                break;
-            // Triangle
-            case Role.TRIANGLE_Corner:
-                Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
-                break;
-            default: break;
-        }
 
-        return item;
-    }
 
     public List<T> ClearRole<T>(Role role)
     {
@@ -147,13 +119,17 @@ public class RoleMap
 
     public T AddToRole<T>(Role role, T item)
     {
-        if (Has(role ,item)) return item;
+        if (Has(role, item)) return item;
         if (underlying.ContainsKey(role)) underlying[role].Add(item);
         else underlying[role] = new List<object> { item };
         if (underlying[role].Count == 1) Count++;
 
         switch (role)
         {
+            // Ray
+            case Role.RAY_On:
+                (item as RayFormula).AddFollower(Subject);
+                break;
             // Segment
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
@@ -170,6 +146,41 @@ public class RoleMap
             // Triangle
             case Role.TRIANGLE_Corner:
                 Subject.OnRemoved.Add((_, _) => (item as Triangle).Dismantle());
+                break;
+            default: break;
+        }
+
+        return item;
+    }
+    public T RemoveFromRole<T>(Role role, T item)
+    {
+        var list = Access<T>(role);
+        if (list.Count == 0 || !list.Contains(item)) return item;
+        if (list.Count == 1) Count--;
+        underlying[role].Remove(item);
+        switch (role)
+        {
+            // Ray
+            case Role.RAY_On:
+                (item as RayFormula).AddFollower(Subject);
+                break;
+            // Segment
+            case Role.SEGMENT_Corner:
+                var s1 = item as Segment;
+                Subject.OnMoved.Remove(s1.__updateFormula);
+                Subject.OnDragged.Remove(s1.__reposition);
+                break;
+            // Circle
+            case Role.CIRCLE_On:
+                (item as Circle).Formula.RemoveFollower(Subject);
+                break;
+            case Role.CIRCLE_Center:
+                var circ = item as Circle;
+                circ.center.OnMoved.Remove(circ.__circle_OnChange);
+                break;
+            // Triangle
+            case Role.TRIANGLE_Corner:
+                Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
                 break;
             default: break;
         }
