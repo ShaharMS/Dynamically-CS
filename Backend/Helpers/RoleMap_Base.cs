@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Dynamically.Backend.Helpers;
 #pragma warning disable CS8602
 #pragma warning disable CS8604
-public class RoleMap
+public partial class RoleMap
 {
 
     public static Dictionary<Role, List<object>> QuickCreateMap(params (Role, dynamic[])[] elements)
@@ -32,7 +32,7 @@ public class RoleMap
         return underlying.GetEnumerator();
     }
 
-    public Joint Subject;
+    public Either<Joint, Segment> Subject;
 
     public int Count { get; private set; }
     public List<object> this[Role role]
