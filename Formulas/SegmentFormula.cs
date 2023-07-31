@@ -10,10 +10,38 @@ namespace Dynamically.Formulas;
 
 public class SegmentFormula : Formula
 {
-    public double x1;
-    public double y1;
-    public double x2;
-    public double y2;
+    public double x1 
+    {
+        get => x1;
+        set {
+            x1 = value;
+            Move(x1, y1, x2, y2);
+        }
+    }
+    public double y1 
+    {
+        get => y1;
+        set {
+            y1 = value;
+            Move(x1, y1, x2, y2);
+        }
+    }
+    public double x2 
+    {
+        get => x2;
+        set {
+            x2 = value;
+            Move(x1, y1, x2, y2);
+        }
+    }
+    public double y2 
+    {
+        get => y2;
+        set {
+            y2 = value;
+            Move(x1, y1, x2, y2);
+        }
+    }
 
     double yIntercept
     {
@@ -34,15 +62,15 @@ public class SegmentFormula : Formula
         get => (y2 - y1) / (x2 - x1);
     }
 
-    public SegmentFormula(Point p1, Point p2)
+    public SegmentFormula(Point p1, Point p2) : base()
     {
-        this.x1 = p1.X;
-        this.y1 = p1.Y;
-        this.x2 = p2.X;
-        this.y2 = p2.Y;
+        x1 = p1.X;
+        y1 = p1.Y;
+        x2 = p2.X;
+        y2 = p2.Y;
     }
 
-    public SegmentFormula(double x1, double y1, double x2, double y2) 
+    public SegmentFormula(double x1, double y1, double x2, double y2) : base()
     {
         this.x1 = x1;
         this.y1 = y1;
@@ -130,5 +158,26 @@ public class SegmentFormula : Formula
         x2 += offsetX;
         y1 += offsetY;
         y2 += offsetX;
+
+
+        var nRectX = Math.Min(x1, x2);
+        var nRectY = Math.Min(y1, y2);
+
+        foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
+        foreach (var l in OnChange) l();
+    }
+    public void Move(double x1, double y1, double x2, double y2)
+    {
+        var rectX = Math.Min(this.x1, this.x2);
+        var rectY = Math.Min(this.y1, this.y2);
+
+        this.x1 = x1; this.y1 = y1;
+        this.x2 = x2; this.y2 = y2;
+
+        var nRectX = Math.Min(this.x1, this.x2);
+        var nRectY = Math.Min(this.y1, this.y2);
+
+        foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
+        foreach (var l in OnChange) l();
     }
 }

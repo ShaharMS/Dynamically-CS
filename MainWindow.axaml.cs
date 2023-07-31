@@ -62,5 +62,6 @@ public partial class MainWindow : Window
 
         MainDisplay.Children.Add(BigScreen);
         BigScreen.Refresh();
+
     }
 }

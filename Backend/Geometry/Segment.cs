@@ -26,7 +26,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     public string text = "";
     public string dataText = "";
 
-    public RoleMap Roles { get; set; }
+    public RoleMap Roles { get; private set; }
 
     double org1X;
     double org1Y;

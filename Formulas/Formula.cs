@@ -18,39 +18,54 @@ public abstract class Formula
     public abstract double[] SolveForY(double x);
 
     public abstract Point? GetClosestOnFormula(double x, double y);
-    public virtual Point? GetClosestOnFormula(Point point) {
+    public virtual Point? GetClosestOnFormula(Point point)
+    {
         return GetClosestOnFormula(point.X, point.Y);
     }
 
     public abstract void Move(double x, double y);
-    public virtual void Move(Point point) {
+    public virtual void Move(Point point)
+    {
         Move(point.X, point.Y);
+    }
+
+
+    public Formula()
+    {
+        OnChange.Add(UpdateFollowers);
     }
 
     public virtual void AddFollower(Joint joint)
     {
         Followers.Add(joint);
-        joint.OnMoved.Add((double _, double _, double _, double _) => UpdateFollowers());
-        UpdateFollowers();
+        joint.PositioningByFormula.Add(UpdateJointPosition);
+        joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
     }
 
     public virtual void RemoveFollower(Joint joint)
     {
         Followers.Add(joint);
-        joint.OnMoved.Remove((double _, double _, double _, double _) => UpdateFollowers());
+        joint.PositioningByFormula.Remove(UpdateJointPosition);
     }
 
-    public virtual void UpdateFollowers() 
+    public virtual (double X, double Y) UpdateJointPosition(double inputX, double inputY)
     {
-        foreach (var follower in Followers)
-        {
-            var pos = GetClosestOnFormula(follower);
-            if (pos == null) continue;
-            follower.X = pos.Value.X;
-            follower.Y = pos.Value.Y;
+        var X = inputX; var Y = inputY;
+        var pos = GetClosestOnFormula(inputX, inputY);
+        if (pos == null) return (X, Y);
+        X = pos.Value.X;
+        Y = pos.Value.Y;
 
-            follower.reposition();
+        return (X, Y);
+    }
+
+    public virtual void UpdateFollowers()
+    {
+        foreach(var joint in Followers)
+        {
+            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
         }
     }
+
 }
 

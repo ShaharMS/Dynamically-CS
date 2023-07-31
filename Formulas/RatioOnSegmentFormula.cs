@@ -16,7 +16,7 @@ public class RatioOnSegmentFormula : Formula
         get => new(ratio * (SegmentFormula.x2 - SegmentFormula.x1), ratio * (SegmentFormula.y2 - SegmentFormula.y1));
     }
 
-    public RatioOnSegmentFormula(SegmentFormula Formula, double ratio)
+    public RatioOnSegmentFormula(SegmentFormula Formula, double ratio) : base()
     {
         SegmentFormula = Formula;
         this.ratio = ratio;

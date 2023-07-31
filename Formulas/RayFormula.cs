@@ -35,13 +35,13 @@ public class RayFormula : Formula
         }
     }
 
-    public RayFormula(double yIntercept, double slope)
+    public RayFormula(double yIntercept, double slope) : base()
     {
         this.yIntercept = yIntercept;
         this.slope = slope;
     }
 
-    public RayFormula(Point pointOnRay, double slope) 
+    public RayFormula(Point pointOnRay, double slope) : base()
     { 
         if (pointOnRay.X > 0)
         {
@@ -54,7 +54,7 @@ public class RayFormula : Formula
         this.slope = slope;
     }
 
-    public RayFormula(Point p1, Point p2)
+    public RayFormula(Point p1, Point p2) : base()
     {
         slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)

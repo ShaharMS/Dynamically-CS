@@ -18,7 +18,6 @@ public class CircleFormula : Formula
         {
             _radius = value;
             foreach (var l in OnChange) l();
-            UpdateFollowers();
         }
     }
     double _centerX;
@@ -45,7 +44,7 @@ public class CircleFormula : Formula
             foreach (var l in OnMoved) l(_centerX, value, _centerX, prev);
         }
     }
-    public CircleFormula(double radius, double centerX, double centerY)
+    public CircleFormula(double radius, double centerX, double centerY) : base()
     {
         this.radius = radius;
         this.centerX = centerX;
@@ -101,8 +100,7 @@ public class CircleFormula : Formula
         {
             joint.X = joint.X - preX + curX;
             joint.Y = joint.Y - preY + curY;
-            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Segment c in Segment.all) c.InvalidateVisual();
+            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
         });
         base.AddFollower(joint);
     }
@@ -112,8 +110,7 @@ public class CircleFormula : Formula
         {
             joint.X = joint.X - preX + curX;
             joint.Y = joint.Y - preY + curY;
-            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Segment c in Segment.all) c.InvalidateVisual();
+            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
         });
         base.RemoveFollower(joint);
     }

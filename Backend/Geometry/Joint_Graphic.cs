@@ -38,8 +38,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         }
     }
 
-    public List<Segment> Connections = new();
-
     public List<Action<double, double>> OnRemoved = new();
 
     /// <summary>
@@ -47,7 +45,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     /// for example, given a circle, and a triangle formed with one joint being the center, 
     /// the joint's <c>Roles</c> map would contain the circle and the triangle. <br />
     /// </summary>
-    public RoleMap Roles { get; set; }
+    public RoleMap Roles { get; private set; }
 
     public JointContextMenuProvider Provider;
 
@@ -63,25 +61,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         set {
             IdDisplay.IsVisible = IsVisible = !value;
         }
-    }
-
-    bool _anchored;
-    public bool Anchored
-    {
-        get => _anchored;
-        set
-        {
-            _anchored = value;
-            Draggable &= value;
-        }
-    }
-
-    public override double X { get => base.X; set { if (!Anchored) base.X = value; } }
-    public override double Y { get => base.Y; set { if (!Anchored) base.Y = value; } }
-
-    public override void DispatchOnMovedEvents(double x, double y, double px, double py)
-    {
-        if (!Anchored) base.DispatchOnMovedEvents(x, y, px, py);
     }
 
     public Joint(Point p) : this(p.X, p.Y) { }

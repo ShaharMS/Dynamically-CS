@@ -10,6 +10,8 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Joint
 {
+    public List<Segment> Connections = new();
+
     public Segment Connect(Joint to, bool updateRelations = true)
     {
         // Don't connect something twice
