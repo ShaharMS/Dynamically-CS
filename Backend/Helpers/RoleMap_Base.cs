@@ -135,32 +135,10 @@ public partial class RoleMap
         if (list.Count == 0 || !list.Contains(item)) return item;
         if (list.Count == 1) Count--;
         underlying[role].Remove(item);
-        switch (role)
-        {
-            // Ray
-            case Role.RAY_On:
-                (item as RayFormula).AddFollower(Subject);
-                break;
-            // Segment
-            case Role.SEGMENT_Corner:
-                var s1 = item as Segment;
-                Subject.OnMoved.Remove(s1.__updateFormula);
-                Subject.OnDragged.Remove(s1.__reposition);
-                break;
-            // Circle
-            case Role.CIRCLE_On:
-                (item as Circle).Formula.RemoveFollower(Subject);
-                break;
-            case Role.CIRCLE_Center:
-                var circ = item as Circle;
-                circ.center.OnMoved.Remove(circ.__circle_OnChange);
-                break;
-            // Triangle
-            case Role.TRIANGLE_Corner:
-                Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
-                break;
-            default: break;
-        }
+
+        if (Subject.Is<Joint>()) Joint__RemoveFromRole(role, item, Subject.L());
+        else Segment__RemoveFromRole(role, item, Subject.R());
+        
 
         return item;
     }

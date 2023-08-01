@@ -11,8 +11,13 @@ namespace Dynamically.Backend.Helpers;
 #pragma warning disable CS8604
 public partial class RoleMap
 {
-    private void Segment__AddToRole<T>(Role role, T item, Segment segment) {
-        
+    private void Segment__AddToRole<T>(Role role, T item, Segment Subject)
+    {
+
+    }
+    private void Segment__RemoveFromRole<T>(Role role, T item, Segment Subject)
+    {
+
     }
 }
 
