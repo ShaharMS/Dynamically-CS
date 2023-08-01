@@ -45,7 +45,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     /// for example, given a circle, and a triangle formed with one joint being the center, 
     /// the joint's <c>Roles</c> map would contain the circle and the triangle. <br />
     /// </summary>
-    public RoleMap Roles { get; private set; }
+    public RoleMap Roles { get; set; }
 
     public JointContextMenuProvider Provider;
 

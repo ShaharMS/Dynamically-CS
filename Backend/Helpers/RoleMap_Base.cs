@@ -46,7 +46,7 @@ public partial class RoleMap
         }
     }
 
-    public RoleMap(Joint subject) : base()
+    public RoleMap(Either<Joint, Segment> subject) : base()
     {
         Subject = subject;
         Count = 0;
@@ -124,31 +124,8 @@ public partial class RoleMap
         else underlying[role] = new List<object> { item };
         if (underlying[role].Count == 1) Count++;
 
-        switch (role)
-        {
-            // Ray
-            case Role.RAY_On:
-                (item as RayFormula).AddFollower(Subject);
-                break;
-            // Segment
-            case Role.SEGMENT_Corner:
-                var s1 = item as Segment;
-                Subject.OnMoved.Add(s1.__updateFormula);
-                Subject.OnDragged.Add(s1.__reposition);
-                break;
-            // Circle
-            case Role.CIRCLE_On:
-                (item as Circle).Formula.AddFollower(Subject);
-                break;
-            case Role.CIRCLE_Center:
-                Subject.OnMoved.Add((item as Circle).__circle_OnChange);
-                break;
-            // Triangle
-            case Role.TRIANGLE_Corner:
-                Subject.OnRemoved.Add((_, _) => (item as Triangle).Dismantle());
-                break;
-            default: break;
-        }
+        if (Subject.Is<Joint>())  Joint__AddToRole(role, item, Subject.L());
+        else Segment__AddToRole(role, item, Subject.R());
 
         return item;
     }

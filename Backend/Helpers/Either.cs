@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Helpers;
 
-public class Either<L, R>
+public class Either<l, r>
 {
     public dynamic Value;
 
@@ -14,9 +14,16 @@ public class Either<L, R>
         Value = v;
     }
 
-    public static implicit operator L(Either<L, R> e) { return (L)(e.Value);}
-    public static implicit operator R(Either<L, R> e) { return (R)(e.Value);}
-    public static implicit operator Either<L, R>(L v) { return new Either<L, R>(v);}
-    public static implicit operator Either<L, R>(R v) { return new Either<L, R>(v);}
+    public bool Is<T>() {
+        return Value is T;
+    }
+
+    public l L() { return (l)Value; }
+	public r R() { return (r)Value; }
+
+    public static implicit operator l(Either<l, r> e) { return (l)(e.Value);}
+    public static implicit operator r(Either<l, r> e) { return (r)(e.Value);}
+    public static implicit operator Either<l, r>(l v) { return new Either<l, r>(v);}
+    public static implicit operator Either<l, r>(r v) { return new Either<l, r>(v);}
 
 }

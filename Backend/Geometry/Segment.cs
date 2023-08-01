@@ -26,7 +26,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     public string text = "";
     public string dataText = "";
 
-    public RoleMap Roles { get; private set; }
+    public RoleMap Roles { get; set; }
 
     double org1X;
     double org1Y;
@@ -48,6 +48,8 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         this.dataText = dataText;
         text = "" + f.Id + t.Id;
         Formula = new SegmentFormula(f, t);
+
+        Roles = new RoleMap(this);
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
