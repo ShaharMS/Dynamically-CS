@@ -10,35 +10,39 @@ namespace Dynamically.Formulas;
 
 public class SegmentFormula : Formula
 {
+    double _x1;
     public double x1 
     {
-        get => x1;
+        get => _x1;
         set {
-            x1 = value;
+            _x1 = value;
             Move(x1, y1, x2, y2);
         }
     }
+    double _y1;
     public double y1 
     {
-        get => y1;
+        get => _y1;
         set {
-            y1 = value;
+            _y1 = value;
             Move(x1, y1, x2, y2);
         }
     }
+    double _x2;
     public double x2 
     {
-        get => x2;
+        get => _x2;
         set {
-            x2 = value;
+            _x2 = value;
             Move(x1, y1, x2, y2);
         }
     }
+    double _y2;
     public double y2 
     {
-        get => y2;
+        get => _y2;
         set {
-            y2 = value;
+            _y2 = value;
             Move(x1, y1, x2, y2);
         }
     }
@@ -154,10 +158,10 @@ public class SegmentFormula : Formula
         var rectY = Math.Min(y1, y2);
         double offsetX = x - rectX, offsetY = y - rectY;
 
-        x1 += offsetX;
-        x2 += offsetX;
-        y1 += offsetY;
-        y2 += offsetX;
+        _x1 += offsetX;
+        _x2 += offsetX;
+        _y1 += offsetY;
+        _y2 += offsetX;
 
 
         var nRectX = Math.Min(x1, x2);
@@ -171,8 +175,8 @@ public class SegmentFormula : Formula
         var rectX = Math.Min(this.x1, this.x2);
         var rectY = Math.Min(this.y1, this.y2);
 
-        this.x1 = x1; this.y1 = y1;
-        this.x2 = x2; this.y2 = y2;
+        _x1 = x1; _y1 = y1;
+        _x2 = x2; _y2 = y2;
 
         var nRectX = Math.Min(this.x1, this.x2);
         var nRectY = Math.Min(this.y1, this.y2);

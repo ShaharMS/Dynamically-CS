@@ -18,9 +18,10 @@ public partial class Joint
         set
         {
             _anchored = value;
-            Draggable &= value;
         }
     }
+
+    public override bool Draggable { get => base.Draggable && !Anchored; set => base.Draggable = value; }
 
     public override double X { get => base.X; set { if (!Anchored) base.X = value; } }
     public override double Y { get => base.Y; set { if (!Anchored) base.Y = value; } }
@@ -45,8 +46,8 @@ public partial class Joint
                 listener(x, y, px, py);
             }
 
-            if (X - x < epsilon && X - y < epsilon) safety = 0;
-            else if (epsilon > 100)
+            if (X - x < epsilon && Y - y < epsilon) safety = 0;
+            else if (safety > 20)
             {
                 string Keys()
                 {

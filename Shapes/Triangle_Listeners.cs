@@ -2,6 +2,7 @@
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Formulas;
+using Dynamically.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ public partial class Triangle
     }
 
     private Joint R_origin;
+    private RayFormula R_O;
     private void Right_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
@@ -45,29 +47,31 @@ public partial class Triangle
             if (other1.Anchored && other2.Anchored)
             {
                 moved.X = px; moved.Y = py;
-                moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
-            }
-            foreach (var other in new[] { other1, other2 })
+            } else if (other1.Anchored)
             {
-                var ray = new RayFormula(other, pos);
-                if (other.Anchored)
+                var ray = new RayFormula(pos, other1);
+                var p = ray.GetClosestOnFormula(new Point(BigScreen.MouseX, BigScreen.MouseY));
+                if (p != null)
                 {
-                    var p = ray.GetClosestOnFormula(moved);
-                    if (p != null)
-                    {
-                        moved.X = p.Value.X; moved.Y = p.Value.Y;
-                        moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
-                    }
+                    moved.X = p.Value.X; moved.Y = p.Value.Y;
+                    other2.X += moved.X - px;
+                    other2.Y += moved.Y - py;
                 }
+            } else if (other2.Anchored)
+            {
+                var ray = new RayFormula(pos, other2);
+                var p = ray.GetClosestOnFormula(new Point(BigScreen.MouseX, BigScreen.MouseY));
+                if (p != null)
+                {
+                    moved.X = p.Value.X; moved.Y = p.Value.Y;
+                    other1.X += moved.X - px;
+                    other1.Y += moved.Y - py;
+                }
+            } else
+            {
+                other1.X += moved.X - px; other1.Y += moved.Y - py;
+                other2.X += moved.X - px; other2.Y += moved.Y - py;
             }
-
-
-            other1.X = moved.X + distOA * Math.Cos(pos.RadiansTo(other1));
-            other1.Y = moved.Y + distOA * Math.Sin(pos.RadiansTo(other1));
-            other2.X = moved.X + distOB * Math.Cos(pos.RadiansTo(other2));
-            other2.Y = moved.Y + distOB * Math.Sin(pos.RadiansTo(other2));
-            other1.DispatchOnMovedEvents(other1.X, other1.Y, other1.X, other1.Y);
-            other2.DispatchOnMovedEvents(other2.X, other2.Y, other2.X, other2.Y);
 
         }
         else
@@ -86,14 +90,12 @@ public partial class Triangle
                     radToOther -= Math.PI / 2;
                     moved.X = R_origin.X + dist * Math.Cos(radToOther);
                     moved.Y = R_origin.Y + dist * Math.Sin(radToOther);
-                    moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
                 }
                 else
                 {
                     radToMoved += Math.PI / 2;
                     other.X = R_origin.X + dist * Math.Cos(radToMoved);
                     other.Y = R_origin.Y + dist * Math.Sin(radToMoved);
-                    other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
                 }
             }
             else
@@ -104,20 +106,33 @@ public partial class Triangle
                     radToOther += Math.PI / 2;
                     moved.X = R_origin.X + dist * Math.Cos(radToOther);
                     moved.Y = R_origin.Y + dist * Math.Sin(radToOther);
-                    moved.DispatchOnMovedEvents(moved.X, moved.Y, moved.X, moved.Y);
                 }
                 else
                 {
                     radToMoved -= Math.PI / 2;
                     other.X = R_origin.X + dist * Math.Cos(radToMoved);
                     other.Y = R_origin.Y + dist * Math.Sin(radToMoved);
-                    other.DispatchOnMovedEvents(other.X, other.Y, other.X, other.Y);
                 }
             }
 
         }
 
     }
+    private void Right_OnSegmentMoved(Joint other)
+    {
+        if (!other.Anchored)
+        {
+            other.Anchored = true;
+            R_O = new RayFormula(other, R_origin);
+            R_origin.Roles.AddToRole(Role.RAY_On, R_O);
+        }
+    }
+    private void Right_OnSegmentDragged(Joint other)
+    {
+        other.Anchored = false;
+        R_origin.Roles.RemoveFromRole(Role.RAY_On, R_O);
+    }
+
 
     private Joint ISO_origin;
 
@@ -135,15 +150,12 @@ public partial class Triangle
             var radsToOther1 = Math.Atan2(j1.Y - ISO_origin.Y, j1.X - ISO_origin.X);
             j1.X = ISO_origin.X + dist * Math.Cos(radsToOther1);
             j1.Y = ISO_origin.Y + dist * Math.Sin(radsToOther1);
-            j1.DispatchOnMovedEvents(j1.X, j1.Y, j1.X, j1.Y);
-
         }
         else
         {
             var radsToOther2 = Math.Atan2(j2.Y - ISO_origin.Y, j2.X - ISO_origin.X);
             j2.X = ISO_origin.X + dist * Math.Cos(radsToOther2);
             j2.Y = ISO_origin.Y + dist * Math.Sin(radsToOther2);
-            j2.DispatchOnMovedEvents(j2.X, j2.Y, j2.X, j2.Y);
         }
     }
 }

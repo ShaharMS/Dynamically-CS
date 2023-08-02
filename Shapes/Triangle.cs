@@ -290,6 +290,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
                 joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
+                con12.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint3));
+                con13.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint2));
+                con23.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint1));
+                con12.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint3));
+                con13.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint2));
+                con23.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint1));
                 // Add EQUILATERAL
                 joint1.OnMoved.Add((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Add((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
@@ -300,6 +306,16 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
                 joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
+                // Remove RIGHT
+                joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
+                joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
+                joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
+                con12.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint3));
+                con13.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint2));
+                con23.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint1));
+                con12.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint3));
+                con13.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint2));
+                con23.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint1));
                 // Add ISOCELES
                 joint1.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
@@ -318,6 +334,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 joint1.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
                 joint3.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
+                con12.OnMoved.Add((_, _, _, _) => Right_OnSegmentMoved(joint3));
+                con13.OnMoved.Add((_, _, _, _) => Right_OnSegmentMoved(joint2));
+                con23.OnMoved.Add((_, _, _, _) => Right_OnSegmentMoved(joint1));
+                con12.OnDragged.Add((_, _, _, _) => Right_OnSegmentDragged(joint3));
+                con13.OnDragged.Add((_, _, _, _) => Right_OnSegmentDragged(joint2));
+                con23.OnDragged.Add((_, _, _, _) => Right_OnSegmentDragged(joint1));
                 break;
             case TriangleType.SCALENE:
                 // Remove ISOCELES
@@ -328,6 +350,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
                 joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
+                con12.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint3));
+                con13.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint2));
+                con23.OnMoved.Remove((_, _, _, _) => Right_OnSegmentMoved(joint1));
+                con12.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint3));
+                con13.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint2));
+                con23.OnDragged.Remove((_, _, _, _) => Right_OnSegmentDragged(joint1));
                 // Remove EQUILATERAL:
                 joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
                 joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));

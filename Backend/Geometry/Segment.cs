@@ -53,24 +53,28 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
+            joint1.CurrentlyDragging = joint2.CurrentlyDragging = true;
             if (joint1.Anchored || joint2.Anchored)
             {
                 this.SetPosition(0, 0);
                 return;
             }
+            var pj1X = joint1.X; var pj2X = joint2.X;
+            var pj1Y = joint1.Y; var pj2Y = joint2.Y;
             joint1.X = org1X + X;
             joint2.X = org2X + X;
             joint1.Y = org1Y + Y;
             joint2.Y = org2Y + Y;
             X = 0; Y = 0;
             Log.Write(joint2.OnMoved.Count, joint2.OnMoved.Count);
-            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, mx, my);
-            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, mx, my);
+            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, pj1X, pj1Y);
+            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, pj2X, pj2Y);
             InvalidateVisual();
         });
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
+            joint1.CurrentlyDragging = joint2.CurrentlyDragging = false;
             joint1.Provider.EvaluateRecommendations();
             joint2.Provider.EvaluateRecommendations();
             foreach (var c in joint1.Connections) c.reposition();
