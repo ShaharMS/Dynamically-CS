@@ -183,8 +183,7 @@ public class RayFormula : Formula
         {
             joint.Y = joint.Y - preY + curY;
             joint.X = SolveForX(joint.Y)[0];
-            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Segment c in Segment.all) c.InvalidateVisual();
+            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
         });
         base.AddFollower(joint);
     }
@@ -194,8 +193,7 @@ public class RayFormula : Formula
         {
             joint.Y = joint.Y - preY + curY;
             joint.X = SolveForX(joint.Y)[0];
-            foreach (var l in joint.OnMoved) l(joint.X, joint.Y, joint.X, joint.Y);
-            foreach (Segment c in Segment.all) c.InvalidateVisual();
+            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
         });
         base.RemoveFollower(joint);
     }
