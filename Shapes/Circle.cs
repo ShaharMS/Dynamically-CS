@@ -157,7 +157,7 @@ public class Circle : EllipseBase, IDismantable, IShape
     }
     public override void Render(DrawingContext context)
     {
-        if (MainWindow.BigScreen.HoveredObject == this)
+        if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
         {
             context.DrawEllipse(UIColors.ShapeHoverFill, null, center, radius, radius);
         }

@@ -220,19 +220,17 @@ public class JointContextMenuProvider
 
         return dis;
     }
-    CheckBox defaults_Anchored()
+    MenuItem defaults_Anchored()
     {
-        var c = new CheckBox
+        var c = new MenuItem();
+        if (Subject.Anchored) c.Header = "Unanchor";
+        else c.Header = "Anchor";
+        c.Click += (s, args) =>
         {
-            Content = "Anchored"
-        };
-        c.Checked += (s, args) =>
-        {
-            Subject.Anchored = true;
-        };
-        c.Unchecked += (s, args) =>
-        {
-            Subject.Anchored = false;
+            Subject.Anchored = !Subject.Anchored;
+
+            if (Subject.Anchored) c.Header = "Unanchor";
+            else c.Header = "Anchor";
         };
         return c;
     }

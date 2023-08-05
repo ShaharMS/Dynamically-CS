@@ -70,5 +70,6 @@ public partial class Joint
                 DispatchOnMovedEvents(X, Y, x, y);
             }
         }
+        reposition();
     }
 }

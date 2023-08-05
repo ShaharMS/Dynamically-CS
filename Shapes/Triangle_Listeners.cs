@@ -118,27 +118,24 @@ public partial class Triangle
         }
 
     }
-    private void Right_OnSegmentMoved(Joint other)
-    {
-        if (!other.Anchored)
-        {
-            other.Anchored = true;
-            R_O = new RayFormula(other, R_origin);
-            R_origin.Roles.AddToRole(Role.RAY_On, R_O);
-        }
-    }
-    private void Right_OnSegmentDragged(Joint other)
-    {
-        other.Anchored = false;
-        R_origin.Roles.RemoveFromRole(Role.RAY_On, R_O);
-    }
-
 
     private Joint ISO_origin;
 
     private void Isoceles_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
+
+        if (moved == ISO_origin)
+        {
+            var ray = new RatioOnSegmentFormula(new SegmentFormula(other1, other2), 0.5).GetPerpendicular();
+
+            var p = ray.GetClosestOnFormula(moved);
+            if (p != null) {
+                moved.X = p.Value.X; moved.Y = p.Value.Y;
+            }
+            return;
+        }
+
         Joint j1 = other1, j2 = other2;
         if (j1 == ISO_origin) j1 = moved;
         else if (j2 == ISO_origin) j2 = moved;

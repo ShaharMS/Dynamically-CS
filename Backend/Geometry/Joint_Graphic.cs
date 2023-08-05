@@ -74,7 +74,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
             FontWeight = FontWeight.DemiBold,
             Background = null,
             BorderThickness = new Thickness(0, 0, 0, 0),
-            Width = 20
+            Width = 25
         };
         
         if (id == '_') IDGenerator.GenerateFor(this);
