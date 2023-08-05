@@ -16,36 +16,10 @@ using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Menus.ContextMenus;
 
-public class JointContextMenuProvider
+public class JointContextMenuProvider : ContextMenuProvider
 {
-    public List<Control> Items
-    {
-        get
-        {
-#pragma warning disable CA1806
-            var list = Defaults.ToList();
-            new TextSeparator("Suggestions", list);
-            list = list.Concat(Suggestions.ToList()).ToList();
-            new TextSeparator("Recommended", list);
-            list = list.Concat(Recommendations.ToList()).ToList();
-            if (MainWindow.Debug)
-            {
-                new TextSeparator("Debug", list);
-                list = list.Concat(Debugging.ToList()).ToList();
-            }
-#pragma warning restore CA1806
-
-            return list;
-        }
-    }
-
-    public List<Control> Defaults = new();
-    public List<Control> Suggestions = new();
-    public List<Control> Recommendations = new();
-    public List<Control> Debugging = new();
 
     public Joint Subject;
-    public ContextMenu Menu;
     public JointContextMenuProvider(Joint joint, ContextMenu menu)
     {
         Subject = joint;
@@ -56,7 +30,7 @@ public class JointContextMenuProvider
         if (MainWindow.Debug) AddDebugInfo();
     }
 
-    public void GenerateDefaults()
+    public override void GenerateDefaults()
     {
         Defaults = new List<Control>
         {
@@ -68,7 +42,7 @@ public class JointContextMenuProvider
         };
     }
 
-    public void GeneratePerShapeSuggestions()
+    public override void GeneratePerShapeSuggestions()
     {
         //Log.Write("Eval");
         Suggestions = new List<Control>();
@@ -82,12 +56,12 @@ public class JointContextMenuProvider
         }
     }
 
-    public void EvaluateRecommendations()
+    public override void EvaluateRecommendations()
     {
 
     }
 
-    public void AddDebugInfo()
+    public virtual void AddDebugInfo()
     {
         Debugging = new List<Control>
         {
@@ -95,13 +69,9 @@ public class JointContextMenuProvider
         };
     }
 
-    public void Regenerate()
+    public override void Regenerate()
     {
-        GenerateDefaults();
-        GeneratePerShapeSuggestions();
-        EvaluateRecommendations();
-        if (MainWindow.Debug) AddDebugInfo();
-
+        base.Regenerate();
         Subject.ContextMenu = new ContextMenu
         {
             Items = Items

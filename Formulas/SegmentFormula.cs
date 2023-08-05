@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Dynamically.Backend.Geometry;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -80,6 +81,22 @@ public class SegmentFormula : Formula
         this.y1 = y1;
         this.x2 = x2;
         this.y2 = y2;
+    }
+
+    public SegmentFormula(Segment segment)
+    {
+        x1 = segment.joint1.X;
+        y1 = segment.joint1.Y;
+        x2 = segment.joint2.X;
+        y2 = segment.joint2.Y;
+
+        segment.OnMoved.Add((_, _, _, _) =>
+        {
+            x1 = segment.joint1.X;
+            y1 = segment.joint1.Y;
+            x2 = segment.joint2.X;
+            y2 = segment.joint2.Y;
+        });
     }
 
     public Point? Intersect(SegmentFormula formula)
