@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Input;
 using Dynamically.Backend.Geometry;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     {
         Defaults = new List<Control>
         {
-
+            Defaults_Disconnect(),
+            Defaults_Label()
         };
     }
 
@@ -39,4 +41,136 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             Items = Items
         };
     }
+
+
+    // -------------------------------------------------------
+    // ------------------------Defaults-----------------------
+    // -------------------------------------------------------
+
+    MenuItem Defaults_Disconnect()
+    {
+        var m = new MenuItem
+        {
+            Header = $"Disconnect {Subject.ToString()}"
+        };
+
+        m.Click += (s, e) => { Subject.joint1.Disconnect(Subject.joint2); };
+
+        return m;
+    }
+    MenuItem Defaults_Label()
+    {
+        var len = new MenuItem();
+        len.Header = "Length (Exact) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_EXACT ? "✓" : "");
+        len.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_EXACT; };
+
+        var lenR = new MenuItem();
+        lenR.Header = "Length (Rounded) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_ROUND? "✓" : "");
+        lenR.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_ROUND; };
+
+        var none = new MenuItem();
+        none.Header = "Nothing " + (Subject.TextDisplayMode == SegmentTextDisplay.NONE ? "✓" : "");
+        none.Click += (s, e) => { Subject.Label.Content = "";  Subject.TextDisplayMode = SegmentTextDisplay.NONE; };
+
+        var paramField = new TextBox
+        {
+            NewLine = "",
+            AcceptsTab = false,
+            AcceptsReturn = false,
+            Text = Subject.Label.Content.ToString(),
+            Watermark = "Letter"
+        };
+        paramField.SelectAll();
+        paramField.Focus();
+        paramField.PropertyChanged += (sender, e) =>
+        {
+            try
+            {
+                if (paramField.Text.Length > 0) paramField.Text = paramField.Text.ToLower().ToCharArray()[paramField.Text.Length - 1].ToString();
+            } catch { }
+        };
+        paramField.KeyDown += (sender, e) =>
+        {
+            if (e.Key == Key.Enter)
+            {
+                Subject.Label.Content = paramField.Text.ToCharArray()[0];
+                //Hide hack
+                var prev = Subject.ContextMenu;
+                Subject.ContextMenu = null;
+                Subject.ContextMenu = prev;
+            }
+        };
+
+        var hBar = new DockPanel
+        {
+            LastChildFill = true
+        };
+        DockPanel.SetDock(hBar, Dock.Left);
+        hBar.Children.Add(new Label { Content = "Parameter:" });
+        hBar.Children.Add(paramField);
+
+        var param = new MenuItem
+        {
+            Header = "Parameter" + (Subject.TextDisplayMode == SegmentTextDisplay.PARAM ? "✓" : ""),
+            Items = new Control[] { hBar, new Label { Content = "(Press `enter` to confirm)" } }
+        };
+
+        var customField = new TextBox
+        {
+            NewLine = "",
+            AcceptsTab = false,
+            AcceptsReturn = false,
+            Text = Subject.Label.Content.ToString(),
+            Watermark = "Word"
+        };
+        customField.SelectAll();
+        customField.Focus();
+        customField.PropertyChanged += (sender, e) =>
+        {
+            try
+            {
+                if (customField.Text.Length > 0) customField.Text = customField.Text.ToLower().ToCharArray()[customField.Text.Length - 1].ToString();
+            }
+            catch { }
+        };
+        customField.KeyDown += (sender, e) =>
+        {
+            if (e.Key == Key.Enter)
+            {
+                Subject.Label.Content = customField.Text.ToCharArray()[0];
+                //Hide hack
+                var prev = Subject.ContextMenu;
+                Subject.ContextMenu = null;
+                Subject.ContextMenu = prev;
+            }
+        };
+
+        var hBar2 = new DockPanel
+        {
+            LastChildFill = true
+        };
+        DockPanel.SetDock(hBar2, Dock.Left);
+        hBar2.Children.Add(new Label { Content = "Content:" });
+        hBar2.Children.Add(customField);
+
+        var custom = new MenuItem
+        {
+            Header = "Custom" + (Subject.TextDisplayMode == SegmentTextDisplay.CUSTOM ? "✓" : ""),
+            Items = new Control[] { hBar2, new Label { Content = "(Press `enter` to confirm)" } }
+        };
+
+        return new MenuItem
+        {
+            Header = "Label",
+            Items = new[]
+            {
+                len,
+                lenR,
+                none,
+                param,
+                custom
+            }
+        };
+    }
+
 }

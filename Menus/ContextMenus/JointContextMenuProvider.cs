@@ -34,11 +34,11 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         Defaults = new List<Control>
         {
-            defaults_Rename(),
-            defaults_Remove(),
-            defaults_Anchored(),
-            defaults_Connect(),
-            defaults_Disconnect()
+            Defaults_Rename(),
+            Defaults_Remove(),
+            Defaults_Anchored(),
+            Defaults_Connect(),
+            Defaults_Disconnect()
         };
     }
 
@@ -51,7 +51,7 @@ public class JointContextMenuProvider : ContextMenuProvider
             //Log.Write("Circ");
             if (Subject.Roles.CountOf(Role.CIRCLE_Center) == 1)
             {
-                Suggestions.Add(shapedefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
+                Suggestions.Add(ShapeDefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
             }
         }
     }
@@ -61,11 +61,11 @@ public class JointContextMenuProvider : ContextMenuProvider
 
     }
 
-    public virtual void AddDebugInfo()
+    public override void AddDebugInfo()
     {
         Debugging = new List<Control>
         {
-            debug_DisplayRoles()
+            Debug_DisplayRoles()
         };
     }
 
@@ -78,11 +78,10 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
     }
 
-#pragma warning disable IDE1006
     // -------------------------------------------------------
     // ------------------------Defaults-----------------------
     // -------------------------------------------------------
-    MenuItem defaults_Rename()
+    MenuItem Defaults_Rename()
     {
         var field = new TextBox
         {
@@ -90,23 +89,18 @@ public class JointContextMenuProvider : ContextMenuProvider
             AcceptsTab = false,
             AcceptsReturn = false,
             Text = Subject.Id.ToString(),
-            Watermark = "Letter",
-            MaxLength = 1
+            Watermark = "Letter"
         };
         field.SelectAll();
         field.Focus();
-        field.TextInput += (sender, e) =>
+        field.PropertyChanged += (sender, e) =>
         {
-            if (e.Text == "\n" || e.Text == "\n\r")
+            try
             {
-                Subject.Id = field.Text.ToCharArray()[0];
-                //Hide hack
-                var prev = Subject.ContextMenu;
-                Subject.ContextMenu = null;
-                Subject.ContextMenu = prev;
+
+                if (field.Text.Length > 0) field.Text = field.Text.ToLower().ToCharArray()[field.Text.Length - 1].ToString();
             }
-            if (e.Text == null) return;
-            field.Text = e.Text.ToUpper();
+            catch { }
         };
         field.KeyDown += (sender, e) =>
         {
@@ -136,7 +130,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
         return rename;
     }
-    MenuItem defaults_Remove()
+    MenuItem Defaults_Remove()
     {
         var remove = new MenuItem
         {
@@ -148,7 +142,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
         return remove;
     }
-    MenuItem defaults_Connect()
+    MenuItem Defaults_Connect()
     {
         var connect = new MenuItem
         {
@@ -163,7 +157,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
         return connect;
     }
-    MenuItem defaults_Disconnect()
+    MenuItem Defaults_Disconnect()
     {
         var options = new List<MenuItem>();
 
@@ -190,7 +184,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
         return dis;
     }
-    MenuItem defaults_Anchored()
+    MenuItem Defaults_Anchored()
     {
         var c = new MenuItem();
         if (Subject.Anchored) c.Header = "Unanchor";
@@ -208,7 +202,7 @@ public class JointContextMenuProvider : ContextMenuProvider
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
 
-    MenuItem shapedefaults_CrateRadius(Circle circle, string circleName = "")
+    MenuItem ShapeDefaults_CrateRadius(Circle circle, string circleName = "")
     {
         var text = "Create Radius";
         if (circleName.Length > 0) text += " At " + circleName;
@@ -238,7 +232,7 @@ public class JointContextMenuProvider : ContextMenuProvider
     // -------------------------Debug-------------------------
     // -------------------------------------------------------
 
-    MenuItem debug_DisplayRoles()
+    MenuItem Debug_DisplayRoles()
     {
         string Keys()
         {
@@ -255,10 +249,9 @@ public class JointContextMenuProvider : ContextMenuProvider
         var roles = new MenuItem
         {
             Header = "Display Roles",
-            Items = new Control[] { new Label { Content = Keys() }}
+            Items = new Control[] { new Label { Content = Keys() } }
         };
 
         return roles;
     }
-#pragma warning restore IDE1006
 }

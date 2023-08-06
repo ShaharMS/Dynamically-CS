@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.TextFormatting;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
@@ -40,8 +41,39 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
 
     public SegmentContextMenuProvider Provider;
 
-    public Label Label { get; set; }
+    public Label Label = new();
 
+    SegmentTextDisplay _disp = SegmentTextDisplay.NONE;
+    public SegmentTextDisplay TextDisplayMode
+    {
+        get => _disp;
+        set
+        {
+            _disp = value;
+            switch (value)
+            {
+                case SegmentTextDisplay.LENGTH_EXACT:
+                    labelUpdater = () => Label.Content = "" + Math.Round(Length, 3);
+                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    break;
+                case SegmentTextDisplay.LENGTH_ROUND:
+                    labelUpdater = () => Label.Content = "" + Math.Round(Length);
+                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    break;
+                case SegmentTextDisplay.PARAM:
+                case SegmentTextDisplay.CUSTOM:
+                case SegmentTextDisplay.NONE:
+                    labelUpdater = () => { };
+                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    break;
+            }
+        }
+    }
+
+    Action labelUpdater = () => { };
     public Segment(Joint f, Joint t, string dataText = "")
     {
         joint1 = f;
@@ -57,32 +89,26 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         Formula = new SegmentFormula(this);
         MiddleFormula = new RatioOnSegmentFormula(Formula, 0.5);
 
+        Label = new Label
+        {
+            FontSize = 16,
+            FontWeight = FontWeight.SemiLight,
+            Background = new SolidColorBrush(Colors.White),
+            BorderThickness = new Thickness(0, 0, 0, 0),
+            Width = double.NaN,
+            Height = 24,
+            Content = "test"
+        };
+
         Roles = new RoleMap(this);
 
         ContextMenu = new ContextMenu();
         Provider = new SegmentContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
-        Label = new Label
-        {
-            FontSize = 16,
-            FontWeight = FontWeight.SemiLight,
-            Background = null,
-            BorderThickness = new Thickness(0, 0, 0, 0),
-            Width = double.NaN,
-            Opacity = 0.8,
-            Content = "test"
-        };
 
 
-        Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
-        var potentials = MiddleFormula.GetPerpendicular().GetPointsByDistanceFrom(MiddleFormula.pointOnRatio, 5);
-        if (potentials != null)
-        {
-            Label.SetPosition(potentials[0].X, potentials[0].Y);
-        }
-
-        MainWindow.BigScreen.Children.Add(Label);
+        Children.Add(Label);
 
         OnMoved.Add((double px, double py, double mx, double my) =>
         {
@@ -102,13 +128,6 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
             joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, pj1X, pj1Y);
             joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, pj2X, pj2Y);
             InvalidateVisual();
-
-            Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
-            var potentials = MiddleFormula.GetPerpendicular().GetPointsByDistanceFrom(MiddleFormula.pointOnRatio, 10);
-            if (potentials != null)
-            {
-                Label.SetPosition(potentials[0].X, potentials[0].Y);
-            }
         });
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
@@ -178,6 +197,13 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
 
     public override void Render(DrawingContext context)
     {
+        UpdateFormula();
+        // Label
+        Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
+        var rad = Math.Atan(Formula.slope);
+        Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
+        Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
+
         // Graphic is cleared
         var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.ConnectionGraphicWidth);
         context.DrawLine(pen, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
@@ -218,4 +244,13 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         reposition();
     }
 #pragma warning restore IDE1006
+}
+
+public enum SegmentTextDisplay
+{
+    LENGTH_EXACT,
+    LENGTH_ROUND,
+    PARAM,
+    NONE,
+    CUSTOM
 }

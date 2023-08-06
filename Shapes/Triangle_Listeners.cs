@@ -17,11 +17,16 @@ public partial class Triangle
     private void Equilateral_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
+        if (moved.Anchored || other1.Anchored || other2.Anchored) return;
         var center = EQ_temp_incircle_center;
         var len = center.DistanceTo(moved);
-        var angle = Math.Atan2(moved.Y - center.Y, moved.X - center.X);
-        Log.Write(angle * 180 / Math.PI);
-        foreach (var o in new[] { other1, other2 })
+        var angle = center.RadiansTo(moved);
+        var arr = new Joint[2];
+
+        Log.Write(angle.RadiansBetween(center.RadiansTo(other1), true), angle.RadiansBetween(center.RadiansTo(other2), true));
+        if (angle.RadiansBetween(center.RadiansTo(other1), true) > angle.RadiansBetween(center.RadiansTo(other2), true) ) arr = new[] { other1, other2 };
+        else arr = new[] { other2, other1 };
+        foreach (var o in arr)
         {
             angle += 2 * Math.PI / 3;
             o.X = center.X + len * Math.Cos(angle);
@@ -31,18 +36,13 @@ public partial class Triangle
     }
 
     private Joint R_origin;
-    private RayFormula R_O;
     private void Right_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
 
         if (moved == R_origin)
         {
-            RayFormula optRay1 = new RayFormula(moved, other1), optRay2 = new RayFormula(moved, other2);
-
             var pos = new Point(px, py);
-            var distOA = pos.DistanceTo(other1);
-            var distOB = pos.DistanceTo(other2);
 
             if (other1.Anchored && other2.Anchored)
             {

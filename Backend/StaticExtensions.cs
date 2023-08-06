@@ -53,7 +53,7 @@ public static class StaticExtensions
         if (angleInDegrees < 0) angleInDegrees += 360;
         return angleInDegrees;
     }
-    
+
     public static double RadiansTo(this Point from, Point to)
     {
         double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
@@ -73,11 +73,19 @@ public static class StaticExtensions
         return Math.Pow(b, exponent);
     }
 
-    public static double RadiansBetween(this double radBA, double radBC)
+    public static double RadiansBetween(this double radBA, double radBC, bool neg = false)
     {
         var a = (radBC - radBA);
-        if (a < 0) a += Math.PI * 2;
-        if (a > Math.PI) a = Math.PI * 2 - a;
+        if (!neg)
+        {
+            if (a < 0) a += Math.PI * 2;
+            if (a > Math.PI) a = Math.PI * 2 - a;
+        }
+        else
+        {
+            if (a < -Math.PI) a += Math.PI * 2;
+            if (a > Math.PI) a -= Math.PI * 2;
+        }
         return a;
     }
 
