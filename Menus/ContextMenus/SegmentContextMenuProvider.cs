@@ -78,16 +78,15 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             AcceptsTab = false,
             AcceptsReturn = false,
             Text = Subject.Label.Content.ToString(),
-            Watermark = "Letter"
+            Watermark = "Letter",
+            MaxLength = 1
         };
         paramField.SelectAll();
         paramField.Focus();
-        paramField.PropertyChanged += (sender, e) =>
+        paramField.TextInput += (sender, e) =>
         {
-            try
-            {
-                if (paramField.Text.Length > 0) paramField.Text = paramField.Text.ToLower().ToCharArray()[paramField.Text.Length - 1].ToString();
-            } catch { }
+            if (e.Text == null) return;
+            paramField.Text = e.Text.ToLower();
         };
         paramField.KeyDown += (sender, e) =>
         {
@@ -121,17 +120,15 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             AcceptsTab = false,
             AcceptsReturn = false,
             Text = Subject.Label.Content.ToString(),
-            Watermark = "Word"
+            Watermark = "Word",
+            MaxLength = 1
         };
         customField.SelectAll();
         customField.Focus();
-        customField.PropertyChanged += (sender, e) =>
+        customField.TextInput += (sender, e) =>
         {
-            try
-            {
-                if (customField.Text.Length > 0) customField.Text = customField.Text.ToLower().ToCharArray()[customField.Text.Length - 1].ToString();
-            }
-            catch { }
+            if (e.Text == null) return;
+            customField.Text = e.Text.ToLower();
         };
         customField.KeyDown += (sender, e) =>
         {

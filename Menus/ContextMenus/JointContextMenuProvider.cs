@@ -89,18 +89,15 @@ public class JointContextMenuProvider : ContextMenuProvider
             AcceptsTab = false,
             AcceptsReturn = false,
             Text = Subject.Id.ToString(),
-            Watermark = "Letter"
+            Watermark = "Letter",
+            MaxLength = 1
         };
         field.SelectAll();
         field.Focus();
-        field.PropertyChanged += (sender, e) =>
+        field.TextInput += (sender, e) =>
         {
-            try
-            {
-
-                if (field.Text.Length > 0) field.Text = field.Text.ToLower().ToCharArray()[field.Text.Length - 1].ToString();
-            }
-            catch { }
+            if (e.Text == null) return;
+            field.Text = e.Text.ToUpper();
         };
         field.KeyDown += (sender, e) =>
         {
@@ -249,7 +246,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         var roles = new MenuItem
         {
             Header = "Display Roles",
-            Items = new Control[] { new Label { Content = Keys() } }
+            Items = new Control[] { new Label { Content = Keys() }}
         };
 
         return roles;
