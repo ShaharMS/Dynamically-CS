@@ -12,6 +12,8 @@ public partial class Joint
 {
     public List<Segment> Connections = new();
 
+    public List<Joint> Relations = new();
+
     public Segment Connect(Joint to, bool updateRelations = true)
     {
         // Don't connect something twice
@@ -24,10 +26,13 @@ public partial class Joint
         Connections.Add(connection);
         to.Connections.Add(connection);
 
+        Relations.Add(to);
+        to.Relations.Add(this);
+
         reposition();
         to.reposition();
 
-        if (updateRelations) CreateBoardRelationsWith(to, connection);
+        if (updateRelations) UpdateBoardRelationsWith(to, connection);
         return connection;
     }
 
@@ -50,8 +55,12 @@ public partial class Joint
                 cons.Add(connection);
                 Connections.Add(connection);
                 joint.Connections.Add(connection);
+
+                Relations.Add(joint);
+                joint.Relations.Add(this);
+
                 joint.reposition();
-                CreateBoardRelationsWith(joint, connection);
+                UpdateBoardRelationsWith(joint, connection);
             }
         }
         reposition();
@@ -88,6 +97,7 @@ public partial class Joint
             {
                 Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 Connections.Remove(c);
+                Relations.Remove(joint);
                 MainWindow.BigScreen.Children.Remove(c);
             }
         }
@@ -98,6 +108,7 @@ public partial class Joint
             {
                 joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 joint.Connections.Remove(c);
+                joint.Relations.Remove(this);
                 MainWindow.BigScreen.Children.Remove(c);
             }
         }
@@ -113,8 +124,8 @@ public partial class Joint
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
                     this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     Connections.Remove(c);
+                    Relations.Remove(joint);
                     MainWindow.BigScreen.Children.Remove(c);
                 }
             }
@@ -125,8 +136,8 @@ public partial class Joint
                 if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
                 {
                     this.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
-                    joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     joint.Connections.Remove(c);
+                    joint.Relations.Remove(this);
                     MainWindow.BigScreen.Children.Remove(c);
                 }
             }
@@ -142,6 +153,8 @@ public partial class Joint
             MainWindow.BigScreen.Children.Remove(c);
             if (c.joint1 != this) c.joint1.Connections.Remove(c);
             else c.joint2.Connections.Remove(c);
+            if (c.joint1 != this) c.joint1.Relations.Remove(c.joint2);
+            else c.joint2.Relations.Remove(c.joint1);
             if (c.joint1 != this) c.joint1.RepositionText();
             else c.joint2.RepositionText();
 
@@ -149,30 +162,38 @@ public partial class Joint
             c.joint2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
         }
         Connections.Clear();
+        Relations.Clear();
         RepositionText();
     }
 
-    public void CreateBoardRelationsWith(Joint joint, Segment segment)
+    public void UpdateBoardRelationsWith(Joint joint, Segment segment)
     {
         // Basic connection info
 
         //First check - radius
-        if ((joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_Center)) || joint.Roles.Has(Role.CIRCLE_Center) && Roles.Has(Role.CIRCLE_On)) {
-            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On)) {
-                if (Roles.Has(Role.CIRCLE_Center, circle)) {
+        if ((joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_Center)) || joint.Roles.Has(Role.CIRCLE_Center) && Roles.Has(Role.CIRCLE_On))
+        {
+            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On))
+            {
+                if (Roles.Has(Role.CIRCLE_Center, circle))
+                {
                     segment.Roles.AddToRole(Role.CIRCLE_Radius, circle);
                 }
             }
         }
         // Second check - diameter & chord
-        if (joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_On)) {
-            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On)) {
-                if (Roles.Has(Role.CIRCLE_On, circle)) {
-                    if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this)) {
+        if (joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_On))
+        {
+            foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On))
+            {
+                if (Roles.Has(Role.CIRCLE_On, circle))
+                {
+                    if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this))
+                    {
                         segment.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
-                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, new RatioOnSegmentFormula(segment.Formula, 0.5));
-                    }
-                    segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
+                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, segment);
+                    } 
+                    else segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
                 }
             }
         }

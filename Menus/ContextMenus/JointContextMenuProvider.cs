@@ -25,7 +25,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         Subject = joint;
         Menu = menu;
         GenerateDefaults();
-        GeneratePerShapeSuggestions();
+        GenerateSuggestions();
         EvaluateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
     }
@@ -42,7 +42,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
     }
 
-    public override void GeneratePerShapeSuggestions()
+    public override void GenerateSuggestions()
     {
         //Log.Write("Eval");
         Suggestions = new List<Control>();

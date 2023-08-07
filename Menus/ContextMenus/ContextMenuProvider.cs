@@ -37,15 +37,16 @@ public class ContextMenuProvider
     public List<Control> Suggestions = new();
     public List<Control> Recommendations = new();
     public List<Control> Debugging = new();
-
+#pragma warning disable CS8618
     public ContextMenu Menu;
+#pragma warning restore CS8618
 
     public virtual void GenerateDefaults()
     {
         Defaults.Clear();
     }
 
-    public virtual void GeneratePerShapeSuggestions()
+    public virtual void GenerateSuggestions()
     {
         Suggestions.Clear();
     }
@@ -64,7 +65,7 @@ public class ContextMenuProvider
     {
 
         GenerateDefaults();
-        GeneratePerShapeSuggestions();
+        GenerateSuggestions();
         EvaluateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
     }

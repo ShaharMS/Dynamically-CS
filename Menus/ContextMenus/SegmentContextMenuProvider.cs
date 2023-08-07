@@ -1,6 +1,8 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
+using Dynamically.Screens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +21,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         Subject = segment;
         Menu = menu;
         GenerateDefaults();
-        GeneratePerShapeSuggestions();
+        GenerateSuggestions();
         EvaluateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
     }
@@ -30,6 +32,23 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             Defaults_Disconnect(),
             Defaults_Label()
+        };
+    }
+
+    public override void GenerateSuggestions()
+    {
+        Suggestions = new List<Control> 
+        {
+            Suggestions_CreateOnSegment(),
+            Suggestions_CreateMiddle()
+        };
+    }
+
+    public override void AddDebugInfo()
+    {
+        Debugging = new List<Control>
+        {
+            Debug_DisplayRoles()
         };
     }
 
@@ -51,7 +70,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     {
         var m = new MenuItem
         {
-            Header = $"Disconnect {Subject.ToString()}"
+            Header = $"Disconnect {Subject}"
         };
 
         m.Click += (s, e) => { Subject.joint1.Disconnect(Subject.joint2); };
@@ -60,16 +79,22 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     }
     MenuItem Defaults_Label()
     {
-        var len = new MenuItem();
-        len.Header = "Length (Exact) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_EXACT ? "✓" : "");
+        var len = new MenuItem
+        {
+            Header = "Length (Exact) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_EXACT ? "✓" : "")
+        };
         len.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_EXACT; };
 
-        var lenR = new MenuItem();
-        lenR.Header = "Length (Rounded) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_ROUND? "✓" : "");
+        var lenR = new MenuItem
+        {
+            Header = "Length (Rounded) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_ROUND ? "✓" : "")
+        };
         lenR.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_ROUND; };
 
-        var none = new MenuItem();
-        none.Header = "Nothing " + (Subject.TextDisplayMode == SegmentTextDisplay.NONE ? "✓" : "");
+        var none = new MenuItem
+        {
+            Header = "Nothing " + (Subject.TextDisplayMode == SegmentTextDisplay.NONE ? "✓" : "")
+        };
         none.Click += (s, e) => { Subject.Label.Content = "";  Subject.TextDisplayMode = SegmentTextDisplay.NONE; };
 
         var paramField = new TextBox
@@ -86,14 +111,14 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             try
             {
-                if (paramField.Text.Length > 0) paramField.Text = paramField.Text.ToLower().ToCharArray()[paramField.Text.Length - 1].ToString();
+                if (paramField.Text?.Length > 0) paramField.Text = paramField.Text.ToLower().ToCharArray()[paramField.Text.Length - 1].ToString();
             } catch { }
         };
         paramField.KeyDown += (sender, e) =>
         {
             if (e.Key == Key.Enter)
             {
-                Subject.Label.Content = paramField.Text.ToCharArray()[0];
+                Subject.Label.Content = paramField.Text?.ToCharArray()[0];
                 //Hide hack
                 var prev = Subject.ContextMenu;
                 Subject.ContextMenu = null;
@@ -129,7 +154,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             try
             {
-                if (customField.Text.Length > 0) customField.Text = customField.Text.ToLower().ToCharArray()[customField.Text.Length - 1].ToString();
+                if (customField.Text?.Length > 0) customField.Text = customField.Text.ToLower().ToCharArray()[customField.Text.Length - 1].ToString();
             }
             catch { }
         };
@@ -137,7 +162,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             if (e.Key == Key.Enter)
             {
-                Subject.Label.Content = customField.Text.ToCharArray()[0];
+                Subject.Label.Content = customField.Text?.ToCharArray()[0];
                 //Hide hack
                 var prev = Subject.ContextMenu;
                 Subject.ContextMenu = null;
@@ -173,4 +198,68 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
     }
 
+    // -------------------------------------------------------
+    // -----------------------Suggestions---------------------
+    // -------------------------------------------------------
+
+    MenuItem Suggestions_CreateOnSegment() {
+        var c = new MenuItem {
+            Header = "Create Interior Joint" 
+        };
+        c.Click += (o, e) => {
+            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            j.Roles.AddToRole(Role.SEGMENT_On, Subject);
+
+            j.ForceStartDrag(MainWindow.Mouse);
+        };
+
+        return c;
+    }
+
+    MenuItem Suggestions_CreateMiddle() {
+        var m = new MenuItem {
+            Header = "Create Middle"
+        };
+        m.Click += (o, e) => {
+            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
+        };
+
+        return m;
+    }
+
+
+
+    // -------------------------------------------------------
+    // ----------------------Recommended----------------------
+    // -------------------------------------------------------
+
+
+
+    // -------------------------------------------------------
+    // -------------------------Debug-------------------------
+    // -------------------------------------------------------
+
+    MenuItem Debug_DisplayRoles()
+    {
+        string Keys()
+        {
+            var s = "";
+            foreach (var role in Subject.Roles.underlying.Keys)
+            {
+                if (Subject.Roles.CountOf(role) == 0) continue;
+                s += role.ToString();
+                s += $" ({Subject.Roles.CountOf(role)}) ({Log.StringifyCollection(Subject.Roles.Access<dynamic>(role))})\n\r";
+            }
+            if (s == "") return s;
+            return s.Substring(0, s.Length - 2);
+        }
+        var roles = new MenuItem
+        {
+            Header = "Display Roles",
+            Items = new Control[] { new Label { Content = Keys() } }
+        };
+
+        return roles;
+    }
 }
