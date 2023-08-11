@@ -60,6 +60,8 @@ public partial class MainWindow : Window
         var t4 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
         t4.Type = TriangleType.EQUILATERAL;
         var t5 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
+        t5.Type = TriangleType.ISOCELES_RIGHT;
+        var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
 
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);

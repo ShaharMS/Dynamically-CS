@@ -32,7 +32,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
     public double distanceSum;
 
-    private Ring ring;
+    internal Ring ring;
     public EllipseBase(Joint f1, Joint f2, double dSum)
     {
         focal1 = f1;

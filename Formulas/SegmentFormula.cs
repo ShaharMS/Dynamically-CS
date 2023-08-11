@@ -90,11 +90,15 @@ public class SegmentFormula : Formula
         x2 = segment.joint2.X;
         y2 = segment.joint2.Y;
 
-        segment.OnMoved.Add((_, _, _, _) =>
+        segment.joint1.OnMoved.Add((_, _, _, _) =>
         {
-            x1 = segment.joint1.X;
+            _x1 = segment.joint1.X;
             y1 = segment.joint1.Y;
-            x2 = segment.joint2.X;
+        });
+
+        segment.joint2.OnMoved.Add((_, _, _, _) =>
+        {
+            _x2 = segment.joint2.X;
             y2 = segment.joint2.Y;
         });
     }
@@ -186,6 +190,8 @@ public class SegmentFormula : Formula
 
         foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
         foreach (var l in OnChange) l();
+
+        UpdateFollowers();
     }
     public void Move(double x1, double y1, double x2, double y2)
     {
@@ -200,5 +206,7 @@ public class SegmentFormula : Formula
 
         foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
         foreach (var l in OnChange) l();
+
+        UpdateFollowers();
     }
 }

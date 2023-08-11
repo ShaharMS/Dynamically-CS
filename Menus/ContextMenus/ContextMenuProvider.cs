@@ -51,7 +51,7 @@ public class ContextMenuProvider
         Suggestions.Clear();
     }
 
-    public virtual void EvaluateRecommendations()
+    public virtual void GenerateRecommendations()
     {
         Recommendations.Clear();
     }
@@ -66,7 +66,7 @@ public class ContextMenuProvider
 
         GenerateDefaults();
         GenerateSuggestions();
-        EvaluateRecommendations();
+        GenerateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
     }
 }

@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
+public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable
 {
     public static readonly List<Segment> all = new();
 
@@ -26,9 +26,8 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     public Joint joint2;
 
     public Color outlineColor;
-    public string text = "";
-    public string dataText = "";
 
+    public List<Action<Joint, Joint>> OnRemoved = new();
     public RoleMap Roles { get; set; }
 
     double org1X;
@@ -74,7 +73,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     }
 
     Action labelUpdater = () => { };
-    public Segment(Joint f, Joint t, string dataText = "")
+    public Segment(Joint f, Joint t)
     {
         joint1 = f;
         joint2 = t;
@@ -84,8 +83,6 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         org1Y = f.Y;
         org2X = t.X;
         org2Y = t.Y;
-        this.dataText = dataText;
-        text = "" + f.Id + t.Id;
         Formula = new SegmentFormula(this);
         MiddleFormula = new RatioOnSegmentFormula(Formula, 0.5);
 
@@ -133,8 +130,8 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
             joint1.CurrentlyDragging = joint2.CurrentlyDragging = false;
-            joint1.Provider.EvaluateRecommendations();
-            joint2.Provider.EvaluateRecommendations();
+            joint1.Provider.GenerateRecommendations();
+            joint2.Provider.GenerateRecommendations();
             foreach (var c in joint1.Connections) c.reposition();
             foreach (var c in joint2.Connections) c.reposition();
         });
@@ -195,6 +192,32 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
         }
     }
 
+    public Segment ReplaceJoint(Joint joint, Joint by)
+    {
+        if (joint1 == joint)
+        {
+            joint1.Connections.Remove(this);
+            joint1.Relations.Remove(joint2);
+            joint1 = by;
+            joint1.Connections.Add(this);
+            joint1.Relations.Add(joint2);
+
+            joint1.UpdateBoardRelationsWith(joint2, this);
+        }
+        else if (joint2 == joint)
+        {
+            joint2.Connections.Remove(this);
+            joint2.Relations.Remove(joint1);
+            joint2 = by;
+            joint2.Connections.Add(this);
+            joint2.Relations.Add(joint1);
+
+            joint1.UpdateBoardRelationsWith(joint2, this);
+        }
+        InvalidateVisual();
+        return this;
+    }
+
     public override void Render(DrawingContext context)
     {
         UpdateFormula();
@@ -224,6 +247,12 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter
     public override string ToString()
     {
         return ((char)Math.Min(joint1.Id, joint2.Id)).ToString() + ((char)Math.Max(joint1.Id, joint2.Id)).ToString();
+    }
+
+    public string ToString(bool descriptive)
+    {
+        if (!descriptive) return ToString();
+        return "Segment " + ToString();
     }
 
     public override double Area()

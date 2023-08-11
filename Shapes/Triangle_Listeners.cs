@@ -23,7 +23,6 @@ public partial class Triangle
         var angle = center.RadiansTo(moved);
         var arr = new Joint[2];
 
-        Log.Write(angle.RadiansBetween(center.RadiansTo(other1), true), angle.RadiansBetween(center.RadiansTo(other2), true));
         if (angle.RadiansBetween(center.RadiansTo(other1), true) > angle.RadiansBetween(center.RadiansTo(other2), true) ) arr = new[] { other1, other2 };
         else arr = new[] { other2, other1 };
         foreach (var o in arr)
@@ -31,7 +30,7 @@ public partial class Triangle
             angle += 2 * Math.PI / 3;
             o.X = center.X + len * Math.Cos(angle);
             o.Y = center.Y + len * Math.Sin(angle);
-
+            o.DispatchOnMovedEvents(o.X, o.Y, o.X, o.Y);
         }
     }
 
@@ -80,7 +79,6 @@ public partial class Triangle
 
             var radToMoved = R_origin.RadiansTo(moved);
             var radToOther = R_origin.RadiansTo(other);
-            Log.Write(radToMoved.RadiansBetween(radToOther).ToDegrees(), radToMoved.ToDegrees(), radToOther.ToDegrees());
             var dist = other.DistanceTo(R_origin);
             if ((radToMoved + Math.PI / 2).RadiansBetween(radToOther) < (radToOther + Math.PI / 2).RadiansBetween(radToMoved))
             {

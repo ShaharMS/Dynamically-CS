@@ -13,6 +13,9 @@ using Dynamically.Shapes;
 using Avalonia;
 using Dynamically.Screens;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend;
+using System.Collections;
+using Dynamically.Backend.Interfaces;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -26,7 +29,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         Menu = menu;
         GenerateDefaults();
         GenerateSuggestions();
-        EvaluateRecommendations();
+        GenerateRecommendations();
         if (MainWindow.Debug) AddDebugInfo();
     }
 
@@ -38,7 +41,8 @@ public class JointContextMenuProvider : ContextMenuProvider
             Defaults_Remove(),
             Defaults_Anchored(),
             Defaults_Connect(),
-            Defaults_Disconnect()
+            Defaults_Disconnect(),
+            Defaults_Dismount()
         };
     }
 
@@ -51,14 +55,18 @@ public class JointContextMenuProvider : ContextMenuProvider
             //Log.Write("Circ");
             if (Subject.Roles.CountOf(Role.CIRCLE_Center) == 1)
             {
-                Suggestions.Add(ShapeDefaults_CrateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
+                Suggestions.Add(ShapeDefaults_CreateRadius(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
+                Suggestions.Add(ShapeDefaults_CreateDiameter(Subject.Roles.Access<Circle>(Role.CIRCLE_Center, 0)));
             }
         }
     }
 
-    public override void EvaluateRecommendations()
+    public override void GenerateRecommendations()
     {
-
+        Recommendations = new List<Control?>
+        {
+            Recom_MergeJoints()
+        }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
     public override void AddDebugInfo()
@@ -94,11 +102,6 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
         field.SelectAll();
         field.Focus();
-        field.TextInput += (sender, e) =>
-        {
-            if (e.Text == null) return;
-            field.Text = e.Text.ToUpper();
-        };
         field.KeyDown += (sender, e) =>
         {
             if (e.Key == Key.Enter)
@@ -181,6 +184,35 @@ public class JointContextMenuProvider : ContextMenuProvider
 
         return dis;
     }
+    MenuItem Defaults_Dismount()
+    {
+        var options = new List<MenuItem>();
+
+        foreach (var r in new[] { Role.CIRCLE_On, Role.SEGMENT_On, Role.SEGMENT_Center, Role.RAY_On })
+        {
+            foreach (var obj in Subject.Roles.Access<dynamic>(r))
+            {
+                var item = new MenuItem
+                {
+                    Header = obj.ToString(true),
+                };
+                item.Click += (sender, e) =>
+                {
+                    Subject.Roles.RemoveFromRole(r, obj);
+                };
+                options.Add(item);
+            }
+        }
+
+        var dis = new MenuItem
+        {
+            Header = "Dismount From...",
+            IsEnabled = Subject.Roles.Has(Role.CIRCLE_On, Role.RAY_On, Role.SEGMENT_On, Role.SEGMENT_Center),
+            Items = options
+        };
+
+        return dis;
+    }
     MenuItem Defaults_Anchored()
     {
         var c = new MenuItem();
@@ -199,7 +231,7 @@ public class JointContextMenuProvider : ContextMenuProvider
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
 
-    MenuItem ShapeDefaults_CrateRadius(Circle circle, string circleName = "")
+    MenuItem ShapeDefaults_CreateRadius(Circle circle, string circleName = "")
     {
         var text = "Create Radius";
         if (circleName.Length > 0) text += " At " + circleName;
@@ -218,11 +250,159 @@ public class JointContextMenuProvider : ContextMenuProvider
         return item;
     }
 
+    MenuItem ShapeDefaults_CreateDiameter(Circle circle, string circleName = "")
+    {
+        var text = "Create Diameter";
+        if (circleName.Length > 0) text += " At " + circleName;
+
+        var item = new MenuItem
+        {
+            Header = text,
+        };
+        item.Click += (sender, e) =>
+        {
+            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            j.Roles.AddToRole(Role.CIRCLE_On, circle);
+            MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+
+            var j1 = new Joint(j.X - (j.X - circle.center.X) * 2, j.Y - (j.Y - circle.center.Y) * 2);
+
+            void AddRole(double z, double y, double x, double v)
+            {
+                j1.Roles.AddToRole(Role.CIRCLE_On, circle);
+                j.OnDragged.Remove(AddRole);
+            }
+
+            j.OnDragged.Add(AddRole);
+
+            j.Connect(j1);
+
+            j.OnMoved.Add((cx, cy, _, _) =>
+            {
+                if (!j.CurrentlyDragging) return;
+                j1.X = j.X - (j.X - circle.center.X) * 2;
+                j1.Y = j.Y - (j.Y - circle.center.Y) * 2;
+            });
+            j1.OnMoved.Add((cx, cy, _, _) =>
+            {
+                if (!j1.CurrentlyDragging) return;
+                j.X = j1.X - (j1.X - circle.center.X) * 2;
+                j.Y = j1.Y - (j1.Y - circle.center.Y) * 2;
+            });
+        };
+
+        return item;
+    }
+
 
     // -------------------------------------------------------
     // ----------------------Recommended----------------------
     // -------------------------------------------------------
 
+    class C : IComparer<Joint>
+    {
+        public int Compare(Joint? x, Joint? y)
+        {
+            if (y == null || x == null) return int.MaxValue;
+            return (int)x.DistanceTo(y);
+        }
+    }
+
+    MenuItem? Recom_MergeJoints()
+    {
+        List<Joint> veryCloseTo = new(); 
+        foreach (var j in Joint.all)
+        {
+            if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance) veryCloseTo.Add(j);
+        }
+        veryCloseTo.Sort(new C());
+
+        if (veryCloseTo.Count == 0) return null;
+        if (veryCloseTo.Count == 1)
+        {
+            var m = new MenuItem
+            {
+                Header = $"Merge With {veryCloseTo[0]}"
+            };
+            m.Click += (sender, args) =>
+            {
+                Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
+                veryCloseTo[0].RemoveFromBoard();
+            };
+            return m;
+        }
+
+        var list = new List<MenuItem>();
+        foreach (var cj in veryCloseTo)
+        {
+            var m = new MenuItem
+            {
+                Header = $"Merge With {cj}"
+            };
+            m.Click += (sender, args) =>
+            {
+                Subject.Roles.TransferFrom(cj.Roles);
+                cj.RemoveFromBoard();
+            };
+            list.Add(m);
+        }
+
+        var c = new MenuItem
+        {
+            Header = "Merge With...",
+            Items = list
+        };
+
+        return c;
+    }
+
+   /* MenuItem? Recom_MountJoints()
+    {
+        List<IShape> veryCloseTo = new();
+        foreach (var shape in new List<IShape>().Concat(Circle.all).Concat(Triangle.all))
+        {
+            if (!shape.Contains(Subject) && !shape.HasMounted(Subject)) veryCloseTo.Add(shape);
+        }
+        veryCloseTo.Sort(new C());
+
+        if (veryCloseTo.Count == 0) return null;
+        if (veryCloseTo.Count == 1)
+        {
+            var m = new MenuItem
+            {
+                Header = $"Merge With {veryCloseTo[0]}"
+            };
+            m.Click += (sender, args) =>
+            {
+                Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
+                veryCloseTo[0].RemoveFromBoard();
+            };
+            return m;
+        }
+
+        var list = new List<MenuItem>();
+        foreach (var cj in veryCloseTo)
+        {
+            var m = new MenuItem
+            {
+                Header = $"Merge With {cj}"
+            };
+            m.Click += (sender, args) =>
+            {
+                Subject.Roles.TransferFrom(cj.Roles);
+                cj.RemoveFromBoard();
+            };
+            list.Add(m);
+        }
+
+        var c = new MenuItem
+        {
+            Header = "Merge With...",
+            Items = list
+        };
+
+        return c;
+    } */
 
 
     // -------------------------------------------------------

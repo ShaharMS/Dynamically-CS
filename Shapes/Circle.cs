@@ -16,8 +16,12 @@ using Dynamically.Menus;
 using Dynamically.Design;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase, IDismantable, IShape
+public class Circle : EllipseBase, IDismantable, IShape, IStringifyable
 {
+
+    public static new readonly List<Circle> all = new();
+
+
     public Joint center;
 
     public List<Action<double, double>> onResize = new();
@@ -42,6 +46,8 @@ public class Circle : EllipseBase, IDismantable, IShape
         this.center = center;
         Formula = new CircleFormula(radius, center.X, center.Y);
 
+        all.Add(this);
+
         OnMoved.Add((x, y, px, py) =>
         {
             double pcx = center.X, pcy = center.Y;
@@ -60,6 +66,7 @@ public class Circle : EllipseBase, IDismantable, IShape
         Formula.queueRemoval = true;
         onResize.Clear();
         MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.BigScreen.Children.Remove(ring);
     }
 
     public void Set(Joint center, double radius)
@@ -140,6 +147,11 @@ public class Circle : EllipseBase, IDismantable, IShape
     {
         return $"●{center.Id}";
     }
+    public string ToString(bool descriptive)
+    {
+        if (!descriptive) return ToString();
+        return "Circle " + ToString();
+    }
 
     public override bool Overlaps(Point point)
     {
@@ -166,6 +178,26 @@ public class Circle : EllipseBase, IDismantable, IShape
             context.DrawEllipse(UIColors.ShapeFill, null, center, radius, radius);
         }
         base.Render(context);
+    }
+
+    public bool Contains(Joint joint)
+    {
+        return joint == center;
+    }
+
+    public bool Contains(Segment segment)
+    {
+        return false;
+    }
+
+    public bool HasMounted(Joint joint)
+    {
+        return joint.Roles.Has(Role.CIRCLE_On, this);
+    }
+
+    public bool HasMounted(Segment segment)
+    {
+        return segment.Roles.Has(Role.CIRCLE_Tangent, this);
     }
 }
 

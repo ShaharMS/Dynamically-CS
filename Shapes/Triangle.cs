@@ -14,8 +14,11 @@ using System.Linq;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : DraggableGraphic, IDismantable, IShape
+public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable
 {
+
+    public static readonly List<Triangle> all = new();
+
     public Joint joint1;
     public Joint joint2;
     public Joint joint3;
@@ -24,7 +27,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
     public Segment con13;
     public Segment con23;
 
-    private Circle? incircle;
+    public Circle? incircle;
 
     TriangleType _type = TriangleType.SCALENE;
 
@@ -39,6 +42,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         joint1 = j1;
         joint2 = j2;
         joint3 = j3;
+
+        all.Add(this);
 
         foreach (var j in new[] { joint1, joint2, joint3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
 
@@ -71,17 +76,19 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         });
 
         MainWindow.BigScreen.Children.Add(this);
+
     }
 
     public void Dismantle()
     {
+        Type = TriangleType.SCALENE; // Remove position modifiers
         if (joint1.GotRemoved) joint1.Disconnect(joint2, joint3);
         if (joint2.GotRemoved) joint2.Disconnect(joint1, joint3);
         if (joint3.GotRemoved) joint3.Disconnect(joint2, joint1);
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Remove(RecalcuateInCircle);
+            j.OnMoved.Remove(__RecalcuateInCircle);
         }
         if (incircle != null)
         {
@@ -93,6 +100,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         {
             j.Roles.RemoveFromRole(Role.TRIANGLE_Corner, this);
         }
+
+        MainWindow.BigScreen.Children.Remove(this);
     }
 
     public Circle GenerateCircumCircle()
@@ -112,7 +121,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Add(RecalcuateInCircle);
+            j.OnMoved.Add(__RecalcuateInCircle);
         }
 
         return circle;
@@ -143,7 +152,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         };
     }
 
-    void RecalcuateInCircle(double ux, double uy, double mouseX, double mouseY)
+    public void __RecalcuateInCircle(double ux, double uy, double px, double py)
     {
         var stats = GetCircleStats();
         if (incircle == null) return;
@@ -152,7 +161,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         incircle.radius = stats.r;
         incircle.UpdateFormula();
         incircle.InvalidateVisual();
-        foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, mouseX, mouseY);
+        foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, px, py);
     }
     TriangleType ChangeType(TriangleType type)
     {
@@ -274,6 +283,29 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint3, joint2);
                 else MakeRightRelativeToABC(joint2, joint1, joint3);
                 break;
+            case TriangleType.ISOCELES_RIGHT:
+                var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a_ACB_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a_BAC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
+                {
+                    MakeRightRelativeToABC(joint1, joint2, joint3);
+                    MakeIsocelesRelativeToABC(joint1, joint2, joint3);
+                }
+                else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
+                {
+                    MakeRightRelativeToABC(joint1, joint3, joint2);
+                    MakeIsocelesRelativeToABC (joint1, joint3, joint2);
+                }
+                else
+                {
+                    MakeRightRelativeToABC(joint2, joint1, joint3);
+                    MakeIsocelesRelativeToABC(joint2, joint1, joint3);
+                }
+                break;
             case TriangleType.SCALENE:
                 break;
         }
@@ -323,6 +355,20 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
                 joint2.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
                 joint3.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
                 break;
+            case TriangleType.ISOCELES_RIGHT:
+                // Remove EQUILATERAL:
+                joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
+                joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
+                joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
+                // Add RIGHT
+                joint1.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
+                joint2.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
+                joint3.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
+                // Add ISOCELES
+                joint1.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
+                joint2.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
+                joint3.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
+                break;
             case TriangleType.SCALENE:
                 // Remove ISOCELES
                 joint1.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
@@ -346,6 +392,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
     public override string ToString()
     {
         return $"△{joint1.Id}{joint2.Id}{joint3.Id}";
+    }
+
+    public string ToString(bool descriptive)
+    {
+        if (!descriptive) return ToString();
+        return "Triangle " + ToString();
     }
 
     public override double Area()
@@ -405,22 +457,29 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape
         }
     }
 
-/*
-    public static bool operator ==(Triangle rhs, Triangle lhs)
-    {
-        var arr = new Joint[] { rhs.joint1, rhs.joint2, rhs.joint3 };
-        return arr.Contains(lhs.joint1) && arr.Contains(lhs.joint2) && arr.Contains(lhs.joint3);
-    }
-    public static bool operator !=(Triangle rhs, Triangle lhs)
-    {
-        var arr = new Joint[] { rhs.joint1, rhs.joint2, rhs.joint3 };
-        return !arr.Contains(lhs.joint1) || !arr.Contains(lhs.joint2) || !arr.Contains(lhs.joint3);
-    }
-*/
     public bool IsDefinedBy(Joint j1, Joint j2, Joint j3)
     {
         var arr = new Joint[] { j1, j2, j3 };
         return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3);
+    }
+    public bool Contains(Joint joint)
+    {
+        return joint == joint1 || joint == joint2 || joint == joint3;
+    }
+
+    public bool Contains(Segment segment)
+    {
+        return segment == con12 && segment == con13 && segment == con23;
+    }
+
+    public bool HasMounted(Joint joint)
+    {
+        return false;
+    }
+
+    public bool HasMounted(Segment segment)
+    {
+        return segment.Roles.Has((Role.TRIANGLE_AngleBisector, Role.TRIANGLE_Perpendicular), this);
     }
 }
 
@@ -429,6 +488,7 @@ public enum TriangleType
     EQUILATERAL,
     ISOSCELES,
     RIGHT,
+    ISOCELES_RIGHT,
     SCALENE,
 }
 

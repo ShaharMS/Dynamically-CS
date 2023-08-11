@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -69,7 +70,14 @@ public partial class RoleMap
 
     public bool Has(Role role)
     {
-        return Access<object>(role).Count > 0;
+        return Access<dynamic>(role).Count > 0;
+    }
+
+    public bool Has(params Role[] roles)
+    {
+        var count = 0;
+        foreach (var role in roles) count += Access<dynamic>(role).Count;
+        return count > 0;
     }
 
     public bool Has(Role role, object item)
@@ -89,6 +97,22 @@ public partial class RoleMap
         }
 
         return true;
+    }
+
+    public bool Has(ITuple roles, object item)
+    {
+        var result = false;
+        var arr = new Role[roles.Length];
+        for (int i = 0; i < roles.Length; i++)
+        {
+            arr[i] = (Role?)roles[i] ?? Role.Null;
+        }
+        foreach (var role in arr)
+        {
+            result |= Has(role, item);
+        }
+
+        return result;
     }
 
     public int CountOf(Role role)
@@ -141,6 +165,36 @@ public partial class RoleMap
         
 
         return item;
+    }
+
+    public RoleMap TransferFrom(RoleMap Roles)
+    {
+        if (Roles == null) return this;
+        foreach (var (role, items) in Roles)
+        {
+            var c = items.ToArray();
+            foreach (var item in c)
+            {
+                // Counting & Defining
+
+                // Remove from given:
+                var list = Roles.Access<dynamic>(role);
+                if (list.Count == 0 || !list.Contains(item)) continue;
+                if (list.Count == 1) Roles.Count--;
+                Roles.underlying[role].Remove(item);
+
+                // Add to this:
+                if (Has(role, item)) continue;
+                if (underlying.ContainsKey(role)) underlying[role].Add(item);
+                else underlying[role] = new List<object> { item };
+                if (underlying[role].Count == 1) Count++;
+
+                if (Subject.Is<Joint>()) Joint__TransferRole(Roles.Subject.L(), role, item, Subject.L());
+                else Segment__TransferRole(Roles.Subject.R(), role, item, Subject.R());
+            }
+        }
+
+        return this;
     }
 }
 #pragma warning restore CS8602

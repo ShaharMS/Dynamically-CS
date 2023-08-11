@@ -48,6 +48,12 @@ public abstract class Formula
         joint.PositioningByFormula.Remove(UpdateJointPosition);
     }
 
+    public virtual void RemoveAllFollowers()
+    {
+        var c = Followers.ToArray();
+        foreach (var f in c) RemoveFollower(f);
+    }
+
     public virtual (double X, double Y) UpdateJointPosition(double inputX, double inputY)
     {
         var X = inputX; var Y = inputY;

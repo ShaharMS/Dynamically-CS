@@ -65,7 +65,7 @@ public partial class RoleMap
         {
             // Ray
             case Role.RAY_On:
-                (item as RayFormula).AddFollower(Subject);
+                (item as RayFormula).RemoveFollower(Subject);
                 break;
             // Segment
             case Role.SEGMENT_Corner:
@@ -82,7 +82,6 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_On:
                 (item as Circle).Formula.RemoveFollower(Subject);
-                Log.Write("Relations:", Subject.Relations);
                 foreach (Joint joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         // try for both diameter & chord
@@ -94,7 +93,6 @@ public partial class RoleMap
                 break;
             case Role.CIRCLE_Center:
                 (item as Circle).center.OnMoved.Remove((item as Circle).__circle_OnChange);
-                Log.Write("Relations:", Subject.Relations);
                 foreach (Joint joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         joint.Roles.RemoveFromRole(Role.CIRCLE_On, item);
@@ -110,6 +108,107 @@ public partial class RoleMap
         }
     }
 
+    private void Joint__TransferRole<T>(Joint From, Role role, T item, Joint Subject)
+    {
+        switch (role)
+        {
+            // Ray
+            case Role.RAY_On:
+                (item as RayFormula).RemoveFollower(From);
+                (item as RayFormula).AddFollower(Subject);
+                break;
+            // Segment
+            case Role.SEGMENT_Corner:
+                var s1 = item as Segment;
+                s1.ReplaceJoint(From, Subject);
+                From.OnMoved.Remove(s1.__updateFormula);
+                From.OnMoved.Remove(s1.__reposition);
+                Subject.OnMoved.Add(s1.__updateFormula);
+                Subject.OnDragged.Add(s1.__reposition);
+                break;
+            case Role.SEGMENT_On:
+                (item as Segment).Formula.RemoveFollower(From);
+                (item as Segment).Formula.AddFollower(Subject);
+                break;
+            case Role.SEGMENT_Center:
+                (item as Segment).MiddleFormula.RemoveFollower(From);
+                (item as Segment).MiddleFormula.AddFollower(Subject);
+                break;
+            // Circle
+            case Role.CIRCLE_On:
+                (item as Circle).Formula.RemoveFollower(From);
+                foreach (Joint joint in Subject.Relations)
+                {
+                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
+                    {
+                        From.UpdateBoardRelationsWith(joint, From.GetConnectionTo(joint));
+                    }
+                } 
+                (item as Circle).Formula.AddFollower(Subject);
+                foreach (Joint joint in Subject.Relations)
+                {
+                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
+                    {
+                        Subject.UpdateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
+                    }
+                }
+                break;
+            case Role.CIRCLE_Center:
+                (item as Circle).Formula.RemoveFollower(From);
+                foreach (Joint joint in Subject.Relations)
+                {
+                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
+                    {
+                        From.UpdateBoardRelationsWith(joint, From.GetConnectionTo(joint));
+                    }
+                }
+                (item as Circle).Formula.AddFollower(Subject);
+                foreach (Joint joint in Subject.Relations)
+                {
+                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
+                    {
+                        Subject.UpdateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
+                    }
+                }
+                break;
+            // Triangle
+            case Role.TRIANGLE_Corner:
+                var t1 = item as Triangle;
+
+                char? id = null;
+                if (t1.incircle != null)
+                {
+                    t1.incircle.Dismantle();
+                    id = t1.incircle.center.Id;
+                    t1.incircle.center.RemoveFromBoard();
+                }
+
+                if (t1.joint1 == From) t1.joint1 = Subject;
+                else if (t1.joint2 == From) t1.joint2 = Subject;
+                else if (t1.joint3 == From) t1.joint3 = Subject;
+
+                t1.con12.ReplaceJoint(From, Subject);
+                t1.con23.ReplaceJoint(From, Subject);
+                t1.con13.ReplaceJoint(From, Subject);
+
+                if (From.OnMoved.Contains(t1.__RecalcuateInCircle))
+                {
+                    From.OnMoved.Remove(t1.__RecalcuateInCircle);
+                    Subject.OnMoved.Add(t1.__RecalcuateInCircle);
+                }
+
+                From.OnRemoved.Remove((_, _) => t1.Dismantle());
+                Subject.OnRemoved.Add((_, _) => t1.Dismantle());
+
+                if (id != null)
+                {
+                    t1.GenerateInCircle();
+                    t1.incircle.center.Id = id.Value;
+                }
+                break;
+            default: break;
+        }
+    }
 }
 
 

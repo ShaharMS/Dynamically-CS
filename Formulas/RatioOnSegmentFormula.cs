@@ -19,6 +19,7 @@ public class RatioOnSegmentFormula : Formula
     public RatioOnSegmentFormula(SegmentFormula Formula, double ratio) : base()
     {
         SegmentFormula = Formula;
+        Formula.OnChange.Add(() => UpdateFollowers());
         this.ratio = ratio;
 
     }

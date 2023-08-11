@@ -25,7 +25,8 @@ public partial class DraggableGraphic : Canvas
 
     public virtual void DispatchOnMovedEvents(double x, double y, double px, double py)
     {
-        foreach (var listener in OnMoved)
+        var c = OnMoved.ToArray();
+        foreach (var listener in c)
         {
             listener(x, y, px, py);
         }
@@ -33,7 +34,8 @@ public partial class DraggableGraphic : Canvas
 
     public virtual void DispatchOnDraggedEvents(double x, double y, double px, double py)
     {
-        foreach (var listener in OnDragged)
+        var c = OnDragged.ToArray();
+        foreach (var listener in c)
         {
             listener(x, y, px, py);
         }

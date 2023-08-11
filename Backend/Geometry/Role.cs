@@ -29,5 +29,10 @@ public enum Role
 
     TRIANGLE_Side,
     TRIANGLE_AngleBisector,
-    TRIANGLE_Perpendicular
+    TRIANGLE_Perpendicular,
+
+    /// <summary>
+    /// Used only in internal RoleMap class.
+    /// </summary>
+    Null
 }

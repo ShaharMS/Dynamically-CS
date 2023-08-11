@@ -20,7 +20,7 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
+public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable
 {
 
     public static readonly List<Joint> all = new();
@@ -88,6 +88,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 
         X = x;
         Y = y;
+
         ContextMenu = new ContextMenu();
         Provider = new JointContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
@@ -152,6 +153,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
         var brush = new SolidColorBrush(Colors.White);
         var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.JointGraphicCircleRadius / 2.5);
         context.DrawEllipse(brush, pen, new Point(0, 0), UIDesign.JointGraphicCircleRadius, UIDesign.JointGraphicCircleRadius);
+        context.FillRectangle(new SolidColorBrush(Colors.Red), new Rect(-1, -1, 2, 2));
     }
 
     public void reposition()
@@ -189,12 +191,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
 
         OnRemoved.Clear();
     }
-
-    public override string ToString()
-    {
-        return Id + "";
-    }
-
     public override bool Overlaps(Point point)
     {
         return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.BigScreen.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.BigScreen.GetPosition().Y + Height / 2 > point.Y;
@@ -203,6 +199,17 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter
     public override double Area()
     {
         return 0;
+    }
+
+    public override string ToString()
+    {
+        return Id + "";
+    }
+
+    public string ToString(bool descriptive)
+    {
+        if (!descriptive) return ToString();
+        return "Joint " + Id;
     }
 
     public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }
