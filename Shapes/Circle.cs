@@ -16,7 +16,7 @@ using Dynamically.Menus;
 using Dynamically.Design;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase, IDismantable, IShape, IStringifyable
+public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFormula<CircleFormula>
 {
 
     public static new readonly List<Circle> all = new();

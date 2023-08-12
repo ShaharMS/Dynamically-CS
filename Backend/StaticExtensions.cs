@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 using Dynamically.Backend.Geometry;
+using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,6 +38,20 @@ public static class StaticExtensions
         double x = from.X - X;
         double y = from.Y - Y;
         return Math.Sqrt(x * x + y * y);
+    }
+    
+    public static double DistanceTo(this Formula from, Point p)
+    {
+        return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p).Value) : double.PositiveInfinity;
+    }
+
+    public static double DistanceTo(this Formula from, Joint j)
+    {
+        return DistanceTo(from, j);
+    }
+    public static double DistanceTo(this Formula from, double X, double Y)
+    {
+        return DistanceTo(from, new Point(X, Y));
     }
     public static double DegreesTo(this Point from, Point to)
     {

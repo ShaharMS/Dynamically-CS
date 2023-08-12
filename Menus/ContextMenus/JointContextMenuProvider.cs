@@ -16,6 +16,8 @@ using Dynamically.Backend.Helpers;
 using Dynamically.Backend;
 using System.Collections;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Formulas;
+using System.Reactive.Subjects;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -65,7 +67,8 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         Recommendations = new List<Control?>
         {
-            Recom_MergeJoints()
+            Recom_MergeJoints(),
+            Recom_MountJoints()
         }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
@@ -301,10 +304,12 @@ public class JointContextMenuProvider : ContextMenuProvider
 
     class C : IComparer<Joint>
     {
+        Joint Subject;
+        public C(Joint j) { Subject = j; }
         public int Compare(Joint? x, Joint? y)
         {
             if (y == null || x == null) return int.MaxValue;
-            return (int)x.DistanceTo(y);
+            return (int)(Subject.DistanceTo(x) - Subject.DistanceTo(y));
         }
     }
 
@@ -315,7 +320,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         {
             if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance) veryCloseTo.Add(j);
         }
-        veryCloseTo.Sort(new C());
+        veryCloseTo.Sort(new C(Subject));
 
         if (veryCloseTo.Count == 0) return null;
         if (veryCloseTo.Count == 1)
@@ -356,53 +361,66 @@ public class JointContextMenuProvider : ContextMenuProvider
         return c;
     }
 
-   /* MenuItem? Recom_MountJoints()
-    {
-        List<IShape> veryCloseTo = new();
-        foreach (var shape in new List<IShape>().Concat(Circle.all).Concat(Triangle.all))
-        {
-            if (!shape.Contains(Subject) && !shape.HasMounted(Subject)) veryCloseTo.Add(shape);
-        }
-        veryCloseTo.Sort(new C());
 
+    MenuItem? Recom_MountJoints()
+    {
+        List<dynamic> veryCloseTo = new();
+        foreach (var container in new List<dynamic>().Concat(Circle.all).Concat(Segment.all)) // container is IHasFormula<Formula>
+        {
+            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance) veryCloseTo.Add(container);
+        }
         if (veryCloseTo.Count == 0) return null;
         if (veryCloseTo.Count == 1)
         {
             var m = new MenuItem
             {
-                Header = $"Merge With {veryCloseTo[0]}"
+                Header = $"Mount On {veryCloseTo[0]}"
             };
             m.Click += (sender, args) =>
             {
-                Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
-                veryCloseTo[0].RemoveFromBoard();
+                if (veryCloseTo[0] is Circle)
+                {
+                    Subject.Roles.AddToRole(Role.CIRCLE_On, veryCloseTo[0] as Circle);
+                }
+                else if (veryCloseTo[0] is Segment)
+                {
+                    Subject.Roles.AddToRole(Role.SEGMENT_On, veryCloseTo[0] as Segment);
+                }
+                else Log.Write($"{Subject} cannot mount on {veryCloseTo[0]}");
             };
             return m;
         }
 
         var list = new List<MenuItem>();
-        foreach (var cj in veryCloseTo)
+        foreach (var cs in veryCloseTo)
         {
             var m = new MenuItem
             {
-                Header = $"Merge With {cj}"
+                Header = $"Mount On {cs}"
             };
             m.Click += (sender, args) =>
             {
-                Subject.Roles.TransferFrom(cj.Roles);
-                cj.RemoveFromBoard();
+                if (cs is Circle)
+                {
+                    Subject.Roles.AddToRole(Role.CIRCLE_On, cs as Circle);
+                }
+                else if (cs is Segment)
+                {
+                    Subject.Roles.AddToRole(Role.SEGMENT_On, cs as Segment);
+                }
+                else Log.Write($"{Subject} cannot mount on {cs}");
             };
             list.Add(m);
         }
 
         var c = new MenuItem
         {
-            Header = "Merge With...",
+            Header = "Mount On...",
             Items = list
         };
 
         return c;
-    } */
+    }
 
 
     // -------------------------------------------------------

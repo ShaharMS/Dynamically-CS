@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable
+public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
 
@@ -35,7 +35,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
     double org2X;
     double org2Y;
 
-    public SegmentFormula Formula { get; }
+    public SegmentFormula Formula { get; set; }
     public RatioOnSegmentFormula MiddleFormula { get; }
 
     public SegmentContextMenuProvider Provider;
@@ -271,6 +271,26 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
     {
         _ = z; _ = x; _ = c; _ = v; // Supress unused params warning
         reposition();
+    }
+
+    public bool Contains(Joint joint)
+    {
+        return joint1 == joint || joint2 == joint;
+    }
+
+    public bool Contains(Segment segment)
+    {
+        return segment.Contains(joint1) && segment.Contains(joint2);
+    }
+
+    public bool HasMounted(Joint joint)
+    {
+        return Formula.Followers.Contains(joint) || MiddleFormula.Followers.Contains(joint);
+    }
+
+    public bool HasMounted(Segment segment)
+    {
+        return false;
     }
 #pragma warning restore IDE1006
 }

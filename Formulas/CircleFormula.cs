@@ -98,9 +98,7 @@ public class CircleFormula : Formula
     {
         OnMoved.Add((curX, curY, preX, preY) =>
         {
-            joint.X = joint.X - preX + curX;
-            joint.Y = joint.Y - preY + curY;
-            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
+            move(curX, curY, preX, preY, joint);
         });
         base.AddFollower(joint);
     }
@@ -108,10 +106,15 @@ public class CircleFormula : Formula
     {
         OnMoved.Remove((curX, curY, preX, preY) =>
         {
-            joint.X = joint.X - preX + curX;
-            joint.Y = joint.Y - preY + curY;
-            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
+            move(curX, curY, preX, preY, joint);
         });
         base.RemoveFollower(joint);
+    }
+
+    private void move(double curX, double curY, double preX, double preY, Joint joint)
+    {
+        joint.X = joint.X - preX + curX;
+        joint.Y = joint.Y - preY + curY;
+        joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
     }
 }

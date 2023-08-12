@@ -1,4 +1,5 @@
 using Avalonia;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using System;
@@ -29,6 +30,14 @@ public abstract class Formula
         Move(point.X, point.Y);
     }
 
+    public double DistanceTo( Point p)
+    {
+        return GetClosestOnFormula(p) != null ? p.DistanceTo(GetClosestOnFormula(p).Value) : double.PositiveInfinity;
+    }
+    public double DistanceTo(double X, double Y)
+    {
+        return DistanceTo(new Point(X, Y));
+    }
 
     public Formula()
     {
