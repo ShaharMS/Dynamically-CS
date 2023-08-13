@@ -63,10 +63,12 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
 internal class Ring : DraggableGraphic
 {
+    public static readonly List<Ring> all = new();
     private EllipseBase ellipse;
 
     public Ring(EllipseBase el)
     {
+        all.Add(this);
         ellipse = el;
 
         OnMoved.Add((double _, double _, double _, double _) =>

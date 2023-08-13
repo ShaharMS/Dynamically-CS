@@ -25,8 +25,8 @@ class Program
                 .UsePlatformDetect()
                 .AfterSetup((_) =>
                 {
-                    var mainWindow = new MainWindow();
                     var logWindow = Log.current;
+                    var mainWindow = new MainWindow();
 
                     var screen = mainWindow.Screens.Primary; // Get the primary screen
 

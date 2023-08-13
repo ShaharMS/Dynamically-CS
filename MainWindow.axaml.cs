@@ -10,6 +10,9 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using System;
 using Dynamically.Backend;
+using Dynamically.Backend.Interfaces;
+using System.Linq;
+using Dynamically.Backend.Graphics;
 
 namespace Dynamically;
 
@@ -67,7 +70,23 @@ public partial class MainWindow : Window
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
+
+
+
+
+        foreach (DraggableGraphic obj in Joint.all.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.all)) obj.OnDragged.Add(regenAll);
+
         BigScreen.Refresh();
 
+
+
+    }
+
+    public void regenAll(double z, double x, double c, double v) {
+        _ = z; _ = x; _ = c; _ = v;
+        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all))
+        {
+            item.Provider.Regenerate();
+        }
     }
 }

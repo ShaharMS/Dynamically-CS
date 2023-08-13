@@ -93,7 +93,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         Provider = new JointContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
-
         OnMoved.Add((double _, double _, double _, double _) => reposition());
 
         InvalidateVisual();
@@ -167,7 +166,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
             else c.joint1.RepositionText();
         }
         RepositionText();
-        Provider.Regenerate();
     }
 
     public void RemoveFromBoard()

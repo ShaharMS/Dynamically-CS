@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Shapes;
 using System;
@@ -125,17 +126,12 @@ public class SegmentFormula : Formula
         return new Point(X, Y[0]);
     }
 
-    public double DistanceTo(Point point)
+    public override double DistanceTo(Point point)
     {
         // Get the closest point on the ray to the given point
         Point? closestPoint = GetClosestOnFormula(point);
-        if (!closestPoint.HasValue) return -1;
-        // Calculate the distance between the closest point and the given point
-        double dx = closestPoint.Value.X - point.X;
-        double dy = closestPoint.Value.Y - point.Y;
-        double distance = Math.Sqrt(dx * dx + dy * dy);
-
-        return distance;
+        if (!closestPoint.HasValue) return double.NaN;
+        return point.DistanceTo(closestPoint.Value);
     }
 
     public Point[] GetPointsByDistanceFrom(Point start, double distance)

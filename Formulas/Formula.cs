@@ -30,9 +30,9 @@ public abstract class Formula
         Move(point.X, point.Y);
     }
 
-    public double DistanceTo( Point p)
+    public virtual double DistanceTo(Point p)
     {
-        return GetClosestOnFormula(p) != null ? p.DistanceTo(GetClosestOnFormula(p).Value) : double.PositiveInfinity;
+        return GetClosestOnFormula(p) != null ? p.DistanceTo(GetClosestOnFormula(p).Value) : double.NaN;
     }
     public double DistanceTo(double X, double Y)
     {
@@ -41,6 +41,13 @@ public abstract class Formula
 
     public Formula()
     {
+        OnMoved.Add((curX, curY, preX, preY) => {
+            foreach (var joint in Followers) {
+                joint.X = joint.X - preX + curX;
+                joint.Y = joint.Y - preY + curY;
+                joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
+            }
+        });
         OnChange.Add(UpdateFollowers);
     }
 
@@ -53,7 +60,7 @@ public abstract class Formula
 
     public virtual void RemoveFollower(Joint joint)
     {
-        Followers.Add(joint);
+        Followers.Remove(joint);
         joint.PositioningByFormula.Remove(UpdateJointPosition);
     }
 

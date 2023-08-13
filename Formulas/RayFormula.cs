@@ -125,20 +125,7 @@ public class RayFormula : Formula
 
         return new Point(X, Y[0]);
     }
-
-    public double DistanceTo(Point point)
-    {
-        // Get the closest point on the ray to the given point
-        Point? closestPoint = GetClosestOnFormula(point);
-        if (!closestPoint.HasValue) return -1;
-        // Calculate the distance between the closest point and the given point
-        double dx = closestPoint.Value.X - point.X;
-        double dy = closestPoint.Value.Y - point.Y;
-        double distance = Math.Sqrt(dx * dx + dy * dy);
-
-        return distance;
-    }
-
+    
     public Point[] GetPointsByDistanceFrom(Point start, double distance)
     {
         var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
@@ -175,26 +162,5 @@ public class RayFormula : Formula
         }
         foreach (var l in OnMoved) l(0, pYI, 0, _yIntercept);
         foreach (var l in OnChange) l();
-    }
-
-    public override void AddFollower(Joint joint)
-    {
-        OnMoved.Add((curX, curY, preX, preY) =>
-        {
-            joint.Y = joint.Y - preY + curY;
-            joint.X = SolveForX(joint.Y)[0];
-            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
-        });
-        base.AddFollower(joint);
-    }
-    public override void RemoveFollower(Joint joint)
-    {
-        OnMoved.Remove((curX, curY, preX, preY) =>
-        {
-            joint.Y = joint.Y - preY + curY;
-            joint.X = SolveForX(joint.Y)[0];
-            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
-        });
-        base.RemoveFollower(joint);
     }
 }

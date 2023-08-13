@@ -102,7 +102,9 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
         ContextMenu = new ContextMenu();
         Provider = new SegmentContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
-
+        PointerReleased += (sender, args) => {
+            if (args.InitialPressMouseButton == Avalonia.Input.MouseButton.Right) Provider.Regenerate();
+        };
 
 
         Children.Add(Label);
@@ -263,13 +265,13 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
 #pragma warning disable IDE1006
     public void __updateFormula(double z, double x, double c, double v)
     {
-        _ = z; _ = x; _ = c; _ = v; // Supress unused params warning
+        _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
         UpdateFormula();
     }
 
     public void __reposition(double z, double x, double c, double v)
     {
-        _ = z; _ = x; _ = c; _ = v; // Supress unused params warning
+        _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
         reposition();
     }
 

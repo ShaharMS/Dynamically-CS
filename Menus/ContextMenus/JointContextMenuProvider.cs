@@ -29,10 +29,6 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         Subject = joint;
         Menu = menu;
-        GenerateDefaults();
-        GenerateSuggestions();
-        GenerateRecommendations();
-        if (MainWindow.Debug) AddDebugInfo();
     }
 
     public override void GenerateDefaults()
@@ -40,11 +36,11 @@ public class JointContextMenuProvider : ContextMenuProvider
         Defaults = new List<Control>
         {
             Defaults_Rename(),
-            Defaults_Remove(),
             Defaults_Anchored(),
             Defaults_Connect(),
             Defaults_Disconnect(),
-            Defaults_Dismount()
+            Defaults_Dismount(),
+            Defaults_Remove(),
         };
     }
 
@@ -367,7 +363,10 @@ public class JointContextMenuProvider : ContextMenuProvider
         List<dynamic> veryCloseTo = new();
         foreach (var container in new List<dynamic>().Concat(Circle.all).Concat(Segment.all)) // container is IHasFormula<Formula>
         {
-            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance) veryCloseTo.Add(container);
+            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance) {
+                veryCloseTo.Add(container);
+                Log.Write(container, container.Formula.DistanceTo(Subject));
+            }
         }
         if (veryCloseTo.Count == 0) return null;
         if (veryCloseTo.Count == 1)
