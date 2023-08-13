@@ -78,7 +78,7 @@ public partial class MainWindow : Window
 
         BigScreen.Refresh();
 
-
+        regenAll(0, 0, 0, 0);
 
     }
 
