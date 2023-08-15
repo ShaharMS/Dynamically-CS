@@ -94,6 +94,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         ContextMenu.Items = Provider.Items;
 
         OnMoved.Add((double _, double _, double _, double _) => reposition());
+        OnDragged.Add(MainWindow.regenAll);
 
         InvalidateVisual();
         RepositionText();
@@ -173,6 +174,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         double sx = X, sy = Y;
         all.Remove(this);
         DisconnectAll();
+        Relations.Clear();
         IDGenerator.Remove(this);
 
         MainWindow.BigScreen.Children.Remove(this);

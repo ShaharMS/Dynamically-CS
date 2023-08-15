@@ -132,11 +132,11 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
             joint1.CurrentlyDragging = joint2.CurrentlyDragging = false;
-            joint1.Provider.GenerateRecommendations();
-            joint2.Provider.GenerateRecommendations();
-            foreach (var c in joint1.Connections) c.reposition();
-            foreach (var c in joint2.Connections) c.reposition();
+            joint1.InvalidateVisual();
+            joint2.InvalidateVisual();
         });
+        OnDragged.Add(MainWindow.regenAll);
+
 
         all.Add(this);
 

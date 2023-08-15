@@ -82,7 +82,7 @@ public partial class MainWindow : Window
 
     }
 
-    public void regenAll(double z, double x, double c, double v) {
+    public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
         foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all))
         {

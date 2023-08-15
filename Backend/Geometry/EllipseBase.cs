@@ -83,6 +83,8 @@ internal class Ring : DraggableGraphic
 
             foreach (var l in ellipse.OnMoved) l(X, Y, X, Y);
         });
+        OnDragged.Add(MainWindow.regenAll);
+
     }
 
     public override void Render(DrawingContext context)

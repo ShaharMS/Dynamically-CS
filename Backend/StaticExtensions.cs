@@ -39,7 +39,33 @@ public static class StaticExtensions
         double y = from.Y - Y;
         return Math.Sqrt(x * x + y * y);
     }
-    
+
+    public static double DistanceTo(this (double, double) from, (double, double) to)
+    {
+        double x = from.Item1 - to.Item1;
+        double y = from.Item2 - to.Item2;
+        return Math.Sqrt(x * x + y * y);
+    }
+
+    public static double DistanceTo(this (double, double) from, Point to)
+    {
+        double x = from.Item1 - to.X;
+        double y = from.Item2 - to.Y;
+        return Math.Sqrt(x * x + y * y);
+    }
+    public static double DistanceTo(this (double, double) from, Joint to)
+    {
+        double x = from.Item1 - to.X;
+        double y = from.Item2 - to.Y;
+        return Math.Sqrt(x * x + y * y);
+    }
+    public static double DistanceTo(this (double, double) from, double X, double Y)
+    {
+        double x = from.Item1 - X;
+        double y = from.Item2 - Y;
+        return Math.Sqrt(x * x + y * y);
+    }
+
     public static double DistanceTo(this Formula from, Point p)
     {
         return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p).Value) : double.PositiveInfinity;
