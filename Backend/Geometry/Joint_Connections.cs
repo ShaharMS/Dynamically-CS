@@ -110,6 +110,7 @@ public partial class Joint
                 joint.Relations.Remove(this);
                 c.Formula.RemoveAllFollowers();
                 c.MiddleFormula.RemoveAllFollowers();
+                Segment.all.Remove(c);
                 MainWindow.BigScreen.Children.Remove(c);
                 foreach (var l in c.OnRemoved) l(this, joint);
             }
@@ -141,6 +142,7 @@ public partial class Joint
                     joint.Relations.Remove(this);
                     c.Formula.RemoveAllFollowers();
                     c.MiddleFormula.RemoveAllFollowers();
+                    Segment.all.Remove(c);
                     MainWindow.BigScreen.Children.Remove(c);
                     foreach (var l in c.OnRemoved) l(this, joint);
 
@@ -166,9 +168,10 @@ public partial class Joint
             c.joint1.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // One of them is `this`
             c.joint2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
 
-
             c.Formula.RemoveAllFollowers();
             c.MiddleFormula.RemoveAllFollowers();
+            Segment.all.Remove(c);
+
             foreach (var l in c.OnRemoved) l(c.joint1, c.joint2);
 
         }
