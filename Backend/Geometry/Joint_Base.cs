@@ -174,7 +174,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         double sx = X, sy = Y;
         all.Remove(this);
         DisconnectAll();
-        Relations.Clear();
+        Log.Write(Relations);
         IDGenerator.Remove(this);
 
         MainWindow.BigScreen.Children.Remove(this);
@@ -190,6 +190,8 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         }
 
         OnRemoved.Clear();
+
+        MainWindow.regenAll(0, 0, 0, 0);
     }
     public override bool Overlaps(Point point)
     {

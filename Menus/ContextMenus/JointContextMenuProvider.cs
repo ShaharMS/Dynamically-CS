@@ -365,7 +365,6 @@ public class JointContextMenuProvider : ContextMenuProvider
         {
             if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance) {
                 veryCloseTo.Add(container);
-                Log.Write(Subject, container, container.Formula.DistanceTo(Subject));
             }
         }
         if (veryCloseTo.Count == 0) return null;
