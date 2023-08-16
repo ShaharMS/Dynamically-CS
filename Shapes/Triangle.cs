@@ -101,6 +101,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
             j.Roles.RemoveFromRole(Role.TRIANGLE_Corner, this);
         }
 
+        Triangle.all.Remove(this);
         MainWindow.BigScreen.Children.Remove(this);
     }
 

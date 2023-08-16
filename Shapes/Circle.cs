@@ -65,6 +65,7 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
     {
         Formula.queueRemoval = true;
         onResize.Clear();
+        Circle.all.Remove(this);
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Children.Remove(ring);
     }
