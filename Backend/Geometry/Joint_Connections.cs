@@ -231,11 +231,7 @@ public partial class Joint
                 }
                 if (!hasTriangle)
                 {
-                    var triangle = new Triangle(this, other, joint);
-                    foreach (var j in new[] { other, joint, this })
-                    {
-                        j.Roles.AddToRole(Role.TRIANGLE_Corner, triangle);
-                    }
+                    _ = new Triangle(this, other, joint);
                 }
             }
         }

@@ -298,7 +298,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MergeJoints()
     {
-        List<Joint> veryCloseTo = new(); 
+        List<Joint> veryCloseTo = new();
         foreach (var j in Joint.all)
         {
             if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
@@ -310,12 +310,23 @@ public class JointContextMenuProvider : ContextMenuProvider
         {
             var m = new MenuItem
             {
-                Header = $"Merge With {veryCloseTo[0]}"
+                Header = $"Merge With {veryCloseTo[0]}",
+                IsEnabled = !Subject.Anchored
             };
             m.Click += (sender, args) =>
             {
-                Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
-                veryCloseTo[0].RemoveFromBoard();
+                if (veryCloseTo[0].Anchored)
+                {
+                    var id = Subject.Id;
+                    veryCloseTo[0].Roles.TransferFrom(Subject.Roles);
+                    Subject.RemoveFromBoard();
+                    veryCloseTo[0].Id = id;
+                }
+                else
+                {
+                    Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
+                    veryCloseTo[0].RemoveFromBoard();
+                }
             };
             return m;
         }
@@ -325,12 +336,23 @@ public class JointContextMenuProvider : ContextMenuProvider
         {
             var m = new MenuItem
             {
-                Header = $"Merge With {cj}"
+                Header = $"Merge With {cj}",
+                IsEnabled = !Subject.Anchored
             };
             m.Click += (sender, args) =>
             {
-                Subject.Roles.TransferFrom(cj.Roles);
-                cj.RemoveFromBoard();
+                if (cj.Anchored)
+                {
+                    var id = Subject.Id;
+                    cj.Roles.TransferFrom(Subject.Roles);
+                    Subject.RemoveFromBoard();
+                    cj.Id = id;
+                }
+                else
+                {
+                    Subject.Roles.TransferFrom(cj.Roles);
+                    cj.RemoveFromBoard();
+                }
             };
             list.Add(m);
         }
@@ -350,7 +372,8 @@ public class JointContextMenuProvider : ContextMenuProvider
         List<dynamic> veryCloseTo = new();
         foreach (var container in new List<dynamic>().Concat(Circle.all).Concat(Segment.all)) // container is IHasFormula<Formula>
         {
-            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container)) {
+            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container))
+            {
                 veryCloseTo.Add(container);
             }
         }
@@ -429,7 +452,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         var roles = new MenuItem
         {
             Header = "Display Roles",
-            Items = new Control[] { new Label { Content = Keys() }}
+            Items = new Control[] { new Label { Content = Keys() } }
         };
 
         return roles;

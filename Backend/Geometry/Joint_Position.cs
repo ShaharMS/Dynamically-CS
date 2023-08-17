@@ -10,8 +10,6 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Joint
 {
-
-
     bool _anchored;
     public bool Anchored
     {
@@ -63,36 +61,29 @@ public partial class Joint
                 safety++;
             } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
 
-            x = X; y = Y;
-            safety = 0;
-            foreach (var listener in OnMoved)
+            do
             {
-                listener(X, Y, px, py);
-            }
-
-            if ((X, Y).DistanceTo(x, y) < epsilon) safety = 0;
-            else if (safety > 20)
-            {
-                string Keys()
+                if (initialX != null && initialY != null)
                 {
-                    var s = "";
-                    foreach (var role in Roles.underlying.Keys)
-                    {
-                        if (Roles.CountOf(role) == 0) continue;
-                        s += role.ToString();
-                        s += $" ({Roles.CountOf(role)}) ({Log.StringifyCollection(Roles.Access<dynamic>(role))})\n\r";
-                    }
-                    if (s == "") return s;
-                    return s.Substring(0, s.Length - 2);
+                    var p = new RatioOnSegmentFormula(new SegmentFormula(initialX.Value, initialY.Value, X, Y), 0.5).pointOnRatio;
+                    px = X; py = Y;
+                    X = p.X;
+                    Y = p.Y;
+                    initialX = initialY = null;
                 }
-                Log.Write($"Joint {this} is unpositionable. Info:\n{Keys()}");
-                safety = 0;
-            }
-            else
-            {
+                if (safety > 20)
+                {
+                    safety = 0;
+                    break;
+                }
+                foreach (var listener in OnMoved)
+                {
+                    listener(X, Y, px, py);
+                    if (initialX == null) initialX = X;
+                    if (initialY == null) initialY = Y;
+                }
                 safety++;
-                DispatchOnMovedEvents(X, Y, x, y);
-            }
+            } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
         }
         reposition();
     }

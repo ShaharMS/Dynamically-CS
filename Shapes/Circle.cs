@@ -50,10 +50,10 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
 
         OnMoved.Add((x, y, px, py) =>
         {
-            double pcx = center.X, pcy = center.Y;
-            center.X += x - px;
-            center.Y += y - py;
-            center.DispatchOnMovedEvents(center.X, center.Y, pcx, pcy);
+            double pcx = this.center.X, pcy = this.center.Y;
+            this.center.X += x - px;
+            this.center.Y += y - py;
+            this.center.DispatchOnMovedEvents(this.center.X, this.center.Y, pcx, pcy);
             this.SetPosition(0, 0);
         });
         OnMoved.Add(__circle_OnChange); 
@@ -72,7 +72,11 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
 
     public void Set(Joint center, double radius)
     {
+        center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
         this.center = center;
+        focal1 = this.center;
+        focal2 = this.center;
+        center.Roles.AddToRole(Role.CIRCLE_Center, this);
         this.radius = radius;
         UpdateFormula();
     }

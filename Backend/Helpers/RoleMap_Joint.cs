@@ -158,19 +158,12 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                (item as Circle).Formula.RemoveFollower(From);
+                (item as Circle).Set(Subject, (item as Circle).radius);
                 foreach (Joint joint in Subject.Relations)
                 {
-                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
+                    if (joint.Roles.Has(Role.CIRCLE_On, item))
                     {
                         From.UpdateBoardRelationsWith(joint, From.GetConnectionTo(joint));
-                    }
-                }
-                (item as Circle).Formula.AddFollower(Subject);
-                foreach (Joint joint in Subject.Relations)
-                {
-                    if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
-                    {
                         Subject.UpdateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
                     }
                 }
