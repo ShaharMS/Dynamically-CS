@@ -77,13 +77,14 @@ public partial class MainWindow : Window
         foreach (DraggableGraphic obj in Joint.all.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.all)) obj.OnDragged.Add(regenAll);
 
         BigScreen.Refresh();
-
+         
         regenAll(0, 0, 0, 0);
 
     }
 
     public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
+        Log.Write(Joint.all);
         foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all))
         {
             item.Provider.Regenerate();

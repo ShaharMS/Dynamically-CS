@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend;
+using Dynamically.Shapes;
+using System.Diagnostics;
 
-namespace Dynamically.Shapes;
+namespace Dynamically.Backend.Helpers;
 
 class Tools
 {
@@ -22,7 +24,7 @@ class Tools
             double dx34 = p4.X - p3.X;
             double dy34 = p4.Y - p3.Y;
 
-            // Solve for t1 and t2
+            // Solve for b1 and b2
             double denominator = (dy12 * dx34 - dx12 * dy34);
 
             double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
@@ -31,7 +33,7 @@ class Tools
             // Find the point of intersection.
             intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
 
-            // The segments intersect if t1 and t2 are between 0 and 1.
+            // The segments intersect if b1 and b2 are between 0 and 1.
             segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
         }
 
@@ -56,7 +58,7 @@ class Tools
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
         var c = new Joint(center.X, center.Y);
-        Circle circle = new Circle(c , radius);
+        Circle circle = new Circle(c, radius);
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
         {
@@ -76,7 +78,7 @@ class Tools
             double dx34 = p4.X - p3.X;
             double dy34 = p4.Y - p3.Y;
 
-            // Solve for t1 and t2
+            // Solve for b1 and b2
             double denominator = (dy12 * dx34 - dx12 * dy34);
 
             double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
@@ -85,7 +87,7 @@ class Tools
             // Find the point of intersection.
             intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
 
-            // The segments intersect if t1 and t2 are between 0 and 1.
+            // The segments intersect if b1 and b2 are between 0 and 1.
             segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
 
             // Find the closest points on the segments.
@@ -124,7 +126,7 @@ class Tools
         return circle;
     }
 
-    public static double GetDegreesBetween3Points(Point p1, Point center, Point p2) 
+    public static double GetDegreesBetween3Points(Point p1, Point center, Point p2)
     {
         double angle1 = center.DegreesTo(p1);
         double angle2 = center.DegreesTo(p2);
@@ -170,5 +172,67 @@ class Tools
         if (angle > 180) return Math.PI * 2 - angle;
 
         return angle;
+    }
+
+    public static bool QualifiesForMerge(Joint j1, Joint j2)
+    {
+        // Case 1: CIRCLE_center & CIRCLE_on
+        var a1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
+        var a2 = j2.Roles.Access<Circle>(Role.CIRCLE_On);
+        if (a1.Intersect(a2).Count() != 0) return false;
+        a1 = j1.Roles.Access<Circle>(Role.CIRCLE_On);
+        a2 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
+        if (a1.Intersect(a2).Count() != 0) return false;
+
+        // Case 2: corners of the same triangle
+        var b1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+        var b2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+        if (b1.Intersect(b2).Count() != 0) return false;
+
+        // Case 3: triangle corner & in\circumcircle center
+        var c1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
+        var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        if (c1.Intersect(c2).Count() != 0) return false;
+        c1 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
+        c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        if (c1.Intersect(c2).Count() != 0) return false;
+
+        // Case 4: triangle corner & in/circumcircle on
+
+        var d1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        if (d1.Contains(j2)) return false;
+        var d2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        if (d2.Contains(j1)) return false;
+
+        return true;
+    }
+
+    public static bool QualifiesForMount(Joint j, dynamic shape)
+    {
+        if (shape is Circle circle)
+        {
+            // Case C1: center & its circle
+            var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
+            if (a1.Contains(circle)) return false;
+
+            // Case C2: triangle corner & incircle
+            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => t.incircle).Where(item => item != null).Cast<Circle>();
+            if (b1.Contains(circle)) return false;
+        }
+
+        if (shape is Segment segment)
+        {
+            // Case S1: center & circle chord (stack overflow)
+            var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
+            var a2 = segment.Roles.Access<Circle>(Role.CIRCLE_Chord);
+            if (a1.Intersect(a2).Count() != 0) return false;
+
+            // Case S2: triangle corner & side
+            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+            var b2 = segment.Roles.Access<Triangle>(Role.TRIANGLE_Side);
+            if (b1.Intersect(b2).Count() != 0) return false;
+        }
+
+        return true;
     }
 }

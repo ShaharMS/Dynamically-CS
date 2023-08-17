@@ -70,7 +70,6 @@ public partial class Joint
     public bool IsConnectedTo(Joint joint)
     {
         if (this == joint) return false;
-        Log.Write(Connections);
         foreach (Segment c in Connections)
         {
             Joint[] js = new[] { c.joint1, c.joint2 };

@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Formats.Asn1.AsnWriter;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Formulas;
 

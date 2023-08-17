@@ -103,6 +103,7 @@ public class BigScreen : DraggableGraphic
             }
         }
         else filtered = Joint.all;
+        filtered.Remove(potential);
 
 
         potential.ForceStartDrag(MainWindow.Mouse);
@@ -110,7 +111,6 @@ public class BigScreen : DraggableGraphic
 
         var alreadyDisconnected = new List<Joint>();
         foreach (var j in filtered) if (!j.IsConnectedTo(from)) alreadyDisconnected.Add(j);
-
         from.Connect(current);
 
         void EvalConnection(object? sender, PointerEventArgs args)
@@ -120,7 +120,7 @@ public class BigScreen : DraggableGraphic
 
             foreach (var j in filtered)
             {
-                if (j != potential && j.Overlaps(pos))
+                if (j.Overlaps(pos))
                 {
                     potential.Hidden = true;
                     attached = true;
@@ -136,17 +136,28 @@ public class BigScreen : DraggableGraphic
                 potential.Hidden = false;
                 if (alreadyDisconnected.Contains(current)) from.Disconnect(current);
                 current = potential;
-                if (alreadyDisconnected.Contains(current)) from.Connect(current);
             }
+
+            if (current != potential && from.IsConnectedTo(potential)) from.Disconnect(potential);
+            else if (current == potential && !from.IsConnectedTo(potential)) from.Connect(potential);
 
         }
 
         void Finish(object? sender, PointerReleasedEventArgs args)
         {
-            if (potential.Hidden) potential.RemoveFromBoard();
+            if (potential.Hidden)
+            {
+                Log.Write(current, potential, potential.Hidden);
+                potential.RemoveFromBoard();
+            } else
+            {
+                if (!Joint.all.Contains(potential)) Joint.all.Add(potential); // Todo - shouldnt be necessary, need to resolve later
+            }
 
             MainWindow.Instance.PointerMoved -= EvalConnection;
             MainWindow.Instance.PointerReleased -= Finish;
+
+            MainWindow.regenAll(0,0,0,0);
         }
 
         MainWindow.Instance.PointerMoved += EvalConnection;

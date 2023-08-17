@@ -52,21 +52,25 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
             switch (value)
             {
                 case SegmentTextDisplay.LENGTH_EXACT:
+                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     labelUpdater = () => Label.Content = "" + Math.Round(Length, 3);
                     if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
-                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
                     break;
                 case SegmentTextDisplay.LENGTH_ROUND:
+                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     labelUpdater = () => Label.Content = "" + Math.Round(Length);
                     if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
-                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
                     break;
                 case SegmentTextDisplay.PARAM:
                 case SegmentTextDisplay.CUSTOM:
                 case SegmentTextDisplay.NONE:
-                    labelUpdater = () => { };
                     if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
-                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    labelUpdater = () => { };
                     break;
             }
         }
@@ -94,8 +98,15 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
             BorderThickness = new Thickness(0, 0, 0, 0),
             Width = double.NaN,
             Height = 24,
-            Content = "test"
         };
+        Label.PropertyChanged += (sender, args) =>
+        {
+            if (args.Property.Name == nameof(Label.Content))
+            {
+                Label.IsVisible = Label.Content.ToString()?.Length != 0;
+            }
+        };
+        Label.Content = "";
 
         Roles = new RoleMap(this);
 

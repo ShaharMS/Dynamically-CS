@@ -274,20 +274,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
             j.OnDragged.Add(AddRole);
 
-            j.Connect(j1);
-
-            j.OnMoved.Add((cx, cy, _, _) =>
-            {
-                if (!j.CurrentlyDragging) return;
-                j1.X = j.X - (j.X - circle.center.X) * 2;
-                j1.Y = j.Y - (j.Y - circle.center.Y) * 2;
-            });
-            j1.OnMoved.Add((cx, cy, _, _) =>
-            {
-                if (!j1.CurrentlyDragging) return;
-                j.X = j1.X - (j1.X - circle.center.X) * 2;
-                j.Y = j1.Y - (j1.Y - circle.center.Y) * 2;
-            });
+            j.Connect(j1).Roles.AddToRole(Role.CIRCLE_Diameter, circle);
         };
 
         return item;
@@ -314,7 +301,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         List<Joint> veryCloseTo = new(); 
         foreach (var j in Joint.all)
         {
-            if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance) veryCloseTo.Add(j);
+            if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
         }
         veryCloseTo.Sort(new C(Subject));
 
@@ -363,7 +350,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         List<dynamic> veryCloseTo = new();
         foreach (var container in new List<dynamic>().Concat(Circle.all).Concat(Segment.all)) // container is IHasFormula<Formula>
         {
-            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance) {
+            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container)) {
                 veryCloseTo.Add(container);
             }
         }

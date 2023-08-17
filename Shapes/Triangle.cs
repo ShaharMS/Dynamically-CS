@@ -36,6 +36,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         get => _type;
         set => ChangeType(value);
     }
+    public Circle? circumcircle;
 
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
@@ -107,7 +108,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     public Circle GenerateCircumCircle()
     {
-        return Tools.CircleFrom3Joints(joint1, joint2, joint3);
+        return circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
     }
 
     public Circle GenerateInCircle()

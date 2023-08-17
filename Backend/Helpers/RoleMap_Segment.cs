@@ -16,9 +16,29 @@ public partial class RoleMap
     {
         switch (role)
         {
+
+            // Circle
+            case Role.CIRCLE_Diameter:
+                var c1 = item as Circle;
+
+                Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint1.CurrentlyDragging) return;
+                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
+                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                });
+                Subject.joint2.OnMoved.Add((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint2.CurrentlyDragging) return;
+                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
+                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                });
+                break;
+            // Triangle
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Add((_, _) => (item as Triangle).Dismantle());
                 break;
+
             default:
                 break;
         }
@@ -27,6 +47,23 @@ public partial class RoleMap
     {
         switch (role)
         {
+            // Circle
+            case Role.CIRCLE_Diameter:
+                var c1 = item as Circle;
+
+                Subject.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint1.CurrentlyDragging) return;
+                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
+                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                });
+                Subject.joint2.OnMoved.Remove((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint2.CurrentlyDragging) return;
+                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
+                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                });
+                break;
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
                 break;
@@ -40,6 +77,35 @@ public partial class RoleMap
 
         switch (role)
         {
+            // Circle
+            case Role.CIRCLE_Diameter:
+                var c1 = item as Circle;
+
+                From.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint1.CurrentlyDragging) return;
+                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
+                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                });
+                From.joint2.OnMoved.Remove((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint2.CurrentlyDragging) return;
+                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
+                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                });
+                Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint1.CurrentlyDragging) return;
+                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
+                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                });
+                Subject.joint2.OnMoved.Add((cx, cy, _, _) =>
+                {
+                    if (!Subject.joint2.CurrentlyDragging) return;
+                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
+                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                });
+                break;
             case Role.TRIANGLE_Side:
                 From.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
                 Subject.OnRemoved.Add((_, _) => (item as Triangle).Dismantle());

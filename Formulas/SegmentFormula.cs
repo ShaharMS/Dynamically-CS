@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;

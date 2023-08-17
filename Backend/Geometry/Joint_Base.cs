@@ -66,7 +66,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     public Joint(Point p) : this(p.X, p.Y) { }
     public Joint(double x, double y, char id = '_')
     {
-        all.Add(this);
 
         IdDisplay = new Label()
         {
@@ -99,7 +98,11 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         InvalidateVisual();
         RepositionText();
 
+        all.Add(this);
+
         MainWindow.BigScreen.Children.Add(this);
+
+        Log.Write(all);
     }
 
     public void RepositionText()
@@ -172,7 +175,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     public void RemoveFromBoard()
     {
         double sx = X, sy = Y;
-        all.Remove(this);
         DisconnectAll();
         Log.Write(Relations);
         IDGenerator.Remove(this);
@@ -190,6 +192,8 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         }
 
         OnRemoved.Clear();
+
+        all.Remove(this);
 
         MainWindow.regenAll(0, 0, 0, 0);
     }
