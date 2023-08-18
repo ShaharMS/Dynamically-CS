@@ -55,7 +55,7 @@ public partial class MainWindow : Window
         var t = new Triangle(new Joint(570, 120), new Joint(750, 80), new Joint(860, 320));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
-
+/*
         var t2 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
         t2.Type = TriangleType.RIGHT; 
         var t3 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
@@ -65,7 +65,7 @@ public partial class MainWindow : Window
         var t5 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
         t5.Type = TriangleType.ISOCELES_RIGHT;
         var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
-
+*/
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 

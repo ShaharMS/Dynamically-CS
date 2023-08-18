@@ -18,7 +18,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
+public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
 
@@ -67,6 +67,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
                     break;
                 case SegmentTextDisplay.PARAM:
                 case SegmentTextDisplay.CUSTOM:
+                case SegmentTextDisplay.LENGTH_GIVEN:
                 case SegmentTextDisplay.NONE:
                     if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
@@ -164,46 +165,7 @@ public class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStri
         Formula.y2 = joint2.Y;
     }
 
-    public double Length
-    {
-        get => Math.Sqrt(Math.Pow(joint2.X - joint1.X, 2) + Math.Pow(joint2.Y - joint1.Y, 2));
-        set
-        {
-            var ray = new RayFormula(joint1, joint2);
-            var p2Arr = ray.GetPointsByDistanceFrom(joint1, value);
-            if (p2Arr[0].DistanceTo(joint2) < p2Arr[1].DistanceTo(joint2))
-            {
-                joint2.X = p2Arr[0].X;
-                joint2.Y = p2Arr[0].Y;
-            }
-            else
-            {
-                joint2.X = p2Arr[1].X;
-                joint2.Y = p2Arr[1].Y;
-            }
-        }
-    }
-
-    public void SetLength(double len, bool isFirstStuck = true)
-    {
-        if (isFirstStuck)
-        {
-            Length = len; // First is stuck by default
-            return;
-        }
-        var ray = new RayFormula(joint1, joint2);
-        var p1Arr = ray.GetPointsByDistanceFrom(joint2, len);
-        if (p1Arr[0].DistanceTo(joint1) < p1Arr[1].DistanceTo(joint1))
-        {
-            joint1.X = p1Arr[0].X;
-            joint1.Y = p1Arr[0].Y;
-        }
-        else
-        {
-            joint1.X = p1Arr[1].X;
-            joint1.Y = p1Arr[1].Y;
-        }
-    }
+    
 
     public Segment ReplaceJoint(Joint joint, Joint by)
     {
@@ -314,5 +276,6 @@ public enum SegmentTextDisplay
     LENGTH_ROUND,
     PARAM,
     NONE,
-    CUSTOM
+    CUSTOM,
+    LENGTH_GIVEN
 }

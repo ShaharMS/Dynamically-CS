@@ -38,7 +38,7 @@ public partial class Joint
             double? initialX = null, initialY = null;
             do
             {
-                
+
                 if (initialX != null && initialY != null)
                 {
                     var p = new RatioOnSegmentFormula(new SegmentFormula(initialX.Value, initialY.Value, X, Y), 0.5).pointOnRatio;
@@ -61,29 +61,10 @@ public partial class Joint
                 safety++;
             } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
 
-            do
+            foreach (var listener in OnMoved)
             {
-                if (initialX != null && initialY != null)
-                {
-                    var p = new RatioOnSegmentFormula(new SegmentFormula(initialX.Value, initialY.Value, X, Y), 0.5).pointOnRatio;
-                    px = X; py = Y;
-                    X = p.X;
-                    Y = p.Y;
-                    initialX = initialY = null;
-                }
-                if (safety > 20)
-                {
-                    safety = 0;
-                    break;
-                }
-                foreach (var listener in OnMoved)
-                {
-                    listener(X, Y, px, py);
-                    if (initialX == null) initialX = X;
-                    if (initialY == null) initialY = Y;
-                }
-                safety++;
-            } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
+                listener(X, Y, px, py);
+            }
         }
         reposition();
     }
