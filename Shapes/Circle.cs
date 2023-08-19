@@ -66,13 +66,15 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
         Formula.queueRemoval = true;
         onResize.Clear();
         Circle.all.Remove(this);
-        MainWindow.BigScreen.Children.Remove(this);
+        EllipseBase.all.Remove(this);
         MainWindow.BigScreen.Children.Remove(ring);
+        MainWindow.BigScreen.Children.Remove(this);
     }
 
     public void Set(Joint center, double radius)
     {
         center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
+        center.Draggable = this.center.Draggable;
         this.center = center;
         focal1 = this.center;
         focal2 = this.center;
@@ -119,8 +121,8 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
-        this.center = center;
-        this.radius = radius;
+        
+        Set(center, radius);
         UpdateFormula();
     }
 
