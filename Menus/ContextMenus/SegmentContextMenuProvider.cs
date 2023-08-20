@@ -31,7 +31,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         Defaults = new List<Control>
         {
             Defaults_Disconnect(),
-            Defaults_Label()
+            Defaults_Label(),
+            Defaults_Anchored()
         };
     }
 
@@ -184,6 +185,20 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
     }
 
+    MenuItem Defaults_Anchored()
+    {
+        var c = new MenuItem();
+        if (Subject.Anchored) c.Header = "Unanchor";
+        else c.Header = "Anchor";
+        c.Click += (s, args) =>
+        {
+            Subject.Anchored = !Subject.Anchored;
+
+            if (Subject.Anchored) c.Header = "Unanchor";
+            else c.Header = "Anchor";
+        };
+        return c;
+    }
     // -------------------------------------------------------
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------

@@ -11,6 +11,7 @@ using Dynamically.Screens;
 using Avalonia.Media;
 using Dynamically.Design;
 using System.Linq;
+using Dynamically.Formulas.Special;
 
 namespace Dynamically.Shapes;
 
@@ -27,7 +28,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     public Segment con13;
     public Segment con23;
 
-    public Circle? incircle;
 
     TriangleType _type = TriangleType.SCALENE;
 
@@ -36,8 +36,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         get => _type;
         set => ChangeType(value);
     }
-    public Circle? circumcircle;
 
+    public Circle? circumcircle;
+    public Circle? incircle;
+
+    //public EquilateralTriangleFormula EquilateralFormula;
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
         joint1 = j1;
@@ -54,7 +57,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
 
-        OnMoved.Add((x, y, px, py) => {
+        OnMoved.Add((x, y, px, py) =>
+        {
             if (joint1.Anchored || joint2.Anchored || joint3.Anchored)
             {
                 this.SetPosition(0, 0);
@@ -131,12 +135,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     Stats GetCircleStats()
     {
-        // Calculate the lengths of the triangle sides
+        // Calculate the lengths of the Triangle sides
         double a = joint2.DistanceTo(joint3);
         double b = joint1.DistanceTo(joint3);
         double c = joint1.DistanceTo(joint2);
 
-        // Calculate the semiperimeter of the triangle
+        // Calculate the semiperimeter of the Triangle
         double s = (a + b + c) / 2;
 
         // Calculate the radius of the inscribed circle
@@ -152,6 +156,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
             y = centerY,
             r = radius
         };
+    }
+
+    public Point GetIncircleCenter()
+    {
+        var s = GetCircleStats();
+        return new Point(s.x, s.y);
     }
 
     public void __RecalcuateInCircle(double ux, double uy, double px, double py)
@@ -173,7 +183,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
             case TriangleType.EQUILATERAL:
                 void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
                 {
-                    Log.Write(B);
                     // AB and BC are the most similar to each other, so B was chosen. Now, reset the angle
                     // We'll do this by averaging AB and BC, resetting their length, and BC will 
                     // automatically be the same length as AC, because of equilateral definition.
@@ -236,7 +245,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                     C.Y = B.Y + distance * Math.Sin(radBC);
 
                     ISO_origin = B;
-                    // Now, After equating the two sides, we're pretty much dones - we've reached teh definition of an isoceles triangle
+                    // Now, After equating the two sides, we're pretty much dones - we've reached teh definition of an isoceles Triangle
                 }
                 var con12_to_con13_Diff = Math.Abs(con12.Length - con13.Length);
                 var con12_to_con23_Diff = Math.Abs(con12.Length - con23.Length);
@@ -265,8 +274,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                     else
                     {
                         var dist = B.DistanceTo(A);
-                        var XPosOffset = dist * Math.Cos(radBC + ( radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
-                        var YPosOffset = dist * Math.Sin(radBC + ( radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
+                        var XPosOffset = dist * Math.Cos(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
+                        var YPosOffset = dist * Math.Sin(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
                         A.X = B.X + XPosOffset;
                         A.Y = B.Y + YPosOffset;
                     }
@@ -285,7 +294,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint3, joint2);
                 else MakeRightRelativeToABC(joint2, joint1, joint3);
                 break;
-            case TriangleType.ISOCELES_RIGHT:
+            case TriangleType.ISOSCELES_RIGHT:
                 var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 var a_ACB_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
@@ -300,7 +309,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
                     MakeRightRelativeToABC(joint1, joint3, joint2);
-                    MakeIsocelesRelativeToABC (joint1, joint3, joint2);
+                    MakeIsocelesRelativeToABC(joint1, joint3, joint2);
                 }
                 else
                 {
@@ -311,85 +320,35 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
             case TriangleType.SCALENE:
                 break;
         }
-
-        // Event Listeners
-        switch (type)
-        {
-            case TriangleType.EQUILATERAL:
-                // Remove ISOCELES
-                joint1.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
-                // Remove RIGHT
-                joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
-                // Add EQUILATERAL
-                joint1.OnMoved.Add((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Add((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Add((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
-                break;
-            case TriangleType.ISOSCELES:
-                // Remove EQUILATERAL:
-                joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
-                // Remove RIGHT
-                joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
-                // Add ISOCELES
-                joint1.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
-                break;
-            case TriangleType.RIGHT:
-                // Remove ISOCELES
-                joint1.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
-                // Remove EQUILATERAL:
-                joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
-                // Add RIGHT
-                joint1.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Add((_, _ , px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
-                break;
-            case TriangleType.ISOCELES_RIGHT:
-                // Remove EQUILATERAL:
-                joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
-                // Add RIGHT
-                joint1.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Add((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
-                // Add ISOCELES
-                joint1.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Add((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
-                break;
-            case TriangleType.SCALENE:
-                // Remove ISOCELES
-                joint1.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Isoceles_OnJointMove(joint3, joint2, joint1, px, py));
-                // Remove RIGHT
-                joint1.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Right_OnJointMove(joint3, joint2, joint1, px, py));
-                // Remove EQUILATERAL:
-                joint1.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint1, joint2, joint3, px, py));
-                joint2.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint2, joint1, joint3, px, py));
-                joint3.OnMoved.Remove((_, _, px, py) => Equilateral_OnJointMove(joint3, joint2, joint1, px, py));
-                break;
-        }
         joint1.reposition(); joint2.reposition(); joint3.reposition();
         return _type = type;
     }
 
+    List<(TriangleType type, string details, double confidence)> SuggestTypes()
+    {
+        var l = new List<(TriangleType type, string details, double confidence)>();
+
+        if (Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeEquilateralAngleOffset &&
+            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeEquilateralAngleOffset &&
+            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 0.8 /* Aribitrary, chosen so it would often show at the top of the list */));
+        else  // Dont suggest both isoceles & equilateral. doesnt make sense more often than not.
+        {
+            if (con12.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con13}", con12.Length.GetSimilarityPercentage(con13.Length)));
+            if (con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con23}", con12.Length.GetSimilarityPercentage(con23.Length)));
+            if (con23.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con23} = {con13}", con23.Length.GetSimilarityPercentage(con13.Length)));
+        }
+
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint2}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90));
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint2}{joint1}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90));
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint3}{joint2} = 90°", Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90));
+
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint2}{joint3} = 90°, {con12} = {con23}", (Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90 + con12.Length.GetSimilarityPercentage(con23.Length)) / 2));
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint2}{joint1}{joint3} = 90°, {con13} = {con23}", (Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90 + con13.Length.GetSimilarityPercentage(con23.Length)) / 2));
+        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con12.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint3}{joint2} = 90°, {con13} = {con12}", (Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90 + con13.Length.GetSimilarityPercentage(con12.Length)) / 2));
+
+
+        return l;
+    }
 
     public override string ToString()
     {
@@ -431,7 +390,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                                       joint2.ScreenX * (p.Y - joint1.ScreenY) +
                                       p.X * (joint1.ScreenY - joint2.ScreenY));
 
-        // If the sum of the sub-triangle areas is equal to the triangle area, the point is inside the triangle
+        // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
         return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
     }
 
@@ -453,7 +412,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
         {
             context.DrawGeometry(UIColors.ShapeHoverFill, null, geom);
-        } else
+        }
+        else
         {
             context.DrawGeometry(UIColors.ShapeFill, null, geom);
         }
@@ -490,7 +450,7 @@ public enum TriangleType
     EQUILATERAL,
     ISOSCELES,
     RIGHT,
-    ISOCELES_RIGHT,
+    ISOSCELES_RIGHT,
     SCALENE,
 }
 

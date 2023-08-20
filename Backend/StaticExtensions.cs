@@ -139,6 +139,20 @@ public static class StaticExtensions
         return rads * 180 / Math.PI;
     }
 
+    public static bool IsSimilarTo(this double valueA, double valueB, double offsetUsingPercentage)
+    {
+        if (offsetUsingPercentage < 0 || offsetUsingPercentage > 1)
+        {
+            throw new ArgumentException("Percentage should be in the range 0 to 1.");
+        }
+
+        double upperThreshold = valueB * (1 + offsetUsingPercentage);
+        double lowerThreshold = valueB * (1 - offsetUsingPercentage);
+
+        return valueA > upperThreshold || valueA < lowerThreshold;
+    }
+
+
     public static Point GetPosition(this Control element)
     {
         Point position = new(-1, -1);

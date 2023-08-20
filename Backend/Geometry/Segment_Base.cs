@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,6 +22,12 @@ namespace Dynamically.Backend.Geometry;
 public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
+
+    public bool Anchored
+    {
+        get => joint1.Anchored && joint2.Anchored;
+        set => joint1.Anchored = joint2.Anchored = value;
+    }
 
     public Joint joint1;
     public Joint joint2;

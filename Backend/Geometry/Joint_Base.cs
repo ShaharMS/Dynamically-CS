@@ -42,8 +42,8 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
 
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
-    /// for example, given a circle, and a triangle formed with one joint being the center, 
-    /// the joint's <c>Roles</c> map would contain the circle and the triangle. <br />
+    /// for example, given a circle, and a Triangle formed with one joint being the center, 
+    /// the joint's <c>Roles</c> map would contain the circle and the Triangle. <br />
     /// </summary>
     public RoleMap Roles { get; set; }
 

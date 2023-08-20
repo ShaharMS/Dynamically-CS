@@ -215,9 +215,9 @@ public partial class Joint
         {
             var other = c.joint1 == this ? c.joint2 : c.joint1;
 
-            // First case - connecting a line and forming a triangle
+            // First case - connecting a line and forming a Triangle
 
-            if (other.IsConnectedTo(joint) /* this.IsConnectedTo(joint) is `true` */) // this joint is connected to other, and the just connected joint is also connected to it -> potentially new triangle
+            if (other.IsConnectedTo(joint) /* this.IsConnectedTo(joint) is `true` */) // this joint is connected to other, and the just connected joint is also connected to it -> potentially new Triangle
             {
                 var hasTriangle = false;
                 var currentTriangles = Roles.Access<Triangle>(Role.TRIANGLE_Corner);
