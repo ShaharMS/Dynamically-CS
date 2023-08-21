@@ -29,6 +29,17 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         set => joint1.Anchored = joint2.Anchored = value;
     }
 
+    bool _aux;
+    public bool IsAuxiliary
+    {
+        get => _aux;
+        set
+        {
+            _aux = value;
+            InvalidateVisual();
+        }
+    }
+
     public Joint joint1;
     public Joint joint2;
 
@@ -102,7 +113,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         {
             FontSize = 16,
             FontWeight = FontWeight.SemiLight,
-            Background = new SolidColorBrush(Colors.White),
+            Background = new SolidColorBrush(Colors.Black),
             BorderThickness = new Thickness(0, 0, 0, 0),
             Width = double.NaN,
             Height = 24,
@@ -111,7 +122,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         {
             if (args.Property.Name == nameof(Label.Content))
             {
-                Label.IsVisible = Label.Content.ToString()?.Length != 0;
+                Label.IsVisible = Label.Content?.ToString()?.Length != 0;
             }
         };
         Label.Content = "";
@@ -160,6 +171,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         all.Add(this);
 
         MainWindow.BigScreen.Children.Insert(0, this);
+
         InvalidateVisual();
     }
 
@@ -210,7 +222,12 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
 
         // Graphic is cleared
-        var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.ConnectionGraphicWidth);
+        var pen = new Pen
+        {
+            Brush = UIColors.ConnectionColor,
+            Thickness = UIDesign.ConnectionGraphicWidth,
+        };
+        if (IsAuxiliary) pen.DashStyle = DashStyle.Dash;
         context.DrawLine(pen, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
         // padding for easier dragging
         var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5);

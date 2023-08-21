@@ -9,9 +9,9 @@ namespace Dynamically.Design;
 
 public class UIColors
 {
-    public static IBrush ShapeHoverFill = new SolidColorBrush(Colors.LightGray);
-    public static IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0xFFFFFFFF));
-    public static IBrush ConnectionColor = new SolidColorBrush(Colors.Black);
-    public static IBrush JointOutlineColor = new SolidColorBrush(Colors.Black);
-    public static IBrush JointFillColor = new SolidColorBrush(Colors.White);
+    public static IBrush ShapeHoverFill = new SolidColorBrush(Color.FromUInt32(0x22FFFFFF));
+    public static IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0x00000000));
+    public static IBrush ConnectionColor = new SolidColorBrush(Colors.White);
+    public static IBrush JointOutlineColor = new SolidColorBrush(Colors.White);
+    public static IBrush JointFillColor = new SolidColorBrush(Colors.Black);
 }

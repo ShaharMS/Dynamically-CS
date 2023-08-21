@@ -152,6 +152,21 @@ public static class StaticExtensions
         return valueA > upperThreshold || valueA < lowerThreshold;
     }
 
+    public static double GetSimilarityPercentage(this double valueA, double valueB)
+    {
+        double difference = Math.Abs(valueA - valueB);
+        double maxDifference = Math.Max(valueA, valueB);
+
+        if (maxDifference == 0)
+        {
+            // Handle the case where both values are zero to avoid division by zero.
+            return 1.0;
+        }
+
+        double similarity = 1.0 - (difference / maxDifference);
+        return similarity;
+
+    }
 
     public static Point GetPosition(this Control element)
     {

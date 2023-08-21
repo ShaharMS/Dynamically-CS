@@ -37,4 +37,13 @@ public class IDGenerator
     {
         ids.Remove(j);
     }
+
+    public static bool Has(char id)
+    {
+        foreach (var joint in ids)
+        {
+            if (joint.Id == id) return true;
+        }
+        return false;
+    }
 }

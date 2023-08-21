@@ -11,12 +11,15 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class ContextMenuProvider
 {
+    public string Name;
     public List<Control> Items
     {
         get
         {
 #pragma warning disable CA1806
-            var list = Defaults.ToList();
+            var list = new List<Control>();
+            new TextSeparator(Name, list);
+            list = list.Concat(Defaults.ToList()).ToList();
             new TextSeparator("Suggestions", list);
             list = list.Concat(Suggestions.ToList()).ToList();
             new TextSeparator("Recommended", list);

@@ -153,8 +153,8 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     public override void Render(DrawingContext context)
     {
         // Graphic is cleared
-        var brush = new SolidColorBrush(Colors.White);
-        var pen = new Pen(new SolidColorBrush(Colors.Black), UIDesign.JointGraphicCircleRadius / 2.5);
+        var brush = UIColors.JointFillColor;
+        var pen = new Pen(UIColors.JointOutlineColor, UIDesign.JointGraphicCircleRadius / 2.5);
         context.DrawEllipse(brush, pen, new Point(0, 0), UIDesign.JointGraphicCircleRadius, UIDesign.JointGraphicCircleRadius);
         context.FillRectangle(new SolidColorBrush(Colors.Red), new Rect(-1, -1, 2, 2));
     }
@@ -220,4 +220,14 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
 
     public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }
     public static implicit operator Joint(Point point) { return new Joint(point.X, point.Y); }
+
+
+    public static Joint? GetJointById(char id)
+    {
+        foreach (var joint in all)
+        {
+            if (joint.Id == id) return joint;
+        }
+        return null;
+    }
 }

@@ -235,4 +235,27 @@ class Tools
 
         return true;
     }
+
+    public static double[] OrderRadiansBySmallArc(double rad1, double rad2)
+    {
+        double NormalizeAngle(double angle)
+        {
+            while (angle < 0)
+            {
+                angle += 2 * Math.PI;
+            }
+            while (angle >= 2 * Math.PI)
+            {
+                angle -= 2 * Math.PI;
+            }
+            return angle;
+        }
+
+        // Normalize angles to be between 0 and 2 * PI
+        rad1 = NormalizeAngle(rad1);
+        rad2 = NormalizeAngle(rad2);
+
+        if (Math.Min(rad1, rad2) + Math.PI >= Math.Max(rad1, rad2)) return new double[] { Math.Min(rad1, rad2), Math.Max(rad1, rad2) };
+        else return new double[] { Math.Max(rad1, rad2), Math.Min(rad1, rad2) };
+    }
 }

@@ -177,7 +177,8 @@ public class BigScreen : DraggableGraphic
 
         if (FocusedObject is BigScreen) Log.Write("No object is focused");
         else if (FocusedObject is Joint joint) Log.Write($"{joint.Id} Is Focused");
-        else if (FocusedObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Focused");
+        else if (FocusedObject is Segment connection) Log.Write($"{connection} Is Focused");
+        else if (FocusedObject is Angle angle) Log.Write($"{angle} Is Focused");
         else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
     }
 

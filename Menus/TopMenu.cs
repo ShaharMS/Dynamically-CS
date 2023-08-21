@@ -12,9 +12,9 @@ public class TopMenu
     
     public static void applyDefaultStyling()
     {
-        BackgroundColor = null;
-        BorderColor = null;
-        TextColor = null;
+        //BackgroundColor = null;
+        //BorderColor = null;
+        //TextColor = null;
     }
 
 

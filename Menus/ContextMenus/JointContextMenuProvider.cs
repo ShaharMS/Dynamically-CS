@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +18,8 @@ using System.Collections;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
 using System.Reactive.Subjects;
+using Avalonia.Media;
+using System.Threading;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -29,6 +31,12 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         Subject = joint;
         Menu = menu;
+        Name = Subject.ToString(true);
+
+        GenerateDefaults();
+        GenerateSuggestions();
+        GenerateRecommendations();
+        if (MainWindow.Debug) AddDebugInfo();
     }
 
     public override void GenerateDefaults()
@@ -47,7 +55,10 @@ public class JointContextMenuProvider : ContextMenuProvider
     public override void GenerateSuggestions()
     {
         //Log.Write("Eval");
-        Suggestions = new List<Control>();
+        Suggestions = new List<Control>
+        {
+            Suggestions_MarkAngle()
+        };
         if (Subject.Roles.Has(Role.CIRCLE_Center))
         {
             //Log.Write("Circ");
@@ -101,9 +112,13 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
         field.SelectAll();
         field.Focus();
+        bool canPass = false;
         field.KeyDown += (sender, e) =>
         {
-            if (e.Key == Key.Enter)
+            canPass = field.Text.Length > 0 && !IDGenerator.Has(field.Text.ToCharArray()[0]);
+            if (canPass) field.Background = null;
+            else field.Background = new SolidColorBrush(Colors.Red);
+            if (canPass && e.Key == Key.Enter)
             {
                 Subject.Id = field.Text.ToCharArray()[0];
                 //Hide hack
@@ -229,6 +244,74 @@ public class JointContextMenuProvider : ContextMenuProvider
     // -------------------------------------------------------
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
+
+    MenuItem Suggestions_MarkAngle()
+    {
+        var items = new List<string>();
+            foreach(Joint j1 in Joint.all)
+            {
+                foreach (Joint j2 in Joint.all)
+                {
+                    if (Subject == j1 || Subject == j2 || j1 == j2) continue;
+                    if (Angle.Exists(Subject, j1, j2)) continue;
+                    items.Add($"{j1}{Subject}{j2}");
+                }
+            }
+        var l1 = new Label();
+        l1.Content = "Angle: ∠";
+
+        var ac = new AutoCompleteBox
+        {
+            Items = items
+        };
+
+        var d1 = new DockPanel();
+        d1.Children.Add(l1);
+        d1.Children.Add(ac);
+
+        
+
+        var button = new Button
+        {
+            Content = "Mark Angle",
+        };
+        button.Click += (s, e) =>
+        {
+            var arr = ac.Text.ToCharArray();
+            if (arr.Length == 3)
+            {
+                var j1 = Joint.GetJointById(arr[0]);
+                var c = Joint.GetJointById(arr[1]);
+                var j2 = Joint.GetJointById(arr[2]);
+                if (j1 != null && j2 != null && c != null && j1 != j2 && j1 != c && j2 != c)
+                {
+                    _ = new Angle(j1, c, j2);
+                    // Hide hack
+                    var prev = Subject.ContextMenu;
+                    Subject.ContextMenu = null;
+                    Subject.ContextMenu = prev;
+                    return;
+                }
+            }
+            button.Content = "Invalid Angle!";
+            Timer? timer = null;
+            timer = new Timer((obj) =>
+            {
+                button.Content = "Mark Angle";
+                timer?.Dispose();
+            }, null, 1000, Timeout.Infinite);
+        };
+
+        return new MenuItem
+        {
+            Header = "Mark Angle",
+            Items = new List<Control>
+            {
+                d1,
+                button
+            }
+        };
+    }
 
     MenuItem ShapeDefaults_CreateRadius(Circle circle, string circleName = "")
     {

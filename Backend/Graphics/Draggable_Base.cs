@@ -18,7 +18,7 @@ public partial class DraggableGraphic : Canvas
     public List<Action<double, double, double, double>> OnDragged = new();
 
     public Cursor MouseOverCursor = new (StandardCursorType.SizeAll);
-    public Cursor MouseOverDisabledCursor = new (StandardCursorType.No);
+    public Cursor MouseOverDisabledCursor = new (StandardCursorType.Arrow);
 
     private Point _startPosition;
     private Point _startMousePosition;

@@ -50,8 +50,11 @@ public partial class MainWindow : Window
         
         Menus.TopMenu.applyDefaultStyling();
 
-        var j = new Joint(30, 30).Connect(new Joint(130, 30));
-        var j11 = new Joint(120, 60);
+        var j0 = new Joint(130, 30);
+        var j = new Joint(30, 30);
+        j.Connect(j0);
+        var j11 = new Joint(120, 90);
+        j11.Connect(j);
         var t = new Triangle(new Joint(570, 120), new Joint(750, 80), new Joint(860, 320));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
@@ -66,6 +69,8 @@ public partial class MainWindow : Window
         t4.Type = TriangleType.EQUILATERAL;
         var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
 
+
+        new Angle(j0, j, j11);
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
@@ -84,7 +89,6 @@ public partial class MainWindow : Window
 
     public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        Log.Write(Joint.all);
         foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all))
         {
             item.Provider.Regenerate();

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Dynamically.Screens;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -128,7 +129,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
             // Graphic is cleared
             var info = ConvertFociToEllipse(ellipse.focal1.X, ellipse.focal1.Y, ellipse.focal2.X, ellipse.focal2.Y);
 
-            var pen = new Pen(new SolidColorBrush(Colors.Black), 4);
+            var pen = new Pen(UIColors.ConnectionColor, 4);
             context.DrawEllipse(null, pen, new Point(info.X + info.Width / 2, info.Y + info.Height / 2), info.Width / 2, info.Height / 2);
         }
 
