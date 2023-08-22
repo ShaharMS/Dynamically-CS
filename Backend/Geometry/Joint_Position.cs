@@ -60,11 +60,12 @@ public partial class Joint
                 }
                 safety++;
             } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
-
+            safety = 0;
             foreach (var listener in OnMoved)
             {
                 listener(X, Y, px, py);
             }
+            
         }
         reposition();
     }

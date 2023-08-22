@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Input;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using System;
@@ -27,7 +28,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
     {
         Defaults = new List<Control>
         {
-            Defaults_Label()
+            Defaults_Label(),
+            Defaults_Remove()
         };
     }
 
@@ -53,6 +55,11 @@ public class AngleContextMenuProvider : ContextMenuProvider
             Items = Items
         };
     }
+
+
+    // -------------------------------------------------------
+    // ------------------------Defaults-----------------------
+    // -------------------------------------------------------
 
     MenuItem Defaults_Label()
     {
@@ -108,7 +115,7 @@ public class AngleContextMenuProvider : ContextMenuProvider
                         },
                         new Label
                         {
-                            Content = "Changing this will not affect \nthe angle on screen, but will \nbe taken into account in when solving",
+                            Content = "Changing this will not affect the \nangle on screen, but will be \ntaken into account in when solving",
                             IsEnabled = false,
                             Opacity = 0.7,
                             FontSize = 14
@@ -175,7 +182,7 @@ public class AngleContextMenuProvider : ContextMenuProvider
                         },
                         new Label
                         {
-                            Content = "Changing this will not affect \nthe angle on screen, but will \nbe taken into account in when solving",
+                            Content = "Changing this will not affect the \nangle on screen, but will be \ntaken into account in when solving",
                             IsEnabled = false,
                             Opacity = 0.7,
                             FontSize = 14
@@ -206,19 +213,27 @@ public class AngleContextMenuProvider : ContextMenuProvider
         };
         paramField.SelectAll();
         paramField.Focus();
+        paramField.KeyDown += (s, e) =>
+        {
+            if (e.Key != Key.Enter) return;
+            Subject.Label.Content = paramField.Text;
+            // Hide hack
+            var prev = Subject.ContextMenu;
+            Subject.ContextMenu = null;
+            Subject.ContextMenu = prev;
+        };
 
-        var hBar = new DockPanel
+        var hBar = new HDock
         {
             LastChildFill = true
         };
-        DockPanel.SetDock(hBar, Dock.Left);
         hBar.Children.Add(new Label { Content = "Parameter:" });
         hBar.Children.Add(paramField);
 
         var param = new MenuItem
         {
             Header = "Parameter" + (Subject.TextDisplayMode == AngleTextDisplay.PARAM ? "✓" : ""),
-            Items = new Control[] { hBar }
+            Items = new Control[] { hBar, new Label { Content = "(Press `enter` to confirm)" } }
         };
         param.SubmenuOpened += (s, e) =>
         {
@@ -241,4 +256,21 @@ public class AngleContextMenuProvider : ContextMenuProvider
             }
         };
     }
+    MenuItem Defaults_Remove()
+    {
+        var remove = new MenuItem
+        {
+            Header = "Remove"
+        };
+        remove.Click += (sender, e) =>
+        {
+            Subject.RemoveFromBoard();
+        };
+        return remove;
+    }
+
+
+    // -------------------------------------------------------
+    // -----------------------Suggestions---------------------
+    // -------------------------------------------------------
 }

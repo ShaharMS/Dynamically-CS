@@ -25,7 +25,6 @@ public partial class RoleMap
             // Segment
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
-                Subject.OnMoved.Add(s1.__updateFormula);
                 Subject.OnDragged.Add(s1.__reposition);
                 s1.joint1.Relations.Remove(s1.joint2);
                 s1.joint2.Relations.Remove(s1.joint1);
@@ -72,7 +71,6 @@ public partial class RoleMap
             // Segment
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
-                Subject.OnMoved.Remove(s1.__updateFormula);
                 Subject.OnDragged.Remove(s1.__reposition);
                 s1.joint1.Relations.Remove(s1.joint2);
                 s1.joint2.Relations.Remove(s1.joint1);
@@ -125,9 +123,7 @@ public partial class RoleMap
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
                 s1.ReplaceJoint(From, Subject);
-                From.OnMoved.Remove(s1.__updateFormula);
                 From.OnMoved.Remove(s1.__reposition);
-                Subject.OnMoved.Add(s1.__updateFormula);
                 Subject.OnDragged.Add(s1.__reposition);
                 break;
             case Role.SEGMENT_On:

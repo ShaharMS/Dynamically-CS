@@ -255,6 +255,12 @@ public class Angle : DraggableGraphic, IStringifyable
     {
         return 2;
     }
+
+    public void RemoveFromBoard()
+    {
+        all.Remove(this);
+        MainWindow.BigScreen.Children.Remove(this);
+    }
 }
 
 

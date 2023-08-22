@@ -187,8 +187,6 @@ public class SegmentFormula : Formula
 
         foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
         foreach (var l in OnChange) l();
-
-        UpdateFollowers();
     }
     public void Move(double x1, double y1, double x2, double y2)
     {
@@ -203,7 +201,5 @@ public class SegmentFormula : Formula
 
         foreach (var l in OnMoved) l(nRectX, nRectY, rectX, rectY);
         foreach (var l in OnChange) l();
-
-        UpdateFollowers();
     }
 }

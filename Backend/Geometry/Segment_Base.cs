@@ -175,17 +175,6 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         InvalidateVisual();
     }
 
-    public void UpdateFormula()
-    {
-        if (Formula == null) return;
-        Formula.x1 = joint1.X;
-        Formula.y1 = joint1.Y;
-        Formula.x2 = joint2.X;
-        Formula.y2 = joint2.Y;
-    }
-
-    
-
     public Segment ReplaceJoint(Joint joint, Joint by)
     {
         if (joint1 == joint)
@@ -214,7 +203,6 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
 
     public override void Render(DrawingContext context)
     {
-        UpdateFormula();
         // Label
         Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
         var rad = Math.Atan(Formula.slope);
@@ -260,12 +248,6 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
     }
 
 #pragma warning disable IDE1006
-    public void __updateFormula(double z, double x, double c, double v)
-    {
-        _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
-        UpdateFormula();
-    }
-
     public void __reposition(double z, double x, double c, double v)
     {
         _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
