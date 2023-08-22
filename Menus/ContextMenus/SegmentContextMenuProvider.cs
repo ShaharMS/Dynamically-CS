@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Screens;
@@ -43,6 +44,15 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             Suggestions_CreateOnSegment(),
             Suggestions_CreateMiddle()
+        };
+    }
+
+    public override void GenerateRecommendations()
+    {
+        Recommendations = new List<MenuItem>
+        {
+            Recom_MakeStraight(),
+            Recom_MakeDiameter()
         };
     }
 
@@ -236,7 +246,23 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     // ----------------------Recommended----------------------
     // -------------------------------------------------------
 
+    MenuItem Recom_MakeStraight()
+    {
+        List<Joint> candidatesj1 = new(), candidatesj2 = new();
+        foreach (Joint j in Subject.joint1.Relations)
+        {
+            if (Math.Abs(Subject.joint1.DegreesTo(j) - Subject.joint2.DegreesTo(Subject.joint1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
+        }
+        foreach (Joint j in Subject.joint2.Relations)
+        {
+            if (Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
+        }
+    }
 
+    MenuItem Recom_MakeDiameter()
+    {
+        throw new NotImplementedException();
+    }
 
     // -------------------------------------------------------
     // -------------------------Debug-------------------------

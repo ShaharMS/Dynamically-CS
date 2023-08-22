@@ -12,6 +12,7 @@ public class Settings
     public static int JointMountDistance = 20;
     public static int ConnectionMergeAngleOffset = 10;
     public static int ConnectionParallelingAngleOffset = 10;
+    public static int ConnectionStraighteningAngleOffset = 10;
 
     public static int MakeEquilateralAngleOffset = 5;
     public static double MakeIsocelesSideRatioDiff = 0.1;

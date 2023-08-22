@@ -30,6 +30,10 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
     }
 
     bool _aux;
+
+    /// <summary>
+    /// Determines whether or not this construction doesnt come with the question.
+    /// </summary>
     public bool IsAuxiliary
     {
         get => _aux;
@@ -40,8 +44,8 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         }
     }
 
-    public Joint joint1;
-    public Joint joint2;
+    public Joint joint1 { get; private set; }
+    public Joint joint2 { get; private set;}
 
     public Color outlineColor;
 
