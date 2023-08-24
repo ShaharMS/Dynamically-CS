@@ -32,7 +32,7 @@ public abstract class Formula
 
     public virtual double DistanceTo(Point p)
     {
-        return GetClosestOnFormula(p) != null ? p.DistanceTo(GetClosestOnFormula(p).Value) : double.NaN;
+        return GetClosestOnFormula(p) != null ? p.DistanceTo(GetClosestOnFormula(p) ?? /* The following point never gets through, no worries */new Point(double.NaN, double.NaN)) : double.NaN;
     }
     public double DistanceTo(double X, double Y)
     {

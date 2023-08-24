@@ -68,7 +68,7 @@ public static class StaticExtensions
 
     public static double DistanceTo(this Formula from, Point p)
     {
-        return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p).Value) : double.PositiveInfinity;
+        return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p) ?? new Point(double.NaN, double.NaN)) : double.NaN;
     }
 
     public static double DistanceTo(this Formula from, Joint j)

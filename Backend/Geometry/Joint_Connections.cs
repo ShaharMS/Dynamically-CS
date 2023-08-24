@@ -32,7 +32,7 @@ public partial class Joint
         reposition();
         to.reposition();
 
-        if (updateRelations) UpdateBoardRelationsWith(to, connection);
+        if (updateRelations) CreateBoardRelationsWith(to, connection);
         return connection;
     }
 
@@ -60,7 +60,7 @@ public partial class Joint
                 joint.Relations.Add(this);
 
                 joint.reposition();
-                UpdateBoardRelationsWith(joint, connection);
+                CreateBoardRelationsWith(joint, connection);
             }
         }
         reposition();
@@ -179,11 +179,12 @@ public partial class Joint
         RepositionText();
     }
 
-    public void UpdateBoardRelationsWith(Joint joint, Segment segment)
+    public void CreateBoardRelationsWith(Joint joint, Segment segment)
     {
         // Basic connection info
 
         //First check - radius
+
         if ((joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_Center)) || joint.Roles.Has(Role.CIRCLE_Center) && Roles.Has(Role.CIRCLE_On))
         {
             foreach (var circle in joint.Roles.Access<Circle>(Role.CIRCLE_On))
@@ -234,6 +235,17 @@ public partial class Joint
                     _ = new Triangle(this, other, joint);
                 }
             }
+        }
+    }
+
+    public void UpdateBoardRelations()
+    {
+        Log.Write("Updating", this);
+        foreach (var v in Relations)
+        {
+#pragma warning disable CS8604 // Possible null reference argument.
+            CreateBoardRelationsWith(v, v.GetConnectionTo(this)); // Must be non--null anyways
+#pragma warning restore CS8604 // Possible null reference argument.
         }
     }
 }

@@ -17,6 +17,8 @@ public class ItemLoader : MenuItem
     private MenuItem loadingItem = new();
 
     public bool Working { get; private set; }
+
+    StackPanel h;
     public ItemLoader(ContextMenu parent, params Func<Control>[] tasks)
     {
         
@@ -29,8 +31,9 @@ public class ItemLoader : MenuItem
         };
 
         Tasks = new Queue<Func<Control>>(tasks);
-        Header = new StackPanel();
-        (Header as StackPanel).Children.Add(loadingItem);
+        h = new StackPanel();
+        h.Children.Add(loadingItem);
+        Header = h;
     }
 
     public void AddItem(Func<Control> func)
@@ -48,11 +51,11 @@ public class ItemLoader : MenuItem
     public void Work()
     {
         Working = true;
-        var t = Task.Run(() =>
+        var t = Task.Run(() => // Todo - fix when needed, this would crash with ui thread access errors
         {
             while (Tasks.Count > 0)
             {
-                (Header as StackPanel).Children.Insert((Header as StackPanel).Children.Count - 1, Tasks.Dequeue()());
+                h.Children.Insert(h.Children.Count - 1, Tasks.Dequeue()());
             }
 
             Working = false;

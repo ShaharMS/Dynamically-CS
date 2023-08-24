@@ -49,11 +49,11 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     public override void GenerateRecommendations()
     {
-        Recommendations = new List<MenuItem>
+        Recommendations = new List<Control?>
         {
             Recom_MakeStraight(),
             Recom_MakeDiameter()
-        };
+        }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
     public override void AddDebugInfo()
@@ -246,7 +246,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     // ----------------------Recommended----------------------
     // -------------------------------------------------------
 
-    MenuItem Recom_MakeStraight()
+    MenuItem? Recom_MakeStraight()
     {
         List<Joint> candidatesj1 = new(), candidatesj2 = new();
         foreach (Joint j in Subject.joint1.Relations)
@@ -257,11 +257,67 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             if (Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
         }
+
+        var items = new List<MenuItem>();
+
+        foreach (var joint in candidatesj1)
+        {
+            var item = new MenuItem
+            {
+                Header = $"Straighten {(joint.Id > Subject.joint2.Id ? $"{Subject.joint2.Id}{joint.Id}" : $"{joint.Id}{Subject.joint2.Id}")}"
+            };
+            item.Click += (sender, e) =>
+            {
+                Joint j1 = Subject.joint1, j2 = Subject.joint2;
+                j1.Disconnect(j2, joint);
+                j1.Roles.AddToRole(Role.SEGMENT_On, j2.Connect(joint));
+            };
+            items.Add(item);
+        }
+
+        foreach (var joint in candidatesj2)
+        {
+            var item = new MenuItem
+            {
+                Header = $"Straighten {(joint.Id > Subject.joint1.Id ? $"{Subject.joint1.Id}{joint.Id}" : $"{joint.Id}{Subject.joint1.Id}")}"
+            };
+            item.Click += (sender, e) =>
+            {
+                Joint j1 = Subject.joint1, j2 = Subject.joint2;
+                var followers = Subject.Formula.Followers.ToList().Concat(Subject.MiddleFormula.Followers);
+                var prev = j2.GetConnectionTo(joint);
+                if (prev != null)
+                {
+                    followers = followers.Concat(prev.Formula.Followers).Concat(prev.MiddleFormula.Followers);
+                }
+                j2.Disconnect(j1, joint);
+                var con = j1.Connect(joint);
+                j2.Roles.AddToRole(Role.SEGMENT_On, con);
+                foreach(var f in followers.ToHashSet())
+                {
+                    f.Roles.AddToRole(Role.SEGMENT_On, con);
+                }
+            };
+            items.Add(item);
+        }
+
+        if (items.Count == 0) return null;
+        else if (items.Count == 1)
+        {
+            return items[0];
+        } else
+        {
+            return new MenuItem
+            {
+                Header = "Straighten Segment...",
+                Items = items
+            };
+        }
     }
 
-    MenuItem Recom_MakeDiameter()
+    MenuItem? Recom_MakeDiameter()
     {
-        throw new NotImplementedException();
+        return null;
     }
 
     // -------------------------------------------------------

@@ -23,7 +23,8 @@ public class Either<l, r>
 
     public static implicit operator l(Either<l, r> e) { return (l)(e.Value);}
     public static implicit operator r(Either<l, r> e) { return (r)(e.Value);}
+#pragma warning disable CS8604
     public static implicit operator Either<l, r>(l v) { return new Either<l, r>(v);}
     public static implicit operator Either<l, r>(r v) { return new Either<l, r>(v);}
-
+#pragma warning restore CS8604
 }

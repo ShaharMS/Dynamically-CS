@@ -73,6 +73,9 @@ public class EllipseBase : DraggableGraphic, IDrawable
         focal1.OnDragged.Add(__reposition);
         focal2.OnDragged.Add(__reposition);
 
+        focal1.OnRemoved.Add(__remove);
+        focal1.OnRemoved.Add(__remove);
+
         MainWindow.BigScreen.Children.Insert(0, this);
         MainWindow.BigScreen.Children.Insert(0, ring);
         InvalidateVisual();
@@ -96,6 +99,13 @@ public class EllipseBase : DraggableGraphic, IDrawable
     {
         _ = z; _ = x; _ = c; _ = v;
         reposition();
+    }
+
+    private void __remove(double z, double x)
+    {
+        _ = z; _ = x;
+        MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.BigScreen.Children.Remove(ring);
     }
 }
     internal class Ring : DraggableGraphic

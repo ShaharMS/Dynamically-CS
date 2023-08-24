@@ -5,20 +5,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynamically.Backend.Helpers;
+namespace Dynamically.Backend.Helpers.Containers;
 
-public class VDock : DockPanel
+public class HDock : DockPanel
 {
-    public List<Control> ChildrenQueued {
-        get => new List<Control>(); 
+
+    public List<Control> ChildrenQueued
+    {
+        get => new List<Control>();
         set
         {
+
             foreach (Control control in value)
             {
-                SetDock(control, Dock.Top);
+                SetDock(control, Dock.Left);
                 Children.Add(control);
             }
         }
     }
-    public VDock() : base() { }
+    public HDock() : base()
+    {
+    }
 }

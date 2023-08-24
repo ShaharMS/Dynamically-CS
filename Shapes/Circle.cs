@@ -63,6 +63,10 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
     }
     public void Dismantle()
     {
+        foreach (var follower in Formula.Followers.ToArray())
+        {
+            follower.Roles.RemoveFromRole(Role.CIRCLE_On, this);
+        }
         Formula.queueRemoval = true;
         onResize.Clear();
         Circle.all.Remove(this);
@@ -143,7 +147,11 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
     {
         UpdateFormula();
     }
-
+    public void __circle_Remove(double z, double x)
+    {
+        _ = z; _ = x;
+        Dismantle();
+    }
 
 
 

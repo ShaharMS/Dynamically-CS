@@ -213,6 +213,8 @@ public class JointContextMenuProvider : ContextMenuProvider
                 item.Click += (sender, e) =>
                 {
                     Subject.Roles.RemoveFromRole(r, obj);
+                    Subject.Provider.Regenerate();
+                    Subject.UpdateBoardRelations();
                 };
                 options.Add(item);
             }
@@ -404,11 +406,13 @@ public class JointContextMenuProvider : ContextMenuProvider
                     veryCloseTo[0].Roles.TransferFrom(Subject.Roles);
                     Subject.RemoveFromBoard();
                     veryCloseTo[0].Id = id;
+                    veryCloseTo[0].UpdateBoardRelations();
                 }
                 else
                 {
                     Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
                     veryCloseTo[0].RemoveFromBoard();
+                    Subject.UpdateBoardRelations();
                 }
             };
             return m;
@@ -430,11 +434,13 @@ public class JointContextMenuProvider : ContextMenuProvider
                     cj.Roles.TransferFrom(Subject.Roles);
                     Subject.RemoveFromBoard();
                     cj.Id = id;
+                    cj.UpdateBoardRelations();
                 }
                 else
                 {
                     Subject.Roles.TransferFrom(cj.Roles);
                     cj.RemoveFromBoard();
+                    Subject.UpdateBoardRelations();
                 }
             };
             list.Add(m);
@@ -478,6 +484,8 @@ public class JointContextMenuProvider : ContextMenuProvider
                     Subject.Roles.AddToRole(Role.SEGMENT_On, veryCloseTo[0] as Segment);
                 }
                 else Log.Write($"{Subject} cannot mount on {veryCloseTo[0]}");
+                Subject.UpdateBoardRelations();
+                foreach (Segment c in Subject.Connections) c.Provider.Regenerate();
             };
             return m;
         }
@@ -500,6 +508,7 @@ public class JointContextMenuProvider : ContextMenuProvider
                     Subject.Roles.AddToRole(Role.SEGMENT_On, cs as Segment);
                 }
                 else Log.Write($"{Subject} cannot mount on {cs}");
+                Subject.UpdateBoardRelations();
             };
             list.Add(m);
         }

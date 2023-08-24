@@ -189,7 +189,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
             joint1.Connections.Add(this);
             joint1.Relations.Add(joint2);
 
-            joint1.UpdateBoardRelationsWith(joint2, this);
+            joint1.CreateBoardRelationsWith(joint2, this);
         }
         else if (joint2 == joint)
         {
@@ -199,7 +199,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
             joint2.Connections.Add(this);
             joint2.Relations.Add(joint1);
 
-            joint1.UpdateBoardRelationsWith(joint2, this);
+            joint1.CreateBoardRelationsWith(joint2, this);
         }
         InvalidateVisual();
         return this;

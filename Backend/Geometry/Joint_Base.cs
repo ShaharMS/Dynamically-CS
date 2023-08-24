@@ -176,6 +176,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     {
         double sx = X, sy = Y;
         DisconnectAll();
+
         Log.Write(Relations);
         IDGenerator.Remove(this);
 

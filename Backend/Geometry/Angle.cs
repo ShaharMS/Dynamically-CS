@@ -170,9 +170,13 @@ public class Angle : DraggableGraphic, IStringifyable
                     previous = point;
                 }
             }
-            var p = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end));
-            context.DrawLine(new Pen(UIColors.ConnectionColor, 2), previous.Value, p);
-            context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), previous.Value, p);
+            if (previous != null)
+            {
+                var p = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end));
+                context.DrawLine(new Pen(UIColors.ConnectionColor, 2), previous.Value, p);
+                context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), previous.Value, p);
+            }
+
         }
         else
         {

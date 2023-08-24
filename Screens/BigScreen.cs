@@ -149,9 +149,15 @@ public class BigScreen : DraggableGraphic
             {
                 Log.Write(current, potential, potential.Hidden);
                 potential.RemoveFromBoard();
+#pragma warning disable CS8604 // Possible null reference argument.
+                current.CreateBoardRelationsWith(from, from.GetConnectionTo(current));
+#pragma warning restore CS8604 // Possible null reference argument.
             } else
             {
                 if (!Joint.all.Contains(potential)) Joint.all.Add(potential); // Todo - shouldnt be necessary, need to resolve later
+#pragma warning disable CS8604 // Possible null reference argument.
+                potential.CreateBoardRelationsWith(from, from.GetConnectionTo(potential));
+#pragma warning restore CS8604 // Possible null reference argument.
             }
 
             MainWindow.Instance.PointerMoved -= EvalConnection;
