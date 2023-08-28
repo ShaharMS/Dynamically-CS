@@ -1,6 +1,7 @@
 ﻿using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
@@ -22,14 +23,16 @@ public partial class Joint
 
     public override bool Draggable { get => base.Draggable && !Anchored; set => base.Draggable = value; }
 
-    public override double X { get => base.X; set { if (!Anchored) base.X = value; } }
-    public override double Y { get => base.Y; set { if (!Anchored) base.Y = value; } }
+    public override double X { get => base.X; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Joint {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
+    public override double Y { get => base.Y; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Joint {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
 
     public List<Func<double, double, (double X, double Y)>> PositioningByFormula = new();
 
 
     int safety = 0;
     double epsilon = 0.70710678118; //0.5 * sqrt(2), for a diagonal of 0.5px
+
+    bool dispatchingOnMoved = false;
     public override void DispatchOnMovedEvents(double x, double y, double px, double py)
     {
         if (!Anchored)
@@ -59,13 +62,14 @@ public partial class Joint
                     if (initialY == null) initialY = Y;
                 }
                 safety++;
-            } while ((initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon));
+            } while (initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon);
             safety = 0;
+            dispatchingOnMoved = true;
             foreach (var listener in OnMoved)
             {
                 listener(X, Y, px, py);
             }
-            
+            dispatchingOnMoved = false; 
         }
         reposition();
     }

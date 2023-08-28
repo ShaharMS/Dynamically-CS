@@ -21,7 +21,7 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                /*Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
+                Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
                 {
                     if (!Subject.joint1.CurrentlyDragging) return;
                     Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
@@ -32,7 +32,7 @@ public partial class RoleMap
                     if (!Subject.joint2.CurrentlyDragging) return;
                     Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
                     Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
-                });*/ // TODO: fix this, OnMoved functions cant maipulate positions
+                }); // TODO: fix this, OnMoved functions cant manipulate positions (testing, may be incorrect)
                 break;
             // Triangle
             case Role.TRIANGLE_Side:
@@ -51,7 +51,7 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                /*Subject.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                Subject.joint1.OnMoved.Remove((cx, cy, _, _) =>
                 {
                     if (!Subject.joint1.CurrentlyDragging) return;
                     Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
@@ -62,7 +62,7 @@ public partial class RoleMap
                     if (!Subject.joint2.CurrentlyDragging) return;
                     Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
                     Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
-                });*/
+                });
                 break;
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
@@ -81,7 +81,7 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                /*From.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                From.joint1.OnMoved.Remove((cx, cy, _, _) =>
                 {
                     if (!Subject.joint1.CurrentlyDragging) return;
                     Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
@@ -104,7 +104,7 @@ public partial class RoleMap
                     if (!Subject.joint2.CurrentlyDragging) return;
                     Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
                     Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
-                });*/
+                });
                 break;
             case Role.TRIANGLE_Side:
                 From.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());

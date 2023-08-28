@@ -93,7 +93,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Remove(__RecalcuateInCircle);
+            j.OnMoved.Remove(__RecalculateInCircle);
         }
         if (incircle != null)
         {
@@ -127,7 +127,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
-            j.OnMoved.Add(__RecalcuateInCircle);
+            j.OnMoved.Add(__RecalculateInCircle);
         }
 
         return circle;
@@ -164,7 +164,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         return new Point(s.x, s.y);
     }
 
-    public void __RecalcuateInCircle(double ux, double uy, double px, double py)
+    public void __RecalculateInCircle(double ux, double uy, double px, double py)
     {
         var stats = GetCircleStats();
         if (incircle == null) return;

@@ -251,11 +251,11 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         List<Joint> candidatesj1 = new(), candidatesj2 = new();
         foreach (Joint j in Subject.joint1.Relations)
         {
-            if (Math.Abs(Subject.joint1.DegreesTo(j) - Subject.joint2.DegreesTo(Subject.joint1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.joint2, j, Subject.joint1) && Math.Abs(Subject.joint1.DegreesTo(j) - Subject.joint2.DegreesTo(Subject.joint1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
         }
         foreach (Joint j in Subject.joint2.Relations)
         {
-            if (Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.joint1, j, Subject.joint2) && Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
         }
 
         var items = new List<MenuItem>();

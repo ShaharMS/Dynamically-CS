@@ -205,7 +205,12 @@ public partial class Joint
                     if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this))
                     {
                         segment.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
-                        circle.center.Roles.AddToRole(Role.SEGMENT_Center, segment);
+                        /* 
+                            This causes a crash, since making a diameter already connects its
+                            edges to the circle, which dispatches onMoved on the center, and adding SEGMENT_Center
+                            also does this, during onMoved is dispatched, which is disallowed.
+                        */
+                        //circle.center.Roles.AddToRole(Role.SEGMENT_Center, segment);
                     } 
                     else segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
                 }

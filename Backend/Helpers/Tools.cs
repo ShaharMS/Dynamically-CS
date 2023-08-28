@@ -236,6 +236,15 @@ class Tools
         return true;
     }
 
+    public static bool QualifiesForStraighten(Joint v1, Joint v2, Joint common) 
+    {
+        // Case 1: 2 radii -> diameter
+        foreach (Circle circle in common.Roles.Access<Circle>(Role.CIRCLE_Center)) {
+            if (v1.Roles.Has(Role.CIRCLE_On, circle) && v2.Roles.Has(Role.CIRCLE_On, circle)) return false;
+        }
+
+        return true;
+    }
     public static double[] OrderRadiansBySmallArc(double rad1, double rad2)
     {
         double NormalizeAngle(double angle)

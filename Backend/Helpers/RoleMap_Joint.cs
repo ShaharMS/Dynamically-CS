@@ -186,10 +186,10 @@ public partial class RoleMap
                 t1.con23.ReplaceJoint(From, Subject);
                 t1.con13.ReplaceJoint(From, Subject);
 
-                if (From.OnMoved.Contains(t1.__RecalcuateInCircle))
+                if (From.OnMoved.Contains(t1.__RecalculateInCircle))
                 {
-                    From.OnMoved.Remove(t1.__RecalcuateInCircle);
-                    Subject.OnMoved.Add(t1.__RecalcuateInCircle);
+                    From.OnMoved.Remove(t1.__RecalculateInCircle);
+                    Subject.OnMoved.Add(t1.__RecalculateInCircle);
                 }
 
                 From.OnRemoved.Remove((_, _) => t1.Dismantle());
