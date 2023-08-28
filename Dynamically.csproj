@@ -22,7 +22,11 @@
 		<ProjectReference 
 			Include="C:\Users\shaha\Desktop\Github\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" 
 			OutputItemType="Analyzer"
-			ReferenceOutputAssembly="false" />
+			ReferenceOutputAssembly="false" /> <!-- PC, ignore error on laptop -->
+		<ProjectReference 
+			Include="C:\Users\shahar\Documents\GitHub\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" 
+			OutputItemType="Analyzer"
+			ReferenceOutputAssembly="false" /> <!-- laptop, ignore error on PC -->
 	</ItemGroup>
 
 	<ItemGroup>
