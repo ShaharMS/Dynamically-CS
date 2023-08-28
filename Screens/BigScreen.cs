@@ -83,7 +83,7 @@ public class BigScreen : DraggableGraphic
                 double area = Math.Clamp(draggable.Area(), 0, short.MaxValue);
                 if (double.IsNaN(area))
                 {
-                    Log.Write(child);
+                    Log.Write(child, "Has area of NaN. This should not happen");
                     area = int.MaxValue;
                 }
                 draggable.ZIndex = -Convert.ToInt32(area);

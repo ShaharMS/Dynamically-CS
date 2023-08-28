@@ -50,7 +50,7 @@ public class SegmentFormula : Formula
         }
     }
 
-    double yIntercept
+    double potentialYIntercept
     {
         get
         {
@@ -67,6 +67,11 @@ public class SegmentFormula : Formula
     public double slope
     {
         get => (y2 - y1) / (x2 - x1);
+    }
+
+    public double Length 
+    {
+        get => (x1, y1).DistanceTo(x2, y2);
     }
 
     public SegmentFormula(Point p1, Point p2) : base()
@@ -110,7 +115,7 @@ public class SegmentFormula : Formula
         if (formula == null) return null;
         if (formula.slope == slope) return null;
 
-        var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
+        var X = (potentialYIntercept - formula.potentialYIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
         if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
         return new Point(X, Y[0]);
@@ -121,7 +126,7 @@ public class SegmentFormula : Formula
         if (formula == null) return null;
         if (formula.slope == slope) return null;
 
-        var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
+        var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
         if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
         return new Point(X, Y[0]);
@@ -144,16 +149,16 @@ public class SegmentFormula : Formula
     {
         Point potentialIntersect(RayFormula formula)
         {
-            var X = (yIntercept - formula.yIntercept) / (formula.slope - slope);
+            var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
             var Y = new RayFormula(new Point(x1, y1), new Point(x2, y2)).SolveForY(X);
             return new Point(X, Y[0]);
         }
         double nSlope = -1 / slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
         var potential = potentialIntersect(nRay);
-        if ((potential.X > x1 && potential.X < x2) || (potential.X > x2 && potential.X < x1)) return potential;
-        if ((x1 > x2 && potential.X > x1) || (x1 < x2 && potential.X < x1)) return new Point(x1, y1);
-        if ((x2 > x1 && potential.X > x2) || (x2 < x1 && potential.X < x2)) return new Point(x2, y2);
+        if (potential.DistanceTo(x1, y1) < Length && potential.DistanceTo(x2, y2) < Length) return potential;
+        if (potential.DistanceTo(x1, y1) < potential.DistanceTo(x2, y2)) return new Point(x1, y1);
+        if (potential.DistanceTo(x2, y2) < potential.DistanceTo(x1, y1)) return new Point(x2, y2);
         return null;
 
     }
@@ -161,13 +166,13 @@ public class SegmentFormula : Formula
     public override double[] SolveForX(double y)
     {
         if ((y1 > y2 && (y > y1 || y < y2)) || (y1 < y2 && (y < y1 || y > y2))) return Array.Empty<double>();
-        return new double[] { (y - yIntercept) / slope };
+        return new double[] { (y - potentialYIntercept) / slope };
     }
 
     public override double[] SolveForY(double x)
     {
         if ((x1 > x2 && (x > x1 || x < x2)) || (x1 < x2 && (x < x1 || x > x2))) return Array.Empty<double>();
-        return new double[] { slope * x + yIntercept };
+        return new double[] { slope * x + potentialYIntercept };
     }
 
     public override void Move(double x, double y)
