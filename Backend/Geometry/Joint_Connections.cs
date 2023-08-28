@@ -212,7 +212,7 @@ public partial class Joint
             }
         }
 
-        foreach (Segment c in Connections)
+        foreach (Segment c in Connections.ToArray())
         {
             var other = c.joint1 == this ? c.joint2 : c.joint1;
 

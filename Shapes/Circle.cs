@@ -135,12 +135,7 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
         if (Formula == null) return;
         Formula.centerX = center.X;
         Formula.centerY = center.Y;
-        if (radius != Formula.radius)
-        {        
-            Formula.radius = radius;
-            Formula.UpdateFollowers();
-        }
-
+        Formula.radius = radius;
     }
 
     public void __circle_OnChange(double z, double x, double c, double v)

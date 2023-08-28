@@ -103,6 +103,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         MainWindow.BigScreen.Children.Add(this);
 
         Log.Write(all);
+        Width = Height = GraphicalRadius * 2;
     }
 
     public void RepositionText()
@@ -148,7 +149,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         var finalAngle = degStart + biggestGap / 2;
         Canvas.SetLeft(IdDisplay, X + d * Math.Cos(finalAngle * (Math.PI / 180.0)) - 20 / 2);
         Canvas.SetTop(IdDisplay, Y + d * Math.Sin(finalAngle * (Math.PI / 180.0)) - 30 / 2);
-        Width = Height = GraphicalRadius * 2;
     }
     public override void Render(DrawingContext context)
     {

@@ -145,7 +145,7 @@ public class Angle : DraggableGraphic, IStringifyable
     public override void Render(DrawingContext context)
     {
         Degrees = Tools.GetDegreesBetween3Points(joint1, Center, joint2);
-        if ((Degrees > 180 && !Large) || (Degrees < 180 && Large)) Degrees = 360 - Degrees;
+        //if ((Degrees > 180 && !Large) || (Degrees < 180 && Large)) Degrees = 360 - Degrees;
         Radians = Degrees.ToRadians();
 
         var order = Tools.OrderRadiansBySmallArc(Center.RadiansTo(joint1), Center.RadiansTo(joint2));

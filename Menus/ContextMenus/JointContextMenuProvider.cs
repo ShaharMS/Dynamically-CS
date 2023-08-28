@@ -350,14 +350,8 @@ public class JointContextMenuProvider : ContextMenuProvider
             MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
             var j1 = new Joint(j.X - (j.X - circle.center.X) * 2, j.Y - (j.Y - circle.center.Y) * 2);
-
-            void AddRole(double z, double y, double x, double v)
-            {
-                j1.Roles.AddToRole(Role.CIRCLE_On, circle);
-                j.OnDragged.Remove(AddRole);
-            }
-
-            j.OnDragged.Add(AddRole);
+            j1.Roles.AddToRole(Role.CIRCLE_On, circle);
+            j1.Connect(Subject);
 
             j.Connect(j1).Roles.AddToRole(Role.CIRCLE_Diameter, circle);
         };
