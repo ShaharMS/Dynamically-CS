@@ -143,7 +143,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
 
         Children.Add(Label);
 
-        OnMoved.Add((double px, double py, double mx, double my) =>
+        OnMoved.Add((_, _, _, _) =>
         {
             joint1.CurrentlyDragging = joint2.CurrentlyDragging = true;
             if (joint1.Anchored || joint2.Anchored)

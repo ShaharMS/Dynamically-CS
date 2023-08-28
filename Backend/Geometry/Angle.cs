@@ -123,6 +123,8 @@ public class Angle : DraggableGraphic, IStringifyable
 
         Children.Add(Label);
 
+        foreach (Joint v in new[] { v1, v2, c }) v.OnRemoved.Add((_, _) => { RemoveFromBoard(); });
+
 
 
         MainWindow.BigScreen.Children.Insert(0, this);

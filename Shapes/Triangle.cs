@@ -12,6 +12,8 @@ using Avalonia.Media;
 using Dynamically.Design;
 using System.Linq;
 using Dynamically.Formulas.Special;
+using Dynamically.Menus.ContextMenus;
+using Avalonia.Controls;
 
 namespace Dynamically.Shapes;
 
@@ -40,6 +42,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     public Circle? circumcircle;
     public Circle? incircle;
 
+    public TriangleContextMenuProvider Provider;
+
     //public EquilateralTriangleFormula EquilateralFormula;
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
@@ -56,6 +60,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         con23 = joint2.Connect(joint3);
 
         foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
+
+
+        ContextMenu = new ContextMenu();
+        Provider = new TriangleContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
 
         OnMoved.Add((x, y, px, py) =>
         {

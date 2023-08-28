@@ -3,7 +3,9 @@ using Avalonia.Input;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
+using Dynamically.Formulas;
 using Dynamically.Screens;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -317,7 +319,38 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MakeDiameter()
     {
-        return null;
+        if (!Subject.Roles.Has(Role.CIRCLE_Chord) || Subject.Roles.CountOf(Role.CIRCLE_Chord) > 1) return null;
+        var circle = Subject.Roles.Access<Circle>(Role.CIRCLE_Chord)[0];
+        if (circle == null || Subject.Length < circle.radius * Settings.MakeDiameterLengthRatio) return null;
+        var item = new MenuItem
+        {
+            Header = $"Make Diameter ({circle})"
+        };
+        item.Click += (sender, e) =>
+        {
+            Subject.Roles.RemoveFromRole(Role.CIRCLE_Chord, circle);
+            Subject.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
+            // Don't wait for user gesture, update position right after click
+            // Place the diameter at a position that makes sense - same slope and a bit longer
+            var slope = Subject.Formula.slope;
+            var ray = new RayFormula(circle.center, slope);
+            var j1pos = ray.GetClosestOnFormula(Subject.joint1);
+            if (j1pos != null)
+            {
+                Subject.joint1.X = j1pos.Value.X;
+                Subject.joint1.Y = j1pos.Value.Y;
+            }
+            var j2pos = ray.GetClosestOnFormula(Subject.joint2);
+            if (j2pos != null)
+            {
+                Subject.joint2.X = j2pos.Value.X;
+                Subject.joint2.Y = j2pos.Value.Y;
+            }
+            Subject.joint1.DispatchOnMovedEvents(Subject.joint1.X, Subject.joint1.Y, Subject.joint1.X, Subject.joint1.Y);
+            Subject.joint2.DispatchOnMovedEvents(Subject.joint2.X, Subject.joint2.Y, Subject.joint2.X, Subject.joint2.Y);
+            Regenerate();
+        };
+        return item;
     }
 
     // -------------------------------------------------------

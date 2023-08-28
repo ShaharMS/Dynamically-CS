@@ -276,6 +276,9 @@ public class JointContextMenuProvider : ContextMenuProvider
         var button = new Button
         {
             Content = "Mark Angle",
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+            HorizontalContentAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
         };
         button.Click += (s, e) =>
         {
@@ -296,12 +299,12 @@ public class JointContextMenuProvider : ContextMenuProvider
                 }
             }
             button.Content = "Invalid Angle!";
-            Timer? timer = null;
-            timer = new Timer((obj) =>
+            DockPanel.SetDock(button, Dock.Top);
+            DispatcherTimer.Run(() =>
             {
                 button.Content = "Mark Angle";
-                timer?.Dispose();
-            }, null, 1000, Timeout.Infinite);
+                return false;
+            }, new TimeSpan(0, 0, 2));
         };
 
         return new MenuItem
@@ -401,12 +404,14 @@ public class JointContextMenuProvider : ContextMenuProvider
                     Subject.RemoveFromBoard();
                     veryCloseTo[0].Id = id;
                     veryCloseTo[0].UpdateBoardRelations();
+                    veryCloseTo[0].Provider.Regenerate();
                 }
                 else
                 {
                     Subject.Roles.TransferFrom(veryCloseTo[0].Roles);
                     veryCloseTo[0].RemoveFromBoard();
                     Subject.UpdateBoardRelations();
+                    Regenerate();
                 }
             };
             return m;
@@ -429,12 +434,14 @@ public class JointContextMenuProvider : ContextMenuProvider
                     Subject.RemoveFromBoard();
                     cj.Id = id;
                     cj.UpdateBoardRelations();
+                    cj.Provider.Regenerate();
                 }
                 else
                 {
                     Subject.Roles.TransferFrom(cj.Roles);
                     cj.RemoveFromBoard();
                     Subject.UpdateBoardRelations();
+                    Regenerate();
                 }
             };
             list.Add(m);
@@ -480,6 +487,7 @@ public class JointContextMenuProvider : ContextMenuProvider
                 else Log.Write($"{Subject} cannot mount on {veryCloseTo[0]}");
                 Subject.UpdateBoardRelations();
                 foreach (Segment c in Subject.Connections) c.Provider.Regenerate();
+                Regenerate();
             };
             return m;
         }
@@ -503,6 +511,8 @@ public class JointContextMenuProvider : ContextMenuProvider
                 }
                 else Log.Write($"{Subject} cannot mount on {cs}");
                 Subject.UpdateBoardRelations();
+                foreach (Segment c in Subject.Connections) c.Provider.Regenerate();
+                Regenerate();
             };
             list.Add(m);
         }
