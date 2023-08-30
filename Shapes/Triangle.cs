@@ -333,7 +333,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         return _type = type;
     }
 
-    List<(TriangleType type, string details, double confidence)> SuggestTypes()
+    public List<(TriangleType type, string details, double confidence)> SuggestTypes()
     {
         var l = new List<(TriangleType type, string details, double confidence)>();
 

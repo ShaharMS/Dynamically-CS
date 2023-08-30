@@ -104,6 +104,13 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
     List<Control> Recom_ChangeType()
     {
+        var suggestions = Subject.SuggestTypes();
+        var list = new List<MenuItem>();
+
+        foreach ((TriangleType type, string details, double confidence) suggestion in suggestions) {
+            
+        }
+
         return new();
     }
 }
