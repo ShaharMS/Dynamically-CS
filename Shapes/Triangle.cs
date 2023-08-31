@@ -190,45 +190,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         switch (type)
         {
             case TriangleType.EQUILATERAL:
-                void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
-                {
-                    // AB and BC are the most similar to each other, so B was chosen. Now, reset the angle
-                    // We'll do this by averaging AB and BC, resetting their length, and BC will 
-                    // automatically be the same length as AC, because of equilateral definition.
-
-                    // To Fix the angle, we'll take the point which creates the angle closest to 0/180, and preserve it
-                    var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
-                    var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
-                    var dist = (A.DistanceTo(B) + B.DistanceTo(C)) / 2;
-                    if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
-                    {
-                        var rad = radBA + Math.PI / 3;
-                        if (radBA > radBC) rad -= Math.PI / 1.5;
-                        Log.Write(rad * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI);
-                        C.X = B.X + dist * Math.Cos(rad);
-                        C.Y = B.Y + dist * -Math.Sin(rad);
-
-                        // Don't forget to set length of AB too!
-                        rad -= Math.PI / 3;
-                        A.X = B.X + dist * Math.Cos(rad);
-                        A.Y = B.Y + dist * -Math.Sin(rad);
-                    }
-                    else
-                    {
-                        var rad = radBC + Math.PI / 3;
-                        if (radBC > radBA) rad -= Math.PI / 1.5;
-                        Log.Write(rad * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI);
-                        A.X = B.X + dist * Math.Cos(rad);
-                        A.Y = B.Y + dist * -Math.Sin(rad);
-
-                        // Don't forget to set length of BC too!
-                        rad -= Math.PI / 3;
-                        C.X = B.X + dist * Math.Cos(rad);
-                        C.Y = B.Y + dist * -Math.Sin(rad);
-                    }
-
-                    EQ_temp_incircle_center = new Point(GetCircleStats().x, GetCircleStats().y);
-                }
                 var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
                 var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
                 var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
@@ -237,62 +198,14 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 else MakeEquilateralRelativeToABC(joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES:
-                void MakeIsocelesRelativeToABC(Joint A, Joint B, Joint C)
-                {
-                    // ∠ABC is the head angle, therefore its position should be preserved, and should be where the two equals start from.
-                    // We'll do this by averaging AB and BC, resetting their length, and BC will 
-                    // automatically be the same length as AC, because of equilateral definition.
-
-                    // To correct the distances, we'll  make sure the moving joint when setting connection length is not A:
-
-                    var distance = Math.Max(B.DistanceTo(A), B.DistanceTo(C));
-                    var radBA = B.RadiansTo(A);
-                    A.X = B.X + distance * Math.Cos(radBA);
-                    A.Y = B.Y + distance * Math.Sin(radBA);
-                    var radBC = B.RadiansTo(C);
-                    C.X = B.X + distance * Math.Cos(radBC);
-                    C.Y = B.Y + distance * Math.Sin(radBC);
-
-                    ISO_origin = B;
-                    // Now, After equating the two sides, we're pretty much dones - we've reached teh definition of an isoceles Triangle
-                }
                 var con12_to_con13_Diff = Math.Abs(con12.Length - con13.Length);
                 var con12_to_con23_Diff = Math.Abs(con12.Length - con23.Length);
                 var con13_to_con23_Diff = Math.Abs(con13.Length - con23.Length);
-                if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) MakeIsocelesRelativeToABC(joint1, joint2, joint3);
-                else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) MakeIsocelesRelativeToABC(joint2, joint1, joint3);
-                else MakeIsocelesRelativeToABC(joint1, joint3, joint2);
+                if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) MakeIsoscelesRelativeToABC(joint1, joint2, joint3);
+                else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) MakeIsoscelesRelativeToABC(joint2, joint1, joint3);
+                else MakeIsoscelesRelativeToABC(joint1, joint3, joint2);
                 break;
             case TriangleType.RIGHT:
-                void MakeRightRelativeToABC(Joint A, Joint B, Joint C)
-                {
-                    // ∠ABC is the most similar to 90deg, therefore it should be preserved.
-
-                    // Fixing the angle is easy, its just editing either A or C
-                    // But, for user comfort, we'll modify the point which creates the angle with y = 0 least similar to 0/180
-                    var radBA = B.RadiansTo(A);
-                    var radBC = B.RadiansTo(C);
-                    if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
-                    {
-                        var dist = B.DistanceTo(C);
-                        var XPosOffset = dist * Math.Cos(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
-                        var YPosOffset = dist * Math.Sin(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
-                        C.X = B.X + XPosOffset;
-                        C.Y = B.Y + YPosOffset;
-                    }
-                    else
-                    {
-                        var dist = B.DistanceTo(A);
-                        var XPosOffset = dist * Math.Cos(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
-                        var YPosOffset = dist * Math.Sin(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
-                        A.X = B.X + XPosOffset;
-                        A.Y = B.Y + YPosOffset;
-                    }
-
-                    R_origin = B;
-                    // And we're done :)
-                }
-
                 var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
@@ -313,17 +226,17 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
                     MakeRightRelativeToABC(joint1, joint2, joint3);
-                    MakeIsocelesRelativeToABC(joint1, joint2, joint3);
+                    MakeIsoscelesRelativeToABC(joint1, joint2, joint3);
                 }
                 else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
                     MakeRightRelativeToABC(joint1, joint3, joint2);
-                    MakeIsocelesRelativeToABC(joint1, joint3, joint2);
+                    MakeIsoscelesRelativeToABC(joint1, joint3, joint2);
                 }
                 else
                 {
                     MakeRightRelativeToABC(joint2, joint1, joint3);
-                    MakeIsocelesRelativeToABC(joint2, joint1, joint3);
+                    MakeIsoscelesRelativeToABC(joint2, joint1, joint3);
                 }
                 break;
             case TriangleType.SCALENE:
