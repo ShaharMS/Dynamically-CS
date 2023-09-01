@@ -96,6 +96,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
                     labelUpdater = () => { };
                     break;
             }
+            if (value != SegmentTextDisplay.NONE) InvalidateVisual();
         }
     }
 

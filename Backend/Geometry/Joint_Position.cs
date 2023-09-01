@@ -33,11 +33,25 @@ public partial class Joint
     double epsilon = 0.70710678118; //0.5 * sqrt(2), for a diagonal of 0.5px
 
     bool dispatchingOnMoved = false;
-    public override void DispatchOnMovedEvents(double x, double y, double px, double py)
+
+    /// <summary>
+    /// Dispatches OnMoved events & uptades position according to exisiting formulas. 
+    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="px"></param>
+    /// <param name="py"></param>
+    public override void DispatchOnMovedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
+        if (x == null) x = X;
+        if (y == null) y = Y;
+        if (px == null) px = X;
+        if (py == null) py = Y;
+
         if (!Anchored)
         {
-            X = x; Y = y;
+            X = (double)x; Y = (double)y;
             double? initialX = null, initialY = null;
             do
             {
@@ -67,7 +81,7 @@ public partial class Joint
             dispatchingOnMoved = true;
             foreach (var listener in OnMoved)
             {
-                listener(X, Y, px, py);
+                listener(X, Y, (double)px, (double)py);
             }
             dispatchingOnMoved = false; 
         }

@@ -23,21 +23,35 @@ public partial class DraggableGraphic : Canvas
     private Point _startPosition;
     private Point _startMousePosition;
 
-    public virtual void DispatchOnMovedEvents(double x, double y, double px, double py)
+    /// <summary>
+    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="px"></param>
+    /// <param name="py"></param>
+    public virtual void DispatchOnMovedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
         var c = OnMoved.ToArray();
         foreach (var listener in c)
         {
-            listener(x, y, px, py);
+            listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
         }
     }
 
-    public virtual void DispatchOnDraggedEvents(double x, double y, double px, double py)
+    /// <summary>
+    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="px"></param>
+    /// <param name="py"></param>
+    public virtual void DispatchOnDraggedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
         var c = OnDragged.ToArray();
         foreach (var listener in c)
         {
-            listener(x, y, px, py);
+            listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
         }
     }
 

@@ -1,4 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Shapes;
 using System;
@@ -27,6 +30,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     {
         Defaults = new List<Control>
         {
+            Defalts_Rotate(),
             Defaults_Dismantle(),
             Defaults_Remove()
         };
@@ -41,11 +45,11 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
     public override void GenerateRecommendations()
     {
-        Recommendations = Recom_ChangeType();
-        Recommendations = (List<Control>)Recommendations.Concat(new List<Control?>
+        Recommendations = Recom_ChangeType();/*
+        Recommendations = Recommendations.Concat(new List<Control?>
         {
 
-        }.FindAll((c) => c != null).Cast<Control>());
+        }.FindAll((c) => c != null).Cast<Control>()).ToList();*/
     }
 
     public override void AddDebugInfo()
@@ -81,6 +85,44 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         return remove;
     }
 
+    MenuItem Defalts_Rotate()
+    {
+        var rotate = new MenuItem
+        {
+            Header = "Rotate"
+        };
+        rotate.Click += (sender, e) =>
+        {
+            Point p1 = new Point(Subject.joint1.X, Subject.joint1.Y), p2 = new Point(Subject.joint2.X, Subject.joint2.Y), p3 = new Point(Subject.joint3.X, Subject.joint3.Y);
+            Point rotationCenter = Subject.GetIncircleCenter();
+            double dist1 = Subject.joint1.DistanceTo(rotationCenter), dist2 = Subject.joint2.DistanceTo(rotationCenter), dist3 = Subject.joint3.DistanceTo(rotationCenter);
+            double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
+
+            double rad1 = rotationCenter.RadiansTo(p1), rad2 = rotationCenter.RadiansTo(p2), rad3 = rotationCenter.RadiansTo(p3);
+
+            void Move(object? sender, PointerEventArgs args)
+            {
+                var currentRotation = rotationCenter.RadiansTo(args.GetPosition(null)) - initialRotationRad;
+                Subject.joint1.X = rotationCenter.X + dist1 * Math.Cos(rad1 + currentRotation); Subject.joint1.Y = rotationCenter.Y + dist1 * Math.Sin(rad1 + currentRotation);
+                Subject.joint2.X = rotationCenter.X + dist2 * Math.Cos(rad2 + currentRotation); Subject.joint2.Y = rotationCenter.Y + dist2 * Math.Sin(rad2 + currentRotation);
+                Subject.joint3.X = rotationCenter.X + dist3 * Math.Cos(rad3 + currentRotation); Subject.joint3.Y = rotationCenter.Y + dist3 * Math.Sin(rad3 + currentRotation);
+                Subject.joint1.DispatchOnMovedEvents(); Subject.joint2.DispatchOnMovedEvents(); Subject.joint3.DispatchOnMovedEvents();
+            }
+
+            void Finish(object? sender, PointerReleasedEventArgs arg)
+            {
+                MainWindow.Instance.PointerMoved -= Move; 
+                MainWindow.Instance.PointerReleased -= Finish;
+            }
+
+            MainWindow.Instance.PointerMoved += Move;
+            MainWindow.Instance.PointerReleased += Finish;
+        };
+
+
+        return rotate;
+    }
+
     MenuItem Defaults_Remove()
     {
         var remove = new MenuItem
@@ -106,6 +148,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     List<Control> Recom_ChangeType()
     {
         var suggestions = Subject.SuggestTypes();
+        Log.Write(suggestions);
         var list = new List<Control>();
 
         foreach ((TriangleType type, string details, double confidence) suggestion in suggestions)
@@ -151,24 +194,21 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     iso.Click += (sender, e) =>
                     {
                         var joints = string.Join("", suggestion.details.Split(" = "));
+                        var dict = new Dictionary<char, int>();
+                        foreach (char c in joints) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
+                        Log.Write(dict.Keys.ToArray(), dict.Values.ToArray());
                         Joint? main = null, v1 = null, v2 = null;
-                        foreach (char c in joints)
+
+                        foreach (KeyValuePair<char, int> pair in dict)
                         {
-                            var j = Joint.GetJointById(c);
-                            if (v1 == j)
+                            if (pair.Value == 1)
                             {
-                                main = j;
-                                v1 = null;
-                            }
-                            else if (v2 == j)
-                            {
-                                main = j;
-                                v1 = null;
-                            }
-                            else if (v1 == null) v1 = j;
-                            else if (v2 == null) v2 = j;
-                            else if (main == null) main = j;
+                                if (v1 == null) v1 = Joint.GetJointById(pair.Key);
+                                else if (v2 == null) v2 = Joint.GetJointById(pair.Key);
+                            } else main = Joint.GetJointById(pair.Key);
                         }
+
+                        Log.Write(v1, v2, main);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.MakeIsoscelesRelativeToABC(v1, main, v2);
                     };

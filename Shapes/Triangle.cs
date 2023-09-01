@@ -53,11 +53,13 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         all.Add(this);
 
-        foreach (var j in new[] { joint1, joint2, joint3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
 
         con12 = joint1.Connect(joint2);
         con13 = joint1.Connect(joint3);
         con23 = joint2.Connect(joint3);
+
+        foreach (var j in new[] { joint1, joint2, joint3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
+        foreach (var con in new[] { con12, con13, con23 }) con.Roles.AddToRole(Role.TRIANGLE_Side, this);
 
         foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
 
@@ -183,6 +185,23 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         incircle.UpdateFormula();
         incircle.InvalidateVisual();
         foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, px, py);
+    }
+
+    public void __Disment(Joint z, Joint x)
+    {
+        _ = z; _ = x;
+        Dismantle();
+    }
+    public void __Disment(double z, double x)
+    {
+        _ = z; _ = x;
+        Dismantle();
+    }
+
+    public void __Regen(double z, double x, double c, double v)
+    {
+        _ = z; _ = x; _ = c; _ = v;
+        Provider.Regenerate();
     }
     TriangleType ChangeType(TriangleType type)
     {

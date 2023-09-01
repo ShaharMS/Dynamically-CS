@@ -55,7 +55,8 @@ public partial class RoleMap
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
-                Subject.OnRemoved.Add((_, _) => (item as Triangle).Dismantle());
+                Subject.OnRemoved.Add((item as Triangle).__Disment);
+                Subject.OnDragged.Add((item as Triangle).__Regen);
                 break;
             default: break;
         }
@@ -106,7 +107,9 @@ public partial class RoleMap
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
-                Subject.OnRemoved.Remove((_, _) => (item as Triangle).Dismantle());
+                Subject.OnRemoved.Remove((item as Triangle).__Disment);
+                Subject.OnDragged.Remove((item as Triangle).__Regen);
+
                 break;
             default: break;
         }
@@ -192,8 +195,11 @@ public partial class RoleMap
                     Subject.OnMoved.Add(t1.__RecalculateInCircle);
                 }
 
-                From.OnRemoved.Remove((_, _) => t1.Dismantle());
-                Subject.OnRemoved.Add((_, _) => t1.Dismantle());
+                From.OnRemoved.Remove(t1.__Disment);
+                From.OnDragged.Remove(t1.__Regen);
+                Subject.OnRemoved.Add(t1.__Disment);
+                Subject.OnDragged.Add(t1.__Regen);
+
 
                 if (id != null)
                 {

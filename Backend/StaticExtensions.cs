@@ -27,6 +27,13 @@ public static class StaticExtensions
         return Math.Sqrt(x * x + y * y);
     }
 
+    public static double DistanceTo(this Joint from, Point to)
+    {
+        double x = from.X - to.X;
+        double y = from.Y - to.Y;
+        return Math.Sqrt(x * x + y * y);
+    }
+
     public static double DistanceTo(this Joint from, double X, double Y)
     {
         double x = from.X - X;
@@ -146,25 +153,22 @@ public static class StaticExtensions
             throw new ArgumentException("Percentage should be in the range 0 to 1.");
         }
 
-        double upperThreshold = valueB * (1 + offsetUsingPercentage);
-        double lowerThreshold = valueB * (1 - offsetUsingPercentage);
+        double ratio = valueA < valueB ? valueA / valueB : valueB / valueA;
 
-        return valueA > upperThreshold || valueA < lowerThreshold;
+        return ratio >= offsetUsingPercentage;
     }
 
     public static double GetSimilarityPercentage(this double valueA, double valueB)
     {
-        double difference = Math.Abs(valueA - valueB);
-        double maxDifference = Math.Max(valueA, valueB);
+        double m = Math.Max(valueA, valueB);
 
-        if (maxDifference == 0)
+        if (m == 0)
         {
             // Handle the case where both values are zero to avoid division by zero.
             return 1.0;
         }
 
-        double similarity = 1.0 - (difference / maxDifference);
-        return similarity;
+        return valueA < valueB ? valueA / valueB : valueB / valueA;
 
     }
 

@@ -16,6 +16,6 @@ public class Settings
     public static double MakeDiameterLengthRatio = 0.9;
 
     public static int MakeEquilateralAngleOffset = 5;
-    public static double MakeIsocelesSideRatioDiff = 0.1;
+    public static double MakeIsocelesSideRatioDiff = 0.9;
     public static int MakeRightAngleOffset = 10;
 }
