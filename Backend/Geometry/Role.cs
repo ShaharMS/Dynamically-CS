@@ -20,7 +20,8 @@ public enum Role
     CIRCLE_On,
 
     TRIANGLE_Corner,
-    
+    TRIANGLE_InCircleCenter,
+    TRIANGLE_CircumCircleCenter,
     // Segment
     CIRCLE_Radius,
     CIRCLE_Diameter,
@@ -30,6 +31,7 @@ public enum Role
     TRIANGLE_Side,
     TRIANGLE_AngleBisector,
     TRIANGLE_Perpendicular,
+
 
     /// <summary>
     /// Used only in internal RoleMap class.

@@ -106,11 +106,15 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         {
             j.OnMoved.Remove(__RecalculateInCircle);
         }
+
         if (incircle != null)
         {
             incircle.Draggable = true;
             incircle.center.Draggable = true;
+            incircle.center.Roles.RemoveFromRole(Role.TRIANGLE_InCircleCenter, this);
         }
+
+        if (circumcircle != null) circumcircle.center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
@@ -123,7 +127,9 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     public Circle GenerateCircumCircle()
     {
-        return circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
+        circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
+        circumcircle.center.Roles.AddToRole(Role.TRIANGLE_CircumCircleCenter, this);
+        return circumcircle;
     }
 
     public Circle GenerateInCircle()
@@ -132,7 +138,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         var circle = new Circle(new Joint(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
-        circle.center.Roles.AddToRole(Role.CIRCLE_Center, circle);
+        circle.center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
         circle.Draggable = false;
         incircle = circle;
 

@@ -121,7 +121,6 @@ class Tools
 
         var c = new Joint(center.X, center.Y);
         Circle circle = new Circle(c, radius);
-        c.Roles.AddToRole(Role.CIRCLE_Center, circle);
 
         return circle;
     }
@@ -184,12 +183,22 @@ class Tools
         a2 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
         if (a1.Intersect(a2).Count() != 0) return false;
 
-        // Case 2: corners of the same Triangle
+        // Case 2: Circum & Incircle
+        var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        Log.Write(e1, e2);
+        if (e1.Intersect(e2).Count() != 0) return false;
+        e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        Log.Write(e1, e2);
+        if (e1.Intersect(e2).Count() != 0) return false;
+
+        // Case 3: corners of the same Triangle
         var b1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
         var b2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
         if (b1.Intersect(b2).Count() != 0) return false;
 
-        // Case 3: Triangle corner & in\circumcircle center
+        // Case 4: Triangle corner & in\circumcircle center
         var c1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
         var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Count() != 0) return false;
@@ -197,7 +206,7 @@ class Tools
         c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Count() != 0) return false;
 
-        // Case 4: Triangle corner & in/circumcircle on
+        // Case 5: Triangle corner & in/circumcircle on
 
         var d1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
         if (d1.Contains(j2)) return false;
