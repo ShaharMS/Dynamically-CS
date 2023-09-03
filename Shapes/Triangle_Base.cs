@@ -384,7 +384,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     public bool Contains(Segment segment)
     {
-        return segment == con12 && segment == con13 && segment == con23;
+        return segment == con12 || segment == con13 || segment == con23;
     }
 
     public bool HasMounted(Joint joint)
