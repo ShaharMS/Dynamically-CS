@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
 using Dynamically.Formulas;
 using Dynamically.Screens;
 using System;
@@ -169,25 +170,18 @@ public partial class Triangle
         // ∠ABC is the most similar to 90deg, therefore it should be preserved.
 
         // Fixing the angle is easy, its just editing either A or C
-        // But, for user comfort, we'll modify the point which creates the angle with y = 0 least similar to 0/180
-        var radBA = B.RadiansTo(A);
-        var radBC = B.RadiansTo(C);
-        if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
-        {
-            var dist = B.DistanceTo(C);
-            var XPosOffset = dist * Math.Cos(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
-            var YPosOffset = dist * Math.Sin(radBA + (radBC < radBA ? Math.PI / 2 : -Math.PI / 2));
-            C.X = B.X + XPosOffset;
-            C.Y = B.Y + YPosOffset;
-        }
-        else
-        {
-            var dist = B.DistanceTo(A);
-            var XPosOffset = dist * Math.Cos(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
-            var YPosOffset = dist * Math.Sin(radBC + (radBA < radBC ? Math.PI / 2 : -Math.PI / 2));
-            A.X = B.X + XPosOffset;
-            A.Y = B.Y + YPosOffset;
-        }
+        // For user comfort, we'll modify both A & C to make ABC 90deg.
+        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
+        var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
+        var remainingGap = Math.PI / 2 - Math.Abs(radBC.RadiansBetween(radBA, true));
+        double distAB = A.DistanceTo(B), distBC = C.DistanceTo(B);
+
+        int oppose = Math.Abs((radBA + remainingGap / 2).RadiansBetween(radBC - remainingGap / 2, true)) < Math.PI / 2 ? -1 : 1;
+
+        A.X = B.X + distAB * Math.Cos(radBA + remainingGap / 2 * oppose);
+        A.Y = B.Y + distAB * Math.Sin(radBA + remainingGap / 2 * oppose);
+        C.X = B.X + distBC * Math.Cos(radBC - remainingGap / 2 * oppose); 
+        C.Y = B.Y + distBC * Math.Sin(radBC - remainingGap / 2 * oppose); 
 
         R_origin = B;
         // And we're done :)
@@ -221,41 +215,39 @@ public partial class Triangle
     public void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
     {
         // AB and BC are the most similar to each other, so B was chosen. Now, reset the angle
-        // We'll do this by averaging AB and BC, resetting their length, and BC will 
-        // automatically be the same length as AC, because of equilateral definition.
 
-        // To Fix the angle, we'll take the point which creates the angle closest to 0/180, and preserve it
+        
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
         var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
-        var dist = (A.DistanceTo(B) + B.DistanceTo(C)) / 2;
-        if (Math.Abs(radBA % Math.PI) < Math.Abs(radBC % Math.PI)) // BA should be preserved
-        {
-            var rad = radBA + Math.PI / 3;
-            if (radBA > radBC) rad -= Math.PI / 1.5;
-            Log.Write(rad * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI);
-            C.X = B.X + dist * Math.Cos(rad);
-            C.Y = B.Y + dist * -Math.Sin(rad);
+        var remainingGap = Math.PI / 3 - Math.Abs(radBC.RadiansBetween(radBA, true));
+        double dist = (A.DistanceTo(B) + C.DistanceTo(B)) / 2;
 
-            // Don't forget to set length of AB too!
-            rad -= Math.PI / 3;
-            A.X = B.X + dist * Math.Cos(rad);
-            A.Y = B.Y + dist * -Math.Sin(rad);
-        }
-        else
-        {
-            var rad = radBC + Math.PI / 3;
-            if (radBC > radBA) rad -= Math.PI / 1.5;
-            Log.Write(rad * 180 / Math.PI, "radBC:", radBC * 180 / Math.PI, "radBA:", radBA * 180 / Math.PI);
-            A.X = B.X + dist * Math.Cos(rad);
-            A.Y = B.Y + dist * -Math.Sin(rad);
+        int oppose = Math.Abs((radBA + remainingGap / 2).RadiansBetween(radBC - remainingGap / 2, true)) < Math.PI / 3 ? -1 : 1;
 
-            // Don't forget to set length of BC too!
-            rad -= Math.PI / 3;
-            C.X = B.X + dist * Math.Cos(rad);
-            C.Y = B.Y + dist * -Math.Sin(rad);
-        }
+        A.X = B.X + dist * Math.Cos(radBA + remainingGap / 2 * oppose);
+        A.Y = B.Y + dist * Math.Sin(radBA + remainingGap / 2 * oppose);
+        C.X = B.X + dist * Math.Cos(radBC - remainingGap / 2 * oppose); 
+        C.Y = B.Y + dist * Math.Sin(radBC - remainingGap / 2 * oppose); 
 
         EQ_temp_incircle_center = new Point(GetCircleStats().x, GetCircleStats().y);
     }
 
+    public void MakeIsoscelesRightRelativeToABC(Joint A, Joint B, Joint C) {
+        MakeRightRelativeToABC(A, B, C);
+        MakeIsoscelesRelativeToABC(A, B, C);
+    }
+    public void ForceType(TriangleType type, Joint A, Joint B, Joint C) {
+        Point a, b, c;
+        do {
+            a = A; b = B; c = C;
+            switch (type) {
+                case TriangleType.ISOSCELES_RIGHT: MakeIsoscelesRightRelativeToABC(A, B, C); break;
+                case TriangleType.EQUILATERAL: MakeEquilateralRelativeToABC(A, B, C); break;
+                case TriangleType.ISOSCELES: MakeIsoscelesRelativeToABC(A, B, C); break;
+                case TriangleType.RIGHT: MakeRightRelativeToABC(A, B, C); break;
+                case TriangleType.SCALENE: return;
+            }
+            A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents();
+        } while (!a.Equals(A) || !b.Equals(B) || !c.Equals(C));
+    }
 }

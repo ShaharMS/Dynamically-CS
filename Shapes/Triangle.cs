@@ -93,6 +93,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         MainWindow.BigScreen.Children.Add(this);
 
+        MainWindow.regenAll(0, 0, 0, 0);
+        Provider.Regenerate();
     }
 
     public void Dismantle()
@@ -129,6 +131,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     {
         circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
         circumcircle.center.Roles.AddToRole(Role.TRIANGLE_CircumCircleCenter, this);
+        Provider.Regenerate();
         return circumcircle;
     }
 
@@ -138,14 +141,17 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         var circle = new Circle(new Joint(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
-        circle.center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
         circle.Draggable = false;
         incircle = circle;
+
+        circle.center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
 
         foreach (var j in new[] { joint1, joint2, joint3 })
         {
             j.OnMoved.Add(__RecalculateInCircle);
         }
+
+        Provider.Regenerate();
 
         return circle;
     }
@@ -275,23 +281,23 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     {
         var l = new List<(TriangleType type, string details, double confidence)>();
 
-        if (Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeEquilateralAngleOffset &&
+        if (Type != TriangleType.EQUILATERAL && Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeEquilateralAngleOffset &&
             Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeEquilateralAngleOffset &&
             Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 0.8 /* Aribitrary, chosen so it would often show at the top of the list */));
-        else  // Dont suggest both isoceles & equilateral. doesnt make sense more often than not.
+        else  // Don't suggest both isosceles & equilateral. does'nt make sense more often than not.
         {
-            if (con12.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con13}", con12.Length.GetSimilarityPercentage(con13.Length)));
-            if (con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con23}", con12.Length.GetSimilarityPercentage(con23.Length)));
-            if (con23.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con23} = {con13}", con23.Length.GetSimilarityPercentage(con13.Length)));
+            if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con13}", con12.Length.GetSimilarityPercentage(con13.Length)));
+            if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con23}", con12.Length.GetSimilarityPercentage(con23.Length)));
+            if (Type != TriangleType.ISOSCELES && con23.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con23} = {con13}", con23.Length.GetSimilarityPercentage(con13.Length)));
         }
 
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint2}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90));
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint2}{joint1}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90));
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint3}{joint2} = 90°", Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint2}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint2}{joint1}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint3}{joint2} = 90°", Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90));
 
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint2}{joint3} = 90°, {con12} = {con23}", (Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90 + con12.Length.GetSimilarityPercentage(con23.Length)) / 2));
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint2}{joint1}{joint3} = 90°, {con13} = {con23}", (Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90 + con13.Length.GetSimilarityPercentage(con23.Length)) / 2));
-        if (Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con12.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint3}{joint2} = 90°, {con13} = {con12}", (Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90 + con13.Length.GetSimilarityPercentage(con12.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint2}{joint3} = 90°, {con12} = {con23}", (Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90 + con12.Length.GetSimilarityPercentage(con23.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint2}{joint1}{joint3} = 90°, {con13} = {con23}", (Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90 + con13.Length.GetSimilarityPercentage(con23.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con12.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint3}{joint2} = 90°, {con13} = {con12}", (Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90 + con13.Length.GetSimilarityPercentage(con12.Length)) / 2));
 
 
         return l;

@@ -39,7 +39,7 @@ namespace Dynamically
             AvaloniaXamlLoader.Load(this);
         }
 
-        public static void Write(params object[] text)
+        public static void Write(params object?[] text)
         {
             current.consoleTextBlock.Text += StringifyCollection(text) + "\n";
             if (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)

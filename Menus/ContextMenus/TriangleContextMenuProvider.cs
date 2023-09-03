@@ -30,7 +30,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     {
         Defaults = new List<Control>
         {
-            Defalts_Rotate(),
+            Defaults_Rotate(),
             Defaults_Dismantle(),
             Defaults_Remove()
         };
@@ -38,18 +38,20 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
     public override void GenerateSuggestions()
     {
-        Suggestions = new List<Control>
+        Suggestions = new List<Control?>
         {
-        };
+            Sgest_GenerateCircumCircle(),
+            Sgest_GenerateInCircle()
+        }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
     public override void GenerateRecommendations()
     {
-        Recommendations = Recom_ChangeType();/*
-        Recommendations = Recommendations.Concat(new List<Control?>
+        Recommendations = Recom_ChangeType();
+        Recommendations.Concat(new List<Control?>
         {
 
-        }.FindAll((c) => c != null).Cast<Control>()).ToList();*/
+        }.FindAll((c) => c != null).Cast<Control>()).ToList();
     }
 
     public override void AddDebugInfo()
@@ -85,7 +87,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         return remove;
     }
 
-    MenuItem Defalts_Rotate()
+    MenuItem Defaults_Rotate()
     {
         var rotate = new MenuItem
         {
@@ -109,14 +111,14 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 Subject.joint1.DispatchOnMovedEvents(); Subject.joint2.DispatchOnMovedEvents(); Subject.joint3.DispatchOnMovedEvents();
             }
 
-            void Finish(object? sender, PointerReleasedEventArgs arg)
+            void Finish(object? sender, PointerPressedEventArgs arg)
             {
                 MainWindow.Instance.PointerMoved -= Move; 
-                MainWindow.Instance.PointerReleased -= Finish;
+                MainWindow.Instance.PointerPressed -= Finish;
             }
 
             MainWindow.Instance.PointerMoved += Move;
-            MainWindow.Instance.PointerReleased += Finish;
+            MainWindow.Instance.PointerPressed += Finish;
         };
 
 
@@ -140,6 +142,39 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
 
+    MenuItem Sgest_GenerateCircumCircle() {
+        if (Subject.circumcircle != null) {
+            return new MenuItem {
+                Header = $"Circum-Circle {Subject.circumcircle}",
+                // Todo: items, which are the circle's right-click
+            };
+        }
+        var circum = new MenuItem
+        {
+            Header = "Generate Circum-Circle"
+        };
+        circum.Click += (sender, e) => {
+            Subject.GenerateCircumCircle();
+        };
+        return circum;
+    }
+    MenuItem Sgest_GenerateInCircle() {
+        
+        if (Subject.incircle != null) {
+            return new MenuItem {
+                Header = $"Incircle {Subject.incircle}",
+                // Todo: items, which are the circle's right-click
+            };
+        }
+        var incirc = new MenuItem
+        {
+            Header = "Generate Incircle"
+        };
+        incirc.Click += (sender, e) => {
+            Subject.GenerateInCircle();
+        };
+        return incirc;
+    }
 
     // -------------------------------------------------------
     // ---------------------Recommendations-------------------
@@ -163,7 +198,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     };
                     eq.Click += (sender, e) =>
                     {
-                        Subject.MakeEquilateralRelativeToABC(Subject.joint1, Subject.joint2, Subject.joint3);
+                        Subject.ForceType(TriangleType.EQUILATERAL ,Subject.joint1, Subject.joint2, Subject.joint3);
+                        Subject.Type = TriangleType.EQUILATERAL;
                     };
                     list.Add(eq);
                     break;
@@ -180,8 +216,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var v1 = Joint.GetJointById(ang[0]);
                         var v2 = Joint.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
-                        Subject.MakeRightRelativeToABC(v1, main, v2);
-                        Subject.MakeIsoscelesRelativeToABC(v1, main, v2);
+                        Subject.ForceType(TriangleType.ISOSCELES_RIGHT, v1, main, v2);
+                        Subject.Type = TriangleType.ISOSCELES_RIGHT;
                     };
                     list.Add(ir);
                     break;
@@ -210,7 +246,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
                         Log.Write(v1, v2, main);
                         if (v1 == null || main == null || v2 == null) return;
-                        Subject.MakeIsoscelesRelativeToABC(v1, main, v2);
+                        Subject.ForceType(TriangleType.ISOSCELES, v1, main, v2);
+                        Subject.Type = TriangleType.ISOSCELES;
                     };
                     list.Add(iso);
                     break;
@@ -227,7 +264,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var v1 = Joint.GetJointById(ang[0]);
                         var v2 = Joint.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
-                        Subject.MakeRightRelativeToABC(v1, main, v2);
+                        Subject.ForceType(TriangleType.RIGHT, v1, main, v2);
+                        Subject.Type = TriangleType.RIGHT;
                     };
                     list.Add(r); 
                     break;

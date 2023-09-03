@@ -39,6 +39,7 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
     }
 
     public CircleFormula Formula { get; set; }
+    public List<Action> OnRemoved = new();
 
     public Circle(Joint center, double radius) : base(center, center, radius * 2)
     {
@@ -71,6 +72,9 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
         onResize.Clear();
         Circle.all.Remove(this);
         EllipseBase.all.Remove(this);
+
+        foreach (var l in OnRemoved) l();
+
         MainWindow.BigScreen.Children.Remove(ring);
         MainWindow.BigScreen.Children.Remove(this);
     }

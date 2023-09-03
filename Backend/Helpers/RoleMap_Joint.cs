@@ -53,6 +53,12 @@ public partial class RoleMap
                     }
                 }
                 break;
+            case Role.TRIANGLE_CircumCircleCenter:
+                (item as Triangle).circumcircle.OnRemoved.Add(() => (item as Triangle).circumcircle = null);
+                break;
+            case Role.TRIANGLE_InCircleCenter:
+                (item as Triangle).incircle.OnRemoved.Add(() => (item as Triangle).incircle = null);
+                break;
             // Triangle
             case Role.TRIANGLE_Corner:
                 Subject.OnRemoved.Add((item as Triangle).__Disment);
@@ -104,6 +110,12 @@ public partial class RoleMap
                         Subject.GetConnectionTo(joint).Roles.RemoveFromRole(Role.CIRCLE_Radius, item);
                     }
                 }
+                break;
+            case Role.TRIANGLE_CircumCircleCenter:
+                (item as Triangle).circumcircle.OnRemoved.Remove(() => (item as Triangle).circumcircle = null);
+                break;
+            case Role.TRIANGLE_InCircleCenter:
+                (item as Triangle).incircle.OnRemoved.Remove(() => (item as Triangle).incircle = null);
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
