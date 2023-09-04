@@ -266,7 +266,11 @@ public partial class Joint
                     }
                     if (!hasQuad)
                     {
-                        Log.Write(new Quadrilateral(this, joint, other1, other2));
+                        var con2 = other1.GetConnectionTo(this);
+                        var con3 = other2.GetConnectionTo(joint);
+                        if (con2 )
+                        if (con2.Formula.Intersect(con3)) continue;
+                        _ = new Quadrilateral(this, joint, other1, other2);
                     }
                 }
             }
