@@ -238,6 +238,7 @@ public partial class Triangle
     }
     public void ForceType(TriangleType type, Joint A, Joint B, Joint C) {
         Point a, b, c;
+        _type = type;
         do {
             a = A; b = B; c = C;
             switch (type) {

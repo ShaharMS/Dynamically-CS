@@ -1,4 +1,5 @@
-﻿using Dynamically.Formulas;
+﻿using Dynamically.Backend.Helpers;
+using Dynamically.Formulas;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ public partial class Joint
 
     public Segment Connect(Joint to, bool updateRelations = true)
     {
-        // Don't connect something twice
+        // Don'q connect something twice
         foreach (Segment c in Connections.Concat(to.Connections))
         {
             if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
@@ -42,7 +43,7 @@ public partial class Joint
         foreach (Joint joint in joints)
         {
             var doNothing = false;
-            // Don't connect something twice
+            // Don'q connect something twice
             foreach (Segment c in Connections.Concat(joint.Connections))
             {
                 if ((c.joint1 == this && c.joint2 == joint) || (c.joint2 == this && c.joint1 == joint))
@@ -217,11 +218,12 @@ public partial class Joint
             }
         }
 
+        // Third case - connecting a line and forming a Triangle
         foreach (Segment c in Connections.ToArray())
         {
             var other = c.joint1 == this ? c.joint2 : c.joint1;
 
-            // First case - connecting a line and forming a Triangle
+            
 
             if (other.IsConnectedTo(joint) /* this.IsConnectedTo(joint) is `true` */) // this joint is connected to other, and the just connected joint is also connected to it -> potentially new Triangle
             {
@@ -238,6 +240,34 @@ public partial class Joint
                 if (!hasTriangle)
                 {
                     _ = new Triangle(this, other, joint);
+                }
+            }
+        }
+        // Fourth case - connection a line and forming a quadrilateral
+        foreach (Joint other1 in this.Relations.ToArray())
+        {
+            if (other1 == joint) continue;
+            foreach (Joint other2 in joint.Relations.ToArray())
+            {
+                if (other2 == this) continue;
+                if (other1 == other2) continue;
+                Log.Write(other1, other2);
+                if (other1.IsConnectedTo(other2))
+                {
+                    var hasQuad = false;
+                    var currentQuads = Roles.Access<Quadrilateral>(Role.QUAD_Corner);
+                    foreach (var q in currentQuads)
+                    {
+                        if (q.IsDefinedBy(this, joint, other1, other2))
+                        {
+                            hasQuad = true;
+                            break;
+                        }
+                    }
+                    if (!hasQuad)
+                    {
+                        Log.Write(new Quadrilateral(this, joint, other1, other2));
+                    }
                 }
             }
         }

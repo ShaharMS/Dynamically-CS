@@ -69,6 +69,8 @@ public partial class MainWindow : Window
         t4.Type = TriangleType.EQUILATERAL;
         var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
 
+        var q1 = new Quadrilateral(new Joint(600, 600), new Joint(900, 550), new Joint(600, 700), new Joint(900, 900));
+
 
         new Angle(j0, j, j11);
 

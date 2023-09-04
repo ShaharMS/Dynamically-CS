@@ -8,6 +8,7 @@ using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,7 +29,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     QuadrilateralType _type = QuadrilateralType.IRREGULAR;
 
-    public QuadrilateralType type
+    public QuadrilateralType Type
     {
         get => _type;
         set => ChangeType(value);
@@ -41,10 +42,15 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         joint3 = j3;
         joint4 = j4;
 
-        con12 = joint1.Connect(joint2);
+        //con12 = joint1.Connect(joint2);
         con23 = joint2.Connect(joint3);
         con34 = joint3.Connect(joint4);
         con41 = joint4.Connect(joint1);
+
+        foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
+        foreach (var con in new[] { con12, con23, con34, con41 }) con?.Roles.AddToRole(Role.QUAD_Side, this);
+
+        foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
     }
 
     public void Dismantle()
@@ -62,18 +68,30 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     public override bool Overlaps(Point p)
     {
-        bool isInside = false;
+        bool checkWithTriangle(Joint joint1, Joint joint2, Joint joint3)
+        {
+            double areaABC = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - joint3.ScreenY) +
+                                       joint2.ScreenX * (joint3.ScreenY - joint1.ScreenY) +
+                                       joint3.ScreenX * (joint1.ScreenY - joint2.ScreenY));
 
-        var CrossProduct = (Point p1, Point p2, Point p3) => (p2.X - p1.X) * (p3.Y - p1.Y) - (p3.X - p1.X) * (p2.Y - p1.Y);
+            double areaPBC = 0.5 * Math.Abs(p.X * (joint2.ScreenY - joint3.ScreenY) +
+                                          joint2.ScreenX * (joint3.ScreenY - p.Y) +
+                                          joint3.ScreenX * (p.Y - joint2.ScreenY));
 
-        // Calculate vectors from the test point to the vertices
-        double d1 = CrossProduct(p, joint1, joint2);
-        double d2 = CrossProduct(p, joint2, joint3);
-        double d3 = CrossProduct(p, joint3, joint4);
-        double d4 = CrossProduct(p, joint4, joint1);
+            double areaPCA = 0.5 * Math.Abs(joint1.ScreenX * (p.Y - joint3.ScreenY) +
+                                          p.X * (joint3.ScreenY - joint1.ScreenY) +
+                                          joint3.ScreenX * (joint1.ScreenY - p.Y));
 
-        // Check if the signs of the cross products are all the same
-        return (d1 > 0 && d2 > 0 && d3 > 0 && d4 > 0) || (d1 < 0 && d2 < 0 && d3 < 0 && d4 < 0);
+            double areaPAB = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - p.Y) +
+                                          joint2.ScreenX * (p.Y - joint1.ScreenY) +
+                                          p.X * (joint1.ScreenY - joint2.ScreenY));
+
+            // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
+            return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
+        }
+
+        return checkWithTriangle(joint1, joint2, joint3) || checkWithTriangle(joint1, joint4, joint3) || checkWithTriangle(joint2, joint1, joint4) || checkWithTriangle(joint2, joint3, joint4); 
+        // Two extra check because we don't know which triangles overlap
     }
     public override void Render(DrawingContext context)
     {
@@ -134,10 +152,10 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public string ToString(bool descriptive)
     {
         if (!descriptive) return ToString();
-        return "Triangle " + ToString();
+        return $"{typeToString(Type)} " + ToString();
     }
 
-    private string typeToString(QuadrilateralType type) => type.ToString().ToLower()
+    private string typeToString(QuadrilateralType type) => type != QuadrilateralType.IRREGULAR ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Quadrilateral";
 }
 
 public enum QuadrilateralType

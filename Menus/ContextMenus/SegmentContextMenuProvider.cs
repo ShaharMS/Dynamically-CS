@@ -97,19 +97,19 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             Header = "Length (Exact) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_EXACT ? "✓" : "")
         };
-        len.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_EXACT; };
+        len.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_EXACT; Subject.InvalidateVisual(); };
 
         var lenR = new MenuItem
         {
             Header = "Length (Rounded) " + (Subject.TextDisplayMode == SegmentTextDisplay.LENGTH_ROUND ? "✓" : "")
         };
-        lenR.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_ROUND; };
+        lenR.Click += (s, e) => { Subject.TextDisplayMode = SegmentTextDisplay.LENGTH_ROUND; Subject.InvalidateVisual(); };
 
         var none = new MenuItem
         {
             Header = "Nothing " + (Subject.TextDisplayMode == SegmentTextDisplay.NONE ? "✓" : "")
         };
-        none.Click += (s, e) => { Subject.Label.Content = "";  Subject.TextDisplayMode = SegmentTextDisplay.NONE; };
+        none.Click += (s, e) => { Subject.Label.Content = "";  Subject.TextDisplayMode = SegmentTextDisplay.NONE; Subject.InvalidateVisual(); };
 
         var paramField = new TextBox
         {

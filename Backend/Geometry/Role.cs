@@ -22,6 +22,10 @@ public enum Role
     TRIANGLE_Corner,
     TRIANGLE_InCircleCenter,
     TRIANGLE_CircumCircleCenter,
+
+    QUAD_Corner,
+    QUAD_CircumCircleCenter,
+    QUAD_InCircleCenter,
     // Segment
     CIRCLE_Radius,
     CIRCLE_Diameter,
@@ -32,6 +36,8 @@ public enum Role
     TRIANGLE_AngleBisector,
     TRIANGLE_Perpendicular,
 
+    QUAD_Side,
+    QUAD_Hypotenuse,
 
     /// <summary>
     /// Used only in internal RoleMap class.

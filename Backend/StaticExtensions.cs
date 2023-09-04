@@ -183,9 +183,9 @@ public static class StaticExtensions
 
             if (rootVisual != null)
             {
-#pragma warning disable CS8629 // Nullable value type may be null.
+#pragma warning disable CS8629 // Nullable value Type may be null.
                 position = visual.TranslatePoint(new Point(0, 0), rootVisual).Value; // Must be non-null here
-#pragma warning restore CS8629 // Nullable value type may be null.
+#pragma warning restore CS8629 // Nullable value Type may be null.
             }
         }
 

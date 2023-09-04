@@ -14,6 +14,7 @@ using System.Linq;
 using Dynamically.Formulas.Special;
 using Dynamically.Menus.ContextMenus;
 using Avalonia.Controls;
+using System.Globalization;
 
 namespace Dynamically.Shapes;
 
@@ -224,17 +225,17 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
                 var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
                 var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
-                if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint2, joint3);
-                else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) MakeEquilateralRelativeToABC(joint1, joint3, joint2);
-                else MakeEquilateralRelativeToABC(joint2, joint1, joint3);
+                if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint2, joint3);
+                else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint3, joint2);
+                else ForceType(TriangleType.EQUILATERAL, joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES:
                 var con12_to_con13_Diff = Math.Abs(con12.Length - con13.Length);
                 var con12_to_con23_Diff = Math.Abs(con12.Length - con23.Length);
                 var con13_to_con23_Diff = Math.Abs(con13.Length - con23.Length);
-                if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) MakeIsoscelesRelativeToABC(joint1, joint2, joint3);
-                else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) MakeIsoscelesRelativeToABC(joint2, joint1, joint3);
-                else MakeIsoscelesRelativeToABC(joint1, joint3, joint2);
+                if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
+                else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
+                else ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
                 break;
             case TriangleType.RIGHT:
                 var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
@@ -243,9 +244,9 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 Log.Write(Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
                 var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
                 Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-                if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint2, joint3);
-                else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) MakeRightRelativeToABC(joint1, joint3, joint2);
-                else MakeRightRelativeToABC(joint2, joint1, joint3);
+                if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
+                else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
+                else ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES_RIGHT:
                 var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
@@ -256,25 +257,27 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
                 if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
-                    MakeRightRelativeToABC(joint1, joint2, joint3);
-                    MakeIsoscelesRelativeToABC(joint1, joint2, joint3);
+                    ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
+                    ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
                 }
                 else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
-                    MakeRightRelativeToABC(joint1, joint3, joint2);
-                    MakeIsoscelesRelativeToABC(joint1, joint3, joint2);
+                    ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
+                    ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
                 }
                 else
                 {
-                    MakeRightRelativeToABC(joint2, joint1, joint3);
-                    MakeIsoscelesRelativeToABC(joint2, joint1, joint3);
+                    ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
+                    ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
                 }
                 break;
             case TriangleType.SCALENE:
                 break;
         }
         joint1.reposition(); joint2.reposition(); joint3.reposition();
-        return _type = type;
+        _type = type;
+        Provider.Regenerate();
+        return type;
     }
 
     public List<(TriangleType type, string details, double confidence)> SuggestTypes()
@@ -283,8 +286,8 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         if (Type != TriangleType.EQUILATERAL && Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeEquilateralAngleOffset &&
             Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeEquilateralAngleOffset &&
-            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 0.8 /* Aribitrary, chosen so it would often show at the top of the list */));
-        else  // Don't suggest both isosceles & equilateral. does'nt make sense more often than not.
+            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 1 /* Chosen so it would often show at the top of the list */));
+        else if (Type != TriangleType.EQUILATERAL)  // Don't suggest both isosceles & equilateral. does'nt make sense more often than not.
         {
             if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con13}", con12.Length.GetSimilarityPercentage(con13.Length)));
             if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con23}", con12.Length.GetSimilarityPercentage(con23.Length)));
@@ -311,8 +314,10 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     public string ToString(bool descriptive)
     {
         if (!descriptive) return ToString();
-        return "Triangle " + ToString();
+        return $"{typeToString(Type)} " + ToString();
     }
+
+    private string typeToString(TriangleType type) => type != TriangleType.SCALENE ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Triangle";
 
     public override double Area()
     {

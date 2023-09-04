@@ -167,8 +167,11 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
             joint1.CurrentlyDragging = joint2.CurrentlyDragging = false;
+            joint1.DispatchOnDraggedEvents();
+            joint2.DispatchOnDraggedEvents();
             joint1.InvalidateVisual();
             joint2.InvalidateVisual();
+            reposition();
         });
         OnDragged.Add(MainWindow.regenAll);
 

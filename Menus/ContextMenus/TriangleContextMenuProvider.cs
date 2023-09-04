@@ -31,6 +31,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         Defaults = new List<Control>
         {
             Defaults_Rotate(),
+            Defaults_ChangeType(),
             Defaults_Dismantle(),
             Defaults_Remove()
         };
@@ -58,12 +59,15 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     {
         Debugging = new List<Control>
         {
+            Debug_Type()
         };
     }
+
 
     public override void Regenerate()
     {
         base.Regenerate();
+        Name = Subject.ToString(true);
         Subject.ContextMenu = new ContextMenu
         {
             Items = Items
@@ -74,18 +78,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     // -------------------------------------------------------
     // ------------------------Defaults-----------------------
     // -------------------------------------------------------
-    MenuItem Defaults_Dismantle()
-    {
-        var remove = new MenuItem
-        {
-            Header = "Dismantle"
-        };
-        remove.Click += (sender, e) =>
-        {
-            Subject.Dismantle();
-        };
-        return remove;
-    }
 
     MenuItem Defaults_Rotate()
     {
@@ -113,7 +105,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
             void Finish(object? sender, PointerPressedEventArgs arg)
             {
-                MainWindow.Instance.PointerMoved -= Move; 
+                MainWindow.Instance.PointerMoved -= Move;
                 MainWindow.Instance.PointerPressed -= Finish;
             }
 
@@ -123,6 +115,56 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
 
         return rotate;
+    }
+
+    MenuItem Defaults_ChangeType()
+    {
+        var eq = new MenuItem
+        {
+            Header = "Equilateral " + (Subject.Type == TriangleType.EQUILATERAL ? "✓" : "")
+        };
+        eq.Click += (s, e) => { Subject.Type = TriangleType.EQUILATERAL; Regenerate(); };
+
+        var iso = new MenuItem
+        {
+            Header = "Isosceles " + (Subject.Type == TriangleType.ISOSCELES ? "✓" : "")
+        };
+        iso.Click += (s, e) => { Subject.Type = TriangleType.ISOSCELES; Regenerate(); };
+        var r = new MenuItem
+        {
+            Header = "Right " + (Subject.Type == TriangleType.RIGHT ? "✓" : "")
+        };
+        r.Click += (s, e) => { Subject.Type = TriangleType.RIGHT; Regenerate(); }; 
+        var isor = new MenuItem
+        {
+            Header = "Isosceles-Right " + (Subject.Type == TriangleType.ISOSCELES_RIGHT ? "✓" : "")
+        };
+        isor.Click += (s, e) => { Subject.Type = TriangleType.ISOSCELES_RIGHT; Regenerate(); };
+        var s = new MenuItem
+        {
+            Header = "Scalene " + (Subject.Type == TriangleType.SCALENE ? "✓" : "")
+        };
+        s.Click += (s, e) => { Subject.Type = TriangleType.SCALENE; Regenerate(); };
+
+
+        return new MenuItem
+        {
+            Header = "Change Type",
+            Items = new[] {eq, iso, r, isor, s }
+        };
+    }
+
+    MenuItem Defaults_Dismantle()
+    {
+        var remove = new MenuItem
+        {
+            Header = "Dismantle"
+        };
+        remove.Click += (sender, e) =>
+        {
+            Subject.Dismantle();
+        };
+        return remove;
     }
 
     MenuItem Defaults_Remove()
@@ -142,9 +184,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
 
-    MenuItem Sgest_GenerateCircumCircle() {
-        if (Subject.circumcircle != null) {
-            return new MenuItem {
+    MenuItem Sgest_GenerateCircumCircle()
+    {
+        if (Subject.circumcircle != null)
+        {
+            return new MenuItem
+            {
                 Header = $"Circum-Circle {Subject.circumcircle}",
                 // Todo: items, which are the circle's right-click
             };
@@ -153,15 +198,19 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         {
             Header = "Generate Circum-Circle"
         };
-        circum.Click += (sender, e) => {
+        circum.Click += (sender, e) =>
+        {
             Subject.GenerateCircumCircle();
         };
         return circum;
     }
-    MenuItem Sgest_GenerateInCircle() {
-        
-        if (Subject.incircle != null) {
-            return new MenuItem {
+    MenuItem Sgest_GenerateInCircle()
+    {
+
+        if (Subject.incircle != null)
+        {
+            return new MenuItem
+            {
                 Header = $"Incircle {Subject.incircle}",
                 // Todo: items, which are the circle's right-click
             };
@@ -170,7 +219,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         {
             Header = "Generate Incircle"
         };
-        incirc.Click += (sender, e) => {
+        incirc.Click += (sender, e) =>
+        {
             Subject.GenerateInCircle();
         };
         return incirc;
@@ -183,7 +233,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     List<Control> Recom_ChangeType()
     {
         var suggestions = Subject.SuggestTypes();
-        Log.Write(suggestions);
         var list = new List<Control>();
 
         foreach ((TriangleType type, string details, double confidence) suggestion in suggestions)
@@ -198,8 +247,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     };
                     eq.Click += (sender, e) =>
                     {
-                        Subject.ForceType(TriangleType.EQUILATERAL ,Subject.joint1, Subject.joint2, Subject.joint3);
                         Subject.Type = TriangleType.EQUILATERAL;
+                        Regenerate();
                     };
                     list.Add(eq);
                     break;
@@ -217,7 +266,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var v2 = Joint.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.ISOSCELES_RIGHT, v1, main, v2);
-                        Subject.Type = TriangleType.ISOSCELES_RIGHT;
+                        Regenerate();
                     };
                     list.Add(ir);
                     break;
@@ -232,7 +281,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var joints = string.Join("", suggestion.details.Split(" = "));
                         var dict = new Dictionary<char, int>();
                         foreach (char c in joints) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
-                        Log.Write(dict.Keys.ToArray(), dict.Values.ToArray());
                         Joint? main = null, v1 = null, v2 = null;
 
                         foreach (KeyValuePair<char, int> pair in dict)
@@ -241,13 +289,13 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                             {
                                 if (v1 == null) v1 = Joint.GetJointById(pair.Key);
                                 else if (v2 == null) v2 = Joint.GetJointById(pair.Key);
-                            } else main = Joint.GetJointById(pair.Key);
+                            }
+                            else main = Joint.GetJointById(pair.Key);
                         }
 
-                        Log.Write(v1, v2, main);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.ISOSCELES, v1, main, v2);
-                        Subject.Type = TriangleType.ISOSCELES;
+                        Regenerate();
                     };
                     list.Add(iso);
                     break;
@@ -265,9 +313,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var v2 = Joint.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.RIGHT, v1, main, v2);
-                        Subject.Type = TriangleType.RIGHT;
+                        Regenerate();
                     };
-                    list.Add(r); 
+                    list.Add(r);
                     break;
                 case TriangleType.SCALENE: break;
             }
@@ -276,5 +324,17 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         list.OrderBy(m => (double?)m.Tag ?? 0.0);
 
         return list;
+    }
+
+    // -------------------------------------------------------
+    // --------------------------Debug------------------------
+    // -------------------------------------------------------
+
+    MenuItem Debug_Type()
+    {
+        return new MenuItem
+        {
+            Header = $"Type: {Subject.Type}"
+        };
     }
 }

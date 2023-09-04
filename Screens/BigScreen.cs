@@ -7,6 +7,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -185,6 +186,9 @@ public class BigScreen : DraggableGraphic
         else if (FocusedObject is Joint joint) Log.Write($"{joint.Id} Is Focused");
         else if (FocusedObject is Segment connection) Log.Write($"{connection} Is Focused");
         else if (FocusedObject is Angle angle) Log.Write($"{angle} Is Focused");
+        else if (FocusedObject is Circle circle) Log.Write($"Circle {circle} Is Focused");
+        else if (FocusedObject is Triangle triangle) Log.Write($"Triangle {triangle} Is Focused");
+        else if (FocusedObject is Quadrilateral quadrilateral) Log.Write($"Quadrilateral {quadrilateral} Is Focused");
         else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
     }
 
