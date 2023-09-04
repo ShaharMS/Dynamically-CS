@@ -125,6 +125,19 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     {
         return false;
     }
+
+    public override string ToString()
+    {
+        return $"{joint1.Id}{joint2.Id}{joint3.Id}{joint4.Id}";
+    }
+
+    public string ToString(bool descriptive)
+    {
+        if (!descriptive) return ToString();
+        return "Triangle " + ToString();
+    }
+
+    private string typeToString(QuadrilateralType type) => type.ToString().ToLower()
 }
 
 public enum QuadrilateralType
