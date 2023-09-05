@@ -39,7 +39,11 @@ public partial class RoleMap
                 Subject.OnRemoved.Add((item as Triangle).__Disment);
                 Subject.OnDragged.Add((item as Triangle).__Regen);
                 break;
-
+            // Quadrilateral
+            case Role.QUAD_Side:
+                Subject.OnRemoved.Add((item as Quadrilateral).__Disment);
+                Subject.OnDragged.Add((item as Quadrilateral).__Regen);
+                break;
             default:
                 break;
         }
@@ -68,6 +72,11 @@ public partial class RoleMap
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Remove((item as Triangle).__Disment);
                 Subject.OnDragged.Remove((item as Triangle).__Regen);
+                break;
+            // Quadrilateral
+            case Role.QUAD_Side:
+                Subject.OnRemoved.Remove((item as Quadrilateral).__Disment);
+                Subject.OnDragged.Remove((item as Quadrilateral).__Regen);
                 break;
             default:
                 break;
@@ -108,11 +117,19 @@ public partial class RoleMap
                     Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
                 });
                 break;
+            // Triangle
             case Role.TRIANGLE_Side:
                 From.OnRemoved.Remove((item as Triangle).__Disment);
                 From.OnDragged.Remove((item as Triangle).__Regen);
                 Subject.OnRemoved.Add((item as Triangle).__Disment);
                 Subject.OnDragged.Add((item as Triangle).__Regen);
+                break;
+            // Quadrilateral
+            case Role.QUAD_Side:
+                From.OnRemoved.Remove((item as Quadrilateral).__Disment);
+                From.OnDragged.Remove((item as Quadrilateral).__Regen);
+                Subject.OnRemoved.Add((item as Quadrilateral).__Disment);
+                Subject.OnDragged.Add((item as Quadrilateral).__Regen);
                 break;
             default:
                 break;

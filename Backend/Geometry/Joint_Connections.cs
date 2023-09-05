@@ -268,9 +268,9 @@ public partial class Joint
                     {
                         var con2 = other1.GetConnectionTo(this);
                         var con3 = other2.GetConnectionTo(joint);
-                        if (con2 )
-                        if (con2.Formula.Intersect(con3)) continue;
-                        _ = new Quadrilateral(this, joint, other1, other2);
+                        if (con2 == null || con3 == null) continue;
+                        if (con2.Formula.Intersect(con3.Formula) != null) continue;
+                        _ = new Quadrilateral(this, joint, other2, other1);
                     }
                 }
             }

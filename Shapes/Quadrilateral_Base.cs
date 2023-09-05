@@ -22,10 +22,10 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Joint joint3;
     public Joint joint4;
 
-    public Segment con12;
-    public Segment con23;
-    public Segment con34;
-    public Segment con41;
+    public Segment con1;
+    public Segment con2;
+    public Segment con3;
+    public Segment con4;
 
     QuadrilateralType _type = QuadrilateralType.IRREGULAR;
 
@@ -35,6 +35,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         set => ChangeType(value);
     }
 
+#pragma warning disable CS8618
     public Quadrilateral(Joint j1, Joint j2, Joint j3, Joint j4)
     {
         joint1 = j1;
@@ -42,16 +43,25 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         joint3 = j3;
         joint4 = j4;
 
-        //con12 = joint1.Connect(joint2);
-        con23 = joint2.Connect(joint3);
-        con34 = joint3.Connect(joint4);
-        con41 = joint4.Connect(joint1);
-
+        
+        var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
+        if (sides.Count == 0) return; // Don't do anything
+        
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
-        foreach (var con in new[] { con12, con23, con34, con41 }) con?.Roles.AddToRole(Role.QUAD_Side, this);
+
+        for (int i = 0; i < 4; i++) {
+            var side = sides[i];
+            var x = side.Item1.Connect(side.Item2);
+            x.Roles.AddToRole(Role.QUAD_Side, this);
+            if (i == 0) con1 = x;
+            else if (i == 1) con2 = x;
+            else if (i == 2) con3 = x;
+            else if (i == 3) con4 = x;
+        } 
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
     }
+#pragma warning restore CS8618
 
     public void Dismantle()
     {
@@ -66,32 +76,26 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         return type;
     }
 
+    public void __Disment(Joint z, Joint x)
+    {
+        _ = z; _ = x;
+        Dismantle();
+    }
+    public void __Disment(double z, double x)
+    {
+        _ = z; _ = x;
+        Dismantle();
+    }
+
+    public void __Regen(double z, double x, double c, double v)
+    {
+        _ = z; _ = x; _ = c; _ = v;
+        //Provider.Regenerate();
+    }
+
     public override bool Overlaps(Point p)
     {
-        bool checkWithTriangle(Joint joint1, Joint joint2, Joint joint3)
-        {
-            double areaABC = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - joint3.ScreenY) +
-                                       joint2.ScreenX * (joint3.ScreenY - joint1.ScreenY) +
-                                       joint3.ScreenX * (joint1.ScreenY - joint2.ScreenY));
-
-            double areaPBC = 0.5 * Math.Abs(p.X * (joint2.ScreenY - joint3.ScreenY) +
-                                          joint2.ScreenX * (joint3.ScreenY - p.Y) +
-                                          joint3.ScreenX * (p.Y - joint2.ScreenY));
-
-            double areaPCA = 0.5 * Math.Abs(joint1.ScreenX * (p.Y - joint3.ScreenY) +
-                                          p.X * (joint3.ScreenY - joint1.ScreenY) +
-                                          joint3.ScreenX * (joint1.ScreenY - p.Y));
-
-            double areaPAB = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - p.Y) +
-                                          joint2.ScreenX * (p.Y - joint1.ScreenY) +
-                                          p.X * (joint1.ScreenY - joint2.ScreenY));
-
-            // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
-            return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
-        }
-
-        return checkWithTriangle(joint1, joint2, joint3) || checkWithTriangle(joint1, joint4, joint3) || checkWithTriangle(joint2, joint1, joint4) || checkWithTriangle(joint2, joint3, joint4); 
-        // Two extra check because we don't know which triangles overlap
+        // Solution one - make pentagon, if its area is smaller than this return true
     }
     public override void Render(DrawingContext context)
     {
@@ -131,7 +135,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     public bool Contains(Segment segment)
     {
-        return segment == con12 || segment == con23 || segment == con34 || segment == con41;
+        return segment == con1 || segment == con2 || segment == con3 || segment == con4;
     }
 
     public bool HasMounted(Joint joint)

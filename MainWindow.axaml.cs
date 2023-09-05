@@ -55,7 +55,7 @@ public partial class MainWindow : Window
         j.Connect(j0);
         var j11 = new Joint(120, 90);
         j11.Connect(j);
-        var t = new Triangle(new Joint(570, 120), new Joint(750, 80), new Joint(860, 320));
+        var t = new Triangle(new Joint(570, 20), new Joint(750, 10), new Joint(860, 220));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 /*
@@ -69,7 +69,7 @@ public partial class MainWindow : Window
         t4.Type = TriangleType.EQUILATERAL;
         var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
 
-        var q1 = new Quadrilateral(new Joint(600, 600), new Joint(900, 550), new Joint(600, 700), new Joint(900, 900));
+        var q1 = new Quadrilateral(new Joint(600, 400), new Joint(900, 350), new Joint(600, 500), new Joint(900, 700));
 
 
         new Angle(j0, j, j11);
