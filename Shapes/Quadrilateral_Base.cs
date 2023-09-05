@@ -6,6 +6,7 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
+using Dynamically.Formulas;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -17,6 +18,8 @@ namespace Dynamically.Shapes;
 
 public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable
 {
+    public static readonly List<Quadrilateral> all = new();
+
     public Joint joint1;
     public Joint joint2;
     public Joint joint3;
@@ -46,6 +49,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         
         var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
         if (sides.Count == 0) return; // Don't do anything
+        Log.Write(this);
         
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
 
@@ -60,6 +64,9 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         } 
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
+
+        all.Add(this);
+        MainWindow.BigScreen.Children.Add(this);
     }
 #pragma warning restore CS8618
 
@@ -95,21 +102,35 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     public override bool Overlaps(Point p)
     {
-        // Solution one - make pentagon, if its area is smaller than this return true
+        var rayCast = new RayFormula(p, 0);
+
+        int intersections = 0;
+        bool flag = new Random().NextDouble() > 0.99;
+        foreach (var f in new[] {con1.Formula, con2.Formula, con3.Formula, con4.Formula})
+        {
+            if (flag) Log.Write(f.Intersect(rayCast));
+            if (f.Intersect(rayCast) != null) intersections++;
+        }
+
+        return intersections % 2 == 1;
     }
     public override void Render(DrawingContext context)
     {
         var geom = new PathGeometry();
         var figure = new PathFigure
         {
-            StartPoint = joint1,
+            StartPoint = con1.joint1,
             IsClosed = true,
             IsFilled = true
         };
 
-        figure?.Segments?.Add(new LineSegment { Point = joint2 });
-        figure?.Segments?.Add(new LineSegment { Point = joint3 });
-        figure?.Segments?.Add(new LineSegment { Point = joint4 });
+        figure?.Segments?.Add(new LineSegment { Point = con1.joint2 });
+        figure?.Segments?.Add(new LineSegment { Point = con2.joint1 });
+        figure?.Segments?.Add(new LineSegment { Point = con2.joint2 });
+        figure?.Segments?.Add(new LineSegment { Point = con3.joint1 });
+        figure?.Segments?.Add(new LineSegment { Point = con3.joint2 });
+        figure?.Segments?.Add(new LineSegment { Point = con4.joint1 });
+        figure?.Segments?.Add(new LineSegment { Point = con4.joint2 });
 
         geom.Figures.Add(figure);
 

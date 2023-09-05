@@ -55,9 +55,13 @@ namespace Dynamically
         public static string StringifyCollection(IEnumerable collection)
         {
             var s = new List<string>();
-            foreach (var item in collection) 
-            { 
-                var itemS = item.ToString();
+            foreach (var item in collection)
+            {
+                var itemS = item?.ToString();
+                if (itemS == null) {
+                    s.Add("null"); 
+                    continue; 
+                }
                 if (item.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
                 s.Add(itemS ?? "Value");
             }
