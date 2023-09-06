@@ -68,6 +68,19 @@ public class RayFormula : Formula
         }
     }
 
+    public RayFormula(double x1, double y1, double x2, double y2) : base() 
+    {
+        slope = (y2 - y1) / (x2 - x1);
+        if (x1 > 0)
+        {
+            yIntercept = y1 - (slope * x1);
+        }
+        else
+        {
+            yIntercept = y1 + (slope * x1);
+        }
+    }
+
     /// <summary>
     /// Keeps slope
     /// </summary>
@@ -124,13 +137,15 @@ public class RayFormula : Formula
         var X = (yIntercept - formula._yIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
 
+        if (Y.Length == 0) return null;
         return new Point(X, Y[0]);
     }
     
     public Point[] GetPointsByDistanceFrom(Point start, double distance)
     {
         var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
-        Log.Write(dx, slope);
+        if (SolveForY(start.X + dx).Length == 0) return Array.Empty<Point>();
+        if (SolveForY(start.X - dx).Length == 0) return Array.Empty<Point>();
         return new[] { new Point(start.X + dx, SolveForY(start.X + dx)[0]), new Point(start.X - dx, SolveForY(start.X - dx)[0]) };
     }
     public override Point? GetClosestOnFormula(double x, double y)
@@ -142,11 +157,13 @@ public class RayFormula : Formula
 
     public override double[] SolveForX(double y)
     {
+        if (double.IsNaN((y - yIntercept) / slope)) return Array.Empty<double>();
         return new double[] {(y - yIntercept) / slope};
     }
 
     public override double[] SolveForY(double x)
     {
+        if (double.IsNaN(slope * x + yIntercept)) return Array.Empty<double>();
         return new double[] {slope * x + yIntercept};
     }
 

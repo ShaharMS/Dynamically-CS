@@ -105,13 +105,15 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         var rayCast = new RayFormula(p, 0);
 
         int intersections = 0;
-        bool flag = new Random().NextDouble() > 0.99;
-        foreach (var f in new[] {con1.Formula, con2.Formula, con3.Formula, con4.Formula})
+        List<dynamic> ins = new();
+        foreach (var f in new[] {con1, con2, con3, con4})
         {
-            if (flag) Log.Write(f.Intersect(rayCast));
-            if (f.Intersect(rayCast) != null) intersections++;
+            var i = f.Formula.Intersect(rayCast);
+            if (i != null && i?.X >= p.X) intersections++;
+            ins.Add((f, i));
         }
 
+        Log.Write(ins);
         return intersections % 2 == 1;
     }
     public override void Render(DrawingContext context)

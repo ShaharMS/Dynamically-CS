@@ -118,18 +118,34 @@ public class SegmentFormula : Formula
         var X = (potentialYIntercept - formula.potentialYIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
         if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
+        if (Y.Length == 0) return null;
         return new Point(X, Y[0]);
     }
 
     public Point? Intersect(RayFormula formula)
     {
-        if (formula == null) return null;
-        if (formula.slope == slope) return null;
+        // Calculate the equation of the ray: y = formula.slope * x + rayYIntercept
+        // Calculate the equation of the line segment: y = ((y2 - y1) / (x2 - x1)) * (x - x1) + y1
 
-        var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
-        var Y = SolveForY(X);
-        if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
-        return new Point(X, Y[0]);
+        // Check if the lines are parallel (slope equality)
+        if (Math.Abs(formula.slope - ((y2 - y1) / (x2 - x1))) < double.Epsilon)
+        {
+            return null; // No intersection
+        }
+
+        // Calculate the x-coordinate of the intersection point
+        double x = (formula.yIntercept - y1 + formula.slope * x1) / (formula.slope - ((y2 - y1) / (x2 - x1)));
+
+        // Check if the intersection point is within the segment's x-range
+        if (x < Math.Min(x1, x2) || x > Math.Max(x1, x2))
+        {
+            return null; // No intersection
+        }
+
+        // Calculate the y-coordinate of the intersection point
+        double y = formula.slope * x + formula.yIntercept;
+
+        return new Point(x, y);
     }
 
     public override double DistanceTo(Point point)
@@ -143,6 +159,8 @@ public class SegmentFormula : Formula
     public Point[] GetPointsByDistanceFrom(Point start, double distance)
     {
         var dx = distance * Math.Cos(Tools.GetRadiansBetween3Points(start, new Point(0, 0), new Point(1, 0)));
+        if (SolveForY(start.X + dx).Length == 0) return Array.Empty<Point>();
+        if (SolveForY(start.X - dx).Length == 0) return Array.Empty<Point>();
         return new[] { new Point(start.X + dx, SolveForY(start.X + dx)[0]), new Point(start.X - dx, SolveForY(start.X - dx)[0]) };
     }
     public override Point? GetClosestOnFormula(double x, double y)
@@ -151,11 +169,12 @@ public class SegmentFormula : Formula
         {
             var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
             var Y = new RayFormula(new Point(x1, y1), new Point(x2, y2)).SolveForY(X);
-            return new Point(X, Y[0]);
+            return new Point(X, Y.Length != 0 ? Y[0] : double.NaN);
         }
         double nSlope = -1 / slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
         var potential = potentialIntersect(nRay);
+        if (double.IsNaN(potential.Y)) return null;
         if (potential.DistanceTo(x1, y1) < Length && potential.DistanceTo(x2, y2) < Length) return potential;
         if (potential.DistanceTo(x1, y1) < potential.DistanceTo(x2, y2)) return new Point(x1, y1);
         if (potential.DistanceTo(x2, y2) < potential.DistanceTo(x1, y1)) return new Point(x2, y2);
@@ -165,13 +184,13 @@ public class SegmentFormula : Formula
 
     public override double[] SolveForX(double y)
     {
-        if ((y1 > y2 && (y > y1 || y < y2)) || (y1 < y2 && (y < y1 || y > y2))) return Array.Empty<double>();
+        if ((y1 > y2 && (y > y1 || y < y2)) || (y1 < y2 && (y < y1 || y > y2)) || double.IsNaN((y - potentialYIntercept) / slope)) return Array.Empty<double>();
         return new double[] { (y - potentialYIntercept) / slope };
     }
 
     public override double[] SolveForY(double x)
     {
-        if ((x1 > x2 && (x > x1 || x < x2)) || (x1 < x2 && (x < x1 || x > x2))) return Array.Empty<double>();
+        if ((x1 > x2 && (x > x1 || x < x2)) || (x1 < x2 && (x < x1 || x > x2)) || double.IsNaN(slope * x + potentialYIntercept)) return Array.Empty<double>();
         return new double[] { slope * x + potentialYIntercept };
     }
 
