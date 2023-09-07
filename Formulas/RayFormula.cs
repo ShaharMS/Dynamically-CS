@@ -36,6 +36,12 @@ public class RayFormula : Formula
         }
     }
 
+    /// <summary>
+    /// Useful when dealing with vertical rays, which cannot be represented accurately using slope & yItntercept.
+    /// Only set when defining the ray using a point.
+    /// </summary>
+    public Point? ReferencePoint { get; private set; }
+
     public RayFormula(double yIntercept, double slope) : base()
     {
         this.yIntercept = yIntercept;
@@ -66,6 +72,7 @@ public class RayFormula : Formula
         {
             yIntercept = p1.Y + (slope * p1.X);
         }
+        ReferencePoint = p1;
     }
 
     public RayFormula(double x1, double y1, double x2, double y2) : base() 
@@ -79,6 +86,7 @@ public class RayFormula : Formula
         {
             yIntercept = y1 + (slope * x1);
         }
+        ReferencePoint = new Point(x1, y1);
     }
 
     /// <summary>
@@ -95,6 +103,7 @@ public class RayFormula : Formula
         {
             yIntercept = point.Y + (slope * point.X);
         }
+        ReferencePoint = point;
     }
 
     public void Set(Point p1, Point p2)
@@ -108,12 +117,14 @@ public class RayFormula : Formula
         {
             yIntercept = p1.Y + (slope * p1.X);
         }
+        ReferencePoint = p1;
     }
 
     public void Set(double yIntercept, double slope)
     {
         this.yIntercept = yIntercept;
         this.slope = slope;
+        ReferencePoint = null;
     }
 
     public void Set(Point pointOnRay, double slope)
@@ -127,6 +138,7 @@ public class RayFormula : Formula
             yIntercept = pointOnRay.Y + (slope * pointOnRay.X);
         }
         this.slope = slope;
+        ReferencePoint = pointOnRay;
     }
 
     public Point? Intersect(RayFormula formula)

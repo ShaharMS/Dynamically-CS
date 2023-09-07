@@ -186,11 +186,9 @@ class Tools
         // Case 2: Circum & Incircle
         var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
         var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        Log.Write(e1, e2);
         if (e1.Intersect(e2).Count() != 0) return false;
         e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
         e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        Log.Write(e1, e2);
         if (e1.Intersect(e2).Count() != 0) return false;
 
         // Case 3: corners of the same Triangle

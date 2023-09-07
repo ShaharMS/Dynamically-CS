@@ -18,7 +18,6 @@ public partial class App : Application
         {
             desktop.MainWindow = MainWindow.Instance;
             if (MainWindow.Debug) Log.current.Show();
-            if (MainWindow.Debug) Log.Write("Application start!\n--------------------------");
         }
 
         base.OnFrameworkInitializationCompleted();

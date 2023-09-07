@@ -92,21 +92,21 @@ public class SegmentFormula : Formula
 
     public SegmentFormula(Segment segment)
     {
-        x1 = segment.joint1.X;
-        y1 = segment.joint1.Y;
-        x2 = segment.joint2.X;
-        y2 = segment.joint2.Y;
+        x1 = segment.joint1.ScreenX;
+        y1 = segment.joint1.ScreenY;
+        x2 = segment.joint2.ScreenX;
+        y2 = segment.joint2.ScreenY;
 
         segment.joint1.OnMoved.Add((_, _, _, _) =>
         {
-            _x1 = segment.joint1.X;
-            y1 = segment.joint1.Y;
+            _x1 = segment.joint1.ScreenX;
+            y1 = segment.joint1.ScreenY;
         });
 
         segment.joint2.OnMoved.Add((_, _, _, _) =>
         {
-            _x2 = segment.joint2.X;
-            y2 = segment.joint2.Y;
+            _x2 = segment.joint2.ScreenX;
+            y2 = segment.joint2.ScreenY;
         });
     }
 
@@ -117,35 +117,34 @@ public class SegmentFormula : Formula
 
         var X = (potentialYIntercept - formula.potentialYIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
-        if ((X > x1 || X < x2) || ((x2 > x1) && (X > x2 || X < x1))) return null;
+        if (X > x1 || X < x2 || ((x2 > x1) && (X > x2 || X < x1))) return null;
         if (Y.Length == 0) return null;
         return new Point(X, Y[0]);
     }
 
     public Point? Intersect(RayFormula formula)
     {
-        // Calculate the equation of the ray: y = formula.slope * x + rayYIntercept
-        // Calculate the equation of the line segment: y = ((y2 - y1) / (x2 - x1)) * (x - x1) + y1
+        if (formula == null) return null;
+        if (formula.slope == slope) return null;
 
-        // Check if the lines are parallel (slope equality)
-        if (Math.Abs(formula.slope - ((y2 - y1) / (x2 - x1))) < double.Epsilon)
-        {
-            return null; // No intersection
+        if (!double.IsFinite(slope)) {
+            var x = (x1 + x2) / 2;
+            var y = formula.SolveForY(x);
+            if (y.Length == 0) return null;
+            var value = y[0];
+            if (Math.Clamp(value, y1, y2) != value) return null;
+            return new Point(x, y[0]);
         }
 
-        // Calculate the x-coordinate of the intersection point
-        double x = (formula.yIntercept - y1 + formula.slope * x1) / (formula.slope - ((y2 - y1) / (x2 - x1)));
-
-        // Check if the intersection point is within the segment's x-range
-        if (x < Math.Min(x1, x2) || x > Math.Max(x1, x2))
-        {
-            return null; // No intersection
+        var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
+        
+        if (!double.IsFinite(formula.slope)) {
+            if (formula.ReferencePoint == null) return null;
+            X = formula.ReferencePoint.Value.X;
         }
-
-        // Calculate the y-coordinate of the intersection point
-        double y = formula.slope * x + formula.yIntercept;
-
-        return new Point(x, y);
+        double[] Y = SolveForY(X);
+        if (Y.Length == 0) return null;
+        return new Point(X, Y[0]);
     }
 
     public override double DistanceTo(Point point)

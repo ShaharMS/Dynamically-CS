@@ -251,7 +251,6 @@ public partial class Joint
             {
                 if (other2 == this) continue;
                 if (other1 == other2) continue;
-                Log.Write(other1, other2);
                 if (other1.IsConnectedTo(other2))
                 {
                     var hasQuad = false;
@@ -279,7 +278,6 @@ public partial class Joint
 
     public void UpdateBoardRelations()
     {
-        Log.Write("Updating", this);
         foreach (var v in Relations)
         {
 #pragma warning disable CS8604 // Possible null reference argument.

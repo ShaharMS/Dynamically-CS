@@ -239,22 +239,16 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
                 break;
             case TriangleType.RIGHT:
                 var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
                 var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-                Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
                 if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
                 else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
                 else ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES_RIGHT:
                 var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
                 var a_ACB_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-                Log.Write(Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
                 var a_BAC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-                Log.Write(Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
                 if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
                 {
                     ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
@@ -321,7 +315,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     public override double Area()
     {
-        return Math.Abs(con12.Length * con12.Formula.DistanceTo(joint3) / 2);
+        return con12.Length * con23.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetween3Points(joint1, joint2, joint3))) / 2;
     }
 
     public override double GetClosenessToCenter(Point point)

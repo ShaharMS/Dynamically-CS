@@ -102,7 +102,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
 
         MainWindow.BigScreen.Children.Add(this);
 
-        Log.Write(all);
         Width = Height = GraphicalRadius * 2;
     }
 
@@ -177,7 +176,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         double sx = X, sy = Y;
         DisconnectAll();
 
-        Log.Write(Relations);
         IDGenerator.Remove(this);
 
         MainWindow.BigScreen.Children.Remove(this);

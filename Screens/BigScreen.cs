@@ -200,10 +200,10 @@ public class BigScreen : DraggableGraphic
             if (child is DraggableGraphic draggable)
             {
                 double area = draggable.Area();
-                if (area < 0) { Log.Write(child, area); }
+                if (area < 0) { Log.Write(child, area, "Has area below 0. Fix area algorithm/implement if unimplemented"); }
                 if (double.IsNaN(area))
                 {
-                    Log.Write(child);
+                    Log.Write(child, "Has area of NaN. This should not happen");
                     area = int.MaxValue;
                 }
                 draggable.ZIndex = -Convert.ToInt32(area);

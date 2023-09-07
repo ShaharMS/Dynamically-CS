@@ -262,6 +262,16 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
         reposition();
     }
 
+    public bool SharesJointWith(Segment s) {
+        return joint1 == s.joint1 || joint1 == s.joint2 || joint2 == s.joint1 || joint2 == s.joint2;
+    }
+
+    public Joint? GetSharedJoint(Segment s) {
+        if (s.joint1 == joint1 || s.joint2 == joint1) return joint1;
+        if (s.joint1 == joint2 || s.joint2 == joint2) return joint2;
+        return null;
+    }
+
     public bool Contains(Joint joint)
     {
         return joint1 == joint || joint2 == joint;

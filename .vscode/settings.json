@@ -14,7 +14,8 @@
         "Recom",
         "regen",
         "semiperimeter",
-        "Sgest"
+        "Sgest",
+        "Unanchor"
     ],
     "dotnet.defaultSolution": "Dynamically.sln"
 }

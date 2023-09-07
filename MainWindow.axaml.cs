@@ -42,11 +42,6 @@ public partial class MainWindow : Window
             Name = "BigScreen"
         };
         BigScreen = ca;
-
-        /*for (double a = 0; a < Math.PI * 2; a += Math.PI / 180)
-        {
-            Log.Write(a.RadiansBetween((a + Math.PI / 2) % (Math.PI * 2)) * 180 / Math.PI, a * 180 / Math.PI, ((a + Math.PI / 2) % (Math.PI * 2)) * 180 / Math.PI);
-        }*/
         
         Menus.TopMenu.applyDefaultStyling();
 

@@ -1,6 +1,7 @@
 ﻿
 using Avalonia;
 using Avalonia.Media;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
@@ -49,7 +50,6 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         
         var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
         if (sides.Count == 0) return; // Don't do anything
-        Log.Write(this);
         
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
 
@@ -65,7 +65,34 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
 
+        OnMoved.Add((x, y, px, py) =>
+        {
+            if (joint1.Anchored || joint2.Anchored || joint3.Anchored || joint4.Anchored)
+            {
+                this.SetPosition(0, 0);
+                return;
+            }
+            joint1.X += x - px;
+            joint2.X += x - px;
+            joint3.X += x - px;
+            joint4.X += x - px;
+            joint1.Y += y - py;
+            joint2.Y += y - py;
+            joint3.Y += y - py;
+            joint4.Y += y - py;
+            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, joint1.X, joint1.Y);
+            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, joint2.X, joint2.Y);
+            joint3.DispatchOnMovedEvents(joint3.X, joint3.Y, joint3.X, joint3.Y);
+            joint4.DispatchOnMovedEvents(joint4.X, joint4.Y, joint4.X, joint4.Y);
+            con1?.reposition();
+            con2?.reposition();
+            con3?.reposition();
+            con4?.reposition();
+            this.SetPosition(0, 0);
+        });
+
         all.Add(this);
+        MainWindow.regenAll(0,0,0,0);
         MainWindow.BigScreen.Children.Add(this);
     }
 #pragma warning restore CS8618
@@ -105,16 +132,33 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         var rayCast = new RayFormula(p, 0);
 
         int intersections = 0;
-        List<dynamic> ins = new();
         foreach (var f in new[] {con1, con2, con3, con4})
         {
             var i = f.Formula.Intersect(rayCast);
             if (i != null && i?.X >= p.X) intersections++;
-            ins.Add((f, i));
+        }
+        foreach (var j in new[] {joint1, joint2, joint3, joint4}) {
+            if (p.Equals(j)) {
+                intersections--;
+                break;
+            } 
+        }
+        return intersections % 2 == 1;
+    }
+
+    public override double Area()
+    {
+        if (con1.SharesJointWith(con2)) {
+            return 
+                con1.Length * con2.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con2))) / 2 +
+                con3.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con3, con4))) / 2;
+        } else if (con1.SharesJointWith(con3)) {
+            return 
+                con1.Length * con3.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con3))) / 2 +
+                con2.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con2, con4))) / 2;
         }
 
-        Log.Write(ins);
-        return intersections % 2 == 1;
+        return double.NaN;
     }
     public override void Render(DrawingContext context)
     {

@@ -20,7 +20,8 @@ namespace Dynamically
             {
                 Width = this.Width,
                 Height = this.Height,
-                FontSize = 16
+                FontSize = 16,
+                Text = "Application start!\n--------------------------------\n"
             };
 
             scrollViewer = new ScrollViewer
