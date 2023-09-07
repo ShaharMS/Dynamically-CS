@@ -1,5 +1,6 @@
 ﻿
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
@@ -8,6 +9,7 @@ using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using Dynamically.Formulas;
+using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,12 +34,17 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Segment con4;
 
     QuadrilateralType _type = QuadrilateralType.IRREGULAR;
-
     public QuadrilateralType Type
     {
         get => _type;
         set => ChangeType(value);
     }
+
+    
+    public Circle? circumcircle;
+    public Circle? incircle;
+
+    public QuadrilateralContextMenuProvider Provider;
 
 #pragma warning disable CS8618
     public Quadrilateral(Joint j1, Joint j2, Joint j3, Joint j4)
@@ -64,6 +71,10 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         } 
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
+
+        ContextMenu = new ContextMenu();
+        Provider = new QuadrilateralContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
 
         OnMoved.Add((x, y, px, py) =>
         {
@@ -124,7 +135,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public void __Regen(double z, double x, double c, double v)
     {
         _ = z; _ = x; _ = c; _ = v;
-        //Provider.Regenerate();
+        Provider.Regenerate();
     }
 
     public override bool Overlaps(Point p)

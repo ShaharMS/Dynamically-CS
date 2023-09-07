@@ -40,11 +40,11 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         set => ChangeType(value);
     }
 
+
     public Circle? circumcircle;
     public Circle? incircle;
 
     public TriangleContextMenuProvider Provider;
-
     //public EquilateralTriangleFormula EquilateralFormula;
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
