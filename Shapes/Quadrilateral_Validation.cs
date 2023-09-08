@@ -48,4 +48,17 @@ public partial class Quadrilateral {
 
         return new();
     }
+
+    void AssignAngles(Quadrilateral quad)
+    {
+        Segment s1 = quad.con1, s2 = quad.con2, s3 = quad.con3, s4 = quad.con4;
+        if (s1.SharesJointWith(s2))
+        {
+            quad.angle1 = new Ang
+        }
+        else
+        {
+             
+        }
+    }
 }

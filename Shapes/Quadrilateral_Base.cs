@@ -28,6 +28,11 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Joint joint3;
     public Joint joint4;
 
+    public Angle angle1;
+    public Angle angle2;
+    public Angle angle3;
+    public Angle angle4;
+
     public Segment con1;
     public Segment con2;
     public Segment con3;
@@ -117,7 +122,65 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     QuadrilateralType ChangeType(QuadrilateralType type)
     {
+        // Actual shape modification
+        switch (type)
+        {
+            case QuadrilateralType.SQUARE:
+                var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                var a_ADC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint4, joint3));
+                break;
+            case TriangleType.EQUILATERAL:
+                var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
+                var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
+                var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
+                if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint2, joint3);
+                else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint3, joint2);
+                else ForceType(TriangleType.EQUILATERAL, joint2, joint1, joint3);
+                break;
+            case TriangleType.ISOSCELES:
+                var con12_to_con13_Diff = Math.Abs(con12.Length - con13.Length);
+                var con12_to_con23_Diff = Math.Abs(con12.Length - con23.Length);
+                var con13_to_con23_Diff = Math.Abs(con13.Length - con23.Length);
+                if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
+                else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
+                else ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
+                break;
+            case TriangleType.RIGHT:
+                var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
+                else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
+                else ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
+                break;
+            case TriangleType.ISOSCELES_RIGHT:
+                var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
+                var a_ACB_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
+                var a_BAC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
+                if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
+                {
+                    ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
+                    ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
+                }
+                else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
+                {
+                    ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
+                    ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
+                }
+                else
+                {
+                    ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
+                    ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
+                }
+                break;
+            case TriangleType.SCALENE:
+                break;
+        }
+        joint1.reposition(); joint2.reposition(); joint3.reposition();
         _type = type;
+        Provider.Regenerate();
         return type;
     }
 
