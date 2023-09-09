@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Avalonia;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
 using Dynamically.Formulas;
 
 namespace Dynamically.Shapes;
@@ -49,16 +50,40 @@ public partial class Quadrilateral {
         return new();
     }
 
-    void AssignAngles(Quadrilateral quad)
+    static void AssignAngles(Quadrilateral quad)
     {
         Segment s1 = quad.con1, s2 = quad.con2, s3 = quad.con3, s4 = quad.con4;
         if (s1.SharesJointWith(s2))
         {
-            quad.angle1 = new Ang
+            quad._degrees1 = () => Tools.GetDegreesBetweenConnections(s1, s2, true);
+            quad.angle1Joints = new HashSet<Joint> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+            quad._degrees2 = () => Tools.GetDegreesBetweenConnections(s3, s4, true);
+            quad.angle1Joints = new HashSet<Joint> { s3.joint1, s3.joint2, s4.joint1, s4.joint2 };
+            if (s2.SharesJointWith(s3))
+            {
+                quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s3, true);
+                quad.angle3Joints = new HashSet<Joint>{s3.joint1, s3.joint2, s2.joint1, s2.joint2};
+                quad._degrees4 = () => Tools.GetDegreesBetweenConnections(s1, s4, true);
+                quad.angle4Joints = new HashSet<Joint>{s1.joint1, s1.joint2, s4.joint1, s4.joint2};
+            }
+            else
+            {
+                quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s4, true);
+                quad.angle3Joints = new HashSet<Joint> { s4.joint1, s4.joint2, s2.joint1, s2.joint2 };
+                quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s1, s3, true);
+                quad.angle4Joints = new HashSet<Joint> { s3.joint1, s3.joint2, s1.joint1, s1.joint2 };
+            }
         }
         else
-        {
-             
+        { // there is only one case in which s1 does not share with s2. in which case, s3 and s4 much share with both s1 and s2.
+            quad._degrees1 = () => Tools.GetDegreesBetweenConnections(s1, s3, true);
+            quad.angle1Joints = new HashSet<Joint> { s1.joint1, s1.joint2, s3.joint1, s3.joint2 };
+            quad._degrees2 = () => Tools.GetDegreesBetweenConnections(s2, s4, true);
+            quad.angle1Joints = new HashSet<Joint> { s4.joint1, s4.joint2, s2.joint1, s2.joint2 };
+            quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s3, true);
+            quad.angle1Joints = new HashSet<Joint> { s3.joint1, s3.joint2, s2.joint1, s2.joint2 };
+            quad._degrees4 = () => Tools.GetDegreesBetweenConnections(s1, s4, true);
+            quad.angle1Joints = new HashSet<Joint> { s1.joint1, s1.joint2, s4.joint1, s4.joint2 };
         }
     }
 }

@@ -125,50 +125,62 @@ class Tools
         return circle;
     }
 
-    public static double GetDegreesBetween3Points(Point p1, Point center, Point p2)
+    public static double GetDegreesBetween3Points(Point p1, Point center, Point p2, bool canGetLarge = false)
     {
         double angle1 = center.DegreesTo(p1);
         double angle2 = center.DegreesTo(p2);
 
         double angle = angle2 - angle1;
         if (angle < 0) return -angle;
-        if (angle > 180) return 360 - angle;
+        if (!canGetLarge && angle > 180) return 360 - angle;
 
         return angle;
     }
 
-    public static double GetDegreesBetweenConnections(Segment p1p2, Segment p1p3)
+    public static double GetDegreesBetweenConnections(Segment s1, Segment s2, bool canGetLarge = false)
     {
-        double angle1 = Math.Atan2(p1p2.joint2.Y - p1p2.joint1.Y, p1p2.joint2.X - p1p2.joint1.X);
-        double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);
+        var common = s1.GetSharedJoint(s2);
+        if (common == null) return double.NaN;
+        var others = new HashSet<Joint> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        others.Remove(common);
+        Joint other1 = others.First(), other2 = others.Last();
+
+        double angle1 = Math.Atan2(other1.Y - common.Y, other1.X - common.X);
+        double angle2 = Math.Atan2(other2.Y - common.Y, other2.X - common.X);
 
         double angle = (angle2 - angle1) * (180.0 / Math.PI);
         if (angle < 0) angle = -angle;
-        if (angle > 180) return 360 - angle;
+        if (!canGetLarge && angle > 180) return 360 - angle;
 
         return angle;
     }
 
-    public static double GetRadiansBetween3Points(Point p1, Point center, Point p2)
+    public static double GetRadiansBetween3Points(Point p1, Point center, Point p2, bool canGetLarge = false)
     {
         double angle1 = center.RadiansTo(p1);
         double angle2 = center.RadiansTo(p2);
 
         double angle = angle2 - angle1;
         if (angle < 0) angle = -angle;
-        if (angle > 180) return Math.PI * 2 - angle;
+        if (!canGetLarge && angle > Math.PI) return Math.PI * 2 - angle;
 
         return angle;
     }
 
-    public static double GetRadiansBetweenConnections(Segment p1p2, Segment p1p3)
+    public static double GetRadiansBetweenConnections(Segment s1, Segment s2, bool canGetLarge = false)
     {
-        double angle1 = Math.Atan2(p1p2.joint2.Y - p1p2.joint1.Y, p1p2.joint2.X - p1p2.joint1.X);
-        double angle2 = Math.Atan2(p1p3.joint2.Y - p1p3.joint1.Y, p1p3.joint2.X - p1p3.joint1.X);
+        var common = s1.GetSharedJoint(s2);
+        if (common == null) return double.NaN;
+        var others = new HashSet<Joint> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        others.Remove(common);
+        Joint other1 = others.First(), other2 = others.Last();
+
+        double angle1 = Math.Atan2(other1.Y - common.Y, other1.X - common.X);
+        double angle2 = Math.Atan2(other2.Y - common.Y, other2.X - common.X);
 
         double angle = (angle2 - angle1);
         if (angle < 0) angle = -angle;
-        if (angle > 180) return Math.PI * 2 - angle;
+        if (!canGetLarge && angle > Math.PI) return Math.PI * 2 - angle;
 
         return angle;
     }

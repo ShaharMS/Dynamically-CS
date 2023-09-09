@@ -28,10 +28,25 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Joint joint3;
     public Joint joint4;
 
-    public Angle angle1;
-    public Angle angle2;
-    public Angle angle3;
-    public Angle angle4;
+    Func<double> _degrees1;
+    Func<double> _degrees2;
+    Func<double> _degrees3;
+    Func<double> _degrees4;
+    public double degrees1 { get => _degrees1(); }
+    public double degrees2 { get => _degrees2(); }
+    public double degrees3 { get => _degrees3(); }
+    public double degrees4 { get => _degrees4(); }
+
+    public double radians1 { get => _degrees1().ToRadians(); }
+    public double radians2 { get => _degrees2().ToRadians(); }
+    public double radians3 { get => _degrees3().ToRadians(); }
+    public double radians4 { get => _degrees4().ToRadians(); }
+
+    public IEnumerable<Joint> angle1Joints;
+    public IEnumerable<Joint> angle2Joints;
+    public IEnumerable<Joint> angle3Joints;
+    public IEnumerable<Joint> angle4Joints;
+
 
     public Segment con1;
     public Segment con2;
@@ -73,7 +88,9 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
             else if (i == 1) con2 = x;
             else if (i == 2) con3 = x;
             else if (i == 3) con4 = x;
-        } 
+        }
+
+        Quadrilateral.AssignAngles(this);
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
 
