@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -120,16 +121,25 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
 
     MenuItem Defaults_ChangeType()
     {
-        var sq = new MenuItem
+        var items = new MenuItem[9];
+        for (int i = 0; i < 9; i++)
         {
-            Header = "Square " + (Subject.Type == QuadrilateralType.SQUARE ? "✓" : "")
-        };
-        sq.Click += (s, e) => { Subject.Type = QuadrilateralType.SQUARE; Regenerate(); };
+            var type = (QuadrilateralType)i;
+            var item = new MenuItem
+            {
+                Header = new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) + (Subject.Type == type ? " ✓" : "")
+            };
+            item.Click += (s, e) =>
+            {
+                Subject.Type = type;
+            };
+            items[i] = item;
+        }
 
         return new MenuItem
         {
             Header = "Change Type",
-            Items = new[] { sq }
+            Items = items
         };
     }
 

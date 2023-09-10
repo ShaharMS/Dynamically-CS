@@ -9,6 +9,9 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Segment
 {
+    public double Degrees {
+        get => Math.Wrap
+    }
     public double Length
     {
         get => Math.Sqrt(Math.Pow(joint2.X - joint1.X, 2) + Math.Pow(joint2.Y - joint1.Y, 2));

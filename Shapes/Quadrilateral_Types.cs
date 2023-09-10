@@ -35,16 +35,36 @@ public partial class Quadrilateral
         D.Y = B.Y + dist * Math.Sqrt(2) * Math.Sin((radBA + radBC) / 2);
     }
 
-    public void ForceType(QuadrilateralType type, Joint A, Joint B, Joint C) {
-        Point a, b, c;
+    public void MakeRhombusRelativeToABC(Joint A, Joint B, Joint C)
+    {
+        var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
+
+        var length = new[] { con1.Length, con2.Length, con3.Length, con4.Length }.Average();
+        Segment? AB = A.GetConnectionTo(B), BC = B.GetConnectionTo(C);
+
+        AB?.SetLength(length, AB.joint1 == B);
+        BC?.SetLength(length, BC.joint1 == B);
+
+        Segment? AD = A.GetConnectionTo(D), CD = C.GetConnectionTo(D);
+        AD?.SetLength(length, AD.joint1 == A);
+        CD?.SetLength(length, CD.joint1 == C);
+    }
+
+    public void ForceType(QuadrilateralType type, Joint A, Joint B, Joint C)
+    {
+        var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
+        Point a, b, c, d;
         _type = type;
-        do {
-            a = A; b = B; c = C;
-            switch (type) {
+        do
+        {
+            a = A; b = B; c = C; d = D;
+            switch (type)
+            {
                 case QuadrilateralType.SQUARE: MakeSquareRelativeToABC(A, B, C); break;
+                case QuadrilateralType.RHOMBUS: MakeRhombusRelativeToABC(A, B, C); break;
                 default: break;
             }
-            A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents();
-        } while (!a.Equals(A) || !b.Equals(B) || !c.Equals(C));
+            A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents(); D.DispatchOnMovedEvents();
+        } while (!a.Equals(A) || !b.Equals(B) || !c.Equals(C) || !d.Equals(D));
     }
 }
