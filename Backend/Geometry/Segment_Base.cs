@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
+public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
 
@@ -290,6 +290,11 @@ public partial class Segment : DraggableGraphic, IDrawable, IContextMenuSupporte
     public bool HasMounted(Segment segment)
     {
         return false;
+    }
+
+    public void Dismantle()
+    {
+        joint1.Disconnect(joint2);
     }
 #pragma warning restore IDE1006
 }

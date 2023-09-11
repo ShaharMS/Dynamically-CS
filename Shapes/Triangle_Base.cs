@@ -223,10 +223,10 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         {
             case TriangleType.EQUILATERAL:
                 var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
-                var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
-                var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
-                if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint2, joint3);
-                else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint3, joint2);
+                var a_ACCB_SimilarityOfSides = Math.Abs(con13.Length - con23.Length);
+                var a_BAAC_SimilarityOfSides = Math.Abs(con13.Length - con12.Length);
+                if (a_ABBC_SimilarityOfSides < a_ACCB_SimilarityOfSides && a_ABBC_SimilarityOfSides < a_BAAC_SimilarityOfSides) ForceType(TriangleType.EQUILATERAL, joint1, joint2, joint3);
+                else if (a_ACCB_SimilarityOfSides < a_ABBC_SimilarityOfSides && a_ACCB_SimilarityOfSides < a_BAAC_SimilarityOfSides) ForceType(TriangleType.EQUILATERAL, joint1, joint3, joint2);
                 else ForceType(TriangleType.EQUILATERAL, joint2, joint1, joint3);
                 break;
             case TriangleType.ISOSCELES:

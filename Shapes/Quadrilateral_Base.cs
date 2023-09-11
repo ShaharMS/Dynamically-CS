@@ -53,6 +53,10 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Segment con3;
     public Segment con4;
 
+    public Tuple<Segment, Segment>[] opposites;
+
+    public Tuple<Segment, Segment>[] adjacents;
+
     QuadrilateralType _type = QuadrilateralType.IRREGULAR;
     public QuadrilateralType Type
     {
@@ -90,6 +94,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
             else if (i == 3) con4 = x;
         }
 
+        Quadrilateral.AssignSegmentData(this);
         Quadrilateral.AssignAngles(this);
 
         foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
@@ -132,8 +137,14 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
 
     public void Dismantle()
     {
-        joint1.Disconnect(joint2, joint4);
-        joint3.Disconnect(joint2, joint4);
+        con1.Dismantle();
+        con2.Dismantle();
+        con3.Dismantle();
+        con4.Dismantle();
+
+        all.Remove(this);
+        MainWindow.regenAll(0, 0, 0, 0);
+        MainWindow.BigScreen.Children.Remove(this);
     }
 
 
@@ -147,13 +158,13 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
                 var angle2ClosenessTo90Deg = Math.Abs(90 - degrees2);
                 var angle3ClosenessTo90Deg = Math.Abs(90 - degrees3);
                 var angle4ClosenessTo90Deg = Math.Abs(90 - degrees4);
-                var closest = Math.Min(Math.Min(angle1ClosenessTo90Deg, angle2ClosenessTo90Deg), Math.Min(angle3ClosenessTo90Deg, angle4ClosenessTo90Deg));
+                var closest = angle1ClosenessTo90Deg.Min(angle2ClosenessTo90Deg).Min(angle3ClosenessTo90Deg).Min(angle4ClosenessTo90Deg);
                 if (closest == angle1ClosenessTo90Deg) ForceType(QuadrilateralType.SQUARE, angle1Joints[0], angle1Joints[1], angle1Joints[2]);
                 else if (closest == angle2ClosenessTo90Deg) ForceType(QuadrilateralType.SQUARE, angle2Joints[0], angle2Joints[1], angle2Joints[2]);
                 else if (closest == angle3ClosenessTo90Deg) ForceType(QuadrilateralType.SQUARE, angle3Joints[0], angle3Joints[1], angle3Joints[2]);
                 else if (closest == angle4ClosenessTo90Deg) ForceType(QuadrilateralType.SQUARE, angle4Joints[0], angle4Joints[1], angle4Joints[2]);
                 break;
-            case QuadrilateralType.RECTANGLE: 
+            case QuadrilateralType.RECTANGLE:
                 var _angle1ClosenessTo90Deg = Math.Abs(90 - degrees1);
                 var _angle2ClosenessTo90Deg = Math.Abs(90 - degrees2);
                 var _angle3ClosenessTo90Deg = Math.Abs(90 - degrees3);
@@ -165,65 +176,44 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
                 else if (_closest == _angle4ClosenessTo90Deg) ForceType(QuadrilateralType.RECTANGLE, angle4Joints[0], angle4Joints[1], angle4Joints[2]);
                 break;
             case QuadrilateralType.RHOMBUS:
-                ForceType(QuadrilateralType.RHOMBUS, joint1, joint2, joint3);
+                ForceType(QuadrilateralType.RHOMBUS, angle1Joints[0], angle1Joints[1], angle1Joints[2]);
                 break;
             case QuadrilateralType.PARALLELOGRAM:
-                if (!con1.SharesJointWith(con3)) {
-                    var pair1AngleDiff = Math.Abs(con1.)
-                } 
-                else if (!con1.SharesJointWith(con2)) {
-
-                }
-                else { // 1 opposes 4
-
-                }
+                ForceType(QuadrilateralType.PARALLELOGRAM, angle1Joints[0], angle1Joints[1], angle1Joints[2]);
                 break;
-            // case TriangleType.EQUILATERAL:
-            //     var a_ABBC_SimilarityOfSides = Math.Abs(con12.Length - con23.Length);
-            //     var a_ACCB_ClosenessTo60Deg = Math.Abs(con13.Length - con23.Length);
-            //     var a_BAAC_ClosenessTo60Deg = Math.Abs(con13.Length - con12.Length);
-            //     if (a_ABBC_SimilarityOfSides < a_ACCB_ClosenessTo60Deg && a_ABBC_SimilarityOfSides < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint2, joint3);
-            //     else if (a_ACCB_ClosenessTo60Deg < a_ABBC_SimilarityOfSides && a_ACCB_ClosenessTo60Deg < a_BAAC_ClosenessTo60Deg) ForceType(TriangleType.EQUILATERAL, joint1, joint3, joint2);
-            //     else ForceType(TriangleType.EQUILATERAL, joint2, joint1, joint3);
-            //     break;
-            // case TriangleType.ISOSCELES:
-            //     var con12_to_con13_Diff = Math.Abs(con12.Length - con13.Length);
-            //     var con12_to_con23_Diff = Math.Abs(con12.Length - con23.Length);
-            //     var con13_to_con23_Diff = Math.Abs(con13.Length - con23.Length);
-            //     if (con12_to_con23_Diff < con13_to_con23_Diff && con12_to_con23_Diff < con12_to_con13_Diff) ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
-            //     else if (con12_to_con13_Diff < con13_to_con23_Diff && con12_to_con13_Diff < con12_to_con23_Diff) ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
-            //     else ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
-            //     break;
-            // case TriangleType.RIGHT:
-            //     var a_ABC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-            //     var a_ACB_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-            //     var a_BAC_ClosenessTo90Deg = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-            //     if (a_ABC_ClosenessTo90Deg < a_ACB_ClosenessTo90Deg && a_ABC_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
-            //     else if (a_ACB_ClosenessTo90Deg < a_ABC_ClosenessTo90Deg && a_ACB_ClosenessTo90Deg < a_BAC_ClosenessTo90Deg) ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
-            //     else ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
-            //     break;
-            // case TriangleType.ISOSCELES_RIGHT:
-            //     var a_ABC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3));
-            //     var a_ACB_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2));
-            //     var a_BAC_ClosenessTo90Deg1 = Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3));
-            //     if (a_ABC_ClosenessTo90Deg1 < a_ACB_ClosenessTo90Deg1 && a_ABC_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
-            //     {
-            //         ForceType(TriangleType.RIGHT, joint1, joint2, joint3);
-            //         ForceType(TriangleType.ISOSCELES, joint1, joint2, joint3);
-            //     }
-            //     else if (a_ACB_ClosenessTo90Deg1 < a_ABC_ClosenessTo90Deg1 && a_ACB_ClosenessTo90Deg1 < a_BAC_ClosenessTo90Deg1)
-            //     {
-            //         ForceType(TriangleType.RIGHT, joint1, joint3, joint2);
-            //         ForceType(TriangleType.ISOSCELES, joint1, joint3, joint2);
-            //     }
-            //     else
-            //     {
-            //         ForceType(TriangleType.RIGHT, joint2, joint1, joint3);
-            //         ForceType(TriangleType.ISOSCELES, joint2, joint1, joint3);
-            //     }
-            //     break;
-            // case TriangleType.SCALENE:
-            //     break;
+            case QuadrilateralType.KITE:
+                double similarity1 = adjacents[0].Item1.Length.GetSimilarityPercentage(adjacents[0].Item2.Length),
+                        similarity2 = adjacents[1].Item1.Length.GetSimilarityPercentage(adjacents[1].Item2.Length),
+                        similarity3 = adjacents[2].Item1.Length.GetSimilarityPercentage(adjacents[2].Item2.Length),
+                        similarity4 = adjacents[3].Item1.Length.GetSimilarityPercentage(adjacents[3].Item2.Length);
+                var similar = similarity1.Min(similarity2).Min(similarity3).Min(similarity4);
+                IEnumerable<Joint> set = new List<Joint>();
+                Joint? focus = null;
+                if (similar == similarity1) 
+                {
+                    set = new[] { adjacents[0].Item1.joint1, adjacents[0].Item1.joint2, adjacents[0].Item2.joint1, adjacents[0].Item2.joint2 }.Where(x => x != adjacents[0].Item1.GetSharedJoint(adjacents[0].Item2)); 
+                    focus = adjacents[0].Item1.GetSharedJoint(adjacents[0].Item2);
+                }
+                else if (similar == similarity2) 
+                {
+                    set = new[] { adjacents[1].Item1.joint1, adjacents[1].Item1.joint2, adjacents[1].Item2.joint1, adjacents[1].Item2.joint2 }.Where(x => x != adjacents[1].Item1.GetSharedJoint(adjacents[1].Item2)); 
+                    focus = adjacents[1].Item1.GetSharedJoint(adjacents[1].Item2);
+                }
+                else if (similar == similarity3) 
+                {
+                    set = new[] { adjacents[2].Item1.joint1, adjacents[2].Item1.joint2, adjacents[2].Item2.joint1, adjacents[2].Item2.joint2 }.Where(x => x != adjacents[2].Item1.GetSharedJoint(adjacents[2].Item2)); 
+                    focus = adjacents[2].Item1.GetSharedJoint(adjacents[2].Item2);
+                }
+                else if (similar == similarity4) 
+                {
+                    set = new[] { adjacents[3].Item1.joint1, adjacents[3].Item1.joint2, adjacents[3].Item2.joint1, adjacents[3].Item2.joint2 }.Where(x => x != adjacents[3].Item1.GetSharedJoint(adjacents[3].Item2));
+                    focus = adjacents[3].Item1.GetSharedJoint(adjacents[3].Item2);
+                }
+
+                ForceType(QuadrilateralType.KITE, set.First(), focus ?? joint1 /*never happens anyways*/, set.Last());
+
+                break;
+                // Todo: Trapezoids
         }
         joint1.reposition(); joint2.reposition(); joint3.reposition(); joint4.reposition();
         _type = type;

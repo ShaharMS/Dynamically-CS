@@ -31,8 +31,8 @@ public partial class Quadrilateral
         A.Y = B.Y + dist * Math.Sin(radBA + remainingGap / 2 * oppose);
         C.X = B.X + dist * Math.Cos(radBC - remainingGap / 2 * oppose);
         C.Y = B.Y + dist * Math.Sin(radBC - remainingGap / 2 * oppose);
-        D.X = B.X + dist * Math.Sqrt(2) * Math.Cos((radBA + radBC) / 2);
-        D.Y = B.Y + dist * Math.Sqrt(2) * Math.Sin((radBA + radBC) / 2);
+        D.X = B.X + dist * Math.Sqrt(2) * Math.Cos((radBA + remainingGap / 2 * oppose + radBC - remainingGap / 2 * oppose) / 2);
+        D.Y = B.Y + dist * Math.Sqrt(2) * Math.Sin((radBA + remainingGap / 2 * oppose + radBC - remainingGap / 2 * oppose) / 2);
     }
 
     public void MakeRhombusRelativeToABC(Joint A, Joint B, Joint C)

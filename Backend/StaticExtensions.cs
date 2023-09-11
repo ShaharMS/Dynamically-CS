@@ -121,6 +121,15 @@ public static class StaticExtensions
         return Math.Pow(b, exponent);
     }
 
+    public static double Min(this double val, double val2) => Math.Min(val, val2);
+    public static double Max(this double val, double val2) => Math.Max(val, val2);
+
+    public static List<T> InsertR<T>(this List<T> en, int index, T value)
+    {
+        en.Insert(index, value);
+        return en;
+    }
+
     public static double RadiansBetween(this double radBA, double radBC, bool neg = false)
     {
         var a = (radBC - radBA);

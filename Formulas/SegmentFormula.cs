@@ -132,7 +132,7 @@ public class SegmentFormula : Formula
             var y = formula.SolveForY(x);
             if (y.Length == 0) return null;
             var value = y[0];
-            if (Math.Clamp(value, y1, y2) != value) return null;
+            if (Math.Clamp(value, y1.Min(y2), y2.Max(y1)) != value) return null;
             return new Point(x, y[0]);
         }
 
