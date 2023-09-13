@@ -93,4 +93,16 @@ public class CircleFormula : Formula
         foreach (var l in OnMoved) l(_centerX, _centerY, px, py);
         foreach (var l in OnChange) l();
     }
+
+    public override (double X, double Y) UpdateJointPosition(double inputX, double inputY)
+    {
+        var X = inputX; var Y = inputY;
+
+        var rads = new Point(centerX, centerY).RadiansTo(X, Y);
+
+        X = centerX + radius * Math.Cos(rads);
+        Y = centerY + radius * Math.Sin(rads);
+
+        return (X, Y);
+    }
 }

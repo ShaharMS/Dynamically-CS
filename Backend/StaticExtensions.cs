@@ -115,6 +115,8 @@ public static class StaticExtensions
         if (angleInRadians < 0) angleInRadians += Math.PI * 2;
         return angleInRadians;
     }
+    public static double RadiansTo(this Point from, double x, double y) => RadiansTo(from, new Point(x, y));
+    public static double RadiansTo(this Joint from, double x, double y) => RadiansTo(from, new Point(x, y));
 
     public static double Pow(this double b, double exponent)
     {
