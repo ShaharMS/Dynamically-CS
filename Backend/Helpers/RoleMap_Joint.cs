@@ -26,6 +26,7 @@ public partial class RoleMap
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
                 Subject.OnDragged.Add(s1.__reposition);
+                Subject.OnMoved.Add(s1.__repositionLabel);
                 s1.joint1.Relations.Remove(s1.joint2);
                 s1.joint2.Relations.Remove(s1.joint1);
                 break;

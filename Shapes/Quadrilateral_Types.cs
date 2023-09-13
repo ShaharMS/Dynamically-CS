@@ -126,24 +126,6 @@ public partial class Quadrilateral
 
         D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
         D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
-
-        var ABFormula = new RatioOnSegmentFormula(new SegmentFormula((Point)A, (Point)B), 0.5);
-
-        var centerAB = ABFormula.pointOnRatio;
-        var centerCD = new RatioOnSegmentFormula(new SegmentFormula((Point)C, (Point)D), 0.5).pointOnRatio;
-
-        var perpendicularAB = ABFormula.GetPerpendicular();
-        var distanceOffset = perpendicularAB.GetClosestOnFormula(centerCD)?.DistanceTo(centerCD) ?? throw new ArgumentNullException($"Cannot calculate positioning of Trapezoid {this}");
-
-        // even if the distances measured arent from connected joints, this is still correct:
-        var oppose = Math.Abs(
-            new Point(C.X + distanceOffset * Math.Cos(radBA), C.Y + distanceOffset * Math.Sin(radBA)).DistanceTo(A) -
-            new Point(D.X + distanceOffset * Math.Cos(radBA), D.Y + distanceOffset * Math.Sin(radBA)).DistanceTo(B)) > 0.00001 ? -1 : 1;
-
-        C.X += distanceOffset * Math.Cos(radBA) * oppose;
-        C.Y += distanceOffset * Math.Sin(radBA) * oppose;
-        D.X += distanceOffset * Math.Cos(radBA) * oppose;
-        D.Y += distanceOffset * Math.Sin(radBA) * oppose;
     }
 
     /// <summary>
@@ -184,7 +166,7 @@ public partial class Quadrilateral
                 case QuadrilateralType.RECTANGLE: MakeRectangleRelativeToABC(A, B, C); break;
                 case QuadrilateralType.PARALLELOGRAM: MakeParallelogramRelativeToABC(A, B, C); break;
                 case QuadrilateralType.KITE: MakeKiteRelativeToABC(A, B, C); break;
-                case QuadrilateralType.TRAPEZOID: MakeIsoscelesTrapezoidRelativeToABC(A, B, C); break;
+                case QuadrilateralType.TRAPEZOID: MakeTrapezoidRelativeToABC(A, B, C); break;
                 case QuadrilateralType.ISOSCELES_TRAPEZOID: MakeIsoscelesTrapezoidRelativeToABC(A, B, C); break;
                 case QuadrilateralType.RIGHT_TRAPEZOID: MakeRightTrapezoidRelativeToABC(A, B, C); break;
                 default: break;

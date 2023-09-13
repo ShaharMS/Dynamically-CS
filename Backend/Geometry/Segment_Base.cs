@@ -79,6 +79,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
                     labelUpdater = () => Label.Content = "" + Math.Round(Length, 3);
                     if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
                     if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    labelUpdater();
                     break;
                 case SegmentTextDisplay.LENGTH_ROUND:
                     if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
@@ -86,6 +87,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
                     labelUpdater = () => Label.Content = "" + Math.Round(Length);
                     if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
                     if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    labelUpdater();
                     break;
                 case SegmentTextDisplay.PARAM:
                 case SegmentTextDisplay.CUSTOM:
@@ -96,7 +98,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
                     labelUpdater = () => { };
                     break;
             }
-            if (value != SegmentTextDisplay.NONE) InvalidateVisual();
+            if (_disp != SegmentTextDisplay.NONE) InvalidateVisual();
         }
     }
 
@@ -142,7 +144,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
         };
 
 
-        Children.Add(Label);
+        MainWindow.BigScreen.Children.Add(Label);
 
         OnMoved.Add((_, _, _, _) =>
         {
@@ -161,6 +163,8 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
             X = 0; Y = 0;
             joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, pj1X, pj1Y);
             joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, pj2X, pj2Y);
+            Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
+            Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
             InvalidateVisual();
         });
 
@@ -213,9 +217,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
     {
         // Label
         Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
-        var rad = Math.Atan(Formula.slope);
-        Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
-        Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
+        
 
         // Graphic is cleared
         var pen = new Pen
@@ -262,6 +264,12 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
         reposition();
     }
 
+    public void __repositionLabel(double z, double x, double c, double v) {
+        _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
+        Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
+        Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
+    }
+
     public bool SharesJointWith(Segment s) {
         return joint1 == s.joint1 || joint1 == s.joint2 || joint2 == s.joint1 || joint2 == s.joint2;
     }
@@ -295,6 +303,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
     public void Dismantle()
     {
         joint1.Disconnect(joint2);
+        MainWindow.BigScreen.Children.Remove(Label);
     }
 #pragma warning restore IDE1006
 }
