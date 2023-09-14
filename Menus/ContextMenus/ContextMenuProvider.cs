@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ public class ContextMenuProvider
     {
         get
         {
+            GetAdjacentElements();
 #pragma warning disable CA1806
             var list = new List<Control>();
             new TextSeparator(Name, list);
@@ -24,6 +26,11 @@ public class ContextMenuProvider
             list = list.Concat(Suggestions.ToList()).ToList();
             new TextSeparator("Recommended", list);
             list = list.Concat(Recommendations.ToList()).ToList();
+            if (AdjacentElements.Count > 0) 
+            {
+                new TextSeparator("Others", list);
+                list = list.Concat(AdjacentElements.ToList()).ToList();
+            }
             if (MainWindow.Debug)
             {
                 new TextSeparator("Debug", list);
@@ -39,6 +46,7 @@ public class ContextMenuProvider
     public List<Control> Defaults = new();
     public List<Control> Suggestions = new();
     public List<Control> Recommendations = new();
+    public List<Control> AdjacentElements = new();
     public List<Control> Debugging = new();
 #pragma warning disable CS8618
     public ContextMenu Menu;
@@ -64,12 +72,16 @@ public class ContextMenuProvider
         Debugging.Clear();
     }
 
+    public virtual void GetAdjacentElements() {
+        var list = new List<ISupportsAdjacency>();
+    }
+
     public virtual void Regenerate()
     {
-
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
+        // Adjacent elements retrieved at click time
         if (MainWindow.Debug) AddDebugInfo();
     }
 }

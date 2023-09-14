@@ -18,4 +18,6 @@ public class Settings
     public static int MakeEquilateralAngleOffset = 5;
     public static double MakeIsocelesSideRatioDiff = 0.9;
     public static int MakeRightAngleOffset = 10;
+
+    public static double DistanceCountsAsNear = 5;
 }
