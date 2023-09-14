@@ -57,7 +57,9 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
             this.center.DispatchOnMovedEvents(this.center.X, this.center.Y, pcx, pcy);
             this.SetPosition(0, 0);
         });
-        OnMoved.Add(__circle_OnChange); 
+        OnMoved.Add(__circle_OnChange);
+        OnDragStart.Add(__circle_Moving);
+        OnDragged.Add(__circle_StopMoving);
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
         center.reposition();
@@ -151,7 +153,14 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, IHasFor
         _ = z; _ = x;
         Dismantle();
     }
+    public void __circle_Moving() {
+        Formula.Moving = true;
+    }
+    public void __circle_StopMoving(double z, double x, double c, double v) {
 
+        _ = z; _ = x; _ = c; _ = v;
+        Formula.Moving = false;
+    }
 
 
 

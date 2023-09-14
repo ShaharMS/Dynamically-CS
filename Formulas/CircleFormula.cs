@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace Dynamically.Formulas;
 public class CircleFormula : Formula
 {
+    public bool Moving;
     double _radius;
     public double radius
     {
@@ -50,6 +51,8 @@ public class CircleFormula : Formula
         this.centerX = centerX;
         this.centerY = centerY;
     }
+
+    public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) {}
 
     public override double[] SolveForX(double y)
     {
@@ -96,13 +99,14 @@ public class CircleFormula : Formula
 
     public override (double X, double Y) UpdateJointPosition(double inputX, double inputY)
     {
-        var X = inputX; var Y = inputY;
+        if (!Moving) return base.UpdateJointPosition(inputX, inputY);
+        // var X = inputX; var Y = inputY;
 
-        var rads = new Point(centerX, centerY).RadiansTo(X, Y);
+        // var rads = new Point(centerX, centerY).RadiansTo(X, Y);
 
-        X = centerX + radius * Math.Cos(rads);
-        Y = centerY + radius * Math.Sin(rads);
+        // X = centerX + radius * Math.Cos(rads);
+        // Y = centerY + radius * Math.Sin(rads);
 
-        return (X, Y);
+        return (inputX, inputY);
     }
 }

@@ -17,6 +17,8 @@ public partial class DraggableGraphic : Canvas
     public List<Action<double, double, double, double>> OnMoved = new();
     public List<Action<double, double, double, double>> OnDragged = new();
 
+    public List<Action> OnDragStart = new();
+
     public Cursor MouseOverCursor = new (StandardCursorType.SizeAll);
     public Cursor MouseOverDisabledCursor = new (StandardCursorType.Arrow);
 
@@ -36,6 +38,15 @@ public partial class DraggableGraphic : Canvas
         foreach (var listener in c)
         {
             listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
+        }
+    }
+
+    public virtual void DispatchOnDragStartEvents() {
+        var c = OnDragStart.ToArray();
+
+        foreach (var listener in c)
+        {
+            listener();
         }
     }
 
@@ -61,6 +72,8 @@ public partial class DraggableGraphic : Canvas
         _startPosition = new Point(args.GetPosition(null).X, args.GetPosition(null).Y - MainWindow.BigScreen.GetPosition().Y);
         _startMousePosition = args.GetPosition(null);
         args.Pointer.Capture(this);
+
+        DispatchOnDragStartEvents();
     }
 
     protected override void OnPointerEnter(PointerEventArgs e)
@@ -87,6 +100,8 @@ public partial class DraggableGraphic : Canvas
             _startPosition = new Point(X, Y);
             _startMousePosition = e.GetPosition(null);
             e.Pointer.Capture(this);
+
+            DispatchOnDragStartEvents();
         }
     }
 
