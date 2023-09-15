@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IContextMenuSupporter, IStringifyable, IHasFormula<SegmentFormula>
+public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IContextMenuSupporter, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
 

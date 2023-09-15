@@ -20,7 +20,7 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable
+public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, ISupportsAdjacency
 {
 
     public static readonly List<Joint> all = new();

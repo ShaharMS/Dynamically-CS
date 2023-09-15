@@ -8,7 +8,5 @@ namespace Dynamically.Backend.Interfaces;
 
 public interface ISupportsAdjacency
 {
-    public bool OverlapsOrNear(Point p) {
-        
-    }
+    public bool OverlapsOrNear(Point p);
 }

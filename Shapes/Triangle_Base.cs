@@ -18,7 +18,7 @@ using System.Globalization;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable
+public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency
 {
 
     public static readonly List<Triangle> all = new();

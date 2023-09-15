@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Angle : DraggableGraphic, IStringifyable
+public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency
 {
 
     public static readonly List<Angle> all = new();

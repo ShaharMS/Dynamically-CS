@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable
+public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency
 {
     public static readonly List<Quadrilateral> all = new();
 
