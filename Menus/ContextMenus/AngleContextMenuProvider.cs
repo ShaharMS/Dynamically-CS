@@ -13,7 +13,7 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class AngleContextMenuProvider : ContextMenuProvider
 {
-    public Angle Subject;
+    public Angle Subject {get => _sub; set => _sub = value; }
     public AngleContextMenuProvider(Angle angle, ContextMenu menu)
     {
         Subject = angle;

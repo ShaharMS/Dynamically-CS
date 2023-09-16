@@ -13,6 +13,7 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class ContextMenuProvider
 {
+    protected dynamic _sub;
     public string Name;
     public List<Control> Items
     {
@@ -74,9 +75,18 @@ public class ContextMenuProvider
     }
 
     public virtual void GetAdjacentElements() {
+        AdjacentElements.Clear();
         var list = new List<ISupportsAdjacency>();
+        var mouse = MainWindow.Mouse.GetPosition(null);
         list = list.Concat(Joint.all.ToList()).Concat(Segment.all.ToList()).Concat(Circle.all.ToList()).Concat(Triangle.all.ToList()).Concat(Quadrilateral.all.ToList()).ToList();
-        
+        foreach (var item in list) {
+            if (item != _sub && item.Overlaps(mouse) || item.DistanceTo(mouse) < Settings.DistanceCountsAsNear) {
+                AdjacentElements.Add(new MenuItem {
+                    Header = item is IStringifyable ? ((IStringifyable)item).ToString(true) : item.ToString(),
+                    Items = ((ContextMenuProvider)_sub.Provider).Items
+                });
+            }
+        }  
     }
 
     public virtual void Regenerate()

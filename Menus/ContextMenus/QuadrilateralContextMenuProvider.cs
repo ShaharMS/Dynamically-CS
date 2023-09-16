@@ -14,7 +14,7 @@ namespace Dynamically.Menus.ContextMenus;
 public class QuadrilateralContextMenuProvider : ContextMenuProvider
 {
 
-    public Quadrilateral Subject;
+    public Quadrilateral Subject {get => _sub; set => _sub = value; }
     public QuadrilateralContextMenuProvider(Quadrilateral joint, ContextMenu menu)
     {
         Subject = joint;

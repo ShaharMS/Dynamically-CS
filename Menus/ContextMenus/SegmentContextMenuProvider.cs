@@ -18,7 +18,7 @@ namespace Dynamically.Menus.ContextMenus;
 public class SegmentContextMenuProvider : ContextMenuProvider
 {
 
-    public Segment Subject;
+    public Segment Subject {get => _sub; set => _sub = value; }
     public SegmentContextMenuProvider(Segment segment, ContextMenu menu)
     {
         Subject = segment;

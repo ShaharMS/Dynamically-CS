@@ -26,7 +26,7 @@ namespace Dynamically.Menus.ContextMenus;
 public class JointContextMenuProvider : ContextMenuProvider
 {
 
-    public Joint Subject;
+    public Joint Subject {get => _sub; set => _sub = value; }
     public JointContextMenuProvider(Joint joint, ContextMenu menu)
     {
         Subject = joint;

@@ -14,7 +14,7 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class TriangleContextMenuProvider : ContextMenuProvider
 {
-    public Triangle Subject;
+    public Triangle Subject {get => _sub; set => _sub = value; }
     public TriangleContextMenuProvider(Triangle triangle, ContextMenu menu)
     {
         Subject = triangle;
