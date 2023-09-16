@@ -181,6 +181,11 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISuppor
         return center.GetPosition().DistanceTo(point.X, point.Y) < radius;
     }
 
+    public double DistanceTo(Point p) {
+        if (Overlaps(p)) return 0;
+        return Formula.DistanceTo(p);
+    }
+
     public override double Area()
     {
         return radius * radius * Math.PI;

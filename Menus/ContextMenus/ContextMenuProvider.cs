@@ -2,6 +2,7 @@
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,6 +75,8 @@ public class ContextMenuProvider
 
     public virtual void GetAdjacentElements() {
         var list = new List<ISupportsAdjacency>();
+        list = list.Concat(Joint.all.ToList()).Concat(Segment.all.ToList()).Concat(Circle.all.ToList()).Concat(Triangle.all.ToList()).Concat(Quadrilateral.all.ToList()).ToList();
+        
     }
 
     public virtual void Regenerate()

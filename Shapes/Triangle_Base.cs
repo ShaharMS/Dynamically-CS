@@ -289,6 +289,10 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
         return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
     }
+    public double DistanceTo(Point p) {
+        if (Overlaps(p)) return 0;
+        return con12.Formula.DistanceTo(p).Min(con23.Formula.DistanceTo(p)).Min(con13.Formula.DistanceTo(p));
+    }
 
     public override void Render(DrawingContext context)
     {

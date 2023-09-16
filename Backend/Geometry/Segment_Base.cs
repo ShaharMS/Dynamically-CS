@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
+using Avalonia.Rendering.SceneGraph;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
@@ -255,6 +256,14 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
     public override double Area()
     {
         return 1;
+    }
+
+    public override bool Overlaps(Point point)
+    {
+        return ((IVisualNode)this).HitTest(point);
+    }
+    public double DistanceTo(Point p) {
+        return Formula.DistanceTo(p);
     }
 
 #pragma warning disable IDE1006

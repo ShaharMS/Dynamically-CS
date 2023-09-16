@@ -201,6 +201,10 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
         return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.BigScreen.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.BigScreen.GetPosition().Y + Height / 2 > point.Y;
     }
 
+    public double DistanceTo(Point p) {
+        return p.DistanceTo(X, Y);
+    }
+
     public override double Area()
     {
         return 0;

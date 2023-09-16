@@ -186,6 +186,11 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         return intersections % 2 == 1;
     }
 
+    public double DistanceTo(Point p) {
+        if (Overlaps(p)) return 0;
+        return con1.Formula.DistanceTo(p).Min(con2.Formula.DistanceTo(p)).Min(con3.Formula.DistanceTo(p)).Min(con4.Formula.DistanceTo(p));
+    }
+
     public override double Area()
     {
         if (con1.SharesJointWith(con2)) {
