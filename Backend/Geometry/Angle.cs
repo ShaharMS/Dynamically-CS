@@ -262,6 +262,10 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency
         return 2;
     }
 
+    public double DistanceTo(Point p) {
+        return new CircleFormula(DefaultDistance, Center).DistanceTo(p);
+    }
+
     public void RemoveFromBoard()
     {
         all.Remove(this);

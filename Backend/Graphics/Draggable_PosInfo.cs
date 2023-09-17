@@ -1,4 +1,6 @@
 ﻿using Avalonia;
+using Avalonia.Rendering.SceneGraph;
+using Avalonia.VisualTree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,8 +47,7 @@ public partial class DraggableGraphic
     }
     public virtual bool Overlaps(Point point)
     {
-        var pos = this.GetPosition();
-        return pos.X < point.X && pos.Y < point.Y && pos.X + Width > point.X && pos.Y + Height > point.Y;
+        return VisualTree.HitTest(this, point) != null;
     }
 
     public virtual double Area()

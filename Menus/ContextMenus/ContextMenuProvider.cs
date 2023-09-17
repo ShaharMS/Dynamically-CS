@@ -77,6 +77,7 @@ public class ContextMenuProvider
     public virtual void GetAdjacentElements() {
         AdjacentElements.Clear();
         var list = new List<ISupportsAdjacency>();
+        if (MainWindow.Mouse == null) return;
         var mouse = MainWindow.Mouse.GetPosition(null);
         list = list.Concat(Joint.all.ToList()).Concat(Segment.all.ToList()).Concat(Circle.all.ToList()).Concat(Triangle.all.ToList()).Concat(Quadrilateral.all.ToList()).ToList();
         foreach (var item in list) {
