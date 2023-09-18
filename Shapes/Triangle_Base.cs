@@ -18,7 +18,7 @@ using System.Globalization;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>
+public partial class Triangle : DraggableGraphic
 {
 
     public static readonly List<Triangle> all = new();
@@ -43,9 +43,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
     public Circle? circumcircle;
     public Circle? incircle;
-
-    public TriangleContextMenuProvider Provider { get; }
-    //public EquilateralTriangleFormula EquilateralFormula;
+//public EquilateralTriangleFormula EquilateralFormula;
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
         if (Exists(j1, j2, j3)) return;
@@ -100,37 +98,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         MainWindow.regenAll(0, 0, 0, 0);
         Provider.Regenerate();
     }
-
-    public void Dismantle()
-    {
-        Type = TriangleType.SCALENE; // Remove position modifiers
-        if (joint1.GotRemoved) joint1.Disconnect(joint2, joint3);
-        if (joint2.GotRemoved) joint2.Disconnect(joint1, joint3);
-        if (joint3.GotRemoved) joint3.Disconnect(joint2, joint1);
-
-        foreach (var j in new[] { joint1, joint2, joint3 })
-        {
-            j.OnMoved.Remove(__RecalculateInCircle);
-        }
-
-        if (incircle != null)
-        {
-            incircle.Draggable = true;
-            incircle.center.Draggable = true;
-            incircle.center.Roles.RemoveFromRole(Role.TRIANGLE_InCircleCenter, this);
-        }
-
-        if (circumcircle != null) circumcircle.center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
-
-        foreach (var j in new[] { joint1, joint2, joint3 })
-        {
-            j.Roles.RemoveFromRole(Role.TRIANGLE_Corner, this);
-        }
-
-        Triangle.all.Remove(this);
-        MainWindow.BigScreen.Children.Remove(this);
-    }
-
     public Circle GenerateCircumCircle()
     {
         circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
@@ -191,36 +158,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         return new Point(s.x, s.y);
     }
 
-    public void __RecalculateInCircle(double ux, double uy, double px, double py)
-    {
-        var stats = GetCircleStats();
-        if (incircle == null) return;
-        incircle.center.X = stats.x;
-        incircle.center.Y = stats.y;
-        incircle.radius = stats.r;
-        incircle.UpdateFormula();
-        incircle.InvalidateVisual();
-        foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, px, py);
-    }
-
-    public void __Disment(Joint z, Joint x)
-    {
-        _ = z; _ = x;
-        Dismantle();
-    }
-    public void __Disment(double z, double x)
-    {
-        _ = z; _ = x;
-        Dismantle();
-    }
-
-    public void __Regen(double z, double x, double c, double v)
-    {
-        _ = z; _ = x; _ = c; _ = v;
-        Provider.Regenerate();
-    }
-    
-
     public List<(TriangleType type, string details, double confidence)> SuggestTypes()
     {
         var l = new List<(TriangleType type, string details, double confidence)>();
@@ -246,51 +183,10 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
 
         return l;
     }
-
-    public override string ToString()
-    {
-        return $"△{joint1.Id}{joint2.Id}{joint3.Id}";
-    }
-
-    public string ToString(bool descriptive)
-    {
-        if (!descriptive) return ToString();
-        return $"{typeToString(Type)} " + ToString();
-    }
-
-    private string typeToString(TriangleType type) => type != TriangleType.SCALENE ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Triangle";
-
-    public override double Area()
-    {
-        return con12.Length * con23.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetween3Points(joint1, joint2, joint3))) / 2;
-    }
-
     public override double GetClosenessToCenter(Point point)
     {
         var stats = GetCircleStats();
         return point.DistanceTo(stats.x, stats.y);
-    }
-
-    public override bool Overlaps(Point p)
-    {
-        double areaABC = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - joint3.ScreenY) +
-                                       joint2.ScreenX * (joint3.ScreenY - joint1.ScreenY) +
-                                       joint3.ScreenX * (joint1.ScreenY - joint2.ScreenY));
-
-        double areaPBC = 0.5 * Math.Abs(p.X * (joint2.ScreenY - joint3.ScreenY) +
-                                      joint2.ScreenX * (joint3.ScreenY - p.Y) +
-                                      joint3.ScreenX * (p.Y - joint2.ScreenY));
-
-        double areaPCA = 0.5 * Math.Abs(joint1.ScreenX * (p.Y - joint3.ScreenY) +
-                                      p.X * (joint3.ScreenY - joint1.ScreenY) +
-                                      joint3.ScreenX * (joint1.ScreenY - p.Y));
-
-        double areaPAB = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - p.Y) +
-                                      joint2.ScreenX * (p.Y - joint1.ScreenY) +
-                                      p.X * (joint1.ScreenY - joint2.ScreenY));
-
-        // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
-        return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
     }
 
     public override void Render(DrawingContext context)
@@ -323,26 +219,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         var arr = new Joint[] { j1, j2, j3 };
         return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3);
     }
-    public bool Contains(Joint joint)
-    {
-        return joint == joint1 || joint == joint2 || joint == joint3;
-    }
-
-    public bool Contains(Segment segment)
-    {
-        return segment == con12 || segment == con13 || segment == con23;
-    }
-
-    public bool HasMounted(Joint joint)
-    {
-        return false;
-    }
-
-    public bool HasMounted(Segment segment)
-    {
-        return segment.Roles.Has((Role.TRIANGLE_AngleBisector, Role.TRIANGLE_Perpendicular), this);
-    }
-
     public static bool Exists(Joint j1, Joint j2, Joint j3)
     {
         foreach (var triangle in all)

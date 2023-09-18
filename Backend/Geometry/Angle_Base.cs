@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<AngleContextMenuProvider>
+public partial class Angle : DraggableGraphic
 {
 
     public static readonly List<Angle> all = new();
@@ -26,7 +26,7 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency, ICont
         get => Math.Min(50, Math.Min(Center.DistanceTo(joint1), Center.DistanceTo(joint2)) * 0.8);
     }
 
-    public AngleContextMenuProvider Provider { get; }
+    
 
     Joint _c;
     public Joint Center
@@ -138,12 +138,6 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency, ICont
         all.Add(this);
     }
 
-    private void __updateAngle(double z, double x, double c, double v)
-    {
-        InvalidateVisual();
-    }
-
-
     public override void Render(DrawingContext context)
     {
         Degrees = Tools.GetDegreesBetween3Points(joint1, Center, joint2);
@@ -246,20 +240,6 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency, ICont
         if (angle.Length != 3) return false;
         var arr = angle.ToCharArray();
         return Exists(arr[1], arr[0], arr[2]);
-    }
-
-    public override string ToString()
-    {
-        return $"∠{joint1}{Center}{joint2}";
-    }
-    public string ToString(bool descriptive)
-    {
-        return descriptive ? "Angle " + ToString() : ToString();
-    }
-
-    public override double Area()
-    {
-        return 2;
     }
 
     public void RemoveFromBoard()

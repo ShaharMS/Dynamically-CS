@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>
+public partial class Quadrilateral : DraggableGraphic
 {
     public static readonly List<Quadrilateral> all = new();
 
@@ -67,8 +67,6 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     
     public Circle? circumcircle;
     public Circle? incircle;
-
-    public QuadrilateralContextMenuProvider Provider { get; }
 
 #pragma warning disable CS8618
     public Quadrilateral(Joint j1, Joint j2, Joint j3, Joint j4)
@@ -135,74 +133,13 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         MainWindow.BigScreen.Children.Add(this);
     }
 #pragma warning restore CS8618
-
-    public void Dismantle()
-    {
-        con1.Dismantle();
-        con2.Dismantle();
-        con3.Dismantle();
-        con4.Dismantle();
-
-        all.Remove(this);
-        MainWindow.regenAll(0, 0, 0, 0);
-        MainWindow.BigScreen.Children.Remove(this);
-    }
+    
 
     public Point GetCentroid()
     {
         return new((joint1.X + joint2.X + joint3.X + joint4.X) / 4, (joint1.Y + joint2.Y + joint3.Y + joint4.Y) / 4);
     }
 
-    public void __Disment(Joint z, Joint x)
-    {
-        _ = z; _ = x;
-        Dismantle();
-    }
-    public void __Disment(double z, double x)
-    {
-        _ = z; _ = x;
-        Dismantle();
-    }
-
-    public void __Regen(double z, double x, double c, double v)
-    {
-        _ = z; _ = x; _ = c; _ = v;
-        Provider.Regenerate();
-    }
-
-    public override bool Overlaps(Point p)
-    {
-        var rayCast = new RayFormula(p, 0);
-
-        int intersections = 0;
-        foreach (var f in new[] {con1, con2, con3, con4})
-        {
-            var i = f.Formula.Intersect(rayCast);
-            if (i != null && i?.X >= p.X) intersections++;
-        }
-        foreach (var j in new[] {joint1, joint2, joint3, joint4}) {
-            if (p.Equals(j)) {
-                intersections--;
-                break;
-            } 
-        }
-        return intersections % 2 == 1;
-    }
-
-    public override double Area()
-    {
-        if (con1.SharesJointWith(con2)) {
-            return 
-                con1.Length * con2.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con2))) / 2 +
-                con3.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con3, con4))) / 2;
-        } else if (con1.SharesJointWith(con3)) {
-            return 
-                con1.Length * con3.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con3))) / 2 +
-                con2.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con2, con4))) / 2;
-        }
-
-        return double.NaN;
-    }
     public override void Render(DrawingContext context)
     {
         var geom = new PathGeometry();
@@ -238,39 +175,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         var arr = new Joint[] { j1, j2, j3, j4 };
         return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3) && arr.Contains(joint4);
     }
-    public bool Contains(Joint joint)
-    {
-        return joint == joint1 || joint == joint2 || joint == joint3 || joint == joint4;
     }
-
-    public bool Contains(Segment segment)
-    {
-        return segment == con1 || segment == con2 || segment == con3 || segment == con4;
-    }
-
-    public bool HasMounted(Joint joint)
-    {
-        return false;
-    }
-
-    public bool HasMounted(Segment segment)
-    {
-        return false;
-    }
-
-    public override string ToString()
-    {
-        return $"{joint1.Id}{joint2.Id}{joint3.Id}{joint4.Id}";
-    }
-
-    public string ToString(bool descriptive)
-    {
-        if (!descriptive) return ToString();
-        return $"{typeToString(Type)} " + ToString();
-    }
-
-    private string typeToString(QuadrilateralType type) => type != QuadrilateralType.IRREGULAR ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Quadrilateral";
-}
 
 public enum QuadrilateralType
 {
