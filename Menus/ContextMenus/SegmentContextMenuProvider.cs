@@ -163,7 +163,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             if (e.Key == Key.Enter)
             {
-                Subject.Label.Content = customField.Text?.ToCharArray()[0];
+                Subject.Label.Content = customField.Text;
                 //Hide hack
                 var prev = Subject.ContextMenu;
                 Subject.ContextMenu = null;

@@ -86,4 +86,8 @@
 				</MenuItem>
 			</MenuItem>
 		</Menu>
-	</DockPanel></Window>
+		<Canvas Name="Main">
+			
+		</Canvas>
+	</DockPanel>
+</Window>

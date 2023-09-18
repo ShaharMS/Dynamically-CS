@@ -14,4 +14,15 @@ public class UIColors
     public static IBrush ConnectionColor = new SolidColorBrush(Colors.White);
     public static IBrush JointOutlineColor = new SolidColorBrush(Colors.White);
     public static IBrush JointFillColor = new SolidColorBrush(Colors.Black);
+    public static IBrush BottomNoteFill = new SolidColorBrush(Color.FromUInt32(0x66000000));
+    public static IBrush BottomNoteColor = new SolidColorBrush(Colors.White);
+    public static IBrush SelectionFill = new SolidColorBrush(Color.FromUInt32(0x220000FF));
+    public static Pen SelectionOutline = new Pen
+    {
+        Brush = new SolidColorBrush(Colors.White),
+        DashStyle = DashStyle.Dash,
+        Thickness = UIDesign.SelectionOutlineWidth
+    };
+
+    public static IBrush BigScreenBackground = new SolidColorBrush(Colors.Black);
 }

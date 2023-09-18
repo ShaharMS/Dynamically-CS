@@ -7,6 +7,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Design;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,7 @@ public class BigScreen : DraggableGraphic
         {
             if (value == null) _focused = this;
             else _focused = value;
-            FocusManager.Instance?.Focus(_focused, NavigationMethod.Unspecified);
+            FocusManager.Instance?.Focus(_focused, NavigationMethod.Pointer);
         }
     }
 
@@ -53,16 +54,13 @@ public class BigScreen : DraggableGraphic
         private set => _hovered = value;
     }
 
-    /// <summary>
-    /// Default:
-    /// <code>Brushes.LightGray</code>
-    /// set to <c>null</c> for auto default
-    /// </summary>
-    public static IBrush? BackgroundColor
+    private Selection _selection;
+    public Selection Selection
     {
-        get => MainWindow.BigScreen.Background ?? Brushes.Wheat;
-        set => MainWindow.BigScreen.Background = value ?? Brushes.Wheat;
+        get => _selection;
+        private set  => _selection = value;
     }
+
 
     public BigScreen() : base()
     {
@@ -71,7 +69,8 @@ public class BigScreen : DraggableGraphic
         Draggable = false;
         MouseOverCursor = Cursor.Default;
 
-        AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
+        //MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
         MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
     }
 
@@ -173,6 +172,7 @@ public class BigScreen : DraggableGraphic
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
     {
+        if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         FocusedObject = this;
         foreach (var child in Children)
         {
@@ -190,6 +190,28 @@ public class BigScreen : DraggableGraphic
         else if (FocusedObject is Triangle triangle) Log.Write($"Triangle {triangle} Is Focused");
         else if (FocusedObject is Quadrilateral quadrilateral) Log.Write($"Quadrilateral {quadrilateral} Is Focused");
         else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
+        else if (FocusedObject is Selection selection) Log.Write($"Selection {selection} Is Focused");
+
+        TryStartSelection(sender, e);
+    }
+
+    private void TryStartSelection(object? sender, PointerPressedEventArgs e)
+    {
+        if (FocusedObject is Selection selection)
+        {
+            if (selection.IsHovered) return;
+            else
+            {
+                FocusedObject = this;
+                selection.Cancel();
+            }
+        }
+        if (FocusedObject is not BigScreen) return;
+        
+        if (Selection != null) Selection.Cancel();
+        var pos = e.GetPosition(this);
+
+        Selection = new Selection(pos);
     }
 
     private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from MainWindow

@@ -20,12 +20,11 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<JointContextMenuProvider>, IStringifyable, ISupportsAdjacency
+public partial class Joint : DraggableGraphic
 {
 
     public static readonly List<Joint> all = new();
 
-    public static readonly double GraphicalRadius = 10;
 
     public char _id = 'A';
     public char Id
@@ -40,14 +39,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<
 
     public List<Action<double, double>> OnRemoved = new();
 
-    /// <summary>
-    /// This is used to associate joints with the shapes & formulas they're on. <br/>
-    /// for example, given a circle, and a Triangle formed with one joint being the center, 
-    /// the joint's <c>Roles</c> map would contain the circle and the Triangle. <br />
-    /// </summary>
-    public RoleMap Roles { get; set; }
-
-    public JointContextMenuProvider Provider { get; }
+    
 
     public Label IdDisplay;
 
@@ -102,7 +94,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<
 
         MainWindow.BigScreen.Children.Add(this);
 
-        Width = Height = GraphicalRadius * 2;
+        Width = Height = UIDesign.JointGraphicCircleRadius * 2;
     }
 
     public void RepositionText()
@@ -158,19 +150,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<
         context.FillRectangle(new SolidColorBrush(Colors.Red), new Rect(-1, -1, 2, 2));
     }
 
-    public void reposition()
-    {
-        // Position is validated, now redraw connections & place text
-        // text is placed in the middle of the biggest angle at the distance of fontSize + 4
-        foreach (Segment c in Connections)
-        {
-            c.InvalidateVisual();
-            if (c.joint1 == this) c.joint2.RepositionText();
-            else c.joint1.RepositionText();
-        }
-        RepositionText();
-    }
-
     public void RemoveFromBoard()
     {
         double sx = X, sy = Y;
@@ -195,26 +174,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<
         all.Remove(this);
 
         MainWindow.regenAll(0, 0, 0, 0);
-    }
-    public override bool Overlaps(Point point)
-    {
-        return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.BigScreen.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.BigScreen.GetPosition().Y + Height / 2 > point.Y;
-    }
-
-    public override double Area()
-    {
-        return 0;
-    }
-
-    public override string ToString()
-    {
-        return Id + "";
-    }
-
-    public string ToString(bool descriptive)
-    {
-        if (!descriptive) return ToString();
-        return "Joint " + Id;
     }
 
     public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }

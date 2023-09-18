@@ -22,7 +22,7 @@ public partial class MainWindow : Window
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public static MainWindow Instance { get; private set; }
 
-    public static DockPanel MainDisplay { get; private set; }
+    public static Canvas MainDisplay { get; private set; }
 
     public static BigScreen BigScreen { get; private set; }
 
@@ -36,12 +36,13 @@ public partial class MainWindow : Window
         InitializeComponent();
         Debug = true;
         Instance = this;
-        MainDisplay = Instance.Find<DockPanel>("Display");
+        MainDisplay = Instance.Find<Canvas>("Main");
         var ca = new BigScreen
         {
             Name = "BigScreen"
         };
         BigScreen = ca;
+        BigScreen.SetPosition(0, 0);
         
         Menus.TopMenu.applyDefaultStyling();
 
@@ -81,6 +82,8 @@ public partial class MainWindow : Window
         BigScreen.Refresh();
          
         regenAll(0, 0, 0, 0);
+
+        new BottomNote("Application Started!");
 
     }
 
