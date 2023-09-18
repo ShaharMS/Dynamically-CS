@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IContextMenuSupporter, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>
+public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IContextMenuSupporter<SegmentContextMenuProvider>, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>
 {
     public static readonly List<Segment> all = new();
 
@@ -61,7 +61,7 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
     public SegmentFormula Formula { get; set; }
     public RatioOnSegmentFormula MiddleFormula { get; }
 
-    public SegmentContextMenuProvider Provider;
+    public SegmentContextMenuProvider Provider { get; }
 
     public Label Label = new();
 
@@ -256,14 +256,6 @@ public partial class Segment : DraggableGraphic, IDrawable, IDismantable, IConte
     public override double Area()
     {
         return 1;
-    }
-
-    public override bool Overlaps(Point point)
-    {
-        return ((IVisualNode)this).HitTest(point);
-    }
-    public double DistanceTo(Point p) {
-        return Formula.DistanceTo(p);
     }
 
 #pragma warning disable IDE1006

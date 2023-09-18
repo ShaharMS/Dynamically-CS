@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency
+public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>
 {
     public static readonly List<Quadrilateral> all = new();
 
@@ -68,7 +68,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
     public Circle? circumcircle;
     public Circle? incircle;
 
-    public QuadrilateralContextMenuProvider Provider;
+    public QuadrilateralContextMenuProvider Provider { get; }
 
 #pragma warning disable CS8618
     public Quadrilateral(Joint j1, Joint j2, Joint j3, Joint j4)
@@ -128,6 +128,7 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
             con4?.reposition();
             this.SetPosition(0, 0);
         });
+        OnDragged.Add(MainWindow.regenAll);
 
         all.Add(this);
         MainWindow.regenAll(0,0,0,0);
@@ -147,8 +148,10 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
         MainWindow.BigScreen.Children.Remove(this);
     }
 
-
-    
+    public Point GetCentroid()
+    {
+        return new((joint1.X + joint2.X + joint3.X + joint4.X) / 4, (joint1.Y + joint2.Y + joint3.Y + joint4.Y) / 4);
+    }
 
     public void __Disment(Joint z, Joint x)
     {
@@ -184,11 +187,6 @@ public partial class Quadrilateral : DraggableGraphic, IDismantable, IShape, ISt
             } 
         }
         return intersections % 2 == 1;
-    }
-
-    public double DistanceTo(Point p) {
-        if (Overlaps(p)) return 0;
-        return con1.Formula.DistanceTo(p).Min(con2.Formula.DistanceTo(p)).Min(con3.Formula.DistanceTo(p)).Min(con4.Formula.DistanceTo(p));
     }
 
     public override double Area()

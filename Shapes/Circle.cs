@@ -14,9 +14,11 @@ using Dynamically.Backend;
 using Dynamically.Screens;
 using Dynamically.Menus;
 using Dynamically.Design;
+using Dynamically.Menus.ContextMenus;
+using Avalonia.Controls;
 
 namespace Dynamically.Shapes;
-public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>
+public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>, IContextMenuSupporter<CircleContextMenuProvider>
 {
 
     public static new readonly List<Circle> all = new();
@@ -25,6 +27,8 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISuppor
     public Joint center;
 
     public List<Action<double, double>> onResize = new();
+
+    public List<Action> OnRemoved = new();
 
     public double radius
     {
@@ -39,7 +43,8 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISuppor
     }
 
     public CircleFormula Formula { get; set; }
-    public List<Action> OnRemoved = new();
+
+    public CircleContextMenuProvider Provider { get; }
 
     public Circle(Joint center, double radius) : base(center, center, radius * 2)
     {
@@ -60,6 +65,12 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISuppor
         OnMoved.Add(__circle_OnChange);
         OnDragStart.Add(__circle_Moving);
         OnDragged.Add(__circle_StopMoving);
+        OnDragged.Add(MainWindow.regenAll);
+
+
+        ContextMenu = new ContextMenu();
+        Provider = new CircleContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
         center.reposition();
@@ -179,11 +190,6 @@ public class Circle : EllipseBase, IDismantable, IShape, IStringifyable, ISuppor
     public override bool Overlaps(Point point)
     {
         return center.GetPosition().DistanceTo(point.X, point.Y) < radius;
-    }
-
-    public double DistanceTo(Point p) {
-        if (Overlaps(p)) return 0;
-        return Formula.DistanceTo(p);
     }
 
     public override double Area()

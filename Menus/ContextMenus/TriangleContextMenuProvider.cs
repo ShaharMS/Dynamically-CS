@@ -20,6 +20,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         Subject = triangle;
         Menu = menu;
         Name = Subject.ToString(true);
+        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
@@ -191,12 +192,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             return new MenuItem
             {
                 Header = $"Circum-Circle {Subject.circumcircle}",
-                // Todo: items, which are the circle's right-click
+                Items = Subject.circumcircle.Provider.Items
             };
         }
         var circum = new MenuItem
         {
-            Header = "Generate Circum-Circle"
+            Header = "Generate Circum-Circle",
         };
         circum.Click += (sender, e) =>
         {
@@ -212,7 +213,8 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             return new MenuItem
             {
                 Header = $"Incircle {Subject.incircle}",
-                // Todo: items, which are the circle's right-click
+                Items = Subject.incircle.Provider.Items
+
             };
         }
         var incirc = new MenuItem

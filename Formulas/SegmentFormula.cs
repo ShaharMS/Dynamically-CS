@@ -92,21 +92,21 @@ public class SegmentFormula : Formula
 
     public SegmentFormula(Segment segment)
     {
-        x1 = segment.joint1.ScreenX;
-        y1 = segment.joint1.ScreenY;
-        x2 = segment.joint2.ScreenX;
-        y2 = segment.joint2.ScreenY;
+        x1 = segment.joint1.X;
+        y1 = segment.joint1.Y;
+        x2 = segment.joint2.X;
+        y2 = segment.joint2.Y;
 
         segment.joint1.OnMoved.Add((_, _, _, _) =>
         {
-            _x1 = segment.joint1.ScreenX;
-            y1 = segment.joint1.ScreenY;
+            _x1 = segment.joint1.X;
+            y1 = segment.joint1.Y;
         });
 
         segment.joint2.OnMoved.Add((_, _, _, _) =>
         {
-            _x2 = segment.joint2.ScreenX;
-            y2 = segment.joint2.ScreenY;
+            _x2 = segment.joint2.X;
+            y2 = segment.joint2.Y;
         });
     }
 

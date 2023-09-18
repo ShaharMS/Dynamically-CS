@@ -24,6 +24,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         Subject = segment;
         Menu = menu;
         Name = Subject.ToString(true);
+        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();

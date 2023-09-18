@@ -72,7 +72,7 @@ public partial class MainWindow : Window
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
         MainDisplay.Children.Add(BigScreen);
-
+        BigScreen.SetPosition(0, 0);
 
 
 
@@ -86,7 +86,7 @@ public partial class MainWindow : Window
 
     public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all))
+        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all))
         {
             item.Provider.Regenerate();
         }

@@ -20,6 +20,9 @@ public class ContextMenuProvider
         get
         {
             GetAdjacentElements();
+            GenerateDefaults();
+            GenerateSuggestions();
+            GenerateRecommendations();
 #pragma warning disable CA1806
             var list = new List<Control>();
             new TextSeparator(Name, list);
@@ -35,6 +38,7 @@ public class ContextMenuProvider
             }
             if (MainWindow.Debug)
             {
+                AddDebugInfo();
                 new TextSeparator("Debug", list);
                 list = list.Concat(Debugging.ToList()).ToList();
             }
@@ -44,6 +48,32 @@ public class ContextMenuProvider
         }
     }
 
+    public List<Control> ItemsWithoutAdjacents
+    {
+        get
+        {
+#pragma warning disable CA1806
+            GenerateDefaults();
+            GenerateSuggestions();
+            GenerateRecommendations();
+            var list = new List<Control>();
+            new TextSeparator(Name, list);
+            list = list.Concat(Defaults.ToList()).ToList();
+            new TextSeparator("Suggestions", list);
+            list = list.Concat(Suggestions.ToList()).ToList();
+            new TextSeparator("Recommended", list);
+            list = list.Concat(Recommendations.ToList()).ToList();
+            if (MainWindow.Debug)
+            {
+                AddDebugInfo();
+                new TextSeparator("Debug", list);
+                list = list.Concat(Debugging.ToList()).ToList();
+            }
+#pragma warning restore CA1806
+
+            return list;
+        }
+    }
 
     public List<Control> Defaults = new();
     public List<Control> Suggestions = new();
@@ -53,6 +83,11 @@ public class ContextMenuProvider
 #pragma warning disable CS8618
     public ContextMenu Menu;
 #pragma warning restore CS8618
+
+    private void Menu_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        GetAdjacentElements();
+    }
 
     public virtual void GenerateDefaults()
     {
@@ -78,13 +113,13 @@ public class ContextMenuProvider
         AdjacentElements.Clear();
         var list = new List<ISupportsAdjacency>();
         if (MainWindow.Mouse == null) return;
-        var mouse = MainWindow.Mouse.GetPosition(null);
-        list = list.Concat(Joint.all.ToList()).Concat(Segment.all.ToList()).Concat(Circle.all.ToList()).Concat(Triangle.all.ToList()).Concat(Quadrilateral.all.ToList()).ToList();
+        var mouse = MainWindow.Mouse.GetPosition(MainWindow.BigScreen);
+        list = list.Concat(Joint.all.ToList()).Concat(Segment.all).Concat(Circle.all).Concat(Triangle.all).Concat(Quadrilateral.all).ToList();
         foreach (var item in list) {
-            if (item != _sub && item.Overlaps(mouse) || item.DistanceTo(mouse) < Settings.DistanceCountsAsNear) {
+            if (!item.Equals(_sub) && item.Overlaps(mouse)) {
                 AdjacentElements.Add(new MenuItem {
                     Header = item is IStringifyable ? ((IStringifyable)item).ToString(true) : item.ToString(),
-                    Items = ((ContextMenuProvider)_sub.Provider).Items
+                    Items = ((dynamic)item).Provider.ItemsWithoutAdjacents
                 });
             }
         }  

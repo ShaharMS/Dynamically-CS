@@ -21,6 +21,7 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
         Menu = menu;
         Name = Subject.ToString(true);
 
+        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
@@ -89,7 +90,7 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
         rotate.Click += (sender, e) =>
         {
             Point p1 = new Point(Subject.joint1.X, Subject.joint1.Y), p2 = new Point(Subject.joint2.X, Subject.joint2.Y), p3 = new Point(Subject.joint3.X, Subject.joint3.Y), p4 = new Point(Subject.joint4.X, Subject.joint4.Y);
-            Point rotationCenter = MainWindow.Mouse.GetPosition(null);
+            Point rotationCenter = Subject.GetCentroid();
             double dist1 = Subject.joint1.DistanceTo(rotationCenter), dist2 = Subject.joint2.DistanceTo(rotationCenter), dist3 = Subject.joint3.DistanceTo(rotationCenter), dist4 = Subject.joint4.DistanceTo(rotationCenter);
             double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
 

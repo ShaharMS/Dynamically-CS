@@ -33,6 +33,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         Menu = menu;
         Name = Subject.ToString(true);
 
+        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
@@ -83,7 +84,8 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         Debugging = new List<Control>
         {
-            Debug_DisplayRoles()
+            Debug_DisplayRoles(),
+            Debug_Position()
         };
     }
 
@@ -552,5 +554,13 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
 
         return roles;
+    }
+
+    MenuItem Debug_Position()
+    {
+        return new MenuItem
+        {
+            Header = $"Position: ({((int)Subject.X)}, {((int)Subject.Y)})\nOn-Screen: ({Subject.ScreenX}, {Subject.ScreenY})"
+        };
     }
 }

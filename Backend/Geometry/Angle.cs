@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency
+public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<AngleContextMenuProvider>
 {
 
     public static readonly List<Angle> all = new();
@@ -26,7 +26,7 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency
         get => Math.Min(50, Math.Min(Center.DistanceTo(joint1), Center.DistanceTo(joint2)) * 0.8);
     }
 
-    public AngleContextMenuProvider Provider;
+    public AngleContextMenuProvider Provider { get; }
 
     Joint _c;
     public Joint Center
@@ -260,10 +260,6 @@ public class Angle : DraggableGraphic, IStringifyable, ISupportsAdjacency
     public override double Area()
     {
         return 2;
-    }
-
-    public double DistanceTo(Point p) {
-        return new CircleFormula(DefaultDistance, Center).DistanceTo(p);
     }
 
     public void RemoveFromBoard()

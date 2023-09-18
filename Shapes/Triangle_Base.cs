@@ -18,7 +18,7 @@ using System.Globalization;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency
+public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>
 {
 
     public static readonly List<Triangle> all = new();
@@ -44,10 +44,12 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     public Circle? circumcircle;
     public Circle? incircle;
 
-    public TriangleContextMenuProvider Provider;
+    public TriangleContextMenuProvider Provider { get; }
     //public EquilateralTriangleFormula EquilateralFormula;
     public Triangle(Joint j1, Joint j2, Joint j3)
     {
+        if (Exists(j1, j2, j3)) return;
+
         joint1 = j1;
         joint2 = j2;
         joint3 = j3;
@@ -91,6 +93,7 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
             con23.reposition();
             this.SetPosition(0, 0);
         });
+        OnDragged.Add(MainWindow.regenAll);
 
         MainWindow.BigScreen.Children.Add(this);
 
@@ -289,10 +292,6 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
         // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
         return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
     }
-    public double DistanceTo(Point p) {
-        if (Overlaps(p)) return 0;
-        return con12.Formula.DistanceTo(p).Min(con23.Formula.DistanceTo(p)).Min(con13.Formula.DistanceTo(p));
-    }
 
     public override void Render(DrawingContext context)
     {
@@ -342,6 +341,25 @@ public partial class Triangle : DraggableGraphic, IDismantable, IShape, IStringi
     public bool HasMounted(Segment segment)
     {
         return segment.Roles.Has((Role.TRIANGLE_AngleBisector, Role.TRIANGLE_Perpendicular), this);
+    }
+
+    public static bool Exists(Joint j1, Joint j2, Joint j3)
+    {
+        foreach (var triangle in all)
+        {
+            if (triangle.IsDefinedBy(j1, j2, j3)) return true;
+        }
+        return false;
+    }
+    public static bool Exists(char cid, char id1, char id2)
+    {
+        var c = Joint.GetJointById(cid);
+        if (c == null) return false;
+        var j1 = Joint.GetJointById(id1);
+        if (j1 == null) return false;
+        var j2 = Joint.GetJointById(id2);
+        if (j2 == null) return false;
+        return Exists(c, j1, j2);
     }
 }
 

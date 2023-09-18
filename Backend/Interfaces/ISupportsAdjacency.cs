@@ -9,6 +9,4 @@ namespace Dynamically.Backend.Interfaces;
 public interface ISupportsAdjacency
 {
     public bool Overlaps(Point p);
-
-    public double DistanceTo(Point p);
 }

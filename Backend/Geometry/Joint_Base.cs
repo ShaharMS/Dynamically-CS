@@ -20,7 +20,7 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter, IStringifyable, ISupportsAdjacency
+public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter<JointContextMenuProvider>, IStringifyable, ISupportsAdjacency
 {
 
     public static readonly List<Joint> all = new();
@@ -47,7 +47,7 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     /// </summary>
     public RoleMap Roles { get; set; }
 
-    public JointContextMenuProvider Provider;
+    public JointContextMenuProvider Provider { get; }
 
     public Label IdDisplay;
 
@@ -199,10 +199,6 @@ public partial class Joint : DraggableGraphic, IDrawable, IContextMenuSupporter,
     public override bool Overlaps(Point point)
     {
         return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.BigScreen.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.BigScreen.GetPosition().Y + Height / 2 > point.Y;
-    }
-
-    public double DistanceTo(Point p) {
-        return p.DistanceTo(X, Y);
     }
 
     public override double Area()
