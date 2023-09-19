@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
+using Dynamically.Screens;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -37,6 +38,10 @@ public class Selection : DraggableGraphic
 
     private void FinishSelection(object? sender, PointerReleasedEventArgs e)
     {
+        if (ex == sx && ey == sy) {
+            Cancel();
+            return;
+        }
         MainWindow.BigScreen.FocusedObject = this;
 
         MainWindow.Instance.PointerMoved -= EvalSelection;

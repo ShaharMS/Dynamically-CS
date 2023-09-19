@@ -70,7 +70,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public override bool Overlaps(Point point)
     {
-        return center.GetPosition().DistanceTo(point.X, point.Y) < radius;
+        return center.DistanceTo(point) < radius;
     }
 
     public override double Area()

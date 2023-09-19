@@ -98,21 +98,21 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public override bool Overlaps(Point p)
     {
-        double areaABC = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - joint3.ScreenY) +
-                                       joint2.ScreenX * (joint3.ScreenY - joint1.ScreenY) +
-                                       joint3.ScreenX * (joint1.ScreenY - joint2.ScreenY));
+        double areaABC = 0.5 * Math.Abs(joint1.X * (joint2.Y - joint3.Y) +
+                                       joint2.X * (joint3.Y - joint1.Y) +
+                                       joint3.X * (joint1.Y - joint2.Y));
 
-        double areaPBC = 0.5 * Math.Abs(p.X * (joint2.ScreenY - joint3.ScreenY) +
-                                      joint2.ScreenX * (joint3.ScreenY - p.Y) +
-                                      joint3.ScreenX * (p.Y - joint2.ScreenY));
+        double areaPBC = 0.5 * Math.Abs(p.X * (joint2.Y - joint3.Y) +
+                                      joint2.X * (joint3.Y - p.Y) +
+                                      joint3.X * (p.Y - joint2.Y));
 
-        double areaPCA = 0.5 * Math.Abs(joint1.ScreenX * (p.Y - joint3.ScreenY) +
-                                      p.X * (joint3.ScreenY - joint1.ScreenY) +
-                                      joint3.ScreenX * (joint1.ScreenY - p.Y));
+        double areaPCA = 0.5 * Math.Abs(joint1.X * (p.Y - joint3.Y) +
+                                      p.X * (joint3.Y - joint1.Y) +
+                                      joint3.X * (joint1.Y - p.Y));
 
-        double areaPAB = 0.5 * Math.Abs(joint1.ScreenX * (joint2.ScreenY - p.Y) +
-                                      joint2.ScreenX * (p.Y - joint1.ScreenY) +
-                                      p.X * (joint1.ScreenY - joint2.ScreenY));
+        double areaPAB = 0.5 * Math.Abs(joint1.X * (joint2.Y - p.Y) +
+                                      joint2.X * (p.Y - joint1.Y) +
+                                      p.X * (joint1.Y - joint2.Y));
 
         // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
         return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison

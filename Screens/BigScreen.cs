@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using Avalonia.Remote.Protocol.Input;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
@@ -23,11 +24,11 @@ public class BigScreen : DraggableGraphic
 
     public static double MouseX
     {
-        get => Mouse?.GetPosition(null).X ?? -1;
+        get => Mouse?.GetPosition(MainWindow.BigScreen).X ?? -1;
     }
     public static double MouseY
     {
-        get => Mouse?.GetPosition(null).Y ?? -1;
+        get => Mouse?.GetPosition(MainWindow.BigScreen).Y ?? -1;
     }
 
     public static PointerEventArgs Mouse
@@ -54,8 +55,8 @@ public class BigScreen : DraggableGraphic
         private set => _hovered = value;
     }
 
-    private Selection _selection;
-    public Selection Selection
+    private Selection? _selection;
+    public Selection? Selection
     {
         get => _selection;
         private set  => _selection = value;
@@ -192,7 +193,24 @@ public class BigScreen : DraggableGraphic
         else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
         else if (FocusedObject is Selection selection) Log.Write($"Selection {selection} Is Focused");
 
-        TryStartSelection(sender, e);
+        if (FocusedObject is not Backend.Graphics.Selection) Selection?.Cancel();
+
+        bool mouseAlreadyUp = false;
+        EventHandler<PointerReleasedEventArgs>? listener = null;
+        listener = (_, _) =>
+        {
+            mouseAlreadyUp = true;
+            MainWindow.Instance.PointerReleased -= listener;
+        };
+        EventHandler<PointerEventArgs>? listener2 = null;
+        listener2 = (_, _) =>
+        {
+            if (!mouseAlreadyUp) TryStartSelection(sender, e);
+            MainWindow.Instance.PointerMoved -= listener2;
+        };
+        MainWindow.Instance.PointerReleased += listener;
+        MainWindow.Instance.PointerMoved += listener2;
+
     }
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
