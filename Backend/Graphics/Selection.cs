@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Runtime.CompilerServices;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -30,6 +31,22 @@ public class Selection : DraggableGraphic
         sx = ex = start.X; sy = ey = start.Y;
 
         MainWindow.BigScreen.Children.Add(this);
+
+        OnMoved.Add((x, y, px, py) => {
+            double offsetX = x - px, offsetY = y - py;
+            foreach (var item in EncapsulatedElements)
+            {
+                item.X += offsetX;
+                item.Y += offsetY;
+            }
+            foreach (var item in EncapsulatedElements) item.DispatchOnMovedEvents();
+        });
+        OnDragStart.Add(() => {
+            foreach (var item in EncapsulatedElements) item.DispatchOnDragStartEvents();
+        });
+        OnDragged.Add((_, _, _ ,_) => {
+            foreach (var item in EncapsulatedElements) item.DispatchOnDraggedEvents();
+        });
 
 
         MainWindow.Instance.PointerMoved += EvalSelection;
