@@ -45,6 +45,14 @@ public partial class Segment : DraggableGraphic
         }
     }
 
+    public new double Opacity {
+        get => base.Opacity;
+        set {
+            base.Opacity = value;
+            Label.Opacity = value;
+        }
+    }
+
     public Joint joint1 { get; private set; }
     public Joint joint2 { get; private set;}
 

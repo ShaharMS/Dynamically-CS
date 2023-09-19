@@ -26,6 +26,13 @@ public partial class Angle : DraggableGraphic
         get => Math.Min(50, Math.Min(Center.DistanceTo(joint1), Center.DistanceTo(joint2)) * 0.8);
     }
 
+    public new double Opacity {
+        get => base.Opacity;
+        set {
+            base.Opacity = value;
+            Label.Opacity = value;
+        }
+    }
     
 
     Joint _c;

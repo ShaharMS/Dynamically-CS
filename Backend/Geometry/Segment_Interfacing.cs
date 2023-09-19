@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>, IContextMenuSupporter<SegmentContextMenuProvider>
+public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>, IContextMenuSupporter<SegmentContextMenuProvider>, Interfaces.ISelectable
 {
     public SegmentFormula Formula { get; set; }
     public RatioOnSegmentFormula MiddleFormula { get; }
@@ -95,4 +96,8 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
         MainWindow.BigScreen.Children.Remove(Label);
     }
 #pragma warning restore IDE1006
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        return joint1.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect);
+    }
 }

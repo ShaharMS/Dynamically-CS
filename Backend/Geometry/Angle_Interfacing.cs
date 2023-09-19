@@ -1,4 +1,5 @@
-﻿using Dynamically.Backend.Interfaces;
+﻿using Avalonia;
+using Dynamically.Backend.Interfaces;
 using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSupporter<AngleContextMenuProvider>
+public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSupporter<AngleContextMenuProvider>, ISelectable
 {
     public AngleContextMenuProvider Provider { get; }
     private void __updateAngle(double z, double x, double c, double v)
@@ -27,5 +28,10 @@ public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSup
     public override double Area()
     {
         return 2;
+    }
+
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        return joint1.EncapsulatedWithin(rect) && Center.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect);
     }
 }

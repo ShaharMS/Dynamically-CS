@@ -192,7 +192,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             return new MenuItem
             {
                 Header = $"Circum-Circle {Subject.circumcircle}",
-                Items = Subject.circumcircle.Provider.Items
+                Items = Subject.circumcircle.Provider.ItemsWithoutAdjacents
             };
         }
         var circum = new MenuItem
@@ -213,7 +213,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             return new MenuItem
             {
                 Header = $"Incircle {Subject.incircle}",
-                Items = Subject.incircle.Provider.Items
+                Items = Subject.incircle.Provider.ItemsWithoutAdjacents
 
             };
         }

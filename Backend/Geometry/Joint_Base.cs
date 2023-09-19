@@ -48,6 +48,13 @@ public partial class Joint : DraggableGraphic
         get => !MainWindow.BigScreen.Children.Contains(this);
     }
 
+    public new double Opacity {
+        get => base.Opacity;
+        set {
+            base.Opacity = value;
+            IdDisplay.Opacity = value;
+        }
+    }
     public bool Hidden {
         get => !IsVisible;
         set {

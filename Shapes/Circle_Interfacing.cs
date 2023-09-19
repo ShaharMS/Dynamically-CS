@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>, IContextMenuSupporter<CircleContextMenuProvider>
+public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>, IContextMenuSupporter<CircleContextMenuProvider>, ISelectable
 {
     public CircleFormula Formula { get; set; }
 
@@ -98,5 +98,10 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         return segment.Roles.Has(Role.CIRCLE_Tangent, this);
     }
 
-
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        foreach (var border in new[] {rect.Top, rect.Bottom}) if (center.DistanceTo(new Point(center.X, border)) < radius) return false;
+        foreach (var border in new[] {rect.Left, rect.Right}) if (center.DistanceTo(new Point(border, center.Y)) < radius) return false;
+        return rect.Contains(center);
+    }
 }

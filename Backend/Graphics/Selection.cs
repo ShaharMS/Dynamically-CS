@@ -2,12 +2,14 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ISelectable = Dynamically.Backend.Interfaces.ISelectable;
 
 namespace Dynamically.Backend.Graphics;
 
@@ -21,7 +23,7 @@ public class Selection : DraggableGraphic
 
     public Rect Rect { get => new Rect(sx.Min(ex), sy.Min(ey), Math.Abs(sx - ex), Math.Abs(sy - ey)); }
 
-    List<DraggableGraphic> EncapsulatedElements = new();
+    HashSet<DraggableGraphic> EncapsulatedElements = new();
     public Selection(Point start)
     {
         sx = ex = start.X; sy = ey = start.Y;
@@ -45,6 +47,20 @@ public class Selection : DraggableGraphic
     {
         var pos = e.GetPosition(MainWindow.BigScreen);
         ex = pos.X; ey = pos.Y;
+        var rect = Rect; // Use getter once.
+        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        {
+            if (item.EncapsulatedWithin(rect))
+            {
+                EncapsulatedElements.Add(item);
+                item.Opacity = 1;
+            }
+            else
+            {
+                EncapsulatedElements.Remove(item);
+                item.Opacity = 0.5;
+            }
+        }
 
         InvalidateVisual();
     }
@@ -63,6 +79,10 @@ public class Selection : DraggableGraphic
     {
         MainWindow.BigScreen.Children.Remove(this);
         EncapsulatedElements.Clear();
+        foreach (var element in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        {
+            element.Opacity = 1;
+        }
     }
 
     public override string ToString()

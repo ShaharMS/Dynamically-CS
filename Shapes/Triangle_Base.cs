@@ -11,7 +11,6 @@ using Dynamically.Screens;
 using Avalonia.Media;
 using Dynamically.Design;
 using System.Linq;
-using Dynamically.Formulas.Special;
 using Dynamically.Menus.ContextMenus;
 using Avalonia.Controls;
 using System.Globalization;

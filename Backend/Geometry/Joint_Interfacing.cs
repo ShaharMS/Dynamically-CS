@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuProvider>, IStringifyable, ISupportsAdjacency
+public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable
 {
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
@@ -53,5 +53,10 @@ public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuPr
     {
         if (!descriptive) return ToString();
         return "Joint " + Id;
+    }
+
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        return rect.Contains(this);
     }
 }

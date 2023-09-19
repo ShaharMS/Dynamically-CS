@@ -89,7 +89,7 @@ public partial class MainWindow : Window
 
     public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all))
+        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
         {
             item.Provider.Regenerate();
         }

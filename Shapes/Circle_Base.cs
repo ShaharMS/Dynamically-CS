@@ -41,6 +41,15 @@ public partial class Circle : EllipseBase
             foreach (var l in onResize) l(value, prev);
         }
     }
+
+    public new double Opacity {
+        get => base.Opacity;
+        set {
+            base.Opacity = value;
+            ring.Opacity = value;
+        }
+    }
+
     public Circle(Joint center, double radius) : base(center, center, radius * 2)
     {
         this.radius = radius;

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>
+public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>, ISelectable
 {
 
     public QuadrilateralContextMenuProvider Provider { get; }
@@ -118,4 +118,8 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
     private string typeToString(QuadrilateralType type) => type != QuadrilateralType.IRREGULAR ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Quadrilateral";
 
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        return joint1.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect) && joint3.EncapsulatedWithin(rect) && joint4.EncapsulatedWithin(rect);
+    }
 }
