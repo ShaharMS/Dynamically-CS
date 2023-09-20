@@ -43,6 +43,9 @@ public abstract class Formula
     {
         OnMoved.Add((curX, curY, preX, preY) => {
             foreach (var joint in Followers) {
+                // If a formula moves an element encapsulated within the current selection,
+                // We get double movement. to prevent this:
+                if (MainWindow.BigScreen.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;
                 joint.X = joint.X - preX + curX;
                 joint.Y = joint.Y - preY + curY;
                 joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);

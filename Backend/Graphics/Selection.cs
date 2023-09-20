@@ -11,7 +11,6 @@ using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ISelectable = Dynamically.Backend.Interfaces.ISelectable;
 
 namespace Dynamically.Backend.Graphics;
 
@@ -25,7 +24,7 @@ public class Selection : DraggableGraphic
 
     public Rect Rect { get => new Rect(sx.Min(ex), sy.Min(ey), Math.Abs(sx - ex), Math.Abs(sy - ey)); }
 
-    HashSet<DraggableGraphic> EncapsulatedElements = new();
+    public HashSet<DraggableGraphic> EncapsulatedElements = new();
     public Selection(Point start)
     {
         sx = ex = start.X; sy = ey = start.Y;
@@ -36,16 +35,17 @@ public class Selection : DraggableGraphic
             double offsetX = x - px, offsetY = y - py;
             foreach (var item in EncapsulatedElements)
             {
+                if (item is not Joint) continue;
                 item.X += offsetX;
                 item.Y += offsetY;
             }
-            foreach (var item in EncapsulatedElements) item.DispatchOnMovedEvents();
+            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnMovedEvents();
         });
         OnDragStart.Add(() => {
-            foreach (var item in EncapsulatedElements) item.DispatchOnDragStartEvents();
+            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnDragStartEvents();
         });
         OnDragged.Add((_, _, _ ,_) => {
-            foreach (var item in EncapsulatedElements) item.DispatchOnDraggedEvents();
+            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnDraggedEvents();
         });
 
 
@@ -59,6 +59,10 @@ public class Selection : DraggableGraphic
             Cancel();
             return;
         }
+
+        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+            item.Opacity = 1;
+
         MainWindow.BigScreen.FocusedObject = this;
 
         MainWindow.Instance.PointerMoved -= EvalSelection;
