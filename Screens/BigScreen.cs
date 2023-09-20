@@ -249,6 +249,9 @@ public class BigScreen : DraggableGraphic
                 draggable.ZIndex = -Convert.ToInt32(area);
                 if (draggable.Overlaps(new Point(MouseX, MouseY)) && HoveredObject.Area() > area) HoveredObject = draggable;
                 draggable.InvalidateVisual();
+            } else
+            {
+                child.ZIndex = 1000000000;
             }
         }
         /*
