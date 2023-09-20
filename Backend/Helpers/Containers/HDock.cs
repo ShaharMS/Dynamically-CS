@@ -25,5 +25,12 @@ public class HDock : DockPanel
     }
     public HDock() : base()
     {
+        Children.CollectionChanged += (_, _) =>
+        {
+            foreach (Control control in Children.Cast<Control>())
+            {
+                SetDock(control, Dock.Left);
+            }
+        };
     }
 }

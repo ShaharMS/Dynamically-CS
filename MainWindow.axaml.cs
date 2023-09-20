@@ -85,9 +85,6 @@ public partial class MainWindow : Window
 
         new BottomNote("Application Started!");
         BigScreen.Children.Add(new SolutionTable(true));
-
-        foreach (var child in BigScreen.Children) Log.Write(child);
-
     }
 
     public static void regenAll(double z, double x, double c, double v) {
