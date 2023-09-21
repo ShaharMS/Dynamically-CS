@@ -1,4 +1,7 @@
-﻿using Dynamically.Backend.Helpers.Containers;
+﻿using CSharpMath.Avalonia;
+using CSharpMath.Editor;
+using CSharpMath.Rendering.FrontEnd;
+using Dynamically.Backend.Helpers.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +11,12 @@ using System.Threading.Tasks;
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
 public class TableRow : HDock
-{
-    public string Statement;
+{   
+    private MathView _statement;
+    public string Statement {
+        get => _statement.LaTeX ?? "";
+        set => _statement.LaTeX = value;
+    }
 
     public string Reason;
 
@@ -20,6 +27,7 @@ public class TableRow : HDock
         Statement = statementLatex;
         Reason = reason;
         From = from.ToHashSet();
+
     }
 
 }
