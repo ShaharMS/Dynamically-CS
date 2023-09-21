@@ -1,6 +1,5 @@
 ﻿using CSharpMath.Avalonia;
 using CSharpMath.Editor;
-using CSharpMath.Rendering.FrontEnd;
 using Dynamically.Backend.Helpers.Containers;
 using System;
 using System.Collections.Generic;

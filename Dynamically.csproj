@@ -14,12 +14,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AngouriMath" Version="1.3.0" />
 		<PackageReference Include="Avalonia" Version="0.10.22" />
 		<PackageReference Include="Avalonia.Desktop" Version="0.10.22" />
 		<!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
 		<PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="0.10.22" />
 		<PackageReference Include="CSharpMath" Version="0.5.1" />
 		<PackageReference Include="CSharpMath.Avalonia" Version="0.5.1" />
+		<PackageReference Include="CSharpMath.Evaluation" Version="0.5.1" />
 		<PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
 		<ProjectReference Include="C:\Users\shaha\Desktop\Github\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> <!-- PC, ignore error on laptop -->
 		<ProjectReference Include="C:\Users\shahar\Documents\GitHub\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> <!-- laptop, ignore error on PC -->

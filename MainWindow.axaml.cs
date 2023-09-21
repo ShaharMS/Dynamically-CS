@@ -13,6 +13,7 @@ using Dynamically.Backend;
 using Dynamically.Backend.Interfaces;
 using System.Linq;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Graphics.SolutionTable;
 
 namespace Dynamically;
 
