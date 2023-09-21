@@ -11,6 +11,7 @@ namespace Dynamically.Backend.Graphics.SolutionTable;
 
 public class SolutionTable : DraggableGraphic
 {
+    public List<TableRow> Rows;
     public bool hasFroms;
     public SolutionTable(bool hasFroms = false) : base()
     {
@@ -18,5 +19,10 @@ public class SolutionTable : DraggableGraphic
 
         Background = new SolidColorBrush(Colors.Red);
 
+    }
+
+    public void MoveRow(int from, int toBefore)
+    {
+        throw new NotImplementedException();
     }
 }

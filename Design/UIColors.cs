@@ -25,4 +25,7 @@ public class UIColors
     };
 
     public static IBrush BigScreenBackground = new SolidColorBrush(Colors.Black);
+
+    public static IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);
+    public static IBrush SolutionTableFill = new SolidColorBrush(Colors.Black);
 }
