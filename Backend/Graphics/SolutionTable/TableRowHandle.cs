@@ -11,13 +11,17 @@ namespace Dynamically.Backend.Graphics.SolutionTable;
 
 public class TableRowHandle : DraggableGraphic
 {
-    
+    public SolutionTable Table
+    {
+        get => Row.Table;
+    }
+
     public TableRow Row;
     public int Serial {
-        get => Row.Table.Rows.IndexOf(Row) + 1;
+        get => Table.Rows.IndexOf(Row) + 1;
         set {
-            Row.Table.MoveRow(Row.Table.Rows.IndexOf(Row), value - 1);
-            label.Content = value;
+            Table.MoveRow(Table.Rows.IndexOf(Row), value - 1);
+            label.Content = $" {value} ";
         }
     }
 
@@ -28,7 +32,11 @@ public class TableRowHandle : DraggableGraphic
         label = new Label
         {
             FontSize = 12,
-            Foreground = UIColors.SolutionTableBorder
+            Foreground = UIColors.SolutionTableBorder,
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
+            Width = 20,
+            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
+            Height = 20
         };
         border = new Border {
             Child = label,
@@ -45,13 +53,10 @@ public class TableRowHandle : DraggableGraphic
 
         OnMoved.Add((_, _ , _, _) => {
             Row.AttemptMovement();
-            
         });
     }
 
-
     public override void Render(DrawingContext context)
     {
-        
     }
 }

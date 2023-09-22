@@ -21,5 +21,14 @@ public class VDock : DockPanel
             }
         }
     }
-    public VDock() : base() { }
+    public VDock() : base()
+    {
+        Children.CollectionChanged += (_, _) =>
+        {
+            foreach (Control control in Children.Cast<Control>())
+            {
+                SetDock(control, Dock.Top);
+            }
+        };
+    }
 }
