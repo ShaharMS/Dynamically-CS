@@ -22,6 +22,16 @@ public class TableRow : Canvas
         set
         {
             _vr = value;
+            _vr.PropertyChanged += (s, e) => {
+                if (e.Property.Name != nameof(_vr.Bounds)) return;
+                
+                var newBounds = _vr.Bounds;
+                var oldBounds = (Rect)e.OldValue!;
+                if (_vr.Bounds.Width == oldBounds.Width && newBounds.Height == oldBounds.Height) return;
+                //Height = _vr.Height + 1; // border bottom
+                Width = _vr.Width;
+                Table.Refresh();
+            };
             border.Child = _vr;
         }
     }
@@ -32,10 +42,10 @@ public class TableRow : Canvas
     public TableRowHandle Handle;
     public TableRow(SolutionTable table) : base()
     {
-        Width = 200;
-        Height = 50;
+        Width = table.Width;
+        Height = 20;
+
         Table = table;
-        Table.Rows.Add(this);
 
         border = new Border
         {

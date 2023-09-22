@@ -50,7 +50,6 @@ public partial class ResizableBorder : Border
             
             if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance)
             {
-                Cursor = MouseOverToBottomRight
             }
 
             foreach (var l in OnResizeStart) l();

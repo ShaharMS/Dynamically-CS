@@ -20,7 +20,7 @@ public class TableRowHandle : DraggableGraphic
     public int Serial {
         get => Table.Rows.IndexOf(Row) + 1;
         set {
-            Table.MoveRow(Table.Rows.IndexOf(Row), value - 1);
+            Table.MoveRow(Row, value - 1);
             label.Content = $" {value} ";
         }
     }
@@ -48,7 +48,6 @@ public class TableRowHandle : DraggableGraphic
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
         };
         border.SetPosition(0, 0);
-        Serial = Serial;
         Children.Add(border);
 
         OnMoved.Add((_, _ , _, _) => {
@@ -58,5 +57,9 @@ public class TableRowHandle : DraggableGraphic
 
     public override void Render(DrawingContext context)
     {
+    }
+
+    public void Refresh() {
+        Serial = Serial;
     }
 }
