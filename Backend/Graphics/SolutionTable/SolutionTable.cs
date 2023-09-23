@@ -12,7 +12,7 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
-public class SolutionTable : DraggableGraphic
+public class SolutionTable : Canvas
 {
     public List<TableRow> Rows = new();
 
@@ -22,12 +22,15 @@ public class SolutionTable : DraggableGraphic
 
     Border border;
 
-    public SolutionTable(bool hasFroms = false) : base()
+    public TableHandle Handle;
+    public SolutionTable(bool hasFroms = false, double x = 200, double y = 200) : base()
     {
         HasFroms = hasFroms;
         VisualList = new Canvas {
             Width = 200
         };
+
+        this.SetPosition(x, y);
 
         border = new Border
         {
@@ -37,7 +40,13 @@ public class SolutionTable : DraggableGraphic
             BorderBrush = /*UIColors.SolutionTableBorder*/ new SolidColorBrush(Colors.Red),
         };
 
+        Handle = new TableHandle(this);
+        Handle.X = x + Width / 2 - Handle.Width / 2;
+        Handle.Y = y -50;
+        
+
         Children.Add(border);
+        MainWindow.BigScreen.Children.Add(Handle);
 
         for (int i = 0; i < 4; i++) AddRow(
             new TableRow(this)
@@ -56,8 +65,6 @@ public class SolutionTable : DraggableGraphic
     }
 
     public override void Render(DrawingContext context) {}
-    public override double Area() => 0;
-
     public void MoveRow(int from, int toBefore)
     {
         var _row = Rows[from];

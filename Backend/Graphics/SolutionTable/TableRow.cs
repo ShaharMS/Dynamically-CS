@@ -28,8 +28,8 @@ public class TableRow : Canvas
                 var newBounds = _vr.Bounds;
                 var oldBounds = (Rect)e.OldValue!;
                 if (_vr.Bounds.Width == oldBounds.Width && newBounds.Height == oldBounds.Height) return;
-                //Height = _vr.Height + 1; // border bottom
-                Width = _vr.Width;
+                Height = _vr.Bounds.Height + 1; // border bottom
+                Width = _vr.Bounds.Width;
                 Table.Refresh();
             };
             border.Child = _vr;
