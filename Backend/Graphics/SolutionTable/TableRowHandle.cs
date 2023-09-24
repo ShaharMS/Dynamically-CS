@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using CSharpMath.Atom.Atoms;
 using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
@@ -27,6 +28,14 @@ public class TableRowHandle : DraggableGraphic
 
     private Label label;
     private Border border;
+    public new double Width {
+        get => border.Bounds.Width;
+        set => border.Width = value;
+    }
+    public new double Height {
+        get => border.Bounds.Height;
+        set => border.Height = value;
+    }
     public TableRowHandle(TableRow row) {
         Row = row;
         label = new Label
@@ -52,12 +61,16 @@ public class TableRowHandle : DraggableGraphic
 
         OnMoved.Add((_, _ , _, _) => {
             Row.AttemptMovement();
+            foreach (TableRow row in Table.Rows) row.RepositionHandle();
+        });
+        OnDragged.Add((_, _, _, _) => {
+            Row.RepositionHandle();
+            Table.Refresh();
         });
     }
 
-    public override void Render(DrawingContext context)
-    {
-    }
+    public override double Area() => 0;
+    public override void Render(DrawingContext context) {}
 
     public void Refresh() {
         Serial = Serial;

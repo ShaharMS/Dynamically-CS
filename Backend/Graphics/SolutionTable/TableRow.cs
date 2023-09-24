@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Reflection.Metadata;
+using Avalonia;
 using Avalonia.Controls;
 using CSharpMath.Atom.Atoms;
 using CSharpMath.Avalonia;
@@ -10,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Screens;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
@@ -56,15 +58,38 @@ public class TableRow : Canvas
         };
 
         Handle = new TableRowHandle(this);
+        EventHandler placeHandle = null!;
+        placeHandle = (_, _) =>
+        {
+            Log.Write(this.GetPosition().ToString(), Height, Handle.Height);
+            if (double.IsNaN(this.GetPosition().Y)) return;
+            Handle.X = this.GetPosition().X - 50;
+            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.GetPosition().Y + Height / 2 - Handle.Height / 2;
+            LayoutUpdated -= placeHandle;
+        };
+        LayoutUpdated += placeHandle;
         
         border.SetPosition(0, 0);
-        Handle.SetPosition(-50,  Height / 2 - Handle.Height / 2);
         Children.Add(border);
-        Children.Add(Handle);
+        MainWindow.BigScreen.Children.Add(Handle);
     }
 
     public void AttemptMovement()
     {
-        Handle.SetPosition(-50, Height / 2 - Handle.Height / 2);
+        Handle.X = this.GetPosition().X - 50;
+        int index = 0;
+
+        foreach (TableRow row in Table.Rows) {
+            if (row == this) continue;
+            if (row.Handle.Y < Handle.Y) index++;
+        }
+
+        if (index != Table.Rows.IndexOf(this)) Table.MoveRow(this, index);
+    }
+    public void RepositionHandle() {
+        if (!Handle.CurrentlyDragging) {
+            Handle.X = this.GetPosition().X - 50;
+            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.GetPosition().Y + Height / 2 - Handle.Height / 2;
+        }
     }
 }

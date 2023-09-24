@@ -15,6 +15,15 @@ public class TableHandle : DraggableGraphic
     
     private Label label;
     private Border border;
+
+    public new double Width {
+        get => border.Bounds.Width;
+        set => border.Width = value;
+    }
+    public new double Height {
+        get => border.Bounds.Height;
+        set => border.Height = value;
+    }
     public TableHandle(SolutionTable table) {
         Table = table;
         label = new Label
@@ -38,11 +47,13 @@ public class TableHandle : DraggableGraphic
         };
         Children.Add(border);
 
-        OnMoved.Add((_, _, _, _) =>
+        OnMoved.Add((x, y, _, _) =>
         {
-            Table.SetPosition(X + Width / 2 - Table.Width / 2, Y + 50);
+            Table.SetPosition(x + border.Bounds.Width / 2 - Table.Width / 2, y + 50);
+            foreach(var row in Table.Rows) row.RepositionHandle();
         });
     }
 
     public override double Area() => 0;
+    public override void Render(DrawingContext context) {}
 }

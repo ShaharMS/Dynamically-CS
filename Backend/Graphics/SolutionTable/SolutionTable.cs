@@ -23,10 +23,17 @@ public class SolutionTable : Canvas
     Border border;
 
     public TableHandle Handle;
+
+    public new double Width
+    {
+        get => VisualList.Width + 6; // Border gutter
+        set => VisualList.Width = value - 6; // Border gutter
+    }
     public SolutionTable(bool hasFroms = false, double x = 200, double y = 200) : base()
     {
         HasFroms = hasFroms;
-        VisualList = new Canvas {
+        VisualList = new Canvas
+        {
             Width = 200
         };
 
@@ -36,14 +43,21 @@ public class SolutionTable : Canvas
         {
             Child = VisualList,
             BorderThickness = new Thickness(3, 3, 3, 3),
-            Background = /*UIColors.SolutionTableFill*/ new SolidColorBrush(Colors.Gray),
-            BorderBrush = /*UIColors.SolutionTableBorder*/ new SolidColorBrush(Colors.Red),
+            Background = UIColors.SolutionTableFill,
+            BorderBrush = UIColors.SolutionTableBorder
         };
 
         Handle = new TableHandle(this);
-        Handle.X = x + Width / 2 - Handle.Width / 2;
-        Handle.Y = y - 50;
-        
+
+        EventHandler placeHandle = null!;
+        placeHandle = (_, _) =>
+        {
+            Handle.X = x + Width / 2 - Handle.Width / 2;
+            Handle.Y = y - 50;
+            LayoutUpdated -= placeHandle;
+        };
+        LayoutUpdated += placeHandle;
+
 
         Children.Add(border);
         MainWindow.BigScreen.Children.Add(Handle);
@@ -55,16 +69,16 @@ public class SolutionTable : Canvas
                 {
                     ChildrenQueued = new List<Control>
                     {
-                        new Label { Content = "Statement" },
-                        new Label { Content = "Reason" },
-                        new Label { Content = "From" }
+                        new TextBox { AcceptsReturn = true, Text = $"Statement{i + 1}" },
+                        new TextBox { AcceptsReturn = true, Text = $"Reason{i + 1}" },
+                        new TextBox { AcceptsReturn = true, Text = $"From{i + 1}" }
                     }
                 }
             }
         );
     }
 
-    public override void Render(DrawingContext context) {}
+    public override void Render(DrawingContext context) { }
     public void MoveRow(int from, int toBefore)
     {
         var _row = Rows[from];
@@ -83,13 +97,15 @@ public class SolutionTable : Canvas
         Refresh();
     }
 
-    public void InsertRow(TableRow row, int index) {
+    public void InsertRow(TableRow row, int index)
+    {
         Rows.Insert(index, row);
         VisualList.Children.Add(row);
         row.Handle.Refresh();
         Refresh();
     }
-    public void AddRow(TableRow row) {
+    public void AddRow(TableRow row)
+    {
 
         Rows.Add(row);
         VisualList.Children.Add(row);
@@ -97,12 +113,13 @@ public class SolutionTable : Canvas
         Refresh();
     }
 
-    public void Refresh() 
+    public void Refresh()
     {
         double totalHeight = 0;
-        foreach (TableRow r in Rows) 
+        foreach (TableRow r in Rows)
         {
             Canvas.SetTop(r, totalHeight);
+            r.RepositionHandle();
             totalHeight += r.Height;
         }
         VisualList.Height = totalHeight;

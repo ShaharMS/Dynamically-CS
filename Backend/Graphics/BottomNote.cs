@@ -27,7 +27,7 @@ public class BottomNote : Canvas
 
         this.SetPosition(MainWindow.Instance.Width / 2 - label.Width / 2, MainWindow.Instance.Height - 150);
 
-        EventHandler? pos = null;
+        EventHandler pos = null!;
         pos = (_, _) => 
         {
             this.SetPosition(MainWindow.Instance.Width / 2 - label.Width / 2, MainWindow.Instance.Height - 150);
