@@ -47,12 +47,11 @@ public partial class ResizableBorder : Border
             e.Pointer.Capture(this);
 
             var mousePoint = e.GetPosition(this);
-            
-            if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance)
-            {
-            }
 
-            foreach (var l in OnResizeStart) l();
+            if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance) startResizeTopLeft(e);
+            else if (Bounds.TopRight.DistanceTo(mousePoint) < cornerDistance) 
+
+                foreach (var l in OnResizeStart) l();
         }
     }
 
@@ -65,7 +64,7 @@ public partial class ResizableBorder : Border
         tHeight = ((Control)Child).Height;
     }
 
-    public void startResizeTopLeft(PointerEventArgs e)
+    public void startResizeTopLeft(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -107,7 +106,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeTopRight(PointerEventArgs e)
+    public void startResizeTopRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -195,7 +194,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeBottomRight(PointerEventArgs e)
+    public void startResizeBottomRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -235,7 +234,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeLeft(PointerEventArgs e)
+    public void startResizeLeft(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -270,7 +269,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeRight(PointerEventArgs e)
+    public void startResizeRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -304,7 +303,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeTop(PointerEventArgs e)
+    public void startResizeTop(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -339,7 +338,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeBottom(PointerEventArgs e)
+    public void startResizeBottom(PointerPressedEventArgs e)
     {
         var p = new
         {

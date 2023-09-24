@@ -16,6 +16,26 @@ public class SolutionTable : Canvas
 {
     public List<TableRow> Rows = new();
 
+    double _stWidth;
+    public double StatementsWidth
+    {
+        get => _stWidth;
+        set { var prev = _stWidth; _stWidth = _stWidth.Max(value); if (prev != _stWidth) Refresh(); }
+    }
+    double _rsWidth;
+    public double ReasonsWidth
+    {
+        get => _rsWidth;
+        set {var prev = _rsWidth; _rsWidth = _rsWidth.Max(value); if (prev != _rsWidth) Refresh(); }
+    }
+    double _fsWidth;
+    public double FromsWidth
+    {
+        get => _fsWidth;
+        set {var prev = _fsWidth; _fsWidth = _fsWidth.Max(value); if (prev != _fsWidth) Refresh(); }
+    }
+
+
     public Canvas VisualList;
 
     public bool HasFroms;
@@ -46,6 +66,19 @@ public class SolutionTable : Canvas
             Background = UIColors.SolutionTableFill,
             BorderBrush = UIColors.SolutionTableBorder
         };
+
+        if (!hasFroms )
+        {
+            FromsWidth = 0;
+            StatementsWidth = VisualList.Width / 2;
+            ReasonsWidth = VisualList.Width / 2;
+        }
+        else
+        {
+            StatementsWidth = VisualList.Width * 2 / 5;
+            ReasonsWidth = VisualList.Width * 2 / 5;
+            FromsWidth = VisualList.Width * 1 / 5;
+        }
 
         Handle = new TableHandle(this);
 
@@ -119,10 +152,19 @@ public class SolutionTable : Canvas
         foreach (TableRow r in Rows)
         {
             Canvas.SetTop(r, totalHeight);
+            if (!double.IsNaN(r.VisualRow.Children[0].Bounds.Width) && r.VisualRow.Children[0].Bounds.Width > StatementsWidth) _stWidth = r.VisualRow.Children[0].Bounds.Width;
+            if (!double.IsNaN(r.VisualRow.Children[1].Bounds.Width) && r.VisualRow.Children[1].Bounds.Width > ReasonsWidth) _rsWidth = r.VisualRow.Children[1].Bounds.Width;
+            if (HasFroms && !double.IsNaN(r.VisualRow.Children[2].Bounds.Width) && r.VisualRow.Children[2].Bounds.Width > FromsWidth) _fsWidth = r.VisualRow.Children[2].Bounds.Width;
             r.RepositionHandle();
             totalHeight += r.Height;
         }
+        foreach (TableRow r in Rows)
+        {
+            ((dynamic)r.VisualRow.Children[0]).Width = StatementsWidth;
+            ((dynamic)r.VisualRow.Children[1]).Width = ReasonsWidth;
+            if (HasFroms) ((dynamic)r.VisualRow.Children[2]).Width = FromsWidth;
+        }
         VisualList.Height = totalHeight;
-        Log.Write(Rows.Count);
+        VisualList.Width = StatementsWidth + ReasonsWidth + FromsWidth; 
     }
 }
