@@ -114,10 +114,6 @@ public partial class DraggableGraphic : Canvas
             CurrentlyDragging = false;
             e.Pointer?.Capture(null);
 
-            var currentPosition = e.GetPosition(null);
-            var endX = X + (currentPosition.X - _startMousePosition.X);
-            var endY = Y + (currentPosition.Y - _startMousePosition.Y);
-
             DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
 
         }

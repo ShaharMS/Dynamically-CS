@@ -25,7 +25,7 @@ public class TableHandle : DraggableGraphic
             Width = 20,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             Height = 20,
-            Content = "⭤⭥"
+            Content = "⭤"
         };
         border = new Border {
             Child = label,
@@ -36,16 +36,12 @@ public class TableHandle : DraggableGraphic
             HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
         };
-        border.SetPosition(0, 0);
         Children.Add(border);
 
-        OnMoved.Add((_, _ , _, _) => {
-            Table.SetPosition(Y + 50, X + Width / 2 - Table.Width / 2);
+        OnMoved.Add((_, _, _, _) =>
+        {
+            Table.SetPosition(X + Width / 2 - Table.Width / 2, Y + 50);
         });
-    }
-
-    public override void Render(DrawingContext context)
-    {
     }
 
     public override double Area() => 0;

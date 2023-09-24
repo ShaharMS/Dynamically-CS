@@ -42,7 +42,7 @@ public class SolutionTable : Canvas
 
         Handle = new TableHandle(this);
         Handle.X = x + Width / 2 - Handle.Width / 2;
-        Handle.Y = y -50;
+        Handle.Y = y - 50;
         
 
         Children.Add(border);
