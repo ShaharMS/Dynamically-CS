@@ -174,6 +174,7 @@ public class BigScreen : DraggableGraphic
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+        if (e.Source is not DraggableGraphic) return;
         FocusedObject = this;
         foreach (var child in Children)
         {

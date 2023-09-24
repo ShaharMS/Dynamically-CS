@@ -40,7 +40,7 @@ public class SolutionTable : Canvas
 
     public bool HasFroms;
 
-    Border border;
+    ResizableBorder border;
 
     public TableHandle Handle;
 
@@ -54,12 +54,12 @@ public class SolutionTable : Canvas
         HasFroms = hasFroms;
         VisualList = new Canvas
         {
-            Width = 200
+            Width = 600
         };
 
         this.SetPosition(x, y);
 
-        border = new Border
+        border = new ResizableBorder
         {
             Child = VisualList,
             BorderThickness = new Thickness(3, 3, 3, 3),

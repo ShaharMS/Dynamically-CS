@@ -40,18 +40,25 @@ public partial class ResizableBorder : Border
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-
+        Log.Write("Attempting resize", Resizable);
         if (Resizable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             CurrentlyResizing = true;
             e.Pointer.Capture(this);
 
             var mousePoint = e.GetPosition(this);
+            Log.Write(mousePoint.ToString(), Bounds.ToString());
 
             if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance) startResizeTopLeft(e);
-            else if (Bounds.TopRight.DistanceTo(mousePoint) < cornerDistance) 
+            else if (Bounds.TopRight.DistanceTo(mousePoint) < cornerDistance) startResizeTopRight(e);
+            else if (Bounds.BottomLeft.DistanceTo(mousePoint) < cornerDistance) startResizeBottomLeft(e);
+            else if (Bounds.BottomRight.DistanceTo(mousePoint) < cornerDistance) startResizeBottomRight(e);
+            else if (Math.Abs(Bounds.Top - mousePoint.Y) < cornerDistance) startResizeTop(e);
+            else if (Math.Abs(Bounds.Bottom - mousePoint.Y) < cornerDistance) startResizeBottom(e);
+            else if (Math.Abs(Bounds.Left - mousePoint.X) < cornerDistance) startResizeLeft(e);
+            else if (Math.Abs(Bounds.Right - mousePoint.X) < cornerDistance) startResizeRight(e);
 
-                foreach (var l in OnResizeStart) l();
+            foreach (var l in OnResizeStart) l();
         }
     }
 
@@ -60,8 +67,8 @@ public partial class ResizableBorder : Border
     {
         tX = X;
         tY = Y;
-        tWidth = ((Control)Child).Width;
-        tHeight = ((Control)Child).Height;
+        tWidth = ((dynamic)Child).Width;
+        tHeight = ((dynamic)Child).Height;
     }
 
     public void startResizeTopLeft(PointerPressedEventArgs e)
@@ -70,8 +77,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -80,30 +87,30 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             X = e.GetPosition(Parent).X;
             Y = e.GetPosition(Parent).Y;
             var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
             var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
-            ((Control)Child).Width = width;
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Width = width;
+            ((dynamic)Child).Height = height;
             if (width < 0)
             {
                 X = e.GetPosition(Parent).X + width;
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y + height;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeTopRight(PointerPressedEventArgs e)
@@ -112,8 +119,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -122,9 +129,9 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
 
@@ -132,8 +139,8 @@ public partial class ResizableBorder : Border
             var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
             Log.Write("width: " + width + " height: " + height);
 
-            ((Control)Child).Width = width;
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Width = width;
+            ((dynamic)Child).Height = height;
 
             Y = e.GetPosition(Parent).Y;
 
@@ -141,16 +148,16 @@ public partial class ResizableBorder : Border
             {
                 X = e.GetPosition(Parent).X;
                 Log.Write(width);
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y + height;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeBottomLeft(PointerEventArgs e)
@@ -159,8 +166,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -169,29 +176,29 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             X = e.GetPosition(Parent).X;
             var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
             var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
-            ((Control)Child).Width = width;
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Width = width;
+            ((dynamic)Child).Height = height;
             if (width < 0)
             {
                 X = e.GetPosition(Parent).X + width;
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeBottomRight(PointerPressedEventArgs e)
@@ -200,8 +207,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -210,28 +217,28 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             var width = p.w - (p.x - e.GetPosition(MainWindow.BigScreen).X);
             var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
-            ((Control)Child).Width = width;
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Width = width;
+            ((dynamic)Child).Height = height;
             if (width < 0)
             {
                 X = e.GetPosition(Parent).X;
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeLeft(PointerPressedEventArgs e)
@@ -240,8 +247,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -250,23 +257,23 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             X = e.GetPosition(Parent).X;
             var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            ((Control)Child).Width = width;
+            ((dynamic)Child).Width = width;
             if (width < 0)
             {
                 X = e.GetPosition(Parent).X + width;
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
-            ((Control)Child).Height = p.h;
+            ((dynamic)Child).Height = p.h;
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeRight(PointerPressedEventArgs e)
@@ -275,8 +282,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -285,22 +292,22 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             var width = p.w - (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            ((Control)Child).Width = width;
+            ((dynamic)Child).Width = width;
             if (width < 0)
             {
                 X = e.GetPosition(Parent).X;
-                ((Control)Child).Width = -width;
+                ((dynamic)Child).Width = -width;
             }
-            ((Control)Child).Height = p.h;
+            ((dynamic)Child).Height = p.h;
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeTop(PointerPressedEventArgs e)
@@ -309,8 +316,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -319,23 +326,23 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             Y = e.GetPosition(Parent).Y;
             var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Height = height;
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y + height;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
-            ((Control)Child).Width = p.w;
+            ((dynamic)Child).Width = p.w;
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
     public void startResizeBottom(PointerPressedEventArgs e)
@@ -344,8 +351,8 @@ public partial class ResizableBorder : Border
         {
             x = e.GetPosition(MainWindow.BigScreen).X,
             y = e.GetPosition(MainWindow.BigScreen).Y,
-            w = ((Control)Child).Width, // gutter
-            h = ((Control)Child).Height // gutter
+            w = ((dynamic)Child).Width, // gutter
+            h = ((dynamic)Child).Height // gutter
 
         };
         setPrevStats();
@@ -354,22 +361,22 @@ public partial class ResizableBorder : Border
         {
             if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.RemoveHandler(PointerPressedEvent, res);
+                MainWindow.Instance.RemoveHandler(PointerMovedEvent, res);
 
-                foreach (var l in OnResizeEnd) l(X, Y, ((Control)Child).Width, ((Control)Child).Height, tX, tY, tWidth, tHeight);
+                foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
             var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
-            ((Control)Child).Height = height;
+            ((dynamic)Child).Height = height;
             if (height < 0)
             {
                 Y = e.GetPosition(Parent).Y;
-                ((Control)Child).Height = -height;
+                ((dynamic)Child).Height = -height;
             }
-            ((Control)Child).Width = p.w;
+            ((dynamic)Child).Width = p.w;
         }
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, res, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
 }

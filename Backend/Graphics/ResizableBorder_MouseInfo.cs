@@ -15,6 +15,7 @@ public partial class ResizableBorder : Border
 
     public ResizableBorder()
     {
+        Resizable = true;
         PointerEnter += MouseInfo_PointerHover;
         PointerLeave += MouseInfo_PointerOut;
         PointerPressed += MouseInfo_PointerPressed;
