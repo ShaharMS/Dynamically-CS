@@ -66,6 +66,22 @@ public class SolutionTable : Canvas
             Background = UIColors.SolutionTableFill,
             BorderBrush = UIColors.SolutionTableBorder
         };
+        border.OnResizing.Add(() =>
+        {
+            if (!hasFroms)
+            {
+                _fsWidth = 0;
+                _stWidth = VisualList.Width / 2;
+                _rsWidth = VisualList.Width / 2;
+            }
+            else
+            {
+                _rsWidth = VisualList.Width * 2 / 5;
+                _stWidth = VisualList.Width * 2 / 5;
+                _fsWidth = VisualList.Width * 1 / 5;
+            }
+            Refresh();
+        });
 
         if (!hasFroms )
         {
@@ -102,9 +118,9 @@ public class SolutionTable : Canvas
                 {
                     ChildrenQueued = new List<Control>
                     {
-                        new TextBox { AcceptsReturn = true, Text = $"Statement{i + 1}" },
-                        new TextBox { AcceptsReturn = true, Text = $"Reason{i + 1}" },
-                        new TextBox { AcceptsReturn = true, Text = $"From{i + 1}" }
+                        new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"Statement{i + 1}" },
+                        new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"Reason{i + 1}" },
+                        new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"From{i + 1}" }
                     }
                 }
             }
@@ -152,9 +168,9 @@ public class SolutionTable : Canvas
         foreach (TableRow r in Rows)
         {
             Canvas.SetTop(r, totalHeight);
-            if (!double.IsNaN(r.VisualRow.Children[0].Bounds.Width) && r.VisualRow.Children[0].Bounds.Width > StatementsWidth) _stWidth = r.VisualRow.Children[0].Bounds.Width;
+            /*if (!double.IsNaN(r.VisualRow.Children[0].Bounds.Width) && r.VisualRow.Children[0].Bounds.Width > StatementsWidth) _stWidth = r.VisualRow.Children[0].Bounds.Width;
             if (!double.IsNaN(r.VisualRow.Children[1].Bounds.Width) && r.VisualRow.Children[1].Bounds.Width > ReasonsWidth) _rsWidth = r.VisualRow.Children[1].Bounds.Width;
-            if (HasFroms && !double.IsNaN(r.VisualRow.Children[2].Bounds.Width) && r.VisualRow.Children[2].Bounds.Width > FromsWidth) _fsWidth = r.VisualRow.Children[2].Bounds.Width;
+            if (HasFroms && !double.IsNaN(r.VisualRow.Children[2].Bounds.Width) && r.VisualRow.Children[2].Bounds.Width > FromsWidth) _fsWidth = r.VisualRow.Children[2].Bounds.Width;*/
             r.RepositionHandle();
             totalHeight += r.Height;
         }

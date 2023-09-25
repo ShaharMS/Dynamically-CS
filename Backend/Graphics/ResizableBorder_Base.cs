@@ -46,8 +46,11 @@ public partial class ResizableBorder : Border
             CurrentlyResizing = true;
             e.Pointer.Capture(this);
 
-            var mousePoint = e.GetPosition(this);
-            Log.Write(mousePoint.ToString(), Bounds.ToString());
+            var mousePoint = e.GetPosition(Parent);
+            //Log.Write(mousePoint.ToString(), Bounds.ToString());
+            //Log.Write("Bounds:", "tl", Bounds.TopLeft, "tr", Bounds.TopRight, "bl", Bounds.BottomLeft, "br", Bounds.BottomRight);
+
+            foreach (var l in OnResizeStart) l();
 
             if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance) startResizeTopLeft(e);
             else if (Bounds.TopRight.DistanceTo(mousePoint) < cornerDistance) startResizeTopRight(e);
@@ -58,7 +61,6 @@ public partial class ResizableBorder : Border
             else if (Math.Abs(Bounds.Left - mousePoint.X) < cornerDistance) startResizeLeft(e);
             else if (Math.Abs(Bounds.Right - mousePoint.X) < cornerDistance) startResizeRight(e);
 
-            foreach (var l in OnResizeStart) l();
         }
     }
 
@@ -75,8 +77,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -94,8 +96,8 @@ public partial class ResizableBorder : Border
             }
             X = e.GetPosition(Parent).X;
             Y = e.GetPosition(Parent).Y;
-            var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var width = p.w + (p.x - e.GetPosition(Parent).X);
+            var height = p.h + (p.y - e.GetPosition(Parent).Y);
             ((dynamic)Child).Width = width;
             ((dynamic)Child).Height = height;
             if (width < 0)
@@ -108,6 +110,7 @@ public partial class ResizableBorder : Border
                 Y = e.GetPosition(Parent).Y + height;
                 ((dynamic)Child).Height = -height;
             }
+            foreach (var l in OnResizing) l();
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -117,8 +120,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -135,8 +138,8 @@ public partial class ResizableBorder : Border
                 return;
             }
 
-            var width = p.w - (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var width = p.w - (p.x - e.GetPosition(Parent).X);
+            var height = p.h + (p.y - e.GetPosition(Parent).Y);
             Log.Write("width: " + width + " height: " + height);
 
             ((dynamic)Child).Width = width;
@@ -155,6 +158,8 @@ public partial class ResizableBorder : Border
                 Y = e.GetPosition(Parent).Y + height;
                 ((dynamic)Child).Height = -height;
             }
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -164,8 +169,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -182,8 +187,8 @@ public partial class ResizableBorder : Border
                 return;
             }
             X = e.GetPosition(Parent).X;
-            var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var width = p.w + (p.x - e.GetPosition(Parent).X);
+            var height = p.h - (p.y - e.GetPosition(Parent).Y);
             ((dynamic)Child).Width = width;
             ((dynamic)Child).Height = height;
             if (width < 0)
@@ -196,6 +201,7 @@ public partial class ResizableBorder : Border
                 Y = e.GetPosition(Parent).Y;
                 ((dynamic)Child).Height = -height;
             }
+            foreach (var l in OnResizing) l();
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -205,8 +211,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -222,8 +228,8 @@ public partial class ResizableBorder : Border
                 foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
-            var width = p.w - (p.x - e.GetPosition(MainWindow.BigScreen).X);
-            var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var width = p.w - (p.x - e.GetPosition(Parent).X);
+            var height = p.h - (p.y - e.GetPosition(Parent).Y);
             ((dynamic)Child).Width = width;
             ((dynamic)Child).Height = height;
             if (width < 0)
@@ -236,6 +242,8 @@ public partial class ResizableBorder : Border
                 Y = e.GetPosition(Parent).Y;
                 ((dynamic)Child).Height = -height;
             }
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -245,8 +253,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -263,7 +271,7 @@ public partial class ResizableBorder : Border
                 return;
             }
             X = e.GetPosition(Parent).X;
-            var width = p.w + (p.x - e.GetPosition(MainWindow.BigScreen).X);
+            var width = p.w + (p.x - e.GetPosition(Parent).X);
             ((dynamic)Child).Width = width;
             if (width < 0)
             {
@@ -271,6 +279,8 @@ public partial class ResizableBorder : Border
                 ((dynamic)Child).Width = -width;
             }
             ((dynamic)Child).Height = p.h;
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -280,8 +290,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -297,7 +307,7 @@ public partial class ResizableBorder : Border
                 foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
-            var width = p.w - (p.x - e.GetPosition(MainWindow.BigScreen).X);
+            var width = p.w - (p.x - e.GetPosition(Parent).X);
             ((dynamic)Child).Width = width;
             if (width < 0)
             {
@@ -305,6 +315,8 @@ public partial class ResizableBorder : Border
                 ((dynamic)Child).Width = -width;
             }
             ((dynamic)Child).Height = p.h;
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -314,8 +326,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -332,7 +344,7 @@ public partial class ResizableBorder : Border
                 return;
             }
             Y = e.GetPosition(Parent).Y;
-            var height = p.h + (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var height = p.h + (p.y - e.GetPosition(Parent).Y);
             ((dynamic)Child).Height = height;
             if (height < 0)
             {
@@ -340,6 +352,8 @@ public partial class ResizableBorder : Border
                 ((dynamic)Child).Height = -height;
             }
             ((dynamic)Child).Width = p.w;
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
@@ -349,8 +363,8 @@ public partial class ResizableBorder : Border
     {
         var p = new
         {
-            x = e.GetPosition(MainWindow.BigScreen).X,
-            y = e.GetPosition(MainWindow.BigScreen).Y,
+            x = e.GetPosition(Parent).X,
+            y = e.GetPosition(Parent).Y,
             w = ((dynamic)Child).Width, // gutter
             h = ((dynamic)Child).Height // gutter
 
@@ -366,7 +380,7 @@ public partial class ResizableBorder : Border
                 foreach (var l in OnResizeEnd) l(X, Y, ((dynamic)Child).Width, ((dynamic)Child).Height, tX, tY, tWidth, tHeight);
                 return;
             }
-            var height = p.h - (p.y - e.GetPosition(MainWindow.BigScreen).Y);
+            var height = p.h - (p.y - e.GetPosition(Parent).Y);
             ((dynamic)Child).Height = height;
             if (height < 0)
             {
@@ -374,6 +388,8 @@ public partial class ResizableBorder : Border
                 ((dynamic)Child).Height = -height;
             }
             ((dynamic)Child).Width = p.w;
+            foreach (var l in OnResizing) l();
+
         }
 
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
