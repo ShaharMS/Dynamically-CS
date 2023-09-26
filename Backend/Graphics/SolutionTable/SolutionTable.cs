@@ -170,9 +170,6 @@ public class SolutionTable : Canvas
         foreach (TableRow r in Rows)
         {
             Canvas.SetTop(r, totalHeight);
-            /*if (!double.IsNaN(r.VisualRow.Children[0].Bounds.Width) && r.VisualRow.Children[0].Bounds.Width > StatementsWidth) _stWidth = r.VisualRow.Children[0].Bounds.Width;
-            if (!double.IsNaN(r.VisualRow.Children[1].Bounds.Width) && r.VisualRow.Children[1].Bounds.Width > ReasonsWidth) _rsWidth = r.VisualRow.Children[1].Bounds.Width;
-            if (HasFroms && !double.IsNaN(r.VisualRow.Children[2].Bounds.Width) && r.VisualRow.Children[2].Bounds.Width > FromsWidth) _fsWidth = r.VisualRow.Children[2].Bounds.Width;*/
             r.RepositionHandle();
             totalHeight += r.Height;
         }
@@ -182,7 +179,8 @@ public class SolutionTable : Canvas
             ((dynamic)r.VisualRow.Children[1]).Width = ReasonsWidth;
             if (HasFroms) ((dynamic)r.VisualRow.Children[2]).Width = FromsWidth;
         }
-        VisualList.Height = totalHeight;
-        VisualList.Width = StatementsWidth + ReasonsWidth + FromsWidth; 
+        if (double.IsNaN(VisualList.Height)) VisualList.Height = totalHeight;
+        else VisualList.Height = VisualList.Height.Max(totalHeight);
+        VisualList.Width = StatementsWidth + ReasonsWidth + FromsWidth;
     }
 }

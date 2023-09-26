@@ -86,6 +86,7 @@ public partial class MainWindow : Window
 
         new BottomNote("Application Started!");
         BigScreen.Children.Add(new SolutionTable(true));
+        BigScreen.Children.Add(new MathTextBox());
     }
 
     public static void regenAll(double z, double x, double c, double v) {
