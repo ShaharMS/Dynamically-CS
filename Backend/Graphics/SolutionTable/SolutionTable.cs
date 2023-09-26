@@ -80,6 +80,8 @@ public class SolutionTable : Canvas
                 _stWidth = VisualList.Width * 2 / 5;
                 _fsWidth = VisualList.Width * 1 / 5;
             }
+            Handle.X = this.GetPosition().X - MainWindow.BigScreen.X + Width / 2 - Handle.Width / 2;
+            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.Y - 50;
             Refresh();
         });
 
