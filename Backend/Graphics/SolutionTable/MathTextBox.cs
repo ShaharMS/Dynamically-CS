@@ -12,29 +12,45 @@ using CSharpMath;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
-public class MathTextBox : MathView
+public class MathTextBox : Canvas
 {
-   public TextBox TextInput;
+    public TextBox TextBox;
+    public MathView MathView;
 
-   public MathTextBox()
-   {
-        TextInput = new();
-        TextInput.KeyDown += (_, _) => {
-            Log.Write("Parsing latex...");
-            var c = Convert(TextInput.Text ?? "");
-            Log.Write("Result:", c, "pre:", TextInput.Text ?? "");
-            LaTeX = Convert(TextInput.Text ?? "");
-            InvalidateVisual();
+
+    public MathTextBox()
+    {
+        TextBox = new TextBox
+        {
+            Opacity = 0.05,
+            Text = @"AB = AC = BC"
         };
-        TextInput.SetPosition(200, MainWindow.BigScreen.Height - MainWindow.BigScreen.Y);
-        MainWindow.BigScreen.Children.Add(TextInput);
+        TextBox.PropertyChanged += (s, e) =>
+        {
+            if (e.Property.Name != nameof(TextBox.Text) || MathView == null) return;
+            MathView.LaTeX = Dynamically.Backend.Latex.Latex.Latexify(TextBox.Text ?? "");
+            Log.Write(TextBox.Text, Latex.Latex.Debugify(TextBox.Text ?? ""));
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+        };
+        TextBox.PropertyChanged += (s, e) =>
+        {
+            if (e.Property.Name != nameof(TextBox.Bounds) || MathView == null) return;
+            // Second pass, incase the first didnt catch the bounds update
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+        };
+
+        MathView = new MathView
+        {
+            LaTeX = @"AB = AC = BC",
+            FontSize = (float)TextBox.FontSize,
+            DisplacementX = (float)TextBox.FontSize / 4,
+        };
 
         this.SetPosition(100, 100);
-        this.LaTeX = @"X^4 + \frac{x^2}{q_{12}} = 4";
-   }
+        TextBox.SetPosition(0, 0); MathView.SetPosition(0, 0);
 
-   public static string Convert(string latex) =>
-      LaTeXParser.MathListFromLaTeX(latex)
-        .Bind(list => Evaluation.Interpret(list))
-        .Match(success => success, error => latex);
+
+        Children.Add(MathView); Children.Add(TextBox);
+        AttachedToVisualTree += (_, _) => TextBox.Text = TextBox.Text;
+    }
 }

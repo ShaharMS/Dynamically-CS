@@ -19,7 +19,7 @@ namespace Dynamically
             consoleTextBlock = new TextBlock
             {
                 Width = this.Width,
-                Height = this.Height,
+                Height = this.Height - 30,
                 FontSize = 16,
                 Text = "Application start!\n--------------------------------\n"
             };
@@ -28,7 +28,7 @@ namespace Dynamically
             {
                 Content = consoleTextBlock,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
             };
 
             Content = scrollViewer;

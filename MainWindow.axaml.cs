@@ -14,6 +14,7 @@ using Dynamically.Backend.Interfaces;
 using System.Linq;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Graphics.SolutionTable;
+using Dynamically.Backend.Latex;
 
 namespace Dynamically;
 
@@ -87,6 +88,9 @@ public partial class MainWindow : Window
         new BottomNote("Application Started!");
         BigScreen.Children.Add(new SolutionTable(true));
         BigScreen.Children.Add(new MathTextBox());
+
+        Log.Write("123 + AB / 3 = 66 * 5");
+        Log.Write(Latex.Latexify("123 + AB / 3 = 66 * 5"));
     }
 
     public static void regenAll(double z, double x, double c, double v) {
