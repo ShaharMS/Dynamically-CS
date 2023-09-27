@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CSharpMath;
+using Avalonia;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
@@ -56,5 +57,12 @@ public class MathTextBox : Canvas
 
         Children.Add(MathView); Children.Add(TextBox);
         AttachedToVisualTree += (_, _) => TextBox.Text = TextBox.Text;
+    }
+
+    public virtual int CaretPositionFromPoint(Point point) {
+
+        if (MathView.Painter.Content == null) return 0;
+
+        return 0;
     }
 }
