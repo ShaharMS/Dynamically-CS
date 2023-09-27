@@ -28,15 +28,15 @@ public class MathTextBox : Canvas
         TextBox.PropertyChanged += (s, e) =>
         {
             if (e.Property.Name != nameof(TextBox.Text) || MathView == null) return;
-            MathView.LaTeX = Dynamically.Backend.Latex.Latex.Latexify(TextBox.Text ?? "");
+            MathView.LaTeX = Latex.Latex.Latexify(TextBox.Text ?? "");
             Log.Write(TextBox.Text, Latex.Latex.Debugify(TextBox.Text ?? ""));
-            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2 + 200);
         };
         TextBox.PropertyChanged += (s, e) =>
         {
             if (e.Property.Name != nameof(TextBox.Bounds) || MathView == null) return;
             // Second pass, incase the first didnt catch the bounds update
-            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2 + 200);
         };
 
         MathView = new MathView
@@ -44,6 +44,10 @@ public class MathTextBox : Canvas
             LaTeX = @"AB = AC = BC",
             FontSize = (float)TextBox.FontSize,
             DisplacementX = (float)TextBox.FontSize / 4,
+        };
+        MathView.PointerPressed += (s, e) =>
+        {
+            Log.Write("Clicked!");
         };
 
         this.SetPosition(100, 100);
