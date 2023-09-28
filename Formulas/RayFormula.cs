@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Formats.Asn1.AsnWriter;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend;
 
 namespace Dynamically.Formulas;
 
@@ -151,6 +152,36 @@ public class RayFormula : Formula
 
         if (Y.Length == 0) return null;
         return new Point(X, Y[0]);
+    }
+
+    public Point? Intersect(SegmentFormula formula) => formula.Intersect(this);
+
+    public Point[] Intersect(CircleFormula formula)
+    {
+        var m = slope;
+        var c = yIntercept;
+        var a = formula.centerX;
+        var b = formula.centerY;
+        var r = formula.radius;
+
+        // Get ready for a roller coaster!
+        var x1 =
+            (2 * b * m + 2 * a + Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
+            / (2 * (m.Pow(2) + 1));
+
+        var x2 = 
+            (2 * b * m + 2 * a - Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
+            / (2 * (m.Pow(2) + 1));
+
+        // Roller coaster over, phew
+
+        var y1 = SolveForY(x1);
+        var y2 = SolveForY(x2);
+
+        if (y1.Length == 0 && y2.Length == 0) return Array.Empty<Point>();
+        else if (y1.Length == 0) return new[] {new Point(x2, y2[0])};
+        else if (y2.Length == 0) return new[] {new Point(x1, y1[0])};
+        else return new[] {new Point(x1, y1[0]), new Point(x2, y2[0])};
     }
     
     public Point[] GetPointsByDistanceFrom(Point start, double distance)

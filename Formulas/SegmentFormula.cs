@@ -14,37 +14,41 @@ namespace Dynamically.Formulas;
 public class SegmentFormula : Formula
 {
     double _x1;
-    public double x1 
+    public double x1
     {
         get => _x1;
-        set {
+        set
+        {
             _x1 = value;
             Move(x1, y1, x2, y2);
         }
     }
     double _y1;
-    public double y1 
+    public double y1
     {
         get => _y1;
-        set {
+        set
+        {
             _y1 = value;
             Move(x1, y1, x2, y2);
         }
     }
     double _x2;
-    public double x2 
+    public double x2
     {
         get => _x2;
-        set {
+        set
+        {
             _x2 = value;
             Move(x1, y1, x2, y2);
         }
     }
     double _y2;
-    public double y2 
+    public double y2
     {
         get => _y2;
-        set {
+        set
+        {
             _y2 = value;
             Move(x1, y1, x2, y2);
         }
@@ -69,7 +73,7 @@ public class SegmentFormula : Formula
         get => (y2 - y1) / (x2 - x1);
     }
 
-    public double Length 
+    public double Length
     {
         get => (x1, y1).DistanceTo(x2, y2);
     }
@@ -127,7 +131,8 @@ public class SegmentFormula : Formula
         if (formula == null) return null;
         if (formula.slope == slope) return null;
 
-        if (!double.IsFinite(slope)) {
+        if (!double.IsFinite(slope))
+        {
             var x = (x1 + x2) / 2;
             var y = formula.SolveForY(x);
             if (y.Length == 0) return null;
@@ -137,8 +142,9 @@ public class SegmentFormula : Formula
         }
 
         var X = (potentialYIntercept - formula.yIntercept) / (formula.slope - slope);
-        
-        if (!double.IsFinite(formula.slope)) {
+
+        if (!double.IsFinite(formula.slope))
+        {
             if (formula.ReferencePoint == null) return null;
             X = formula.ReferencePoint.Value.X;
         }
@@ -147,6 +153,33 @@ public class SegmentFormula : Formula
         return new Point(X, Y[0]);
     }
 
+    public Point[] Intersect(CircleFormula formula)
+    {
+        var m = slope;
+        var c = potentialYIntercept;
+        var a = formula.centerX;
+        var b = formula.centerY;
+        var r = formula.radius;
+
+        // Get ready for a roller coaster!
+        var x1 =
+            (2 * b * m + 2 * a + Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
+            / (2 * (m.Pow(2) + 1));
+
+        var x2 = 
+            (2 * b * m + 2 * a - Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
+            / (2 * (m.Pow(2) + 1));
+
+        // Roller coaster over, phew
+
+        var y1 = SolveForY(x1);
+        var y2 = SolveForY(x2);
+
+        if (y1.Length == 0 && y2.Length == 0) return Array.Empty<Point>();
+        else if (y1.Length == 0) return new[] {new Point(x2, y2[0])};
+        else if (y2.Length == 0) return new[] {new Point(x1, y1[0])};
+        else return new[] {new Point(x1, y1[0]), new Point(x2, y2[0])};
+    }
     public override double DistanceTo(Point point)
     {
         // Get the closest point on the ray to the given point

@@ -20,4 +20,5 @@ public class Settings
     public static int MakeRightAngleOffset = 10;
 
     public static double DistanceCountsAsNear = 5;
+    public static double IntersectionGenerationDistance = 10;
 }

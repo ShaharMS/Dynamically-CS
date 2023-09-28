@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
 using Dynamically.Screens;
 using Dynamically.Shapes;
@@ -55,7 +56,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         Recommendations = new List<Control?>
         {
             Recom_MakeStraight(),
-            Recom_MakeDiameter()
+            Recom_MakeDiameter(),
+            Recom_MarkIntersection()
         }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
@@ -352,6 +354,31 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             Regenerate();
         };
         return item;
+    }
+
+    MenuItem? Recom_MarkIntersection() {
+        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.all).ToList();
+
+        scanList.Remove(Subject);
+
+        List<MenuItem> intersections = new();
+        foreach (var element in scanList) {
+            if (element.Formula.DistanceTo(MainWindow.Mouse.GetPosition(element.Parent))) {
+                var item = new MenuItem {
+                    Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
+                };
+                item.Click += (_, _) => {
+                    var j = new Joint(0, 0);
+                    if (element is Segment) {
+                        j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
+                        j.Roles.AddToRole(Role.SEGMENT_On, Subject);
+                    } else { // element is Circle
+                        var intersections = (element as Circle)!.Formula.Intersect(Subject.Formula);
+                    }
+                }
+            }
+        }
+
     }
 
     // -------------------------------------------------------

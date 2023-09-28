@@ -54,6 +54,13 @@ public class CircleFormula : Formula
 
     public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) {}
 
+    public Point[] Intersect(RayFormula formula) => formula.Intersect(this);
+    public Point[] Intersect(SegmentFormula formula) => formula.Intersect(this);
+
+    public Point[] Intersect(CircleFormula formula) {
+        // Since we know th
+    }
+
     public override double[] SolveForX(double y)
     {
         if (y > centerY + radius || y < centerY - radius) return Array.Empty<double>();
