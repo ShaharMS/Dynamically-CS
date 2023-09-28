@@ -112,6 +112,7 @@ public class Selection : DraggableGraphic, IStringifyable
         MainWindow.Instance.PointerMoved -= EvalSelection;
         MainWindow.Instance.PointerReleased -= FinishSelection;
         MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.BigScreen.Selection = null;
         EncapsulatedElements.Clear();
         foreach (var element in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
         {

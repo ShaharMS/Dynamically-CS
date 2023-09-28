@@ -52,14 +52,29 @@ public class CircleFormula : Formula
         this.centerY = centerY;
     }
 
-    public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) {}
+    public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) { }
 
     public Point[] Intersect(RayFormula formula) => formula.Intersect(this);
     public Point[] Intersect(SegmentFormula formula) => formula.Intersect(this);
 
-    public Point[] Intersect(CircleFormula formula) {
-        // Since we know th
+    public Point[] Intersect(CircleFormula formula)
+    {
+        var a = centerX;
+        var b = centerY;
+        var c = formula.centerX;
+        var d = formula.centerY;
+        var r1 = radius;
+        var r2 = formula.radius;
+
+        // we can extract the ray on which the 0-2 points of collision reside:
+        var handleRay = new RayFormula((a * a + b * b + r2 * r2 - c * c - d * d - r1 * r1) / (2 * (b - d)), (c - a) / (b - d));
+
+        // now just intersect it with this circle
+        return handleRay.Intersect(this);
     }
+    public bool Intersects(RayFormula formula) => Intersect(formula).Length > 0;
+    public bool Intersects(SegmentFormula formula) => Intersect(formula).Length > 0;
+    public bool Intersects(CircleFormula formula) => Intersect(formula).Length > 0;
 
     public override double[] SolveForX(double y)
     {

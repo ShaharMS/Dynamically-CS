@@ -161,16 +161,12 @@ public class SegmentFormula : Formula
         var b = formula.centerY;
         var r = formula.radius;
 
-        // Get ready for a roller coaster!
-        var x1 =
-            (2 * b * m + 2 * a + Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
-            / (2 * (m.Pow(2) + 1));
+        var A = (m * m + 1);
+        var B = (2 * (m * (c - b) - a));
+        var C = (a * a + (c - b) * (c - b) - r * r);
 
-        var x2 = 
-            (2 * b * m + 2 * a - Math.Sqrt((-2 * b * m - 2 * a).Pow(2) - 4 * (m.Pow(2) + 1) * (-r.Pow(2) + a.Pow(2) + b.Pow(2) + 2 * m * c - c.Pow(2) - 2 * b * c)))
-            / (2 * (m.Pow(2) + 1));
-
-        // Roller coaster over, phew
+        var x1 = (-B + Math.Sqrt(B * B - 4 * A * C)) / (2 * A);
+        var x2 = (-B - Math.Sqrt(B * B - 4 * A * C)) / (2 * A);
 
         var y1 = SolveForY(x1);
         var y2 = SolveForY(x2);
@@ -180,6 +176,10 @@ public class SegmentFormula : Formula
         else if (y2.Length == 0) return new[] {new Point(x1, y1[0])};
         else return new[] {new Point(x1, y1[0]), new Point(x2, y2[0])};
     }
+
+    public bool Intersects(RayFormula formula) => Intersect(formula) != null;
+    public bool Intersects(SegmentFormula formula) => Intersect(formula) != null;
+    public bool Intersects(CircleFormula formula) => Intersect(formula).Length > 0;
     public override double DistanceTo(Point point)
     {
         // Get the closest point on the ray to the given point

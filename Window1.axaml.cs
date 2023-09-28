@@ -83,7 +83,13 @@ namespace Dynamically
             if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
             if (self1 != null) Write($"{paramName1}: {Stringify(self1)}");
             if (self2 != null) Write($"{paramName2}: {Stringify(self2)}");
-            if (self3 != null) Write($"{paramName3}: {Stringify(self3)}");
+            if (self3 != null) Write($"{paramName3}: {Stringify(self3)}"); 
+            if (self4 != null) Write($"{paramName4}: {Stringify(self4)}");
+            if (self5 != null) Write($"{paramName5}: {Stringify(self5)}");
+            if (self6 != null) Write($"{paramName6}: {Stringify(self6)}");
+            if (self7 != null) Write($"{paramName7}: {Stringify(self7)}");
+            if (self8 != null) Write($"{paramName8}: {Stringify(self8)}");
+            if (self9 != null) Write($"{paramName9}: {Stringify(self9)}");
         }
 
         public static void WriteAsTree(object? self, [CallerArgumentExpression("self")] string paramName = "")

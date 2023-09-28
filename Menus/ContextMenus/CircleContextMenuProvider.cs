@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Helpers.Containers;
+using Dynamically.Backend.Interfaces;
 using Dynamically.Screens;
 using Dynamically.Shapes;
 using System;
@@ -44,6 +45,15 @@ public class CircleContextMenuProvider : ContextMenuProvider
             Sgest_CreateRadius(),
             Sgest_CreateDiameter(),
         };
+    }
+
+
+    public override void GenerateRecommendations()
+    {
+        Recommendations = new List<Control?>
+        {
+            Recom_MarkIntersection()
+        }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
     public override void AddDebugInfo()
@@ -137,5 +147,45 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
 
         return item;
+    }
+
+
+    MenuItem? Recom_MarkIntersection()
+    {
+        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.all).ToList();
+
+        scanList.Remove(Subject);
+
+        List<MenuItem> intersections = new();
+        foreach (var element in scanList)
+        {
+            if (Subject.Formula.Intersects(element.Formula))
+            {
+                var item = new MenuItem
+                {
+                    Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
+                };
+                item.Click += (_, _) =>
+                {
+                    var intersections = Subject.Formula.Intersect(element.Formula);
+                    foreach (var p in intersections)
+                    {
+                        var j = new Joint(p);
+                        j.X = p.X; j.Y = p.Y;
+                        if (element is Circle) j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
+                        else j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
+                        j.Roles.AddToRole(Role.CIRCLE_On, Subject);
+                    }
+                };
+                intersections.Add(item);
+            }
+        }
+
+        if (intersections.Count == 1) return intersections[0];
+        else return new MenuItem
+        {
+            Header = "Mark Intersections...",
+            Items = intersections
+        };
     }
 }

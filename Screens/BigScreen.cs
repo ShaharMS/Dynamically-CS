@@ -59,7 +59,7 @@ public class BigScreen : DraggableGraphic
     public Selection? Selection
     {
         get => _selection;
-        private set  => _selection = value;
+        set  => _selection = value;
     }
 
 
@@ -70,8 +70,8 @@ public class BigScreen : DraggableGraphic
         Draggable = false;
         MouseOverCursor = Cursor.Default;
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
     }
 
@@ -174,7 +174,11 @@ public class BigScreen : DraggableGraphic
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
-        if (e.Source is not DraggableGraphic) return;
+        if (e.Source is not DraggableGraphic)
+        {
+            FocusedObject = this;
+            return;
+        }
         FocusedObject = this;
         foreach (var child in Children)
         {
@@ -200,7 +204,7 @@ public class BigScreen : DraggableGraphic
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Source is not Panel) return;
+        if (e.Source is not Panel || FocusedObject is not BigScreen) return;
 
         if (FocusedObject is Selection selection)
         {
@@ -211,8 +215,8 @@ public class BigScreen : DraggableGraphic
                 selection.Cancel();
             }
         }
-        if (FocusedObject is not BigScreen) return;
-        
+
+
         if (Selection != null) Selection.Cancel();
         var pos = e.GetPosition(this);
         EventHandler<PointerEventArgs> a = null!;

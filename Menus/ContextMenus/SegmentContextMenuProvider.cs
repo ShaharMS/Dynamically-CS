@@ -363,22 +363,40 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
         List<MenuItem> intersections = new();
         foreach (var element in scanList) {
-            if (element.Formula.DistanceTo(MainWindow.Mouse.GetPosition(element.Parent))) {
+            if (Subject.Formula.Intersects(element.Formula)) {
                 var item = new MenuItem {
                     Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
                 };
-                item.Click += (_, _) => {
-                    var j = new Joint(0, 0);
-                    if (element is Segment) {
+                item.Click += (_, _) =>
+                {
+                    if (element is Segment)
+                    {
+                        var j = new Joint(0, 0);
                         j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
                         j.Roles.AddToRole(Role.SEGMENT_On, Subject);
-                    } else { // element is Circle
-                        var intersections = (element as Circle)!.Formula.Intersect(Subject.Formula);
                     }
-                }
+                    else
+                    { // element is Circle
+                        var intersections = (element as Circle)!.Formula.Intersect(Subject.Formula);
+                        foreach (var p in intersections)
+                        {
+                            var j = new Joint(p);
+                            j.X = p.X; j.Y = p.Y;
+                            j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
+                            j.Roles.AddToRole(Role.SEGMENT_On, Subject);
+                        }
+                    }
+                };
+                intersections.Add(item);
             }
         }
 
+        if (intersections.Count == 1) return intersections[0];
+        else return new MenuItem
+        {
+            Header = "Mark Intersections...",
+            Items = intersections
+        };
     }
 
     // -------------------------------------------------------
