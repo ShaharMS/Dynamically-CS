@@ -25,6 +25,21 @@ public class LatexToken
     public virtual string ToDebug() => $"{Name}({Value})";
 }
 
+public class NewLine : LatexToken
+{
+    public NewLine()
+    {
+        Name = GetType().Name;
+        _val.Name = Name;
+    }
+
+    public void Deconstruct(out string n) {n = Name; }
+
+    public override string ToString() => @"\\";
+    public override string ToDebug() => $"{Name}";
+
+}
+
 public class Identifier : LatexToken
 {
     public readonly string Ident;
@@ -43,12 +58,13 @@ public class Identifier : LatexToken
     public override string ToDebug() => $"{Name}({Ident})";
 
 }
+
 public class Op : LatexToken
 {
     public readonly string Operator;
     public Op(string op)
     {
-        Operator = op;
+        Operator = op.Trim();
         Name = GetType().Name;
         _val.Name = Name;
         _val.Value = Operator;
@@ -78,6 +94,7 @@ public class Closure : LatexToken
     public void Deconstruct(out List<LatexToken> id) { id = Tokens; }
     public void Deconstruct(out (string, string) p) { p = Parenthesis; }
     public override string ToString() => $"{Parenthesis.open}{string.Join("", Tokens.Select(e => e.ToString()))}{Parenthesis.close}";
+    public string ToString(bool stripped = true) => stripped ? $"{string.Join("", Tokens.Select(e => e.ToString()))}" : ToString();
     public override string ToDebug() => $"{Name}([{Log.StringifyCollection(Tokens.Select(x => x.ToDebug()))}])";
 
 }
@@ -98,7 +115,7 @@ public class Division : LatexToken
 
     public void Deconstruct(out LatexToken lhs, out LatexToken rhs, out string n) { lhs = Lhs; rhs = Rhs; n = Name; }
     public void Deconstruct(out LatexToken lhs, out LatexToken rhs) { lhs = Lhs; rhs = Rhs; }
-    public override string ToString() => $"\\frac{{{Lhs}}}{{{Rhs}}}";
+    public override string ToString() => $"\\frac{{{(Lhs is Closure closure ? closure.ToString(true) : Lhs)}}}{{{(Rhs is Closure _closure ? _closure.ToString(true) : Rhs)}}}";
     public override string ToDebug() => $"{Name}({Lhs}, {Rhs})";
 
 }

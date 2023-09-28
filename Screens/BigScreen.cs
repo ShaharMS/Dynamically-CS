@@ -44,7 +44,7 @@ public class BigScreen : DraggableGraphic
         {
             if (value == null) _focused = this;
             else _focused = value;
-            FocusManager.Instance?.Focus(_focused, NavigationMethod.Pointer);
+            _focused.Focus();
         }
     }
 
@@ -71,7 +71,7 @@ public class BigScreen : DraggableGraphic
         MouseOverCursor = Cursor.Default;
 
         MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
-        //MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
+        MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
     }
 
@@ -196,26 +196,12 @@ public class BigScreen : DraggableGraphic
 
         if (FocusedObject is not Backend.Graphics.Selection) Selection?.Cancel();
 
-        bool mouseAlreadyUp = false;
-        EventHandler<PointerReleasedEventArgs>? listener = null;
-        listener = (_, _) =>
-        {
-            mouseAlreadyUp = true;
-            MainWindow.Instance.PointerReleased -= listener;
-        };
-        EventHandler<PointerEventArgs>? listener2 = null;
-        listener2 = (_, _) =>
-        {
-            if (!mouseAlreadyUp) TryStartSelection(sender, e);
-            MainWindow.Instance.PointerMoved -= listener2;
-        };
-        MainWindow.Instance.PointerReleased += listener;
-        MainWindow.Instance.PointerMoved += listener2;
-
     }
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
+        if (e.Source is not Panel) return;
+
         if (FocusedObject is Selection selection)
         {
             if (selection.IsHovered) return;
@@ -229,8 +215,19 @@ public class BigScreen : DraggableGraphic
         
         if (Selection != null) Selection.Cancel();
         var pos = e.GetPosition(this);
-
-        Selection = new Selection(pos);
+        EventHandler<PointerEventArgs> a = null!;
+        a = (_, e) =>
+        {
+            if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            {
+                MainWindow.Instance.PointerMoved -= a;
+                Selection?.Cancel();
+                return;
+            }
+            Selection = new Selection(pos);
+            MainWindow.Instance.PointerMoved -= a;
+        };
+        MainWindow.Instance.PointerMoved += a;
     }
 
     private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from MainWindow

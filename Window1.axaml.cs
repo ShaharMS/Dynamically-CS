@@ -2,9 +2,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
 using Avalonia.Media;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 
 namespace Dynamically
 {
@@ -33,6 +37,11 @@ namespace Dynamically
 
             Content = scrollViewer;
 
+            LayoutUpdated += (_, _) =>
+            {
+                scrollViewer.Width = this.Width;
+                scrollViewer.Height = this.Height;
+            };
         }
 
         private void InitializeComponent()
@@ -40,9 +49,11 @@ namespace Dynamically
             AvaloniaXamlLoader.Load(this);
         }
 
+        public static uint Indent = 0;
+
         public static void Write(params object?[] text)
         {
-            current.consoleTextBlock.Text += StringifyCollection(text) + "\n";
+            current.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
             if (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
             {
                 while (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
@@ -52,6 +63,41 @@ namespace Dynamically
             }
             current.scrollViewer.ScrollToEnd();
         }
+        
+        /// <summary>
+        /// Pretty-prints up to 10 var-value pairs
+        /// </summary>
+        public static void WriteVar(
+            object? self, object? self1 = null, object? self2 = null, object? self3 = null, object? self4 = null, object? self5 = null, object? self6 = null, object? self7 = null, object? self8 = null, object? self9 = null,
+            [CallerArgumentExpression("self")] string paramName = "",
+            [CallerArgumentExpression("self1")] string paramName1 = "",
+            [CallerArgumentExpression("self2")] string paramName2 = "",
+            [CallerArgumentExpression("self3")] string paramName3 = "",
+            [CallerArgumentExpression("self4")] string paramName4 = "",
+            [CallerArgumentExpression("self5")] string paramName5 = "",
+            [CallerArgumentExpression("self6")] string paramName6 = "",
+            [CallerArgumentExpression("self7")] string paramName7 = "",
+            [CallerArgumentExpression("self8")] string paramName8 = "",
+            [CallerArgumentExpression("self9")] string paramName9 = "") 
+        {
+            if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
+            if (self1 != null) Write($"{paramName1}: {Stringify(self1)}");
+            if (self2 != null) Write($"{paramName2}: {Stringify(self2)}");
+            if (self3 != null) Write($"{paramName3}: {Stringify(self3)}");
+        }
+
+        public static void WriteAsTree(object? self, [CallerArgumentExpression("self")] string paramName = "")
+        {
+            if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
+            Indent++;
+            foreach (PropertyInfo prop in self.GetType().GetProperties().Where(p => !p.GetIndexParameters().Any()))
+            {
+                Write($"{prop.Name}: {prop.GetValue(self)}");
+            }
+            Indent--;
+        }
+
+        public static string Stringify(params object?[] objects) => StringifyCollection(objects);
 
         public static string StringifyCollection(IEnumerable collection)
         {

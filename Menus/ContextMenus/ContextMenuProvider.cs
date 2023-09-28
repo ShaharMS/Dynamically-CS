@@ -15,7 +15,7 @@ public class ContextMenuProvider
 {
     protected dynamic _sub;
     public string Name;
-    public List<Control> Items
+    public virtual List<Control> Items
     {
         get
         {
@@ -48,7 +48,7 @@ public class ContextMenuProvider
         }
     }
 
-    public List<Control> ItemsWithoutAdjacents
+    public virtual List<Control> ItemsWithoutAdjacents
     {
         get
         {

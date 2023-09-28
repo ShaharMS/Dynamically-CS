@@ -26,6 +26,8 @@ public partial class MainWindow : Window
 
     public static Canvas MainDisplay { get; private set; }
 
+    public static DockPanel MainPanel { get; private set; }
+
     public static BigScreen BigScreen { get; private set; }
 
     public static bool Debug = true;
@@ -39,6 +41,7 @@ public partial class MainWindow : Window
         Debug = true;
         Instance = this;
         MainDisplay = Instance.Find<Canvas>("Main");
+        MainPanel = Instance.Find<DockPanel>("Display");
         var ca = new BigScreen
         {
             Name = "BigScreen"
@@ -89,8 +92,7 @@ public partial class MainWindow : Window
         BigScreen.Children.Add(new SolutionTable(true));
         BigScreen.Children.Add(new MathTextBox());
 
-        Log.Write("123 + AB / 3 = 66 * 5");
-        Log.Write(Latex.Latexify("123 + AB / 3 = 66 * 5"));
+        Log.WriteVar(Latex.Latexify("123 + AB / 3 = 66 * 5"));
     }
 
     public static void regenAll(double z, double x, double c, double v) {

@@ -22,13 +22,16 @@ public class Latex
         while (i < input.Length)
         {
             var ch = input[i].ToString();
-            if (ch == " ")
+            if (" \r".Contains(ch))
             {
                 i++;
                 continue;
             }
-
-            if ("1234567890.".Contains(ch))
+            if (ch == "\n")
+            {
+                tokens.Add(new NewLine());
+            }
+            else if ("1234567890.".Contains(ch))
             {
                 var num = ch;
                 i++;
@@ -47,24 +50,34 @@ public class Latex
                 else tokens.Add(new Identifier(num));
 
             }
+            else if (ch == "\\" || new Regex(@"\w").Match(ch).Success)
+            {
+                var name = ch;
+                i++;
+                if (i < input.Length && input[i] == '\\')
+                {
+                    tokens.Add(new NewLine());
+                    i--;
+                }
+                else
+                {
+                    while (i < input.Length && new Regex(@"\w").Match(input[i].ToString()).Success)
+                    {
+                        name += input[i];
+                        i++;
+                    }
+                    i--;
+                    tokens.Add(new Identifier(name));
+                }
+            }
             else if (new Regex(@"\W").Match(ch).Success)
             {
                 tokens.Add(new Op(ch));
             }
-            else if (new Regex(@"\w").Match(ch).Success)
-            {
-                var name = ch;
-                i++;
-                while (i < input.Length && new Regex(@"\w").Match(input[i].ToString()).Success)
-                {
-                    name += input[i];
-                    i++;
-                }
-                i--;
-                tokens.Add(new Identifier(name));
-            }
             i++;
         }
+
+        Log.Write(tokens.Select(x => x.ToDebug()).ToList());
 
         return tokens;
     }
@@ -113,7 +126,7 @@ public class Latex
                         expressionStack++;
                         expressionBody.Add(lookahead);
                     }
-                    if (lookahead is Op __op && __op.Operator == sign_)
+                    else if (lookahead is Op __op && __op.Operator == sign_)
                     {
                         expressionStack--;
                         if (expressionStack == 0) break;
@@ -125,15 +138,15 @@ public class Latex
                 post.Add(new Closure(mergeClosures(expressionBody, _sign, sign_), _sign, sign_)); // The check performed above includes unmerged blocks inside the outer block. These unmerged blocks should be merged
                 i++;
             }
-            else if (token is Closure closure) post.Add(new Closure(mergeClosures(closure.Tokens, _sign, sign_), _sign, sign_));
+            else if (token is Closure closure) post.Add(new Closure(mergeClosures(closure.Tokens, _sign, sign_), closure.Parenthesis.open, closure.Parenthesis.close));
             else post.Add(token);
             i++;
         }
         return post;
     }
 
-    public static List<LatexToken> prettyDivision(List<LatexToken> pre) 
-    { 
+    public static List<LatexToken> prettyDivision(List<LatexToken> pre)
+    {
         var post = new List<LatexToken>();
 
         var i = 0;
@@ -143,8 +156,13 @@ public class Latex
 
             if (token is Op op && "/÷".Contains(op.Operator))
             {
-                var lookbehind = post.Last();
-                post.Remove(lookbehind);
+                LatexToken lookbehind;
+                if (post.Count == 0) lookbehind = new Closure(new List<LatexToken>(), "(", ")");
+                else
+                {
+                    lookbehind = post.Last();
+                    post.Remove(lookbehind);
+                }
                 if (i + 1 == pre.Count) post.Add(new Division(lookbehind, new Identifier("")));
                 else post.Add(new Division(lookbehind, pre[i + 1]));
                 i++;

@@ -11,10 +11,11 @@ using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dynamically.Menus.ContextMenus;
 
 namespace Dynamically.Backend.Graphics;
 
-public class Selection : DraggableGraphic
+public class Selection : DraggableGraphic, IStringifyable
 {
     double sx;
     double sy;
@@ -25,6 +26,8 @@ public class Selection : DraggableGraphic
     public Rect Rect { get => new Rect(sx.Min(ex), sy.Min(ey), Math.Abs(sx - ex), Math.Abs(sy - ey)); }
 
     public HashSet<DraggableGraphic> EncapsulatedElements = new();
+
+    public SelectionContextMenuProvider Provider { get; }
     public Selection(Point start)
     {
         sx = ex = start.X; sy = ey = start.Y;
@@ -48,6 +51,9 @@ public class Selection : DraggableGraphic
             foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnDraggedEvents();
         });
 
+        ContextMenu = new ContextMenu();
+        Provider = new SelectionContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
 
         MainWindow.Instance.PointerMoved += EvalSelection;
         MainWindow.Instance.PointerReleased += FinishSelection;
@@ -103,6 +109,8 @@ public class Selection : DraggableGraphic
 
     public void Cancel()
     {
+        MainWindow.Instance.PointerMoved -= EvalSelection;
+        MainWindow.Instance.PointerReleased -= FinishSelection;
         MainWindow.BigScreen.Children.Remove(this);
         EncapsulatedElements.Clear();
         foreach (var element in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
@@ -114,5 +122,10 @@ public class Selection : DraggableGraphic
     public override string ToString()
     {
         return $"({sx.Min(ex)}, {sy.Min(ey)}) -> ({sx.Max(ex)}, {sy.Max(ey)})";
+    }
+
+    public string ToString(bool descriptive)
+    {
+        return "Selection";
     }
 }
