@@ -50,7 +50,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     public override void GenerateRecommendations()
     {
         Recommendations = Recom_ChangeType();
-        Recommendations.Concat(new List<Control?>
+        Recommendations = Recommendations.Concat(new List<Control?>
         {
 
         }.FindAll((c) => c != null).Cast<Control>()).ToList();
@@ -88,7 +88,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         };
         rotate.Click += (sender, e) =>
         {
-            Point p1 = new Point(Subject.joint1.X, Subject.joint1.Y), p2 = new Point(Subject.joint2.X, Subject.joint2.Y), p3 = new Point(Subject.joint3.X, Subject.joint3.Y);
+            Point p1 = new(Subject.joint1.X, Subject.joint1.Y), p2 = new(Subject.joint2.X, Subject.joint2.Y), p3 = new(Subject.joint3.X, Subject.joint3.Y);
             Point rotationCenter = Subject.GetIncircleCenter();
             double dist1 = Subject.joint1.DistanceTo(rotationCenter), dist2 = Subject.joint2.DistanceTo(rotationCenter), dist3 = Subject.joint3.DistanceTo(rotationCenter);
             double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
@@ -237,15 +237,15 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         var suggestions = Subject.SuggestTypes();
         var list = new List<Control>();
 
-        foreach ((TriangleType type, string details, double confidence) suggestion in suggestions)
+        foreach ((TriangleType type, string details, double confidence) in suggestions)
         {
-            switch (suggestion.type)
+            switch (type)
             {
                 case TriangleType.EQUILATERAL:
                     var eq = new MenuItem
                     {
                         Header = "★ Make Equilateral",
-                        Tag = suggestion.confidence
+                        Tag = confidence
                     };
                     eq.Click += (sender, e) =>
                     {
@@ -257,12 +257,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES_RIGHT:
                     var ir = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + suggestion.confidence + ") " : "")}{(suggestion.confidence > 0.7 ? "★ " : "")}Make Isosceles-Right {suggestion.details}",
-                        Tag = suggestion.confidence
+                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Isosceles-Right {details}",
+                        Tag = confidence
                     };
                     ir.Click += (sender, e) =>
                     {
-                        var ang = suggestion.details.Split(",")[0].Remove(0, 1);
+                        var ang = details.Split(",")[0].Remove(0, 1);
                         var main = Joint.GetJointById(ang[1]);
                         var v1 = Joint.GetJointById(ang[0]);
                         var v2 = Joint.GetJointById(ang[2]);
@@ -275,12 +275,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES:
                     var iso = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + suggestion.confidence + ") " : "")}{(suggestion.confidence > 0.7 ? "★ " : "")}Make Isosceles {suggestion.details}",
-                        Tag = suggestion.confidence
+                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Isosceles {details}",
+                        Tag = confidence
                     };
                     iso.Click += (sender, e) =>
                     {
-                        var joints = string.Join("", suggestion.details.Split(" = "));
+                        var joints = string.Join("", details.Split(" = "));
                         var dict = new Dictionary<char, int>();
                         foreach (char c in joints) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
                         Joint? main = null, v1 = null, v2 = null;
@@ -304,12 +304,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.RIGHT:
                     var r = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + suggestion.confidence + ") " : "")}{(suggestion.confidence > 0.7 ? "★ " : "")}Make Right {suggestion.details}",
-                        Tag = suggestion.confidence
+                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Right {details}",
+                        Tag = confidence
                     };
                     r.Click += (sender, e) =>
                     {
-                        var ang = suggestion.details.Remove(0, 1);
+                        var ang = details.Remove(0, 1);
                         var main = Joint.GetJointById(ang[1]);
                         var v1 = Joint.GetJointById(ang[0]);
                         var v2 = Joint.GetJointById(ang[2]);
@@ -323,7 +323,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             }
         }
 
-        list.OrderBy(m => (double?)m.Tag ?? 0.0);
+        list = list.OrderBy(m => (double?)m.Tag ?? 0.0).ToList();
 
         return list;
     }

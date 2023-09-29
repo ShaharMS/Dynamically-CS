@@ -96,7 +96,7 @@ namespace Dynamically
         {
             if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
             Indent++;
-            foreach (PropertyInfo prop in self.GetType().GetProperties().Where(p => !p.GetIndexParameters().Any()))
+            foreach (PropertyInfo prop in self!.GetType().GetProperties().Where(p => !p.GetIndexParameters().Any()))
             {
                 Write($"{prop.Name}: {prop.GetValue(self)}");
             }
@@ -115,7 +115,7 @@ namespace Dynamically
                     s.Add("null"); 
                     continue; 
                 }
-                if (item.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
+                if (item!.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
                 s.Add(itemS ?? "Value");
             }
 

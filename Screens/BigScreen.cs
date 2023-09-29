@@ -217,7 +217,7 @@ public class BigScreen : DraggableGraphic
         }
 
 
-        if (Selection != null) Selection.Cancel();
+        Selection?.Cancel();
         var pos = e.GetPosition(this);
         EventHandler<PointerEventArgs> a = null!;
         a = (_, e) =>
