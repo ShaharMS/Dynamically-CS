@@ -375,9 +375,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             if (Subject.Formula.Intersects(element.Formula))
             {
-                Log.WriteVar(Subject.Formula.Intersect(element.Formula), (Point)Subject.joint1, (Point)Subject.joint2);
-                if (element is Segment seg && !new[] { Subject.joint1, Subject.joint2 }.Select(j => seg.Formula.Intersect(Subject.Formula)!.Equals(j)).Contains(false)) continue;
-                if (element is Circle c && !new[] { Subject.joint1, Subject.joint2 }.Select(j => c.Formula.Intersect(Subject.Formula)!.Where(p => p.RoughlyEquals(j)).Count() != 0).Contains(false)) continue;
+                if (element is Segment seg && (seg.SharesJointWith(Subject) || seg.Formula.Followers.Intersect(Subject.Formula.Followers).Count() == 1)) continue;
+                if (element is Circle c && (c.Formula.Followers.ContainsMany(Subject.joint1, Subject.joint2) || Subject.Formula.Followers.Intersect(c.Formula.Followers).Count() >= (Subject.Formula.Intersect(c.Formula)?.Length ?? 0))) continue;
                 var item = new MenuItem
                 {
                     Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
@@ -392,19 +391,25 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                     }
                     else
                     { // element is Circle
-                        var intersections = (element as Circle)!.Formula.Intersect(Subject.Formula);
+                        Point[] intersections = Subject.Formula.Intersect(element.Formula);
+                        List<Joint> existing = Subject.Formula.Followers.Intersect((List<Joint>)element.Formula.Followers).ToList();
                         foreach (var p in intersections)
                         {
+                            if (existing.ContainsRoughly(p)) continue;
                             var j = new Joint(p);
                             j.X = p.X; j.Y = p.Y;
                             j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
                         }
                     }
+                    element.Provider.Regenerate();
+                    Subject.Provider.Regenerate();
                 };
                 intersections.Add(item);
             }
         }
+
+        if (Subject.ToString() == "JK") Log.Write(intersections.Select(x => x.Header).ToList());
 
         if (intersections.Count == 0) return null;
         else if (intersections.Count == 1) return intersections[0];

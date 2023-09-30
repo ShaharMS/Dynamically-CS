@@ -161,8 +161,8 @@ public class CircleContextMenuProvider : ContextMenuProvider
         List<MenuItem> intersections = new();
         foreach (var element in scanList)
         {
-            if (element is Segment s && !new[] { s.joint1, s.joint2 }.Select(j => Subject.Formula.Intersect(s.Formula)?.Where(p => p.RoughlyEquals(j)).Count() != 0).Contains(false)) continue;
-            if (element is Circle circle && ((Point)circle.center).Equals(Subject.center)) continue;
+            if (element is Segment s && (Subject.Formula.Followers.ContainsMany(s.joint1, s.joint2) || s.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (s.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
+            if (element is Circle circle && (((Point)circle.center).RoughlyEquals(Subject.center) || circle.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (circle.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
             if (Subject.Formula.Intersects(element.Formula))
             {
                 var item = new MenuItem
@@ -171,17 +171,24 @@ public class CircleContextMenuProvider : ContextMenuProvider
                 };
                 item.Click += (_, _) =>
                 {
-                    var intersections = Subject.Formula.Intersect(element.Formula);
+                    Point[] intersections = Subject.Formula.Intersect(element.Formula);
+                    List<Joint> existing = Subject.Formula.Followers.Intersect((List<Joint>)element.Formula.Followers).ToList();
                     foreach (var p in intersections)
                     {
+                        if (existing.ContainsRoughly(p)) continue;
                         var j = new Joint(p);
                         j.X = p.X; j.Y = p.Y;
                         if (element is Circle) j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                         else j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
                         j.Roles.AddToRole(Role.CIRCLE_On, Subject);
                     }
+
+                    element.Provider.Regenerate();
+                    Subject.Provider.Regenerate();
                 };
                 intersections.Add(item);
+
+
             }
         }
 

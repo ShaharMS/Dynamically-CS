@@ -114,16 +114,14 @@ public class SegmentFormula : Formula
         });
     }
 
+    public RayFormula CastToRay() => new RayFormula(x1, y1, x2, y2);
+
     public Point? Intersect(SegmentFormula formula)
     {
-        if (formula == null) return null;
-        if (formula.slope.RoughlyEquals(slope)) return null;
-
-        var X = (potentialYIntercept - formula.potentialYIntercept) / (formula.slope - slope);
-        var Y = SolveForY(X);
-        if (X > x1 || X < x2 || ((x2 > x1) && (X > x2 || X < x1))) return null;
-        if (Y.Length == 0) return null;
-        return new Point(X, Y[0]);
+        var intersect = CastToRay().Intersect(formula.CastToRay());
+        if (intersect == null) return null;
+        var i = intersect.Value;
+        return SolveForY(i.X).Length + formula.SolveForY(i.X).Length == 2 ? intersect : null;
     }
 
     public Point? Intersect(RayFormula formula)

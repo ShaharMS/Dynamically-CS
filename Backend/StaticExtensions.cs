@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.VisualTree;
 using Dynamically.Backend.Geometry;
 using Dynamically.Formulas;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -132,6 +133,8 @@ public static class StaticExtensions
         return en;
     }
 
+    public static bool ContainsMany<T>(this IEnumerable<T> en, params T[] items) => items.Any(en.Contains);
+
     public static double RadiansBetween(this double radBA, double radBC, bool neg = false)
     {
         var a = (radBC - radBA);
@@ -189,11 +192,11 @@ public static class StaticExtensions
     public static bool RoughlyEquals(this Point p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this Joint p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    
+
     public static bool RoughlyEquals(this Point p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this Joint p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    
+
     public static bool RoughlyEquals(this Point p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
     public static bool RoughlyEquals(this Joint p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
@@ -203,6 +206,57 @@ public static class StaticExtensions
     public static bool RoughlyEquals(this int a, double b) => Math.Abs(a - b) < 0.0001;
     public static bool RoughlyEquals(this int a, int b) => Math.Abs(a - b) < 0.0001;
 
+    public static bool RoughlyLarger(this double a, double b) => Math.Abs(a - b) > 0.0001;
+    public static bool RoughlyLarger(this double a, int b) => Math.Abs(a - b) > 0.0001;
+    public static bool RoughlyLarger(this int a, double b) => Math.Abs(a - b) > 0.0001;
+    public static bool RoughlyLarger(this int a, int b) => Math.Abs(a - b) > 0.0001;
+
+    public static bool RoughlySmaller(this double a, double b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlySmaller(this double a, int b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlySmaller(this int a, double b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlySmaller(this int a, int b) => Math.Abs(a - b) < 0.0001;
+
+    public static bool ContainsRoughly(this IEnumerable<double> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<int> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<int> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<double> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Joint> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Joint> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Joint> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+
+
+    public static bool IsDifferent(this object? obj, EQUALITY_OP_TYPE type = EQUALITY_OP_TYPE.ROUGH, params dynamic[] others) 
+    {
+        switch (type)
+        {
+            case EQUALITY_OP_TYPE.REFERENCE:
+                foreach (dynamic other in others)
+                {
+                    if (ReferenceEquals(other, obj)) return false;
+                }
+                break;
+            case EQUALITY_OP_TYPE.ROUGH:
+                if (obj is not int && obj is not double && obj is not Point && obj is not Joint && obj is not Tuple<double, double>) goto case EQUALITY_OP_TYPE.REFERENCE;
+                foreach (dynamic other in others)
+                {
+                    if (RoughlyEquals(obj as dynamic, other)) return false;
+                }
+                break;
+            case EQUALITY_OP_TYPE.DEFAULT:
+                foreach (dynamic other in others)
+                {
+                    if (other?.Equals(obj) ?? obj == null) return false;
+                }
+                break;
+        }
+        return true;
+    }
     public static Point GetPosition(this Control element)
     {
         Point position = new(-1, -1);
@@ -228,4 +282,10 @@ public static class StaticExtensions
         Canvas.SetLeft(element, x);
         Canvas.SetTop(element, y);
     }
+}
+public enum EQUALITY_OP_TYPE
+{
+    REFERENCE,
+    DEFAULT,
+    ROUGH
 }
