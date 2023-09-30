@@ -1,0 +1,21 @@
+```
+הנקודות A, B ו-C נמצאות על מעגל.
+נקודה E היא אמצע הקשת BC, כמתואר בסרטוט שלפניכם.
+בנקודה E מעבירים משיק למעגל. 
+המשיק חותך את המשך המיתר AB בנקודה G.
+המיתרים AE ו-BC נחתכים בנקודה F.
+הוכיחו △AEG ~ △ACE
+```
+
+the details above are from a math exam in israel. i want you to extract every single detail from this question, determine whether or not its a given question detail, or something that needs to be proven through statements and reasons.
+the details should end up in a list, containing the details extracted (for example, the existence of a circle, a triangle, its type. intersections & bisections, and more), and the part of the question you extracted this detail from.
+
+message structure (DO NOT DEVIATE):
+
+Info:
+1. <detail>. (<Given or Objective>)
+2. ...
+n. <detail> (Objective)
+
+Strip everything said before the given list, and after it.
+Objectives should appear in the same lists as the givens, right after them. no seperate lists.

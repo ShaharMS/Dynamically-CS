@@ -1,0 +1,55 @@
+```
+הנקודות A, B ו-C נמצאות על מעגל.
+נקודה E היא אמצע הקשת BC, כמתואר בסרטוט שלפניכם.
+בנקודה E מעבירים משיק למעגל. 
+המשיק חותך את המשך המיתר AB בנקודה G.
+המיתרים AE ו-BC נחתכים בנקודה F.
+הוכיחו △AEG ~ △ACE
+```
+
+the details above are from a math exam in israel. i want you to extract every single detail from this question, determine whether or not its a given question detail, or something that needs to be proven through statements and reasons.
+the details should end up in a comma + newline seperated array, containing the details extracted (for example, the existence of a circle, a triangle, its type. intersections & bisections, and more), and the part of the question you extracted this detail from. Example:
+
+```
+[("<Actual Detail>", <Given ? true : false>, "<Part of text its extracted from>")]
+```
+
+Question element types and their string representation:
+      - Point - its associated letter only. for example: "A", "B"
+      - Segment - its two points' representation. for example: "AB", "CD"
+      - Ray - the point it goes through's representation, prepended by ◌⃗, with a serial number as postfix. for example: "◌⃗E0", "◌⃗F1"
+      - Arc - its two points' representation, prepended by `⌒`. for example: "⌒AB", "⌒BC"
+      - Triangle- its three points' representation, prepended by `△`.for example: "△ABC", "△FDG"
+      - Circle- its asociated center (or $"_{SERIAL_NUMBER}" if theres no center given) prepended by `⬤`. for example: "⬤A", "⬤B", "⬤_0"
+
+Special Formatting of data:
+ - <Actual Detail>: Heavily simplified version of the detail, made out of 7 parts, numbered, in order:
+    1. first thing in the detail is the element targeted, for example: "A ..", "AB ...", "△ABC ...", "⬤A...". Only one element targeted at a time. if a details targets multiple elements, it should get split into multiple array entries. if this is the first time this element is referenced, it must be prepended by `NEW` (prepended using whitespace), for example: "NEW A...", "NEW △ABC...", "NEW ⬤A..."
+    2. tab ("\t") character
+    3. the "role" that element is going to serve. can be of types:
+       - ON (for example, if A is on a circle, detail should start "A\tON")
+       - MIDDLE (for example, if C is the midpoint of arc DE, detail should start: "C\tMIDDLE\t⌒DE")
+       - INTERSECTS (used when a circle/segment intersect another circle/segment. first element must be a segment. "AB\tINTERSECTS")
+       - BISECTS (same as before, first argument must be a point/segment. can also be used on angles: "AB\tBISECTS\t∠CBD")
+       - TANGENT (INTERSECTS, but only at one point, cannot appear between 2 segments. first argment must be a point/circle)
+       - DIAMETER (used to denote a segment is a diameter of a circle, for example: "AB\tDIAMETER\t ⬤O")
+       - OVERLAPS (only usable on two triangles)
+       - SIMILAR (only usable on two triangles)
+       - EQUALS (equality between values, for example: "AB\tEQUALS\tCD")
+       - EXTENSIONOF (prependable using whitespace to segments only. used to denote something happens after the segment "ends". for example, if the extension of AB intersects CD, detail should start: "EXTENSIONOF AB\tINTERSECTS\tCD". another example: if point A is on the extension of BC, detail should look like: "A\tON\tEXTENSIONOF BC")
+    4. tab ("\t") character
+    5. the other element the detail depends on. should be formatted just like the first element.
+    6. tab ("\t")
+    7. Side products from the operation:
+       -  "המעגל O חותך את AB בנקודה G" - the first element is `AB`, which `INTERSECTS` element `⬤O`. the result of the intersection, produces a side product, `G` - the point of intersection. Therefore, the final detail should be: "AB\tINTERSECTS\t⬤O\tG".
+       if there is no side product from the operation, this field is left empty, for example: "A\tON\t⬤O\t" (notice - no seventh part here, its left empty)
+- <Given>: `true` if the detail is a given question detail, `false` if it needs to be proven
+- <Part of text its extracted from>: must be from the original question, unchanged.
+
+Examples of full details:
+[("NEW E\tON\tNEW ⬤_0\t", true, "נקודות E ו-C נמצאות על המעגל המסורטט")
+("NEW C\tON\t⬤_0"\t, true, "נקודות E ו-C נמצאות על המעגל המסורטט"),
+("NEW AB\tDIAMETER\t⬤_0\t", true, "ABהוא קוטר"),
+("NEW G\tON\tEXTENSIONOF AB", true, "נקודה G נמצאת על המשך הקוטר AB"),
+("NEW CE\tINTERSECTS\tAB\tNEW F", true, "המיתר CE והקוטר AB נחתכים בנקודה F"),
+("∠ACB\tEQUALS\t∠AEB\t", false, "הוכח: ∠ACB = ∠AEB")]
