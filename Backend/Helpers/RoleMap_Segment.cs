@@ -16,7 +16,6 @@ public partial class RoleMap
     {
         switch (role)
         {
-
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;

@@ -13,7 +13,7 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class AngleContextMenuProvider : ContextMenuProvider
 {
-    public Angle Subject {get => _sub; set => _sub = value; }
+    public Angle Subject { get => _sub; set => _sub = value; }
     public AngleContextMenuProvider(Angle angle, ContextMenu menu)
     {
         Subject = angle;
@@ -39,6 +39,7 @@ public class AngleContextMenuProvider : ContextMenuProvider
     {
         Suggestions = new List<Control>
         {
+            Sgest_AngleBisector()
         };
     }
 
@@ -275,4 +276,54 @@ public class AngleContextMenuProvider : ContextMenuProvider
     // -------------------------------------------------------
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
+
+    private MenuItem Sgest_AngleBisector()
+    {
+        if (Subject.BisectorRay.Followers.Count == 0)
+        {
+            var item = new MenuItem
+            {
+                Header = "Create Bisector",
+            };
+            item.Click += (_, _) => Subject.GenerateBisector();
+            return item;
+        }
+        else if (Subject.BisectorRay.Followers.Count == 1)
+        {
+            return new MenuItem
+            {
+                Header = $"Angle Bisector {Subject.Center.GetConnectionTo(Subject.BisectorRay.Followers[0])}",
+                Items = Subject.Center.GetConnectionTo(Subject.BisectorRay.Followers[0])?.Provider.Items ?? new List<Control> {
+                    new Label {
+                        Content = "Error: Angle bisector not found."
+                    }
+                }
+            };
+        }
+        else
+        {
+            var retrieveBisectors = () =>
+            {
+                var items = new List<MenuItem>();
+                foreach (var follower in Subject.BisectorRay.Followers)
+                {
+                    items.Add(new MenuItem
+                    {
+                        Header = $"Angle Bisector {Subject.Center.GetConnectionTo(follower)}",
+                        Items = Subject.Center.GetConnectionTo(follower)?.Provider.Items ?? new List<Control> {
+                            new Label {
+                                Content = "Error: Angle bisector not found."
+                            }
+                        }
+                    });
+                }
+                return items;
+            };
+            return new MenuItem
+            {
+                Header = $"Angle Bisectors",
+                Items = retrieveBisectors()
+            };
+        }
+    }
 }

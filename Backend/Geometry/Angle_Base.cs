@@ -71,6 +71,7 @@ public partial class Angle : DraggableGraphic
     public double Degrees { get; private set; }
     public double Radians { get; private set; }
 
+    public RayFormula BisectorRay {get; private set;}
     bool _large;
     public bool Large
     {
@@ -136,6 +137,8 @@ public partial class Angle : DraggableGraphic
 
         MainWindow.BigScreen.Children.Insert(0, this);
 
+        BisectorRay = new RayFormula(Center, Math.Tan(GetBisectorRadians()));
+
         ContextMenu = new ContextMenu();
         Provider = new AngleContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
@@ -152,11 +155,11 @@ public partial class Angle : DraggableGraphic
         Radians = Degrees.ToRadians();
 
         var order = Tools.OrderRadiansBySmallArc(Center.RadiansTo(joint1), Center.RadiansTo(joint2));
-        if (Large) order.Reverse();
+        if (Large) order = order.Reverse().ToArray();
         var start = order[0];
         var end = order[1];
         Point? previous = null;
-        if (Degrees != 90)
+        if (!Degrees.RoughlyEquals(90))
         {
             for (double i = start; i <= start + Radians; i += Math.PI / 36)
             {
@@ -216,9 +219,25 @@ public partial class Angle : DraggableGraphic
             case AngleTextDisplay.NONE:
                 break;
         }
-        Canvas.SetLeft(Label, Center.X + DefaultDistance * 0.95 * Math.Cos(start + Radians / 2) - Label.GuessTextWidth() / 2);
-        Canvas.SetTop(Label, Center.Y + DefaultDistance * 0.95 * Math.Sin(start + Radians / 2) - Label.Height / 2);
+        Canvas.SetLeft(Label, Center.X + (DefaultDistance * 0.95 * Math.Cos(start + Radians / 2) - Label.GuessTextWidth() / 2) * (Large ? -1 : 1));
+        Canvas.SetTop(Label, Center.Y + (DefaultDistance * 0.95 * Math.Sin(start + Radians / 2) - Label.Height / 2) * (Large ? -1 : 1));
     }
+
+    public Segment GenerateBisector() {
+        double middleAngle = GetBisectorRadians();
+        var len = (Center.DistanceTo(joint1) + Center.DistanceTo(joint2)) / 2;
+        var x = Center.X + len * Math.Cos(middleAngle);
+        var y = Center.Y + len * Math.Sin(middleAngle);
+        
+        var nj = new Joint(x, y);
+        nj.Roles.AddToRole(Role.RAY_On, BisectorRay);
+        var segment = Center.Connect(nj);
+        segment.Roles.AddToRole(Role.ANGLE_Bisector, this);
+
+        return segment;
+    }
+
+    public double GetBisectorRadians() =>((Center.RadiansTo(joint1) + Center.RadiansTo(joint2) + Math.PI) % (2 * Math.PI) - Math.PI) / 2;
 
     public static bool Exists(Joint center, Joint j1, Joint j2)
     {

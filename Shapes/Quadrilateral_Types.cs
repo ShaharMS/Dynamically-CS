@@ -172,7 +172,7 @@ public partial class Quadrilateral
                 default: break;
             }
             A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents(); D.DispatchOnMovedEvents();
-        } while (!a.Equals(A) || !b.Equals(B) || !c.Equals(C) || !d.Equals(D));
+        } while (!a.RoughlyEquals(A) || !b.RoughlyEquals(B) || !c.RoughlyEquals(C) || !d.RoughlyEquals(D));
     }
 
     QuadrilateralType ChangeType(QuadrilateralType type)

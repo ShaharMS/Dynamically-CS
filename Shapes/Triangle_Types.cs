@@ -249,7 +249,7 @@ public partial class Triangle
                 case TriangleType.SCALENE: return;
             }
             A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents();
-        } while (!a.Equals(A) || !b.Equals(B) || !c.Equals(C));
+        } while (!a.RoughlyEquals(A) || !b.RoughlyEquals(B) || !c.RoughlyEquals(C));
     }
     TriangleType ChangeType(TriangleType type)
     {

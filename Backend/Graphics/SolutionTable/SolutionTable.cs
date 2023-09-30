@@ -59,6 +59,18 @@ public class SolutionTable : Canvas
 
         this.SetPosition(x, y);
 
+        
+        Handle = new TableHandle(this);
+
+        EventHandler placeHandle = null!;
+        placeHandle = (_, _) =>
+        {
+            Handle.X = x + Width / 2 - Handle.Width / 2;
+            Handle.Y = y - 50;
+            LayoutUpdated -= placeHandle;
+        };
+        LayoutUpdated += placeHandle;
+
         border = new ResizableBorder
         {
             Child = VisualList,
@@ -98,16 +110,6 @@ public class SolutionTable : Canvas
             FromsWidth = VisualList.Width * 1 / 5;
         }
 
-        Handle = new TableHandle(this);
-
-        EventHandler placeHandle = null!;
-        placeHandle = (_, _) =>
-        {
-            Handle.X = x + Width / 2 - Handle.Width / 2;
-            Handle.Y = y - 50;
-            LayoutUpdated -= placeHandle;
-        };
-        LayoutUpdated += placeHandle;
 
 
         Children.Add(border);

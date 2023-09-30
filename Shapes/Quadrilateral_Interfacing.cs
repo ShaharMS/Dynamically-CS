@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
@@ -59,7 +60,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
         }
         foreach (var j in new[] { joint1, joint2, joint3, joint4 })
         {
-            if (p.Equals(j))
+            if (p.RoughlyEquals(j))
             {
                 intersections--;
                 break;

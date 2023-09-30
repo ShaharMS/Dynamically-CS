@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
@@ -19,7 +20,7 @@ namespace Dynamically.Menus.ContextMenus;
 public class SegmentContextMenuProvider : ContextMenuProvider
 {
 
-    public Segment Subject {get => _sub; set => _sub = value; }
+    public Segment Subject { get => _sub; set => _sub = value; }
     public SegmentContextMenuProvider(Segment segment, ContextMenu menu)
     {
         Subject = segment;
@@ -44,7 +45,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     public override void GenerateSuggestions()
     {
-        Suggestions = new List<Control> 
+        Suggestions = new List<Control>
         {
             Suggestions_CreateOnSegment(),
             Suggestions_CreateMiddle()
@@ -112,7 +113,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             Header = "Nothing " + (Subject.TextDisplayMode == SegmentTextDisplay.NONE ? "✓" : "")
         };
-        none.Click += (s, e) => { Subject.Label.Content = "";  Subject.TextDisplayMode = SegmentTextDisplay.NONE; Subject.InvalidateVisual(); };
+        none.Click += (s, e) => { Subject.Label.Content = ""; Subject.TextDisplayMode = SegmentTextDisplay.NONE; Subject.InvalidateVisual(); };
 
         var paramField = new TextBox
         {
@@ -219,11 +220,14 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     // -----------------------Suggestions---------------------
     // -------------------------------------------------------
 
-    MenuItem Suggestions_CreateOnSegment() {
-        var c = new MenuItem {
-            Header = "Create Interior Joint" 
+    MenuItem Suggestions_CreateOnSegment()
+    {
+        var c = new MenuItem
+        {
+            Header = "Create Interior Joint"
         };
-        c.Click += (o, e) => {
+        c.Click += (o, e) =>
+        {
             var j = new Joint(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
 
@@ -233,11 +237,14 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         return c;
     }
 
-    MenuItem Suggestions_CreateMiddle() {
-        var m = new MenuItem {
+    MenuItem Suggestions_CreateMiddle()
+    {
+        var m = new MenuItem
+        {
             Header = "Create Middle"
         };
-        m.Click += (o, e) => {
+        m.Click += (o, e) =>
+        {
             var j = new Joint(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
         };
@@ -298,7 +305,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                 j2.Disconnect(j1, joint);
                 var con = j1.Connect(joint);
                 j2.Roles.AddToRole(Role.SEGMENT_On, con);
-                foreach(var f in followers.ToHashSet())
+                foreach (var f in followers.ToHashSet())
                 {
                     f.Roles.AddToRole(Role.SEGMENT_On, con);
                 }
@@ -310,7 +317,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         else if (items.Count == 1)
         {
             return items[0];
-        } else
+        }
+        else
         {
             return new MenuItem
             {
@@ -356,15 +364,22 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         return item;
     }
 
-    MenuItem? Recom_MarkIntersection() {
+    MenuItem? Recom_MarkIntersection()
+    {
         List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.all).ToList();
 
         scanList.Remove(Subject);
 
         List<MenuItem> intersections = new();
-        foreach (var element in scanList) {
-            if (Subject.Formula.Intersects(element.Formula)) {
-                var item = new MenuItem {
+        foreach (var element in scanList)
+        {
+            if (Subject.Formula.Intersects(element.Formula))
+            {
+                Log.WriteVar(Subject.Formula.Intersect(element.Formula), (Point)Subject.joint1, (Point)Subject.joint2);
+                if (element is Segment seg && !new[] { Subject.joint1, Subject.joint2 }.Select(j => seg.Formula.Intersect(Subject.Formula)!.Equals(j)).Contains(false)) continue;
+                if (element is Circle c && !new[] { Subject.joint1, Subject.joint2 }.Select(j => c.Formula.Intersect(Subject.Formula)!.Where(p => p.RoughlyEquals(j)).Count() != 0).Contains(false)) continue;
+                var item = new MenuItem
+                {
                     Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
                 };
                 item.Click += (_, _) =>
@@ -391,7 +406,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             }
         }
 
-        if (intersections.Count == 1) return intersections[0];
+        if (intersections.Count == 0) return null;
+        else if (intersections.Count == 1) return intersections[0];
         else return new MenuItem
         {
             Header = "Mark Intersections...",

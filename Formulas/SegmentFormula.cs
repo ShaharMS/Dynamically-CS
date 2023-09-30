@@ -117,7 +117,7 @@ public class SegmentFormula : Formula
     public Point? Intersect(SegmentFormula formula)
     {
         if (formula == null) return null;
-        if (formula.slope == slope) return null;
+        if (formula.slope.RoughlyEquals(slope)) return null;
 
         var X = (potentialYIntercept - formula.potentialYIntercept) / (formula.slope - slope);
         var Y = SolveForY(X);
@@ -129,7 +129,7 @@ public class SegmentFormula : Formula
     public Point? Intersect(RayFormula formula)
     {
         if (formula == null) return null;
-        if (formula.slope == slope) return null;
+        if (formula.slope.RoughlyEquals(slope)) return null;
 
         if (!double.IsFinite(slope))
         {

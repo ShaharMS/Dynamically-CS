@@ -27,6 +27,9 @@ public enum Role
     QUAD_CircumCircleCenter,
     QUAD_InCircleCenter,
     // Segment
+
+    ANGLE_Bisector,
+    
     CIRCLE_Radius,
     CIRCLE_Diameter,
     CIRCLE_Chord,

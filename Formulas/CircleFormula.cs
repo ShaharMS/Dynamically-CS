@@ -93,7 +93,7 @@ public class CircleFormula : Formula
     }
 
     /// <summary>
-    /// If px & py == cx & cy, returns null.
+    /// If px & py.RoughlyEquals(cx) & cy, returns null.
     /// </summary>
     /// <param name="px"></param>
     /// <param name="py"></param>
@@ -101,7 +101,7 @@ public class CircleFormula : Formula
     public override Point? GetClosestOnFormula(double px, double py)
     {
         //Avoid divide by 0 error:
-        if (px == centerX && py == centerY) return null;
+        if (px.RoughlyEquals(centerX) && py.RoughlyEquals(centerY)) return null;
         double vX = px - centerX;
         double vY = py - centerY;
         double magV = Math.Sqrt(vX * vX + vY * vY);

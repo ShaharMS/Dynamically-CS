@@ -61,7 +61,7 @@ public class Selection : DraggableGraphic, IStringifyable
 
     private void FinishSelection(object? sender, PointerReleasedEventArgs e)
     {
-        if (ex == sx && ey == sy) {
+        if (ex.RoughlyEquals(sx) && ey.RoughlyEquals(sy)) {
             Cancel();
             return;
         }

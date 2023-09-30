@@ -14,6 +14,7 @@ public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSup
     public AngleContextMenuProvider Provider { get; }
     private void __updateAngle(double z, double x, double c, double v)
     {
+        BisectorRay.Set(Center, Math.Tan(GetBisectorRadians()));
         InvalidateVisual();
     }
     public override string ToString()

@@ -183,6 +183,26 @@ public static class StaticExtensions
 
     }
 
+    public static bool RoughlyEquals(this Point p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Joint p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this (double X, double Y) p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Point p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Joint p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this (double X, double Y) p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    
+    public static bool RoughlyEquals(this Point p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Joint p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this (double X, double Y) p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    
+    public static bool RoughlyEquals(this Point p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
+    public static bool RoughlyEquals(this Joint p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
+    public static bool RoughlyEquals(this (double X, double Y) p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
+
+    public static bool RoughlyEquals(this double a, double b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlyEquals(this double a, int b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlyEquals(this int a, double b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlyEquals(this int a, int b) => Math.Abs(a - b) < 0.0001;
+
     public static Point GetPosition(this Control element)
     {
         Point position = new(-1, -1);

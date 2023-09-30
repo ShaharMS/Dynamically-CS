@@ -1,5 +1,7 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Helpers.Containers;
@@ -159,6 +161,8 @@ public class CircleContextMenuProvider : ContextMenuProvider
         List<MenuItem> intersections = new();
         foreach (var element in scanList)
         {
+            if (element is Segment s && !new[] { s.joint1, s.joint2 }.Select(j => Subject.Formula.Intersect(s.Formula)?.Where(p => p.RoughlyEquals(j)).Count() != 0).Contains(false)) continue;
+            if (element is Circle circle && ((Point)circle.center).Equals(Subject.center)) continue;
             if (Subject.Formula.Intersects(element.Formula))
             {
                 var item = new MenuItem
@@ -181,7 +185,8 @@ public class CircleContextMenuProvider : ContextMenuProvider
             }
         }
 
-        if (intersections.Count == 1) return intersections[0];
+        if (intersections.Count == 0) return null;
+        else if (intersections.Count == 1) return intersections[0];
         else return new MenuItem
         {
             Header = "Mark Intersections...",

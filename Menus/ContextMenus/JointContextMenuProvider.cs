@@ -204,7 +204,7 @@ public class JointContextMenuProvider : ContextMenuProvider
     {
         var options = new List<MenuItem>();
 
-        foreach (var r in new[] { Role.CIRCLE_On, Role.SEGMENT_On, Role.SEGMENT_Center, Role.RAY_On })
+        foreach (var r in new[] { Role.CIRCLE_On, Role.SEGMENT_On, Role.SEGMENT_Center})
         {
             foreach (var obj in Subject.Roles.Access<dynamic>(r))
             {
