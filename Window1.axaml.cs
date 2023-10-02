@@ -9,6 +9,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.ConstrainedExecution;
+using System.Text.Json;
 
 namespace Dynamically
 {
@@ -98,7 +99,7 @@ namespace Dynamically
             Indent++;
             foreach (PropertyInfo prop in self!.GetType().GetProperties().Where(p => !p.GetIndexParameters().Any()))
             {
-                Write($"{prop.Name}: {prop.GetValue(self)}");
+                Write($"{prop.Name}: {Stringify(prop.GetValue(self))}");
             }
             Indent--;
         }
@@ -110,12 +111,13 @@ namespace Dynamically
             var s = new List<string>();
             foreach (var item in collection)
             {
-                var itemS = item?.ToString();
+                var itemS = item is Catalyst.TokenData t ? JsonSerializer.Serialize(t) : item?.ToString();
                 if (itemS == null) {
                     s.Add("null"); 
                     continue; 
                 }
                 if (item!.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
+                else if (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)) itemS = StringifyCollection((IEnumerable)item);
                 s.Add(itemS ?? "Value");
             }
 

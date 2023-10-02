@@ -1,4 +1,4 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 using Dynamically.Backend.Geometry;
 using Dynamically.Shapes;
@@ -15,6 +15,7 @@ using System.Linq;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Graphics.SolutionTable;
 using Dynamically.Backend.Latex;
+using Dynamically.Solver.ExerciseInfoExtraction;
 
 namespace Dynamically;
 
@@ -59,13 +60,7 @@ public partial class MainWindow : Window
         var t = new Triangle(new Joint(570, 20), new Joint(750, 10), new Joint(860, 220));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
-/*
-        var t2 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
-        t2.Type = TriangleType.RIGHT; 
-        var t3 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
-        t3.Type = TriangleType.ISOSCELES;
-        var t5 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
-        t5.Type = TriangleType.ISOSCELES_RIGHT;*/
+
         var t4 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
         t4.Type = TriangleType.EQUILATERAL;
         var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
@@ -93,6 +88,7 @@ public partial class MainWindow : Window
         BigScreen.Children.Add(new MathTextBox());
 
         Log.WriteVar(Latex.Latexify("123 + AB / 3 = 66 * 5"));
+
     }
 
     public static void regenAll(double z, double x, double c, double v) {

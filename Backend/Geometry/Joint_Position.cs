@@ -35,7 +35,7 @@ public partial class Joint
     bool dispatchingOnMoved = false;
 
     /// <summary>
-    /// Dispatches OnMoved events & uptades position according to exisiting formulas. 
+    /// Dispatches OnMoved events & updates position according to existing formulas. 
     /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
     /// </summary>
     /// <param name="x"></param>
@@ -44,9 +44,9 @@ public partial class Joint
     /// <param name="py"></param>
     public override void DispatchOnMovedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
-        if (x == null) x = X;
-        if (y == null) y = Y;
-        if (px == null) px = X;
+        x ??= X;
+        y ??= Y;
+        px ??= X;
         if (py == null) py = Y;
 
         if (!Anchored)
@@ -72,8 +72,8 @@ public partial class Joint
                 {
                     var p = listener(X, Y);
                     X = p.X; Y = p.Y;
-                    if (initialX == null) initialX = X;
-                    if (initialY == null) initialY = Y;
+                    initialX ??= X;
+                    initialY ??= Y;
                 }
                 safety++;
             } while (initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon);

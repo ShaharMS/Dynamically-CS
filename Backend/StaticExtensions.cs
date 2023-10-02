@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Dynamically.Backend;
@@ -281,6 +282,19 @@ public static class StaticExtensions
     {
         Canvas.SetLeft(element, x);
         Canvas.SetTop(element, y);
+    }
+
+
+    public static string PrettifyJson(this string unPrettyJson)
+    {
+        var options = new JsonSerializerOptions()
+        {
+            WriteIndented = true
+        };
+
+        var jsonElement = JsonSerializer.Deserialize<JsonElement>(unPrettyJson);
+
+        return JsonSerializer.Serialize(jsonElement, options);
     }
 }
 public enum EQUALITY_OP_TYPE

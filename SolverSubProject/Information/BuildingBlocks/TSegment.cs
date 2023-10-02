@@ -1,4 +1,5 @@
-﻿using Dynamically.Solver.Interfaces;
+﻿using Dynamically.Backend;
+using Dynamically.Solver.Interfaces;
 using Dynamically.Solver.Structs;
 using System;
 using System.Collections.Generic;
@@ -16,9 +17,8 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
     public List<SVertexOnSegmentRatio> MountsWithRatio = new();
     public List<TVertex> Midpoints = new();
     public List<TSegment> Intersectors = new();
-    public List<SSegmentOnSegmentRatio> IntersectsWithRatio = new();
+    public List<SSegmentOnArcRatio> IntersectsWithRatio = new();
     public List<TSegment> Bisectors = new();
-
     public TSegment(TVertex first, TVertex last)
     {
         Parts = new List<ExerciseToken> { first, last };
@@ -28,5 +28,6 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
 
         first.Segments.Add(this);
         last.Segments.Add(this);
+
     }
 }
