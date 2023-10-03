@@ -12,8 +12,14 @@ public class ExerciseToken
 {
     public string Id = "";
 
-    public List<IMountable> On = new();
+    /// <summary>
+    /// Other elements this element is mounted on
+    /// </summary>
+    public List<IMountable> IsOn = new();
 
+    /// <summary>
+    /// Contains elements that use this element to construct themself
+    /// </summary>
     public List<IConstructed> PartOf = new();
 
     public bool IsAuxilarry { get; private set; }

@@ -11,7 +11,7 @@ namespace Dynamically.Solver.Details;
 public class Detail
 {
     public Reason Reason { get; set; }
-    public uint References { get; set; }
+    public List<Detail> References { get; set; } = new();
 
     public ExerciseToken Left { get; private set; }
 
@@ -35,7 +35,6 @@ public class Detail
         Left = left;
         Right = right;
         SideProducts = sideProducts.ToList();
-        References = 0;
     }
 
     /// <summary>
@@ -49,7 +48,6 @@ public class Detail
         Operator = op; 
         Left = left; 
         Right = right;
-        References = 0;
     }
 
     /// <summary>
@@ -61,7 +59,6 @@ public class Detail
     {
         Operator = op;
         Left = left;
-        References = 0;
 
         Right = new ExerciseToken(); // Non-extended ExerciseToken is equivalent to null
     }

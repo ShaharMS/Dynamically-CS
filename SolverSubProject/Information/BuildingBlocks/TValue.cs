@@ -1,5 +1,4 @@
-﻿using Dynamically.Backend.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +8,10 @@ namespace Dynamically.Solver.Information.BuildingBlocks;
 
 public class TValue : ExerciseToken
 {
-    public Either<string, double> Value { get; private set; }
+    /// <summary>
+    /// Contains a latex representation of the value. usable via AngouriMath
+    /// </summary>
+    public string Value { get; private set; }
 
     public TValueKind Kind { get; private set; }
 
@@ -21,7 +23,7 @@ public class TValue : ExerciseToken
 
     public TValue(double value, TValueKind kind) : this(kind)
     {
-        Value = value;
+        Value = value + "";
     }
 
     public TValue(string value, TValueKind kind) : this(kind)
