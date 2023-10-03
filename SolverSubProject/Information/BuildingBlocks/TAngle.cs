@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Dynamically.Backend;
+using Dynamically.Solver.Interfaces;
 
 namespace Dynamically.Solver.Information.BuildingBlocks;
 
-public class TAngle : ExerciseToken
+public class TAngle : ExerciseToken, IConstructed
 {
     public TVertex Origin;
 
@@ -18,6 +19,8 @@ public class TAngle : ExerciseToken
 
     public TSegment? Segment1;
     public TSegment? Segment2;
+
+    public List<ExerciseToken> Parts => new List<ExerciseToken> {Origin, Other1, Other2};
 
     public TAngle(TVertex origin, TVertex other1, TVertex other2)
     {

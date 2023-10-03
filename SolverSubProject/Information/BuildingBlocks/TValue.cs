@@ -17,7 +17,7 @@ public class TValue : ExerciseToken
 
     public TValue(TValueKind kind)
     {
-        Value = 0;
+        Value = "";
         Kind = kind;
     }
 

@@ -11,8 +11,6 @@ namespace Dynamically.Solver.Information;
 
 public class InfoPool
 {
-    public static InfoPool Instance { get; } = new();
-
     public List<Detail> Given = new();
 
     public List<Detail> Objectives = new();
@@ -59,6 +57,8 @@ public class InfoPool
 
         AddElementsOf(detail);
     }
+
+    public void AddElement(ExerciseToken token) => Elements.Add(token);
     
     private void AddElementsOf(Detail detail) =>
         Elements.UnionWith(new[] { detail.Left, detail.Right }.Concat(detail.SideProducts));

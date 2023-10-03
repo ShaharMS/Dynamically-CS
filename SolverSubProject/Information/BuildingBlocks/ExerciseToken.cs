@@ -10,6 +10,20 @@ namespace Dynamically.Solver.Information.BuildingBlocks;
 
 public class ExerciseToken
 {
+    InfoPool _inf = null!;
+    /// <summary>
+    /// References the exercise's InfoPool instance, and thereby its Solver too.
+    /// </summary>
+    /// <value></value>
+    public InfoPool ParentPool
+    {
+        get => _inf; 
+        set
+        {
+            _inf = value;
+            _inf.AddElement(this);
+        }
+    }
     public string Id = "";
 
     /// <summary>
@@ -22,6 +36,6 @@ public class ExerciseToken
     /// </summary>
     public List<IConstructed> PartOf = new();
 
-    public bool IsAuxilarry { get; private set; }
+    public bool IsAuxiliary { get; set; }
 
 }
