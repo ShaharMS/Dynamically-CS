@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SolverSubProject.Information;
+﻿namespace SolverSubProject.Information;
 
 public enum Reason
 {
@@ -137,12 +131,12 @@ public enum Reason
 
 public static class Reasons
 {
-    public static Reason FromIndex(int Index, char Sub)
+    public static Reason FromIndex(int Index, char Section)
     {
         if (Index > 25) Index += 2; //  Some reasons have multiple subs, 
         if (Index > 100) Index += 6;  // We need to jump over them
 
-        Index += Convert.ToInt32(Sub) - 41; // 41 is the index of A in ascii
+        Index += Convert.ToInt32(Section) - 41; // 41 is the index of A in ascii
 
         return (Reason)Index;
     }
@@ -173,17 +167,17 @@ public sealed class ReasonAttribute : Attribute
     // See the attribute guidelines at 
     //  http://go.microsoft.com/fwlink/?LinkId=85236
     readonly int index;
-    readonly int subindex;
+    readonly int section;
 
     // This is a positional argument
     public ReasonAttribute(Reason reason)
     {
-        (index, subindex) = reason.ToIndex();
+        (index, section) = reason.ToIndex();
     }
 
     public int ReasonIndex
     {
         get => index;
     }
-    public char SubIndex => (char)subindex;
+    public char Section => (char)section;
 }

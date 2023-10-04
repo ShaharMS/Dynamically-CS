@@ -26,9 +26,6 @@ public static class DetailQuickCreator
 
     public static Detail Auxiliary(this ExerciseToken s) => new(s, Relation.AUXILIARY);
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
-    public static Detail ValueOf(this ExerciseToken s) => new(s, Relation.VALUEOF);
-
-    public static Detail Assign(this ExerciseToken a, ExerciseToken b) => new(a, Relation.ASSIGN, b);
 
     public static Detail Right(this TAngle a) => new(a, Relation.EQUALS, new TValue(90, TValueKind.Degrees));
     public static Detail Flat(this TAngle a) => new(a, Relation.EQUALS, new TValue(180, TValueKind.Degrees));
@@ -49,15 +46,15 @@ public static class DetailQuickCreator
 
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Left == a && x.Right == b);
 
-    public static Detail? Get(this List<Detail> avaliableDetails, ExerciseToken a, Relation r, ExerciseToken b) => avaliableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a && x.Right == b);
+    public static Detail? Get(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a && x.Right == b);
 
     /// <summary>
     /// NOTICE - Don't use this method without testing with the <c>Has</c> method.
     /// </summary>
-    /// <param name="avaliableDetails"></param>
+    /// <param name="availableDetails"></param>
     /// <param name="a"></param>
     /// <param name="r"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static Detail EnsuredGet(this List<Detail> avaliableDetails, ExerciseToken a, Relation r, ExerciseToken b) => avaliableDetails.First(x => x.Operator == r && x.Left == a && x.Right == b);
+    public static Detail EnsuredGet(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.First(x => x.Operator == r && x.Left == a && x.Right == b);
 }
