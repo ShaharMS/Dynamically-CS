@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AngouriMath;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +12,7 @@ public class TValue : ExerciseToken
     /// <summary>
     /// Contains a latex representation of the value. usable via AngouriMath
     /// </summary>
-    public string Value { get; private set; }
+    public Entity Value { get; private set; }
 
     public TValueKind Kind { get; private set; }
 
@@ -31,11 +32,18 @@ public class TValue : ExerciseToken
         Value = value;
     }
 
+    public bool Equals(TValue? obj)
+    {
+        return Value == obj?.Value;
+    }
+
 }
 public enum TValueKind
 {
     Length,
     Degrees,
     Radians,
-    Parameter
+    Parameter,
+    Element,
+    Equation
 }

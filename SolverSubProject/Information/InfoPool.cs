@@ -17,7 +17,7 @@ public class InfoPool
 
     public List<List<Detail>> Stages = new();
 
-    public List<Detail> AllDetails => Given.Concat(Stages.Flatten()).ToList();
+    public List<Detail> AvailableDetails => Given.Concat(Stages.Flatten()).ToList();
 
     public uint CurrentStage { get; set; }
 

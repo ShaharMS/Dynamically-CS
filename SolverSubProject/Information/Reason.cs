@@ -146,4 +146,44 @@ public static class Reasons
 
         return (Reason)Index;
     }
+
+    public static (int, char) ToIndex(this Reason reason)
+    {
+        var initial = (int)reason;
+
+        var i = initial;
+        if (i > 27) i -= 2;
+        if (i > 108) i -= 6;
+
+        if (i > 24 && i < 28)
+        {
+            return (25, Convert.ToChar(41 + i - 25));
+        } else if (i > 101 && 1 < 109)
+        {
+            return (100, Convert.ToChar(41 + i - 102));
+        }
+
+        return (i, Convert.ToChar(0));
+    }
+}
+
+[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+public sealed class ReasonAttribute : Attribute
+{
+    // See the attribute guidelines at 
+    //  http://go.microsoft.com/fwlink/?LinkId=85236
+    readonly int index;
+    readonly int subindex;
+
+    // This is a positional argument
+    public ReasonAttribute(Reason reason)
+    {
+        (index, subindex) = reason.ToIndex();
+    }
+
+    public int ReasonIndex
+    {
+        get => index;
+    }
+    public char SubIndex => (char)subindex;
 }

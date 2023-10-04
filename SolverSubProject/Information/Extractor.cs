@@ -1,6 +1,6 @@
 ﻿using Dynamically.Solver.Details;
+using Dynamically.Solver.Helpers;
 using Dynamically.Solver.Information.BuildingBlocks;
-using SolverSubProject.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,10 @@ namespace SolverSubProject.Information;
 
 /// <summary>
 /// The heart of the auto-solver - here reside the methods used to infer further information.
-/// 
+/// <br/>
 /// Categories are sorted by the potential detail: for example, a check for similar peripheral angles on arc will be placed under "Angle", and not "Circle".
+/// <br/>
+/// The reason used to infer each detail is marked in every method as an attribute.
 /// </summary>
 public class Extractor
 {
@@ -35,13 +37,26 @@ public class Extractor
                                                  gggggg                                 
     */
 
+    [Reason(Reason.ADJACENT_ANGLES_180)]
     public static Detail[] EvaluateAdjacentAngles(TAngle angle)
     {
-        if (angle.HasAdjacentAngles()) return E();
+        if (!angle.HasAdjacentAngles()) return E();
+
+        var adjacentAngles = angle.GetAdjacentAngles();
+        return adjacentAngles.Select(a => a.EqualsVal(new TValue($"180\\deg - {a.GetValue().Value}", TValueKind.Equation) { ParentPool = a.ParentPool })).ToArray();
+    }
+
+    [Reason(Reason.VERTEX_ANGLES_EQUAL)]
+    public static Detail[] EvaluateVertexAngle(TAngle angle)
+    {
+        if (!angle.HasVertexAngle()) return E();
+        var vertexAngle = angle.GetVertexAngle();
+        if (vertexAngle == null) return E();
+        return new[] { vertexAngle.EqualsVal(angle) };
     }
 
     /*                                                                                                                             
-                                                                                                      
+
         LLLLLLLLL                                                             ttt      hhhhh          
         L:::::::L                                                          t::::t      h:::h          
           L:::L             eeeeeeeeee    nnnn nnnnnnn      gggggg   gggtttt::::tttt    h::h hhhh     
@@ -57,7 +72,7 @@ public class Extractor
     */
 
     /*                                                                                                                                       
-                                                                                                       
+
         TTTTTTTTTTTTTT                iii                                             llll             
         T::TT::::TT::T                                                                l::l             
         TTT  T::T  TTTrrr   rrrrr   iiiiii   aaaaaaaaa   nnnn nnnnnnn     ggggggg  ggg l:l   eeeeeeee  
@@ -72,6 +87,37 @@ public class Extractor
                                                                           ggg:::::g                    
                                                                              ggggg                     
     */
+
+    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
+    public static Detail[] EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
+    {
+        var details = new List<Detail>();
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
+        {
+            details.Add(
+                triangle.V1V3V2.EqualsVal(triangle.V1V2V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
+            );
+        }
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
+        {
+            details.Add(
+                triangle.V1V3V2.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
+            );
+        }
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
+        {
+            details.Add(
+                triangle.V1V2V3.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
+            );
+        }
+        return details.ToArray();
+    }
+
+    [Reason(Reason.ISOSCELES_BASE_ANGLES_EQUAL)]
+    public static Detail[] EquateIsoscelesBaseAngles(TTriangle triangle)
+    {
+        return E();
+    }
 
     /*                                                                            
                                                                             dddddddd
@@ -88,7 +134,7 @@ public class Extractor
     */
 
     /*                                                                                                 
-                                                                                  
+
                CCCCCCCCC  iiiii                               lllllll                     
            C:::::::::::C  iiiii                               l:::::l                     
           C::::CCCCC:::C                                      l:::::l                     

@@ -40,6 +40,8 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
     /// <returns></returns>
     public List<TVertex> MountsAfterLast = new();
 
+    public List<TVertex> MountsBeforeFirstOrAfterLast(TVertex v) => v == First ? MountsBeforeFirst : MountsAfterLast;
+
     public TVertex First {get => (TVertex)Parts.First(); }
     public TVertex Last {get => (TVertex)Parts.Last(); }
 
