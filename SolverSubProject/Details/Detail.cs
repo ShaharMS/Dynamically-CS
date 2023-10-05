@@ -11,7 +11,16 @@ namespace Dynamically.Solver.Details;
 public class Detail
 {
     public Reason Reason { get; set; }
+
+    /// <summary>
+    /// Details this detail references. You should be able to traverse this to get the full solution's path
+    /// </summary>
     public List<Detail> References { get; set; } = new();
+
+    /// <summary>
+    /// Other details that referenced this
+    /// </summary>
+    public List<Detail> ReferencedBy { get; set; } = new();
 
     public ExerciseToken Left { get; private set; }
 

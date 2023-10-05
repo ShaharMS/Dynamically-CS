@@ -21,7 +21,7 @@ public struct SSegmentOnArcRatio
     {
         Intersector = i;
         Arc = a;
-        RatioV1 = (double)(rv1 != null ? rv1 : rv2 != null ? 1 - rv2 : throw new ArgumentException("rv1/rv2 must be non-null, and the other null. both are null"));
+        RatioV1 = (double)(rv1 != null ? rv1 : rv2 != null ? 1 - rv2 : throw new Exception("rv1/rv2 must be non-null, and the other null. both are null"));
         RatioV2 = 1 - RatioV1;
     }
 }

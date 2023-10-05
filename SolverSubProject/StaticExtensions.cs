@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -23,10 +24,21 @@ public static class StaticExtensions
         return en;
     }
 
+    public static bool ContainsMany<T>(this IEnumerable<T> en, IEnumerable<T> items) => items.Any(en.Contains);
     public static bool ContainsMany<T>(this IEnumerable<T> en, params T[] items) => items.Any(en.Contains);
     public static IEnumerable<T> RemoveMany<T>(this IEnumerable<T> en, params T[] items) => en.Where(e => !items.Contains(e));
 
     public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> en) => en.SelectMany(e => e);
+
+    public static T[] ToArray<T>(this ITuple t)
+    {
+        var arr = new T[t.Length];
+        for (var i = 0; i < t.Length; i++)
+        {
+            arr[i] = (T)t[i]!;
+        }
+        return arr;
+    }
 
     public static double RadiansBetween(this double radBA, double radBC, bool neg = false)
     {

@@ -10,6 +10,9 @@ namespace Dynamically.Solver.Information.BuildingBlocks;
 
 public class ExerciseToken
 {
+
+    public static readonly ExerciseToken Null = new();
+
     InfoPool _inf = null!;
     /// <summary>
     /// References the exercise's InfoPool instance, and thereby its Solver too.
@@ -32,10 +35,19 @@ public class ExerciseToken
     public List<IMountable> IsOn = new();
 
     /// <summary>
-    /// Contains elements that use this element to construct themself
+    /// Contains elements that use this element to construct themselves
     /// </summary>
     public List<IConstructed> PartOf = new();
 
     public bool IsAuxiliary { get; set; }
 
+    public override bool Equals(object? obj)
+    {
+        if (obj is ExerciseToken t) return t.Id.Equals(Id);
+        return base.Equals(obj);
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }

@@ -1,8 +1,10 @@
-﻿using Dynamically.Solver.Details;
+﻿using Dynamically.Backend;
+using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,6 +25,7 @@ public static class DetailQuickCreator
     public static Detail Bisects(this TSegment s1, TSegment s2) => new(s1, Relation.BISECTS, s2);
     public static Detail Bisects(this TVertex s1, TSegment s2) => new(s1, Relation.BISECTS, s2);
     public static Detail Bisects(this TSegment s1, TSegment s2, TVertex c) => new(s1, Relation.BISECTS, s2, c);
+    public static Detail Bisects(this TSegment s, TAngle a) => new(s, Relation.BISECTS, a);
 
     public static Detail Auxiliary(this ExerciseToken s) => new(s, Relation.AUXILIARY);
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
@@ -40,13 +43,31 @@ public static class DetailQuickCreator
     public static Detail AddReferences(this Detail detail, params Detail[] Refs)
     {
         detail.References.AddRange(Refs);
+        foreach (var item in Refs)
+        {
+            item.ReferencedBy.Add(detail);
+        }
         return detail;
     }
 
 
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Left == a && x.Right == b);
+    public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Any(x => x.Operator == r && x.Left == a);
 
     public static Detail? Get(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a && x.Right == b);
+    public static Detail? Get(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a);
+    public static Detail? Get(this List<Detail> availableDetails, Relation r, ExerciseToken b) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Right == b);
+
+
+    public static Detail[] GetMany(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Where(x => x.Operator == r && x.Left == a).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, Relation r, ExerciseToken b) => availableDetails.Where(x => x.Operator == r && x.Right == b).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, Relation r, params ExerciseToken[] b) => availableDetails.Where(x => x.Operator == r && b.Contains(x.Right)).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, ITuple r, ExerciseToken b) => availableDetails.Where(x => r.ToArray<Relation>().Contains(x.Operator) && x.Right == b).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, ExerciseToken a) => availableDetails.Where(x => x.Left == a).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, ExerciseToken a, params Relation[] rs) => availableDetails.Where(x => rs.Contains(x.Operator) && x.Left == a).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, ExerciseToken a, Relation r, params ExerciseToken[] bs) => availableDetails.Where(x => x.Operator == r && x.Left == a && bs.Contains(x.Right)).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, ITuple a, Relation r) => availableDetails.Where(x => x.Operator == r && a.ToArray<ExerciseToken>().Contains(x.Left)).ToArray();
+    public static Detail[] GetMany(this List<Detail> availableDetails, params Relation[] rs) => availableDetails.Where(x => rs.Contains(x.Operator)).ToArray();
 
     /// <summary>
     /// NOTICE - Don't use this method without testing with the <c>Has</c> method.
@@ -57,4 +78,48 @@ public static class DetailQuickCreator
     /// <param name="b"></param>
     /// <returns></returns>
     public static Detail EnsuredGet(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.First(x => x.Operator == r && x.Left == a && x.Right == b);
+
+    /// <summary>
+    /// NOTICE - Don't use this method without testing with the <c>Has</c> method.
+    /// </summary>
+    /// <param name="availableDetails"></param>
+    /// <param name="a"></param>
+    /// <param name="r"></param>
+    /// <returns></returns>
+    /// 
+    public static Detail EnsuredGet(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.First(x => x.Operator == r && x.Left == a);
+    /// <summary>
+    /// NOTICE - Don't use this method without testing with the <c>Has</c> method.
+    /// </summary>
+    /// <param name="availableDetails"></param>
+    /// <param name="r"></param>
+    /// <param name="b"></param>
+    /// <returns></returns>
+    /// 
+    public static Detail EnsuredGet(this List<Detail> availableDetails, Relation r, ExerciseToken b) => availableDetails.First(x => x.Operator == r && x.Right == b);
+
+
+
+    public static bool Similar(this Detail a, Detail b)
+    {
+        if (a.Operator != b.Operator) return false;
+        if (new[] { a.Left, a.Right }.Except(new[] { b.Left, b.Right }).Any()) return false;
+        return a.Operator switch
+        {
+            Relation.CONGRUENT or Relation.SIMILAR or Relation.EQUALS or Relation.PERPENDICULAR => 
+                (a.Left == b.Left && a.Right == b.Right) || (a.Left == b.Right && a.Right == b.Left),
+            Relation.INTERSECTS => 
+                ((a.Left == b.Left && a.Right == b.Right) || (a.Left == b.Right && a.Right == b.Left)) && a.SideProducts[0] == b.SideProducts[0],
+            _ => 
+                a.Left == b.Left && a.Right == b.Right,
+        };
+    }
+
+    class DE : IEqualityComparer<Detail>
+    {
+        public DE() : base() { }
+        public bool Equals(Detail? x, Detail? y) => x != null && y != null && x.Similar(y);
+        public int GetHashCode(Detail obj) => obj.GetHashCode();
+    }
+    public static IEnumerable<Detail> FilterSimilars(this IEnumerable<Detail> en) => new HashSet<Detail>(en, new DE()).AsEnumerable();
 }

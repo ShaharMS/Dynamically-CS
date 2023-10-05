@@ -12,7 +12,7 @@ namespace Dynamically.Solver.Helpers;
 public static partial class TokenHelpers
 {
     /// <summary>
-    /// Checks wether or not operations on the given tokens "make sense":
+    /// Checks whether or not operations on the given tokens "make sense":
     /// <list type="bullet">
     ///     <item>Tokens must share the same <c>InfoPool</c> instance</item>
     ///     <item>Tokens must be distinct</item>
@@ -47,4 +47,6 @@ public static partial class TokenHelpers
 
         return val;
     }
+
+    public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;
 }
