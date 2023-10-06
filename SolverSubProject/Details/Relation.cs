@@ -78,13 +78,6 @@ public enum Relation
     PERPENDICULAR,
     /// <summary>
     /// <list type="bullet">
-    ///     <item>Vertex | Segment | Circle</item>
-    ///     <item>No side products</item>
-    /// </list>
-    /// </summary>
-    AUXILIARY,
-    /// <summary>
-    /// <list type="bullet">
     ///     <item>Segment, Segment | Segment, Value | Angle, Angle | Angle, Value | Angle, Arc | Arc, Arc | Arc, Value | Value, Value </item>
     ///     <item>0 or more side products - left operand can be equal to one or more elements</item>
     /// </list>

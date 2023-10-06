@@ -63,4 +63,15 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
         last.PartOf.Add(this);
 
     }
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is not TSegment) return base.Equals(obj);
+        else return Id.ToCharArray().ContainsMany(((TSegment)obj).Id.ToCharArray());
+    }
+
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }

@@ -54,7 +54,7 @@ public class Extractor
     // public static Detail[] BiggerSideLargerAngleAt(TTriangle triangle)
 
     [Reason(Reason.TRIANGLE_ANGLE_SUM_180)]
-    public static Detail[] EvaluateAngleSumWithingTriangle(TTriangle triangle)
+    public static Detail[] EvaluateAngleSumWithinTriangle(TTriangle triangle)
     {
         var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3} - {triangle.V1V3V2}", TValueKind.Equation) { ParentPool = triangle.ParentPool });
         var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V3V2}", TValueKind.Equation) { ParentPool = triangle.ParentPool });
@@ -63,42 +63,62 @@ public class Extractor
         return new[] { detail1, detail2, detail3 };
     }
 
-    /*                                                                                                                             
+    [Reason(Reason.OUTSIDE_ANGLE_EQUALS_TWO_OTHER_TRIANGLE_ANGLES)]
+    public static Detail[] EvaluateOuterAnglesOfTriangle(TTriangle triangle)
+    {
+        var details = new Detail[6];
 
-        █████████                                                             ███      █████          
-        █:::::::█                                                          █::::█      █:::█          
-          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
-          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-          █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
-          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
-        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
-        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
-        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
-                                                         █████    █:::█                               
-                                                          █:::::█:::::█                               
-                                                            ███::::███                                
-    */
+        foreach (TVertex vertex in triangle.GetVertices())
+        {
+            var oppositeSegment = triangle.GetOppositeSegment(vertex);
+            var angle1 = triangle.GetAngleOf(oppositeSegment.First);
+            var angle2 = triangle.GetAngleOf(oppositeSegment.Last);
 
-    // public static Detail[] LargerAngleBiggerSideAt(TTriangle triangle)
+            var segments = triangle.GetSegments().Except(new[] { oppositeSegment });
+            foreach (var segment in segments)
+            {
+                details[i] = vertex.GetAngle()
+            }
+        }
 
-    /*                                                                                                                                       
+        return details;
+    }
+        /*                                                                                                                             
 
-        ██████████████                ███                                             ████             
-        █::██::::██::█                                                                █::█             
-        ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
-             █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
-             █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
-             █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
-             █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
-           █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
-           ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
-                                                                        ████:     █::█                  
-                                                                         █::::██::::█                  
-                                                                          ███:::::█                    
-                                                                             █████:                     
-    */
+            █████████                                                             ███      █████          
+            █:::::::█                                                          █::::█      █:::█          
+              █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+              █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+              █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+              █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+            ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+            █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+            ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                             █████    █:::█                               
+                                                              █:::::█:::::█                               
+                                                                ███::::███                                
+        */
 
-    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
+        // public static Detail[] LargerAngleBiggerSideAt(TTriangle triangle)
+
+        /*                                                                                                                                       
+
+            ██████████████                ███                                             ████             
+            █::██::::██::█                                                                █::█             
+            ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
+                 █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
+                 █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
+                 █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
+                 █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
+               █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
+               ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
+                                                                            ████:     █::█                  
+                                                                             █::::██::::█                  
+                                                                              ███:::::█                    
+                                                                                 █████:                     
+        */
+
+        [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
     public static Detail[] EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
     {
         var details = new List<Detail>();

@@ -28,6 +28,8 @@ public class Detail
 
     public ExerciseToken Right { get; private set; }
 
+    public bool DefinesAuxiliary { get; set; } = false;
+
 
     public List<ExerciseToken> SideProducts = new();
 

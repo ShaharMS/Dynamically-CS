@@ -14,9 +14,14 @@ public static partial class TokenHelpers
         Validate(from, to);
         var item = from.Segments.Where(x => x.Parts.ContainsMany(from, to));
         if (item.Any()) return item.First();
-        return new TSegment(from, to) {
+
+        var seg = new TSegment(from, to)
+        {
             IsAuxiliary = true,
             ParentPool = from.ParentPool
-        };
+        }; 
+        var detail = from.Connect(to).MakeAuxiliary();
+        seg.ParentPool.AddDetail(detail);
+        return seg;
     }
 }
