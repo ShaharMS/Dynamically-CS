@@ -75,10 +75,6 @@ public class Extractor
             var angle2 = triangle.GetAngleOf(oppositeSegment.Last);
 
             var segments = triangle.GetSegments().Except(new[] { oppositeSegment });
-            foreach (var segment in segments)
-            {
-                details[i] = vertex.GetAngle()
-            }
         }
 
         return details;
