@@ -16,40 +16,35 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
 
     /// <summary>
     /// <code>
-    /// <br/>                 / last
+    /// <br/>                 / V2
     /// <br/>                /
     /// <br/>               /
-    /// <br/>              / first
+    /// <br/>              / V1
     /// <br/>             /
     /// <br/>       here /
     /// </code>
     /// </summary>
     /// <returns></returns>
-    public List<TVertex> MountsBeforeFirst = new();
+    public List<TVertex> OnV1sExtension = new();
 
     /// <summary>
     /// <code>
-    /// <br/>            here / 
+    /// <br/>            V1 / 
     /// <br/>                /
-    /// <br/>               / last
+    /// <br/>               / V2
     /// <br/>              / 
     /// <br/>             /
     /// <br/>            / first
     /// </code>
     /// </summary>
     /// <returns></returns>
-    public List<TVertex> MountsAfterLast = new();
+    public List<TVertex> OnV2sExtension = new();
 
-    public List<TVertex> MountsBeforeFirstOrAfterLast(TVertex v) => v == First ? MountsBeforeFirst : MountsAfterLast;
+    public List<TVertex> GetMountsOnExtension(TVertex v) => v == V1 ? OnV1sExtension : OnV2sExtension;
 
-    public TVertex First {get => (TVertex)Parts.First(); }
-    public TVertex Last {get => (TVertex)Parts.Last(); }
+    public TVertex V1 {get => (TVertex)Parts.First(); }
+    public TVertex V2 {get => (TVertex)Parts.Last(); }
 
-    public List<SVertexOnSegmentRatio> MountsWithRatio = new();
-    public List<TVertex> Midpoints = new();
-    public List<TSegment> Intersectors = new();
-    public List<SSegmentOnArcRatio> IntersectsWithRatio = new();
-    public List<TSegment> Bisectors = new();
     public TSegment(TVertex first, TVertex last)
     {
         Parts = new List<ExerciseToken> { first, last };

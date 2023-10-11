@@ -32,7 +32,17 @@ public enum Relation
     /// <summary>
     /// <list type="bullet">
     ///     <item>Segment, Segment | Vertex, Segment</item>
-    ///     <item>On <c>Segment, Segment</c>, one side product - point of intersection</item>
+    ///     <item> <c>Segment, Segment</c> Side products:
+    ///         <list type="number">
+    ///             <item>Optional - intersection ratio</item>
+    ///             <item>Optional - intersection point</item>
+    ///         </list>
+    ///     </item>
+    ///     <item> <c>Vertex, Segment</c> Side products:
+    ///         <list type="number">
+    ///             <item>Optional - intersection ratio</item>
+    ///         </list>
+    ///     </item>
     /// </list>
     /// </summary>
     INTERSECTS,
@@ -61,7 +71,7 @@ public enum Relation
     /// <list type="bullet">
     ///     <item>Segment, Triangle, Segment, Quad</item>
     ///     <item> Two scenarios:
-    ///         <list type="bullet">
+    ///         <list type="number">
     ///             <item>On <c>Segment, Triangle</c>, one side product - the other side</item>
     ///             <item>On <c>Segment, Quad</c>, two side products - the intersecting sides</item>
     ///         </list>

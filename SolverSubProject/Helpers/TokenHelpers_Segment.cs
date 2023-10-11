@@ -1,4 +1,5 @@
 ﻿using Dynamically.Backend;
+using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
 using System;
 using System.Collections.Generic;
@@ -49,12 +50,21 @@ public static partial class TokenHelpers
     public static TVertex GetIntersectionPoint(this TSegment segment, TSegment other) 
     { 
         Validate(segment, other);
-        if (!segment.ParentPool.AvailableDetails.Has(segment, Details.Relation.INTERSECTS, other))
+        if (!segment.ParentPool.AvailableDetails.Has(segment, Relation.INTERSECTS, other))
         {
             throw new ArgumentException($"{segment} and {other} don't share an intersection point");
         }
 
-        var detail = segment.ParentPool.AvailableDetails.EnsuredGet(segment, Details.Relation.INTERSECTS, other);
+        var detail = segment.ParentPool.AvailableDetails.EnsuredGet(segment, Relation.INTERSECTS, other);
         return (TVertex)detail.SideProducts.First();
+    }
+
+    public static IEnumerable<TSegment> GetBisectors(this TSegment segment) {
+        foreach (var x in segment.ParentPool.AvailableDetails.GetMany(Relation.BISECTS, segment)) 
+            yield return (TSegment)x.Left;
+    }
+    public static IEnumerable<TSegment> GetIntersectors(this TSegment segment) {
+        foreach (var x in segment.ParentPool.AvailableDetails.GetMany((Relation.INTERSECTS, Relation.BISECTS), segment)) 
+            yield return (TSegment)x.Left;
     }
 }

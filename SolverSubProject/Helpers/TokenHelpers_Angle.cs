@@ -32,9 +32,9 @@ public static partial class TokenHelpers
     {
         if (!HasAdjacentAngles(angle)) return Array.Empty<TAngle>();
 
-        var p1 = angle.Segment1?.MountsBeforeFirstOrAfterLast(angle.Other1).FirstOrDefault();
+        var p1 = angle.Segment1?.GetMountsOnExtension(angle.Other1).FirstOrDefault();
         var o1 = angle.Parts.ToList().RemoveMany(angle.Origin, angle.Other1).First();
-        var p2 = angle.Segment2?.MountsBeforeFirstOrAfterLast(angle.Other2).FirstOrDefault();
+        var p2 = angle.Segment2?.GetMountsOnExtension(angle.Other2).FirstOrDefault();
         var o2 = angle.Parts.ToList().RemoveMany(angle.Origin, angle.Other2).First();
 
         return new[]
@@ -44,7 +44,7 @@ public static partial class TokenHelpers
         }.Where(x => x != null).Cast<TAngle>().ToArray();
     }
 
-    public static bool HasVertexAngle(this TAngle angle) => angle.Segment1?.MountsBeforeFirstOrAfterLast(angle.Other1).Count > 0 && angle.Segment2?.MountsBeforeFirstOrAfterLast(angle.Other2).Count > 0;
+    public static bool HasVertexAngle(this TAngle angle) => angle.Segment1?.GetMountsOnExtension(angle.Other1).Count > 0 && angle.Segment2?.GetMountsOnExtension(angle.Other2).Count > 0;
 
     public static TAngle? GetVertexAngle(this TAngle angle)
     {
@@ -54,8 +54,8 @@ public static partial class TokenHelpers
         {
             return GetAngle(
                         angle.Origin,
-                        angle.Segment1.MountsBeforeFirstOrAfterLast(angle.Other1).First(),
-                        angle.Segment2.MountsBeforeFirstOrAfterLast(angle.Other2).First()
+                        angle.Segment1.GetMountsOnExtension(angle.Other1).First(),
+                        angle.Segment2.GetMountsOnExtension(angle.Other2).First()
                     );
         } catch (InvalidOperationException)
         {

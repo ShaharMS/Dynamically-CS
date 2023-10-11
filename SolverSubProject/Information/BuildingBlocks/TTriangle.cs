@@ -16,9 +16,20 @@ public class TTriangle : ExerciseToken, IConstructed
     public TVertex V2 {get => (TVertex)Parts[1];}
     public TVertex V3 {get => (TVertex)Parts[2];}
 
+    /// <summary>
+    /// V1 -> V2 -> V3
+    /// </summary>
+    public TVertex[] Vertices => Parts.Cast<TVertex>().ToArray();
+    
     public TSegment V1V2 {get => V1.GetOrCreateSegment(V2); }
     public TSegment V2V3 {get => V2.GetOrCreateSegment(V3); }
     public TSegment V1V3 {get => V1.GetOrCreateSegment(V3); }
+
+    /// <summary>
+    /// V1V2 -> V2V3 -> V1V3
+    /// </summary>
+    public TSegment[] Sides => new[] {V1V2, V2V3, V1V3};
+
     public TAngle V1V2V3 {get => V2.GetAngle(V1, V3); }
     public TAngle V1V3V2 {get => V3.GetAngle(V1, V2); }
     public TAngle V2V1V3 {get => V1.GetAngle(V2, V3); }

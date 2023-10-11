@@ -10,6 +10,8 @@ namespace SolverSubProject.Information;
 /// Categories are sorted by the potential detail, for example, a check for similar peripheral angles on arc will be placed under "Angle", and not "Circle".
 /// The ordering within each category is only by the reason's index.
 /// <br/>
+/// Parallels & perpendiculars will appear under "Angle", not "Length".
+/// <br/>
 /// The reason used to infer each detail is marked in every method as an attribute.
 /// </summary>
 public class Extractor
@@ -66,55 +68,91 @@ public class Extractor
     [Reason(Reason.OUTSIDE_ANGLE_EQUALS_TWO_OTHER_TRIANGLE_ANGLES)]
     public static Detail[] EvaluateOuterAnglesOfTriangle(TTriangle triangle)
     {
-        var details = new Detail[6];
-
+        var details = new List<Detail>();
         foreach (TVertex vertex in triangle.GetVertices())
         {
             var oppositeSegment = triangle.GetOppositeSegment(vertex);
-            var angle1 = triangle.GetAngleOf(oppositeSegment.First);
-            var angle2 = triangle.GetAngleOf(oppositeSegment.Last);
+            var angle1 = triangle.GetAngleOf(oppositeSegment.V1);
+            var angle2 = triangle.GetAngleOf(oppositeSegment.V2);
 
             var segments = triangle.GetSegments().Except(new[] { oppositeSegment });
+
+            var currentSegment = segments.ElementAt(0);
+            var otherSegment = segments.ElementAt(1);
+
+            var currentSegmentExtensionVertex = currentSegment.GetMountsOnExtension(vertex).FirstOrDefault();
+            var thirdAngleVertex = otherSegment.Parts.First(x => x != vertex);
+            if (currentSegmentExtensionVertex != null)
+            {
+                var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
+                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}", TValueKind.Equation)));
+            }
+
+            currentSegment = segments.ElementAt(1);
+            otherSegment = segments.ElementAt(0);
+
+            currentSegmentExtensionVertex = currentSegment.GetMountsOnExtension(vertex).FirstOrDefault();
+            thirdAngleVertex = otherSegment.Parts.First(x => x != vertex);
+            if (currentSegmentExtensionVertex != null)
+            {
+                var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
+                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}", TValueKind.Equation)));
+            }
         }
 
-        return details;
+        return details.ToArray();
     }
-        /*                                                                                                                             
 
-            █████████                                                             ███      █████          
-            █:::::::█                                                          █::::█      █:::█          
-              █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
-              █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-              █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
-              █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
-            ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
-            █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
-            ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
-                                                             █████    █:::█                               
-                                                              █:::::█:::::█                               
-                                                                ███::::███                                
-        */
+    [Reason(Reason.MIDSEGMENT_PARALLEL_OTHER_TRIANGLE_SIDE)]
+    public static Detail[] ParallelizeMidSegmentToSide(TTriangle triangle)
+    {
+        var midSegments = triangle.GetMidSegmentsWithOpposites();
+        return midSegments.Select(x => x.midSegment.Parallel(x.opposite).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(x.midSegment, Relation.MIDSEGMENT, triangle))).ToArray();
+    }
 
-        // public static Detail[] LargerAngleBiggerSideAt(TTriangle triangle)
+    /*                                                                                                                             
 
-        /*                                                                                                                                       
+        █████████                                                             ███      █████          
+        █:::::::█                                                          █::::█      █:::█          
+          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+          █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                         █████    █:::█                               
+                                                          █:::::█:::::█                               
+                                                            ███::::███                                
+    */
 
-            ██████████████                ███                                             ████             
-            █::██::::██::█                                                                █::█             
-            ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
-                 █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
-                 █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
-                 █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
-                 █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
-               █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
-               ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
-                                                                            ████:     █::█                  
-                                                                             █::::██::::█                  
-                                                                              ███:::::█                    
-                                                                                 █████:                     
-        */
+    // public static Detail[] LargerAngleBiggerSideAt(TTriangle triangle)
 
-        [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
+    public static Detail[] MidsegmentProperties_A(TTriangle triangle)
+    {
+        foreach (TSegment side in triangle.Sides) {
+            var bisectors = side.GetBisectors();
+        }
+    }
+
+    /*                                                                                                                                       
+
+        ██████████████                ███                                             ████             
+        █::██::::██::█                                                                █::█             
+        ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
+             █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
+             █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
+             █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
+             █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
+           █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
+           ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
+                                                                        ████:     █::█                  
+                                                                         █::::██::::█                  
+                                                                          ███:::::█                    
+                                                                             █████:                     
+    */
+
+    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
     public static Detail[] EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
     {
         var details = new List<Detail>();
@@ -143,7 +181,7 @@ public class Extractor
     public static Detail[] EquateIsoscelesBaseAngles(TTriangle triangle)
     {
         if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
-        
+
         var equalSides = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Relation.TRIANGLE_ISOSCELES);
         if (equalSides.SideProducts.Count != 2) throw new Exception("Invalid Isosceles triangle - 2 equal sides must be provided");
 
@@ -179,7 +217,7 @@ public class Extractor
 
         var details = new List<Detail>();
 
-        foreach(var potential in potentials)
+        foreach (var potential in potentials)
         {
             if (potential.Left is not TSegment) continue;
             var seg = (potential.Left as TSegment)!;

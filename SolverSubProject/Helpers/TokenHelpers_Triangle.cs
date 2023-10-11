@@ -1,5 +1,7 @@
 ﻿using Dynamically.Backend;
+using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
+using HonkSharp.Fluency;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,5 +77,13 @@ public static partial class TokenHelpers
         var detail = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Details.Relation.TRIANGLE_ISOSCELES);
         
         return new[] { triangle.V1V2, triangle.V2V3, triangle.V1V3}.Except(detail.SideProducts.Cast<TSegment>()).First();
+    }
+
+    public static TSegment[] GetMidSegments(this TTriangle triangle) {
+        return triangle.ParentPool.AvailableDetails.GetMany(Relation.MIDSEGMENT, triangle).Select(x => x.Left).Cast<TSegment>().ToArray();
+    }
+
+    public static (TSegment midSegment, TSegment opposite)[] GetMidSegmentsWithOpposites(this TTriangle triangle) {
+        return triangle.ParentPool.AvailableDetails.GetMany(Relation.MIDSEGMENT, triangle).Select(x => (x.Left, x.SideProducts[0])).Cast<(TSegment midSegment, TSegment opposite)>().ToArray();
     }
 }
