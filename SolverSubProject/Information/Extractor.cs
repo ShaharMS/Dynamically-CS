@@ -1,4 +1,5 @@
-﻿using Dynamically.Solver.Details;
+﻿using Dynamically.Backend;
+using Dynamically.Solver.Details;
 using Dynamically.Solver.Helpers;
 using Dynamically.Solver.Information.BuildingBlocks;
 
@@ -36,16 +37,16 @@ public class Extractor
     */
 
     [Reason(Reason.ADJACENT_ANGLES_180)]
-    public static Detail[] EvaluateAdjacentAngles(TAngle angle)
+    public static IEnumerable<Detail> EvaluateAdjacentAngles(TAngle angle)
     {
         if (!angle.HasAdjacentAngles()) return E();
 
         var adjacentAngles = angle.GetAdjacentAngles();
-        return adjacentAngles.Select(a => a.EqualsVal(new TValue($"180\\deg - {a}", TValueKind.Equation) { ParentPool = a.ParentPool })).ToArray();
+        return adjacentAngles.Select(a => a.EqualsVal(new TValue($"180\\deg - {a}") { ParentPool = a.ParentPool })).ToArray();
     }
 
     [Reason(Reason.VERTEX_ANGLES_EQUAL)]
-    public static Detail[] EvaluateVertexAngle(TAngle angle)
+    public static IEnumerable<Detail> EvaluateVertexAngle(TAngle angle)
     {
         if (!angle.HasVertexAngle()) return E();
         var vertexAngle = angle.GetVertexAngle();
@@ -53,20 +54,20 @@ public class Extractor
         return new[] { vertexAngle.EqualsVal(angle) };
     }
 
-    // public static Detail[] BiggerSideLargerAngleAt(TTriangle triangle)
+    // public static IEnumerable<Detail> BiggerSideLargerAngleAt(TTriangle triangle)
 
     [Reason(Reason.TRIANGLE_ANGLE_SUM_180)]
-    public static Detail[] EvaluateAngleSumWithinTriangle(TTriangle triangle)
+    public static IEnumerable<Detail> EvaluateAngleSumWithinTriangle(TTriangle triangle)
     {
-        var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3} - {triangle.V1V3V2}", TValueKind.Equation) { ParentPool = triangle.ParentPool });
-        var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V3V2}", TValueKind.Equation) { ParentPool = triangle.ParentPool });
-        var detail3 = triangle.V1V3V2.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V2V3}", TValueKind.Equation) { ParentPool = triangle.ParentPool });
+        var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3} - {triangle.V1V3V2}") { ParentPool = triangle.ParentPool });
+        var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V3V2}") { ParentPool = triangle.ParentPool });
+        var detail3 = triangle.V1V3V2.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V2V3}") { ParentPool = triangle.ParentPool });
 
         return new[] { detail1, detail2, detail3 };
     }
 
     [Reason(Reason.OUTSIDE_ANGLE_EQUALS_TWO_OTHER_TRIANGLE_ANGLES)]
-    public static Detail[] EvaluateOuterAnglesOfTriangle(TTriangle triangle)
+    public static IEnumerable<Detail> EvaluateOuterAnglesOfTriangle(TTriangle triangle)
     {
         var details = new List<Detail>();
         foreach (TVertex vertex in triangle.GetVertices())
@@ -85,7 +86,7 @@ public class Extractor
             if (currentSegmentExtensionVertex != null)
             {
                 var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
-                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}", TValueKind.Equation)));
+                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}")));
             }
 
             currentSegment = segments.ElementAt(1);
@@ -96,7 +97,7 @@ public class Extractor
             if (currentSegmentExtensionVertex != null)
             {
                 var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
-                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}", TValueKind.Equation)));
+                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}")));
             }
         }
 
@@ -104,7 +105,7 @@ public class Extractor
     }
 
     [Reason(Reason.MIDSEGMENT_PARALLEL_OTHER_TRIANGLE_SIDE)]
-    public static Detail[] ParallelizeMidSegmentToSide(TTriangle triangle)
+    public static IEnumerable<Detail> ParallelizeMidSegmentToSide(TTriangle triangle)
     {
         var midSegments = triangle.GetMidSegmentsWithOpposites();
         return midSegments.Select(x => x.midSegment.Parallel(x.opposite).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(x.midSegment, Relation.MIDSEGMENT, triangle))).ToArray();
@@ -126,12 +127,48 @@ public class Extractor
                                                             ███::::███                                
     */
 
-    // public static Detail[] LargerAngleBiggerSideAt(TTriangle triangle)
+    // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
 
-    public static Detail[] MidsegmentProperties_A(TTriangle triangle)
+    [Reason(Reason.LINE_BISECTS_SIDE_PARALLEL_OTHER_BISECTS_THIRD)]
+    public static IEnumerable<Detail> MidsegmentProperties_A(TTriangle triangle)
     {
-        foreach (TSegment side in triangle.Sides) {
+        foreach (TSegment side in triangle.Sides)
+        {
             var bisectors = side.GetBisectors();
+            var otherSides = triangle.Sides.Except(side);
+            foreach (TSegment otherSide in otherSides)
+            {
+                foreach (TSegment bisector in bisectors)
+                {
+                    if (bisector.IsParallel(otherSide)) 
+                        yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
+                            triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
+                            triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
+                        );
+                }
+            }
+        }
+    }
+
+    [Reason(Reason.LINE_INTERSECTS_SIDES_PARALLEL_THIRD_HALF_THIRD_LENGTH_IS_MIDSEGMENT)]
+    public static IEnumerable<Detail> ExtractMidsegments(TTriangle triangle)
+    {
+        foreach (TSegment side in triangle.Sides)
+        {
+            var intersectors = side.GetIntersectors();
+            var otherSides = triangle.Sides.Except(side);
+            foreach (TSegment otherSide in otherSides)
+            {
+                foreach (TSegment intersector in intersectors)
+                {
+                    if (intersector.IsParallel(otherSide) && intersector.GetValue() == new TValue($"{intersector.GetValue()} / 2"))
+                        yield return intersector.MidSegment(triangle).AddReferences(
+                            triangle.ParentPool.AvailableDetails.Get(intersector, Relation.INTERSECTS, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Intersect` detail used, but not found"),
+                            triangle.ParentPool.AvailableDetails.Get(intersector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Parallel` detail used, but not found"),
+                            triangle.ParentPool.AvailableDetails.EnsuredGet(intersector, Relation.EQUALS, new TValue($"{intersector.GetValue()} / 2"))
+                        );
+                }
+            }
         }
     }
 
@@ -153,7 +190,7 @@ public class Extractor
     */
 
     [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
-    public static Detail[] EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
+    public static IEnumerable<Detail> EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
     {
         var details = new List<Detail>();
         if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
@@ -178,7 +215,7 @@ public class Extractor
     }
 
     [Reason(Reason.ISOSCELES_BASE_ANGLES_EQUAL)]
-    public static Detail[] EquateIsoscelesBaseAngles(TTriangle triangle)
+    public static IEnumerable<Detail> EquateIsoscelesBaseAngles(TTriangle triangle)
     {
         if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
 
@@ -193,18 +230,18 @@ public class Extractor
     }
 
     [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
-    public static Detail[] TriangleSumTwoSidesLargerThird(TTriangle triangle)
+    public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
     {
         return new[]
         {
-            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}", TValueKind.Equation)),
-            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}", TValueKind.Equation)),
-            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}", TValueKind.Equation))
+            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
+            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
+            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
         };
     }
 
     [Reason(Reason.ISOSCELES_PERPENDICUAL_ANGLEBISECTOR_BISECTOR)]
-    public static Detail[] MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
+    public static IEnumerable<Detail> MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
     {
         if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
 
@@ -245,7 +282,7 @@ public class Extractor
     }
 
     [Reason(Reason.TRIANGLE_ANGLEBISECTOR_PERPENDICULAR_IS_ISOSCELES)]
-    public static Detail[] IsTriangleIsosceles_A(TTriangle triangle)
+    public static IEnumerable<Detail> IsTriangleIsosceles_A(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
         var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
@@ -265,7 +302,7 @@ public class Extractor
     }
 
     [Reason(Reason.TRIANGLE_ANGLEBISECTOR_BISECTOR_IS_ISOSCELES)]
-    public static Detail[] IsTriangleIsosceles_B(TTriangle triangle)
+    public static IEnumerable<Detail> IsTriangleIsosceles_B(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
         var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
@@ -287,7 +324,7 @@ public class Extractor
 
 
     [Reason(Reason.TRIANGLE_PERPENDICULAR_BISECTOR_IS_ISOSCELES)]
-    public static Detail[] IsTriangleIsosceles_C(TTriangle triangle)
+    public static IEnumerable<Detail> IsTriangleIsosceles_C(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
         var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);

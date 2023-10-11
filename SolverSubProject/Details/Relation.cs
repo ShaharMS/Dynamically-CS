@@ -31,7 +31,7 @@ public enum Relation
     MIDDLE,
     /// <summary>
     /// <list type="bullet">
-    ///     <item>Segment, Segment | Vertex, Segment</item>
+    ///     <item>Segment, Segment | Vertex, Segment | Segment, Circle</item>
     ///     <item> <c>Segment, Segment</c> Side products:
     ///         <list type="number">
     ///             <item>Optional - intersection ratio</item>
@@ -41,6 +41,12 @@ public enum Relation
     ///     <item> <c>Vertex, Segment</c> Side products:
     ///         <list type="number">
     ///             <item>Optional - intersection ratio</item>
+    ///         </list>
+    ///     </item>
+    ///     <item> <c>Segment, Circle</c> Side products:
+    ///         <list type="number">
+    ///             <item>Optional - intersection point 1</item>
+    ///             <item>Optional - intersection point 2</item>
     ///         </list>
     ///     </item>
     /// </list>

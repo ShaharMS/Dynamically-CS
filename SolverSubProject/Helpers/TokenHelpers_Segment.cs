@@ -61,10 +61,41 @@ public static partial class TokenHelpers
 
     public static IEnumerable<TSegment> GetBisectors(this TSegment segment) {
         foreach (var x in segment.ParentPool.AvailableDetails.GetMany(Relation.BISECTS, segment)) 
-            yield return (TSegment)x.Left;
+            if (x.Left is TSegment s) yield return s;
     }
+
+    public static bool IsBisecting(this TSegment segment, ExerciseToken element)
+    {
+        Validate(segment, element);
+        return segment.ParentPool.AvailableDetails.Has(segment, Relation.BISECTS, element);
+    }
+
     public static IEnumerable<TSegment> GetIntersectors(this TSegment segment) {
-        foreach (var x in segment.ParentPool.AvailableDetails.GetMany((Relation.INTERSECTS, Relation.BISECTS), segment)) 
-            yield return (TSegment)x.Left;
+        foreach (var x in
+                segment.ParentPool.AvailableDetails.GetMany((Relation.INTERSECTS, Relation.BISECTS), segment).Concat(
+                    segment.ParentPool.AvailableDetails.GetMany(segment, Relation.INTERSECTS, Relation.BISECTS)
+                ).ToHashSet()
+            ) yield return (TSegment)x.Left;
+    }
+
+    public static bool IsIntersecting(this TSegment segment, ExerciseToken element)
+    {
+        Validate(segment, element);
+        return segment.ParentPool.AvailableDetails.Has(segment, Relation.INTERSECTS, element);
+    }
+
+    public static IEnumerable<TSegment> GetParallels(this TSegment segment)
+    {
+        foreach (var x in
+                segment.ParentPool.AvailableDetails.GetMany(Relation.PARALLEL, segment).Concat(
+                    segment.ParentPool.AvailableDetails.GetMany(segment, Relation.PARALLEL)
+                ).ToHashSet()
+            ) yield return (TSegment)x.Left;
+    }
+
+    public static bool IsParallel(this TSegment segment, TSegment element)
+    {
+        Validate(segment, element);
+        return segment.ParentPool.AvailableDetails.Has(segment, Relation.PARALLEL, element);
     }
 }

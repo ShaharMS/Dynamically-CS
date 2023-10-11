@@ -14,20 +14,18 @@ public class TValue : ExerciseToken
     /// </summary>
     public Entity Value { get; private set; }
 
-    public TValueKind Kind { get; private set; }
 
-    public TValue(TValueKind kind)
+    public TValue()
     {
         Value = "";
-        Kind = kind;
     }
 
-    public TValue(double value, TValueKind kind) : this(kind)
+    public TValue(double value)
     {
         Value = value + "";
     }
 
-    public TValue(string value, TValueKind kind) : this(kind)
+    public TValue(string value)
     {
         Value = value;
     }
@@ -37,13 +35,4 @@ public class TValue : ExerciseToken
         return Value == obj?.Value;
     }
 
-}
-public enum TValueKind
-{
-    Length,
-    Degrees,
-    Radians,
-    Parameter,
-    Element,
-    Equation
 }

@@ -26,9 +26,10 @@ public static class StaticExtensions
 
     public static bool ContainsMany<T>(this IEnumerable<T> en, IEnumerable<T> items) => items.Any(en.Contains);
     public static bool ContainsMany<T>(this IEnumerable<T> en, params T[] items) => items.Any(en.Contains);
-    public static IEnumerable<T> RemoveMany<T>(this IEnumerable<T> en, params T[] items) => en.Where(e => !items.Contains(e));
-
+    public static IEnumerable<T> RemoveMany<T>(this IEnumerable<T> en, params T[] items) => en = en.Where(e => !items.Contains(e));
+    public static IEnumerable<T> Except<T>(this IEnumerable<T> en, params T[] items) => en.Where(e => !items.Contains(e));
     public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> en) => en.SelectMany(e => e);
+
 
     public static T[] ToArray<T>(this ITuple t)
     {

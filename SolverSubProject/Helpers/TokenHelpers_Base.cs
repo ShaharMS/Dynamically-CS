@@ -40,7 +40,7 @@ public static partial class TokenHelpers
             if (detail.Operator == Relation.EQUALS && detail.Left == token) return (TValue)detail.Right;
         }
 
-        var val = new TValue(token.Id, TValueKind.Element)
+        var val = new TValue(token.Id)
         {
             ParentPool = token.ParentPool
         };

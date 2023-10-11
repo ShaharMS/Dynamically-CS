@@ -26,12 +26,13 @@ public static class DetailQuickCreator
     public static Detail Bisects(this TVertex s1, TSegment s2) => new(s1, Relation.BISECTS, s2);
     public static Detail Bisects(this TSegment s1, TSegment s2, TVertex c) => new(s1, Relation.BISECTS, s2, c);
     public static Detail Bisects(this TSegment s, TAngle a) => new(s, Relation.BISECTS, a);
+    public static Detail MidSegment(this TSegment s, TTriangle t) => new(s, Relation.MIDSEGMENT, t);
 
     public static Detail MakeAuxiliary(this Detail s) { s.DefinesAuxiliary = true; return s; }
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
 
-    public static Detail Right(this TAngle a) => new(a, Relation.EQUALS, new TValue(90, TValueKind.Degrees));
-    public static Detail Flat(this TAngle a) => new(a, Relation.EQUALS, new TValue(180, TValueKind.Degrees));
+    public static Detail Right(this TAngle a) => new(a, Relation.EQUALS, new TValue(90));
+    public static Detail Flat(this TAngle a) => new(a, Relation.EQUALS, new TValue(180));
 
     public static Detail EqualsVal(this ExerciseToken a, ExerciseToken b) => new(a, Relation.EQUALS, b);
     public static Detail Different(this TAngle a, TAngle b) => new(a, Relation.NOTEQUALS, b);
