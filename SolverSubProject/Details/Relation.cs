@@ -159,6 +159,63 @@ public enum Relation
     CIRCLE,
 
 
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products in 3 pairs - equal sides -> equal angles -> equal sides</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_CONGRUENCY_S_A_S,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products in 3 pairs - equal angles -> equal sides -> equal angles</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_CONGRUENCY_A_S_A,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products, 3 pairs of the equal sides</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_CONGRUENCY_S_S_S,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products in 3 pairs - "similar" sides -> "similar" angles -> "similar" sides</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_SIMILARITY_S_A_S,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>4 side products in 2 pairs - "similar" angles -> "similar" angles -> equal angles</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_SIMILARITY_A_A,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products, 3 pairs of the "similar" sides</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_SIMILARITY_S_S_S,
+    
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Triangle, Triangle</item>
+    ///     <item>6 side products in 3 pairs - equal sides -> equal angles -> equal sides</item>
+    /// </list>
+    /// </summary>
+    TRIANGLE_CONGRUENCY_S_S_A,
+
     /// <summary>
     /// <list type="bullet">
     ///     <item>Triangle</item>

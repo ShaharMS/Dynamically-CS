@@ -54,6 +54,47 @@ public class Extractor
         return new[] { vertexAngle.EqualsVal(angle) };
     }
 
+    
+    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
+    public static IEnumerable<Detail> EqualSidesEqualAngles(TTriangle triangle)
+    {
+        var details = new List<Detail>();
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
+        {
+            details.Add(
+                triangle.V1V3V2.EqualsVal(triangle.V1V2V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
+            );
+        }
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
+        {
+            details.Add(
+                triangle.V1V3V2.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
+            );
+        }
+        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
+        {
+            details.Add(
+                triangle.V1V2V3.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
+            );
+        }
+        return details.ToArray();
+    }
+
+    [Reason(Reason.ISOSCELES_BASE_ANGLES_EQUAL)]
+    public static IEnumerable<Detail> EquateIsoscelesBaseAngles(TTriangle triangle)
+    {
+        if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
+
+        var equalSides = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Relation.TRIANGLE_ISOSCELES);
+        if (equalSides.SideProducts.Count != 2) throw new Exception("Invalid Isosceles triangle - 2 equal sides must be provided");
+
+        TAngle opposite1 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[0]);
+        TAngle opposite2 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[1]);
+
+        var detail = opposite1.EqualsVal(opposite2).AddReferences(equalSides);
+        return new[] { detail };
+    }
+
     // public static IEnumerable<Detail> BiggerSideLargerAngleAt(TTriangle triangle)
 
     [Reason(Reason.TRIANGLE_ANGLE_SUM_180)]
@@ -129,6 +170,17 @@ public class Extractor
 
     // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
 
+    [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
+    public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
+    {
+        return new[]
+        {
+            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
+            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
+            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
+        };
+    }
+
     [Reason(Reason.LINE_BISECTS_SIDE_PARALLEL_OTHER_BISECTS_THIRD)]
     public static IEnumerable<Detail> MidsegmentProperties_A(TTriangle triangle)
     {
@@ -151,7 +203,7 @@ public class Extractor
     }
 
     [Reason(Reason.LINE_INTERSECTS_SIDES_PARALLEL_THIRD_HALF_THIRD_LENGTH_IS_MIDSEGMENT)]
-    public static IEnumerable<Detail> ExtractMidsegments(TTriangle triangle)
+    public static IEnumerable<Detail> ExtractMidSegments(TTriangle triangle)
     {
         foreach (TSegment side in triangle.Sides)
         {
@@ -188,57 +240,6 @@ public class Extractor
                                                                           ███:::::█                    
                                                                              █████:                     
     */
-
-    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
-    public static IEnumerable<Detail> EvaluateTriangleEqualSidesEqualAngles(TTriangle triangle)
-    {
-        var details = new List<Detail>();
-        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
-        {
-            details.Add(
-                triangle.V1V3V2.EqualsVal(triangle.V1V2V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
-            );
-        }
-        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
-        {
-            details.Add(
-                triangle.V1V3V2.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
-            );
-        }
-        if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
-        {
-            details.Add(
-                triangle.V1V2V3.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
-            );
-        }
-        return details.ToArray();
-    }
-
-    [Reason(Reason.ISOSCELES_BASE_ANGLES_EQUAL)]
-    public static IEnumerable<Detail> EquateIsoscelesBaseAngles(TTriangle triangle)
-    {
-        if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
-
-        var equalSides = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Relation.TRIANGLE_ISOSCELES);
-        if (equalSides.SideProducts.Count != 2) throw new Exception("Invalid Isosceles triangle - 2 equal sides must be provided");
-
-        TAngle opposite1 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[0]);
-        TAngle opposite2 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[1]);
-
-        var detail = opposite1.EqualsVal(opposite2).AddReferences(equalSides);
-        return new[] { detail };
-    }
-
-    [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
-    public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
-    {
-        return new[]
-        {
-            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
-            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
-            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
-        };
-    }
 
     [Reason(Reason.ISOSCELES_PERPENDICUAL_ANGLEBISECTOR_BISECTOR)]
     public static IEnumerable<Detail> MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
@@ -341,6 +342,34 @@ public class Extractor
         }
 
         return E();
+    }
+
+    [Reason(Reason.TRIANGLE_CONGRUENCY_S_A_S)]
+    public static IEnumerable<Detail> TriangleCongruencyVia_SAS(TTriangle triangle1, TTriangle triangle2)
+    {
+        TokenHelpers.Validate(triangle1, triangle2);
+        var all = triangle1.ParentPool.AvailableDetails;
+        var anglesOfT1 = triangle1.GetAngles();
+        var anglesOfT2 = triangle2.GetAngles();
+        var equals = new List<(TAngle, TAngle)>();
+        foreach (var angle1 in anglesOfT1)
+        {
+            foreach (var angle2 in anglesOfT2) 
+            {
+                if (angle1.GetValue() == angle2.GetValue())
+                    equals.Add((angle1, angle2));
+            }
+        }
+
+        foreach ((TAngle a1, TAngle a2) in equals) {
+            if (a1.Segment1 == null || a1.Segment2 == null || a2.Segment1 == null || a2.Segment2 == null) continue;
+            if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue()) {
+                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2));
+            }
+            else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue()) {
+                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1));
+            }
+        }
     }
 
     /*                                                                            
