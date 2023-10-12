@@ -17,7 +17,7 @@ namespace SolverSubProject.Information;
 /// </summary>
 public class Extractor
 {
-    static Detail[] E() => Array.Empty<Detail>();
+    static IEnumerable<Detail> E() => Enumerable.Empty<Detail>();
 
     /*                                                                                                   
                                                                                         
@@ -366,11 +366,19 @@ public class Extractor
             if (a1.Segment1 == null || a1.Segment2 == null || a2.Segment1 == null || a2.Segment2 == null) continue;
             if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue())
             {
-                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2));
+                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2)).AddReferences(
+                    all.EnsuredGet(a1.Segment1.GetValue(), Relation.EQUALS, a2.Segment1.GetValue()),
+                    all.EnsuredGet(a1.GetValue(), Relation.EQUALS, a2.GetValue()),
+                    all.EnsuredGet(a1.Segment2.GetValue(), Relation.EQUALS, a2.Segment2.GetValue())
+                );
             }
             else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue())
             {
-                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1));
+                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1)).AddReferences(
+                    all.EnsuredGet(a1.Segment1.GetValue(), Relation.EQUALS, a2.Segment2.GetValue()),
+                    all.EnsuredGet(a1.GetValue(), Relation.EQUALS, a2.GetValue()),
+                    all.EnsuredGet(a1.Segment2.GetValue(), Relation.EQUALS, a2.Segment1.GetValue())
+                );
             }
         }
     }
@@ -394,15 +402,40 @@ public class Extractor
 
         foreach ((TSegment s1, TSegment s2) in equals)
         {
-            if (s1.Segment1 == null || s1.Segment2 == null || s2.Segment1 == null || s2.Segment2 == null) continue;
-            if (s1.Segment1.GetValue() == s2.Segment1.GetValue() && s1.Segment2.GetValue() == s2.Segment2.GetValue())
+            if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue())
             {
-                yield return triangle1.Congruent(triangle2, (s1.Segment1, s2.Segment1), (s1, s2), (s1.Segment2, s2.Segment2));
+                yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V1)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V2))).AddReferences(
+                    all.EnsuredGet(triangle1.GetAngleOf(s1.V1).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V1).GetValue()),
+                    all.EnsuredGet(s1.GetValue(), Relation.EQUALS, s2.GetValue()),
+                    all.EnsuredGet(triangle1.GetAngleOf(s1.V2).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V2).GetValue())
+
+                );
             }
-            else if (s1.Segment1.GetValue() == s2.Segment2.GetValue() && s1.Segment2.GetValue() == s2.Segment1.GetValue())
+            else if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue())
             {
-                yield return triangle1.Congruent(triangle2, (s1.Segment1, s2.Segment2), (s1, s2), (s1.Segment2, s2.Segment1));
+                yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V2)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V1))).AddReferences(
+                    all.EnsuredGet(triangle1.GetAngleOf(s1.V1).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V2).GetValue()),
+                    all.EnsuredGet(s1.GetValue(), Relation.EQUALS, s2.GetValue()),
+                    all.EnsuredGet(triangle1.GetAngleOf(s1.V2).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V1).GetValue())
+                );
             }
+        }
+    }
+
+    [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_S)]
+    public static IEnumerable<Detail> TriangleCongruencyVia_SSS(TTriangle triangle1, TTriangle triangle2) 
+    {
+        foreach (var side1 in triangle1.Sides)
+        {
+            foreach (var side2 in triangle2.Sides)
+            {
+                if (side1.GetValue() != side2.GetValue()) return E();
+            }
+        }
+
+        return new[]
+        {
+            triangle1.Congruent(triangle2);
         }
     }
 
