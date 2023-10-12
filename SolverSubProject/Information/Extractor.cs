@@ -354,20 +354,54 @@ public class Extractor
         var equals = new List<(TAngle, TAngle)>();
         foreach (var angle1 in anglesOfT1)
         {
-            foreach (var angle2 in anglesOfT2) 
+            foreach (var angle2 in anglesOfT2)
             {
                 if (angle1.GetValue() == angle2.GetValue())
                     equals.Add((angle1, angle2));
             }
         }
 
-        foreach ((TAngle a1, TAngle a2) in equals) {
+        foreach ((TAngle a1, TAngle a2) in equals)
+        {
             if (a1.Segment1 == null || a1.Segment2 == null || a2.Segment1 == null || a2.Segment2 == null) continue;
-            if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue()) {
+            if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue())
+            {
                 yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2));
             }
-            else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue()) {
+            else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue())
+            {
                 yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1));
+            }
+        }
+    }
+
+    [Reason(Reason.TRIANGLE_CONGRUENCY_A_S_A)]
+    public static IEnumerable<Detail> TriangleCongruencyVia_ASA(TTriangle triangle1, TTriangle triangle2)
+    {
+        TokenHelpers.Validate(triangle1, triangle2);
+        var all = triangle1.ParentPool.AvailableDetails;
+        var sidesOfT1 = triangle1.Sides;
+        var sidesOfT2 = triangle2.Sides;
+        var equals = new List<(TSegment, TSegment)>();
+        foreach (var side1 in sidesOfT1)
+        {
+            foreach (var side2 in sidesOfT2)
+            {
+                if (side1.GetValue() == side2.GetValue())
+                    equals.Add((side1, side2));
+            }
+        }
+
+        foreach ((TSegment s1, TSegment s2) in equals)
+        {
+            if (s1.Segment1 == null || s1.Segment2 == null || s2.Segment1 == null || s2.Segment2 == null) continue;
+            if (s1.Segment1.GetValue() == s2.Segment1.GetValue() && s1.Segment2.GetValue() == s2.Segment2.GetValue())
+            {
+                yield return triangle1.Congruent(triangle2, (s1.Segment1, s2.Segment1), (s1, s2), (s1.Segment2, s2.Segment2));
+            }
+            else if (s1.Segment1.GetValue() == s2.Segment2.GetValue() && s1.Segment2.GetValue() == s2.Segment1.GetValue())
+            {
+                yield return triangle1.Congruent(triangle2, (s1.Segment1, s2.Segment2), (s1, s2), (s1.Segment2, s2.Segment1));
             }
         }
     }
