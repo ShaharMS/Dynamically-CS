@@ -109,6 +109,10 @@ public static class DetailQuickCreator
     public static Detail EnsuredGet(this List<Detail> availableDetails, Relation r, ExerciseToken b) => availableDetails.First(x => x.Operator == r && x.Right == b);
 
 
+    public static Detail? UnorderedGet(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.FirstOrDefault(x => x.Operator == r && ((x.Left == a && x.Right == b) || (x.Left == b && x.Right == a)));
+    public static Detail[] UnorderedGetMany(this List<Detail> availableDetails, ExerciseToken a, Relation r, params ExerciseToken[] b) => availableDetails.Where(x => x.Operator == r && ((x.Left == a && b.Contains(x.Right)) || (b.Contains(x.Left) && x.Right == a))).ToArray();
+    public static Detail EnsuredUnorderedGet(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.First(x => x.Operator == r && ((x.Left == a && x.Right == b) || (x.Left == b && x.Right == a)));
+
 
     public static bool Similar(this Detail a, Detail b)
     {

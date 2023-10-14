@@ -32,7 +32,52 @@ public class TValue : ExerciseToken
 
     public bool Equals(TValue? obj)
     {
-        return Value == obj?.Value;
+        throw new NotImplementedException();
     }
 
+    public override bool Equals(object? obj)
+    {
+        return base.Equals(obj);
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
+
+
+    /// <summary>
+    /// TValue > TValue
+    /// </summary>
+    public static bool operator >(TValue a, TValue b) {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
+    /// TValue < TValue
+    /// </summary>
+    public static bool operator <(TValue a, TValue b) {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// TValue >= TValue
+    /// </summary>
+    public static bool operator >=(TValue a, TValue b) {
+        throw new NotImplementedException();
+    }
+    
+    /// <summary>
+    /// TValue <= TValue
+    /// </summary>
+    public static bool operator <=(TValue a, TValue b) {
+        throw new NotImplementedException();
+    }
+
+    public static bool operator ==(TValue a, TValue b) {
+        return a.Equals(b);
+    }
+
+    public static bool operator !=(TValue a, TValue b) {
+        return !a.Equals(b);
+    }
 }

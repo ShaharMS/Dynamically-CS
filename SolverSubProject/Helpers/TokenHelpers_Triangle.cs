@@ -43,6 +43,8 @@ public static partial class TokenHelpers
         throw new ArgumentException("Vertex provided must be one of the triangle's vertices", nameof(vertex));
     }
 
+    public static TSegment GetOppositeSegment(this TTriangle triangle, TAngle angle) => GetOppositeSegment(triangle, angle.Origin);
+
     public static TVertex GetOppositeVertex(this TTriangle triangle, TSegment segment)
     {
         if (segment == triangle.V1V2) return triangle.V3;

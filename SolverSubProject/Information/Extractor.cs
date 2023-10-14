@@ -54,7 +54,7 @@ public class Extractor
         return new[] { vertexAngle.EqualsVal(angle) };
     }
 
-    
+
     [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
     public static IEnumerable<Detail> EqualSidesEqualAngles(TTriangle triangle)
     {
@@ -192,7 +192,7 @@ public class Extractor
             {
                 foreach (TSegment bisector in bisectors)
                 {
-                    if (bisector.IsParallel(otherSide)) 
+                    if (bisector.IsParallel(otherSide))
                         yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
                             triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
                             triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
@@ -423,22 +423,73 @@ public class Extractor
     }
 
     [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_S)]
-    public static IEnumerable<Detail> TriangleCongruencyVia_SSS(TTriangle triangle1, TTriangle triangle2) 
+    public static IEnumerable<Detail> TriangleCongruencyVia_SSS(TTriangle triangle1, TTriangle triangle2)
     {
+        TokenHelpers.Validate(triangle1, triangle2);
+        var all = triangle1.ParentPool.AvailableDetails;
+        var equalPairs = new List<(TSegment, TSegment)>();
         foreach (var side1 in triangle1.Sides)
         {
             foreach (var side2 in triangle2.Sides)
             {
                 if (side1.GetValue() != side2.GetValue()) return E();
+                equalPairs.Add((side1, side2));
+            }
+        }
+
+        var uniquePairs = new List<(TSegment, TSegment)>();
+        if (equalPairs.Count > 3)
+        {
+            foreach (var pair in equalPairs)
+            {
+                bool isUnique = true;
+
+                foreach (var uniquePair in uniquePairs)
+                {
+                    if (pair.Item1 == uniquePair.Item1 || pair.Item1 == uniquePair.Item2 ||
+                        pair.Item2 == uniquePair.Item1 || pair.Item2 == uniquePair.Item2)
+                    {
+                        isUnique = false;
+                        break;
+                    }
+                }
+
+                if (isUnique) uniquePairs.Add(pair);
+                if (uniquePairs.Count == 3) break;
             }
         }
 
         return new[]
         {
-            triangle1.Congruent(triangle2);
-        }
+            triangle1.Congruent(triangle2, uniquePairs[0], uniquePairs[1], uniquePairs[2]).AddReferences(
+                all.EnsuredUnorderedGet(uniquePairs[0].Item1, Relation.EQUALS, uniquePairs[0].Item2),
+                all.EnsuredUnorderedGet(uniquePairs[1].Item1, Relation.EQUALS, uniquePairs[1].Item2),
+                all.EnsuredUnorderedGet(uniquePairs[2].Item1, Relation.EQUALS, uniquePairs[2].Item2)
+            )
+        };
     }
 
+    [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_A)]
+    public static IEnumerable<Detail> TriangleCongruencyVia_SSA(TTriangle triangle1, TTriangle triangle2)
+    {
+        TokenHelpers.Validate(triangle1, triangle2);
+        var all = triangle1.ParentPool.AvailableDetails;
+        TAngle big1 = null!, big2 = null!;
+        
+        foreach (var a in triangle1.GetAngles()) {
+            if (big1 == null) big1 = a;
+            else if (a.GetValue() > big1.GetValue()) big1 = a;
+        }
+        foreach (var a in triangle2.GetAngles()) {
+            if (big2 == null) big2 = a;
+            else if (a.GetValue() > big2.GetValue()) big2 = a;
+        }
+        
+        if (big1.GetValue() != big2.GetValue()) return E();
+        if (triangle1.GetOppositeSegment(big1).GetValue() != triangle2.GetOppositeSegment(big2).GetValue()) return E();
+
+        return E();
+    }
     /*                                                                            
                                                                             ████████
            █████████████                                                    █::::::█

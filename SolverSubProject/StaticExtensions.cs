@@ -30,6 +30,8 @@ public static class StaticExtensions
     public static IEnumerable<T> Except<T>(this IEnumerable<T> en, params T[] items) => en.Where(e => !items.Contains(e));
     public static IEnumerable<T> Flatten<T>(this IEnumerable<IEnumerable<T>> en) => en.SelectMany(e => e);
 
+    public static T Middle<T>(this IEnumerable<T> en) => en.Count() != 3 ? throw new InvalidOperationException("Enumerable must contain exactly 3 elements") : en.ElementAt(1);
+    public static T? MiddleOrDefault<T>(this IEnumerable<T> en) => en.Count() != 3 ? default : en.ElementAt(1);
 
     public static T[] ToArray<T>(this ITuple t)
     {
