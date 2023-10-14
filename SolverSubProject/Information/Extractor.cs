@@ -13,6 +13,8 @@ namespace SolverSubProject.Information;
 /// <br/>
 /// Parallels & perpendiculars will appear under "Angle", not "Length".
 /// <br/>
+/// if something is oddly specific and outputs many types of details (for example - kite main diagonal), it would be placed under its related shape, and not category.
+/// <br/>
 /// The reason used to infer each detail is marked in every method as an attribute.
 /// </summary>
 public class Extractor
@@ -485,10 +487,30 @@ public class Extractor
             else if (a.GetValue() > big2.GetValue()) big2 = a;
         }
         
-        if (big1.GetValue() != big2.GetValue()) return E();
-        if (triangle1.GetOppositeSegment(big1).GetValue() != triangle2.GetOppositeSegment(big2).GetValue()) return E();
+        TSegment opp1 = triangle1.GetOppositeSegment(big1), opp2 = triangle2.GetOppositeSegment(big2);
 
-        return E();
+        if (big1.GetValue() != big2.GetValue()) return E();
+        if (opp1.GetValue() != opp2.GetValue()) return E();
+
+        var sides1 = triangle1.Sides.Except(opp1).Select(s => s.GetValue()).ToArray();
+        var sides2 = triangle2.Sides.Except(opp2).Select(s => s.GetValue()).ToArray();
+        var s1 = triangle1.Sides.Except(opp1).ToArray();
+        var s2 = triangle2.Sides.Except(opp2).ToArray();
+        (TSegment, TSegment) otherSides = (null!, null!);
+        if (sides1[0] == sides2[0]) otherSides = (s1[0], s2[0]);
+        else if (sides1[0] == sides2[1]) otherSides = (s1[0], s2[1]);
+        else if (sides1[1] == sides2[0]) otherSides = (s1[1], s2[0]);
+        else if (sides1[1] == sides2[1]) otherSides = (s1[1], s2[1]);
+        else return E();
+        
+        return new[] 
+        {
+            triangle1.Congruent(triangle2, otherSides, (opp1, opp2), (big1, big2)).AddReferences(
+                all.EnsuredUnorderedGet(otherSides.Item1, Relation.EQUALS, otherSides.Item2),
+                all.EnsuredUnorderedGet(opp1, Relation.EQUALS, opp2),
+                all.EnsuredUnorderedGet(big1, Relation.EQUALS, big2)
+            )
+        };
     }
     /*                                                                            
                                                                             ████████
@@ -504,6 +526,34 @@ public class Extractor
                      █::::█
                       ██████                                                        
     */
+
+    [Reason(Reason.KITE_MAIN_DIAGONAL_BISECTS_ANGLE_BISECTS_DIAGONAL)]
+    public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad) {
+
+        var details = new List<Detail>();
+
+        if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_KITE)) return E();
+        var kiteDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad ,Relation.QUAD_KITE);
+
+        TVertex o1 = ((TAngle)kiteDetail.SideProducts[0]).Origin, o2 = ((TAngle)kiteDetail.SideProducts[1]).Origin;
+        var createAuxDetail = false;
+        if (!o1.Relations.Contains(o2)) createAuxDetail = true;
+        var d1 = o1.GetOrCreateSegment(o2);
+        if (createAuxDetail) details.Add(o1.Connect(o2).MakeAuxiliary());
+
+        var otherVertices = quad.Vertices.Except(o1, o2).Cast<TVertex>().ToArray();
+        
+        TVertex v1 = otherVertices[0], v2 = otherVertices[1];
+        createAuxDetail = false;
+        if (!v1.Relations.Contains(v2)) createAuxDetail = true;
+        var d2 = v1.GetOrCreateSegment(v2);
+        if (createAuxDetail) details.Add(v1.Connect(v2).MakeAuxiliary());
+
+        return new [] {
+            d1.Bisects(d2).AddReferences(kiteDetail),
+            d1.Bisects((TAngle)kiteDetail.SideProducts[0]).AddReferences(kiteDetail)
+        };
+    }
 
 
     /*                                                                                                 
