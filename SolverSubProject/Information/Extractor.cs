@@ -154,6 +154,52 @@ public class Extractor
         return midSegments.Select(x => x.midSegment.Parallel(x.opposite).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(x.midSegment, Relation.MIDSEGMENT, triangle))).ToArray();
     }
 
+    [Reason(Reason.CORRESPONDING_ANGLES_EQUAL_LINES_PARALLEL)]
+    public static IEnumerable<Detail> ParallelizeLines_A(TSegment seg1, TSegment seg2, TSegment intersector)
+    {
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
+        var details = new List<Detail>();
+
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
+
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
+        {
+            /*
+             This means the segments V1 & v2 are "aligned" with each other:
+                
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2))
+            };
+            foreach ((TAngle potential1, TAngle potentail2) in potentialPairs)
+            {
+
+            }
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each other:
+                
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+            */
+        }
+
+    }
+
     /*                                                                                                                             
 
         █████████                                                             ███      █████          
@@ -477,16 +523,18 @@ public class Extractor
         TokenHelpers.Validate(triangle1, triangle2);
         var all = triangle1.ParentPool.AvailableDetails;
         TAngle big1 = null!, big2 = null!;
-        
-        foreach (var a in triangle1.GetAngles()) {
+
+        foreach (var a in triangle1.GetAngles())
+        {
             if (big1 == null) big1 = a;
             else if (a.GetValue() > big1.GetValue()) big1 = a;
         }
-        foreach (var a in triangle2.GetAngles()) {
+        foreach (var a in triangle2.GetAngles())
+        {
             if (big2 == null) big2 = a;
             else if (a.GetValue() > big2.GetValue()) big2 = a;
         }
-        
+
         TSegment opp1 = triangle1.GetOppositeSegment(big1), opp2 = triangle2.GetOppositeSegment(big2);
 
         if (big1.GetValue() != big2.GetValue()) return E();
@@ -502,8 +550,8 @@ public class Extractor
         else if (sides1[1] == sides2[0]) otherSides = (s1[1], s2[0]);
         else if (sides1[1] == sides2[1]) otherSides = (s1[1], s2[1]);
         else return E();
-        
-        return new[] 
+
+        return new[]
         {
             triangle1.Congruent(triangle2, otherSides, (opp1, opp2), (big1, big2)).AddReferences(
                 all.EnsuredUnorderedGet(otherSides.Item1, Relation.EQUALS, otherSides.Item2),
@@ -528,12 +576,13 @@ public class Extractor
     */
 
     [Reason(Reason.KITE_MAIN_DIAGONAL_BISECTS_ANGLE_BISECTS_DIAGONAL)]
-    public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad) {
+    public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad)
+    {
 
         var details = new List<Detail>();
 
         if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_KITE)) return E();
-        var kiteDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad ,Relation.QUAD_KITE);
+        var kiteDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_KITE);
 
         TVertex o1 = ((TAngle)kiteDetail.SideProducts[0]).Origin, o2 = ((TAngle)kiteDetail.SideProducts[1]).Origin;
         var createAuxDetail = false;
@@ -542,16 +591,17 @@ public class Extractor
         if (createAuxDetail) details.Add(o1.Connect(o2).MakeAuxiliary());
 
         var otherVertices = quad.Vertices.Except(o1, o2).Cast<TVertex>().ToArray();
-        
+
         TVertex v1 = otherVertices[0], v2 = otherVertices[1];
         createAuxDetail = false;
         if (!v1.Relations.Contains(v2)) createAuxDetail = true;
         var d2 = v1.GetOrCreateSegment(v2);
         if (createAuxDetail) details.Add(v1.Connect(v2).MakeAuxiliary());
 
-        return new [] {
+        return new[] {
             d1.Bisects(d2).AddReferences(kiteDetail),
-            d1.Bisects((TAngle)kiteDetail.SideProducts[0]).AddReferences(kiteDetail)
+            d1.Bisects((TAngle)kiteDetail.SideProducts[0]).AddReferences(kiteDetail),
+            d1.Bisects((TAngle)kiteDetail.SideProducts[1]).AddReferences(kiteDetail)
         };
     }
 

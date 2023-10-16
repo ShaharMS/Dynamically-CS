@@ -98,4 +98,15 @@ public static partial class TokenHelpers
         Validate(segment, element);
         return segment.ParentPool.AvailableDetails.Has(segment, Relation.PARALLEL, element);
     }
+
+    public static TVertex GetOrCreateIntersectionPoint(this TSegment segment1, TSegment segment2)
+    {
+        Validate(segment1, segment2);
+        
+        var intersectionDetail = segment1.ParentPool.AvailableDetails.UnorderedGet(segment1, Relation.INTERSECTS, segment2) ?? throw new ArgumentException("{segment1} and {segment2} don't intersect");
+    
+        if (intersectionDetail.SideProducts.Count == 1) return (TVertex)intersectionDetail.SideProducts.First(); 
+        intersectionDetail.SideProducts.Insert(0, TVertex.Create(segment1.ParentPool));
+        return (TVertex)intersectionDetail.SideProducts.First();
+    }
 }

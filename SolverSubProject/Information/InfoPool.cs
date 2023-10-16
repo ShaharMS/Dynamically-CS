@@ -1,6 +1,7 @@
 ﻿using Dynamically.Backend;
 using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
+using SolverSubProject.Information;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,9 @@ namespace Dynamically.Solver.Information;
 
 public class InfoPool
 {
+    public QuestionData QuestionDiagram { get; set; } = new();
+
+
     public List<Detail> Given = new();
 
     public List<Detail> Objectives = new();
