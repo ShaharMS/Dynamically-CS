@@ -181,9 +181,12 @@ public class Extractor
                 (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
                 (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2))
             };
-            foreach ((TAngle potential1, TAngle potentail2) in potentialPairs)
+            foreach ((TAngle potential1, TAngle potential2) in potentialPairs)
             {
-
+                if (potential1.GetValue() == potential2.GetValue())
+                return new[] {
+                    
+                }
             }
         }
         else
@@ -289,7 +292,7 @@ public class Extractor
                                                                              █████:                     
     */
 
-    [Reason(Reason.ISOSCELES_PERPENDICUAL_ANGLEBISECTOR_BISECTOR)]
+    [Reason(Reason.ISOSCELES_PERPENDICULAR_ANGLEBISECTOR_BISECTOR)]
     public static IEnumerable<Detail> MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
     {
         if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();

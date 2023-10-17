@@ -48,5 +48,23 @@ public static partial class TokenHelpers
         return val;
     }
 
+    /// <summary>
+    /// Gets/creates a detail that equates between two values, if they are equal.
+    /// returns either generic EQUALs or transitivity details
+    /// </summary>
+    /// <param name="token"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static Detail GetEqualityDetail(this ExerciseToken token1, ExerciseToken token2) {
+        Validate(token1, token2);
+        var details = token1.ParentPool.AvailableDetails;
+        List<ExerciseToken> token1Equalities = new(), token2Equalities = new();
+        foreach (var detail in details.GetMany(Relation.EQUALS)) {
+            if (detail.IncludedElements.ContainsSome(token1, new TValue(token1.Id))) {
+                
+            }
+        }
+    }
+
     public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;
 }

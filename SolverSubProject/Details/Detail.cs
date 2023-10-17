@@ -30,6 +30,8 @@ public class Detail
 
     public bool DefinesAuxiliary { get; set; } = false;
 
+    public ExerciseToken[] Operands => new[] {Left, Right};
+    public IEnumerable<ExerciseToken> IncludedElements => new[] {Left, Right}.Concat(SideProducts);
 
     public List<ExerciseToken> SideProducts = new();
 
