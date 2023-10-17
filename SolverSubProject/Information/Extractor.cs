@@ -265,25 +265,82 @@ public class Extractor
                     yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
         }
     }
-        /*                                                                                                                             
 
-            █████████                                                             ███      █████          
-            █:::::::█                                                          █::::█      █:::█          
-              █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
-              █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-              █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
-              █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
-            ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
-            █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
-            ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
-                                                             █████    █:::█                               
-                                                              █:::::█:::::█                               
-                                                                ███::::███                                
-        */
+    [Reason(Reason.COINTERIOR_ANGLES_180_LINES_PARALLEL)]
+    public static IEnumerable<Detail> ParallelizeLines_C(TSegment seg1, TSegment seg2, TSegment intersector)
+    {
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
 
-        // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
 
-        [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
+        {
+            /*
+             This means the segments V1 & v2 are "aligned" with each other:
+
+                              V2
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+                          V1
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each other:
+            
+                              V2
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+                          V1
+            */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+        }
+    }
+    /*                                                                                                                             
+
+        █████████                                                             ███      █████          
+        █:::::::█                                                          █::::█      █:::█          
+          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+          █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                         █████    █:::█                               
+                                                          █:::::█:::::█                               
+                                                            ███::::███                                
+    */
+
+    // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
+
+    [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
         public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
         {
             return new[]
