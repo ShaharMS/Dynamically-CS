@@ -1,6 +1,7 @@
 ﻿using Dynamically.Backend;
 using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
+using SolverSubProject.Information;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,16 +29,15 @@ public static class DetailQuickCreator
     public static Detail Bisects(this TSegment s, TAngle a) => new(s, Relation.BISECTS, a);
     public static Detail MidSegment(this TSegment s, TTriangle t) => new(s, Relation.MIDSEGMENT, t);
 
-    public static Detail MakeAuxiliary(this Detail s) { s.DefinesAuxiliary = true; return s; }
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
 
     public static Detail Right(this TAngle a) => new(a, Relation.EQUALS, new TValue(90));
     public static Detail Flat(this TAngle a) => new(a, Relation.EQUALS, new TValue(180));
 
-    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TAngle, TAngle) angles, (TSegment, TSegment) sides2) => new Detail(t1, Relation.TRIANGLE_CONGRUENCY_S_A_S, t2, sides1.Item1, sides1.Item2, angles.Item1, angles.Item2, sides2.Item1, sides2.Item2);
-    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TAngle, TAngle) angles1, (TSegment, TSegment) sides, (TAngle, TAngle) angles2) => new Detail(t1, Relation.TRIANGLE_CONGRUENCY_A_S_A, t2, angles1.Item1, angles1.Item2, sides.Item1, sides.Item2, angles2.Item1, angles2.Item2);
-    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TSegment, TSegment) sides3) => new Detail(t1, Relation.TRIANGLE_CONGRUENCY_S_S_S, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, sides3.Item1, sides3.Item2);
-    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TAngle, TAngle) angles) => new Detail(t1, Relation.TRIANGLE_CONGRUENCY_S_S_A, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, angles.Item1, angles.Item2);
+    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TAngle, TAngle) angles, (TSegment, TSegment) sides2) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_A_S, t2, sides1.Item1, sides1.Item2, angles.Item1, angles.Item2, sides2.Item1, sides2.Item2);
+    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TAngle, TAngle) angles1, (TSegment, TSegment) sides, (TAngle, TAngle) angles2) => new(t1, Relation.TRIANGLE_CONGRUENCY_A_S_A, t2, angles1.Item1, angles1.Item2, sides.Item1, sides.Item2, angles2.Item1, angles2.Item2);
+    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TSegment, TSegment) sides3) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_S, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, sides3.Item1, sides3.Item2);
+    public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TAngle, TAngle) angles) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_A, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, angles.Item1, angles.Item2);
 
     public static Detail EqualsVal(this ExerciseToken a, ExerciseToken b) => new(a, Relation.EQUALS, b);
     public static Detail Different(this TAngle a, TAngle b) => new(a, Relation.NOTEQUALS, b);
@@ -60,6 +60,9 @@ public static class DetailQuickCreator
         detail.SideProducts.AddRange(SideProducts);
         return detail;
     }
+
+    public static Detail MarkAuxiliary(this Detail s) { s.DefinesAuxiliary = true; return s; }
+    public static Detail MarkReasonExplicit(this Detail s, Reason reason) { s.Reason = reason; return s; }
 
 
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Left == a && x.Right == b);

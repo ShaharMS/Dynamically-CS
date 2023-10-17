@@ -20,7 +20,7 @@ public static partial class TokenHelpers
             IsAuxiliary = true,
             ParentPool = from.ParentPool
         }; 
-        var detail = from.Connect(to).MakeAuxiliary();
+        var detail = from.Connect(to).MarkAuxiliary();
         seg.ParentPool.AddDetail(detail);
         return seg;
     }

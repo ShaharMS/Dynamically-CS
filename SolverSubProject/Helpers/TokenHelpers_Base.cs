@@ -1,6 +1,7 @@
 ﻿using Dynamically.Backend;
 using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
+using SolverSubProject.Information;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,12 +59,28 @@ public static partial class TokenHelpers
     public static Detail GetEqualityDetail(this ExerciseToken token1, ExerciseToken token2) {
         Validate(token1, token2);
         var details = token1.ParentPool.AvailableDetails;
-        List<ExerciseToken> token1Equalities = new(), token2Equalities = new();
+        List<(Detail, IEnumerable<TValue>)> token1Equalities = new(), token2Equalities = new();
         foreach (var detail in details.GetMany(Relation.EQUALS)) {
-            if (detail.IncludedElements.ContainsSome(token1, new TValue(token1.Id))) {
-                
+            if (detail.IncludedElements.ContainsSome(token1.GetValue(), new TValue(token1.Id)) && detail.IncludedElements.ContainsSome(token2.GetValue(), new TValue(token2.Id)))
+                return detail;
+            if (detail.IncludedElements.ContainsSome(token1.GetValue(), new TValue(token1.Id))) {
+                token1Equalities.Add((detail, detail.IncludedElements.Except(token1.GetValue(), new TValue(token1.Id)).Cast<TValue>()));
+            }
+            if (!detail.IncludedElements.ContainsSome(token2.GetValue(), new TValue(token2.Id)))
+            {
+                token2Equalities.Add((detail, detail.IncludedElements.Except(token2.GetValue(), new TValue(token2.Id)).Cast<TValue>()));
             }
         }
+
+        foreach (var (detail1, values1) in token1Equalities)
+        {
+            foreach (var (detail2, values2) in token2Equalities)
+            {
+                if (detail1 == detail2) throw new Exception("Details which reference two exclusive values should not be equal");
+                if (values1.Intersect(values2).Any()) return token1.EqualsVal(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(detail1, detail2);
+            }
+        }
+        throw new ArgumentException($"Equality detail requested, but not found. are {token1} and {token1} equal?");
     }
 
     public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;

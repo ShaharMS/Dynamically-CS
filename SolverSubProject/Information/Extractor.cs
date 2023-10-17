@@ -159,7 +159,6 @@ public class Extractor
     {
         TokenHelpers.Validate(seg1, seg2, intersector);
         var pool = intersector.ParentPool;
-        var details = new List<Detail>();
 
         var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
         var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
@@ -181,445 +180,506 @@ public class Extractor
                 (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
                 (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2))
             };
-            foreach ((TAngle potential1, TAngle potential2) in potentialPairs)
-            {
+            foreach (var (potential1, potential2) in potentialPairs)
                 if (potential1.GetValue() == potential2.GetValue())
-                return new[] {
-                    
-                }
-            }
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
         }
         else
         {
             /*
              This means the segments V1 & v2 are not "aligned" with each other:
                 
+                              V2
                               /
                    V2--------/----V1
                             /
                       V1---/-------------V2
+                          V1
             */
-        }
 
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+        }
     }
 
-    /*                                                                                                                             
-
-        █████████                                                             ███      █████          
-        █:::::::█                                                          █::::█      █:::█          
-          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
-          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-          █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
-          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
-        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
-        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
-        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
-                                                         █████    █:::█                               
-                                                          █:::::█:::::█                               
-                                                            ███::::███                                
-    */
-
-    // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
-
-    [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
-    public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
+    [Reason(Reason.ALTERNATING_ANGLES_EQUAL_LINES_PARALLEL)]
+    public static IEnumerable<Detail> ParallelizeLines_B(TSegment seg1, TSegment seg2, TSegment intersector)
     {
-        return new[]
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
+
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
+
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
         {
+            /*
+             This means the segments V1 & v2 are "aligned" with each other:
+
+                              V2
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+                          V1
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each other:
+            
+                              V2
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+                          V1
+            */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+        }
+    }
+        /*                                                                                                                             
+
+            █████████                                                             ███      █████          
+            █:::::::█                                                          █::::█      █:::█          
+              █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+              █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+              █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+              █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+            ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+            █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+            ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                             █████    █:::█                               
+                                                              █:::::█:::::█                               
+                                                                ███::::███                                
+        */
+
+        // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
+
+        [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
+        public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
+        {
+            return new[]
+            {
             triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
             triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
             triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
         };
-    }
+        }
 
-    [Reason(Reason.LINE_BISECTS_SIDE_PARALLEL_OTHER_BISECTS_THIRD)]
-    public static IEnumerable<Detail> MidsegmentProperties_A(TTriangle triangle)
-    {
-        foreach (TSegment side in triangle.Sides)
+        [Reason(Reason.LINE_BISECTS_SIDE_PARALLEL_OTHER_BISECTS_THIRD)]
+        public static IEnumerable<Detail> MidsegmentProperties_A(TTriangle triangle)
         {
-            var bisectors = side.GetBisectors();
-            var otherSides = triangle.Sides.Except(side);
-            foreach (TSegment otherSide in otherSides)
+            foreach (TSegment side in triangle.Sides)
             {
-                foreach (TSegment bisector in bisectors)
+                var bisectors = side.GetBisectors();
+                var otherSides = triangle.Sides.Except(side);
+                foreach (TSegment otherSide in otherSides)
                 {
-                    if (bisector.IsParallel(otherSide))
-                        yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
-                            triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
-                            triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
-                        );
-                }
-            }
-        }
-    }
-
-    [Reason(Reason.LINE_INTERSECTS_SIDES_PARALLEL_THIRD_HALF_THIRD_LENGTH_IS_MIDSEGMENT)]
-    public static IEnumerable<Detail> ExtractMidSegments(TTriangle triangle)
-    {
-        foreach (TSegment side in triangle.Sides)
-        {
-            var intersectors = side.GetIntersectors();
-            var otherSides = triangle.Sides.Except(side);
-            foreach (TSegment otherSide in otherSides)
-            {
-                foreach (TSegment intersector in intersectors)
-                {
-                    if (intersector.IsParallel(otherSide) && intersector.GetValue() == new TValue($"{intersector.GetValue()} / 2"))
-                        yield return intersector.MidSegment(triangle).AddReferences(
-                            triangle.ParentPool.AvailableDetails.Get(intersector, Relation.INTERSECTS, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Intersect` detail used, but not found"),
-                            triangle.ParentPool.AvailableDetails.Get(intersector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Parallel` detail used, but not found"),
-                            triangle.ParentPool.AvailableDetails.EnsuredGet(intersector, Relation.EQUALS, new TValue($"{intersector.GetValue()} / 2"))
-                        );
-                }
-            }
-        }
-    }
-
-    /*                                                                                                                                       
-
-        ██████████████                ███                                             ████             
-        █::██::::██::█                                                                █::█             
-        ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
-             █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
-             █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
-             █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
-             █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
-           █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
-           ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
-                                                                        ████:     █::█                  
-                                                                         █::::██::::█                  
-                                                                          ███:::::█                    
-                                                                             █████:                     
-    */
-
-    [Reason(Reason.ISOSCELES_PERPENDICULAR_ANGLEBISECTOR_BISECTOR)]
-    public static IEnumerable<Detail> MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
-    {
-        if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
-
-        var headAngle = triangle.GetIsoscelesHeadAngle();
-        var baseSide = triangle.GetIsoscelesBaseSide();
-
-        var potentials = triangle.ParentPool.AvailableDetails.GetMany((Relation.BISECTS, Relation.PERPENDICULAR), baseSide).Where(x => x.Right is TSegment);
-        var potentials2 = triangle.ParentPool.AvailableDetails.GetMany(baseSide, Relation.PERPENDICULAR);
-        var potentials3 = triangle.ParentPool.AvailableDetails.GetMany(Relation.BISECTS, headAngle);
-
-        var details = new List<Detail>();
-
-        foreach (var potential in potentials)
-        {
-            if (potential.Left is not TSegment) continue;
-            var seg = (potential.Left as TSegment)!;
-            if (potential.Operator != Relation.PERPENDICULAR) details.Add(seg.Perpendicular(baseSide).AddReferences(potential));
-            if (potential.Operator != Relation.BISECTS) details.Add(seg.Bisects(baseSide).AddReferences(potential));
-            details.Add(seg.Bisects(headAngle).AddReferences(potential));
-        }
-        foreach (var potential in potentials2)
-        {
-            if (potential.Right is not TSegment) continue;
-            var seg = (potential.Right as TSegment)!;
-
-            details.Add(seg.Bisects(baseSide).AddReferences(potential));
-            details.Add(seg.Bisects(headAngle).AddReferences(potential));
-        }
-        foreach (var potential in potentials3)
-        {
-            if (potential.Left is not TSegment) continue;
-            var seg = (potential.Left as TSegment)!;
-
-            details.Add(seg.Bisects(baseSide).AddReferences(potential));
-            details.Add(seg.Perpendicular(baseSide).AddReferences(potential));
-        }
-        return details.ToArray();
-    }
-
-    [Reason(Reason.TRIANGLE_ANGLEBISECTOR_PERPENDICULAR_IS_ISOSCELES)]
-    public static IEnumerable<Detail> IsTriangleIsosceles_A(TTriangle triangle)
-    {
-        var all = triangle.ParentPool.AvailableDetails;
-        var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
-        if (!angleBisectors.Any()) return E();
-        var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
-
-        foreach (var bisectorDetail in angleBisectors)
-        {
-            var seg = (bisectorDetail.Left as TSegment)!;
-            if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
-            }
-        }
-
-        return E();
-    }
-
-    [Reason(Reason.TRIANGLE_ANGLEBISECTOR_BISECTOR_IS_ISOSCELES)]
-    public static IEnumerable<Detail> IsTriangleIsosceles_B(TTriangle triangle)
-    {
-        var all = triangle.ParentPool.AvailableDetails;
-        var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
-        if (!angleBisectors.Any()) return E();
-        var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
-
-        foreach (var angleBisectorDetail in angleBisectors)
-        {
-            var seg = (angleBisectorDetail.Left as TSegment)!;
-            if (bisectors.Any(x => x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(angleBisectorDetail, bisectors.First(x => x.Right == seg || x.Left == seg)) };
-            }
-        }
-
-        return E();
-    }
-
-
-
-    [Reason(Reason.TRIANGLE_PERPENDICULAR_BISECTOR_IS_ISOSCELES)]
-    public static IEnumerable<Detail> IsTriangleIsosceles_C(TTriangle triangle)
-    {
-        var all = triangle.ParentPool.AvailableDetails;
-        var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
-        if (!bisectors.Any()) return E();
-        var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
-
-        foreach (var bisectorDetail in bisectors)
-        {
-            var seg = (bisectorDetail.Left as TSegment)!;
-            if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
-            }
-        }
-
-        return E();
-    }
-
-    [Reason(Reason.TRIANGLE_CONGRUENCY_S_A_S)]
-    public static IEnumerable<Detail> TriangleCongruencyVia_SAS(TTriangle triangle1, TTriangle triangle2)
-    {
-        TokenHelpers.Validate(triangle1, triangle2);
-        var all = triangle1.ParentPool.AvailableDetails;
-        var anglesOfT1 = triangle1.GetAngles();
-        var anglesOfT2 = triangle2.GetAngles();
-        var equals = new List<(TAngle, TAngle)>();
-        foreach (var angle1 in anglesOfT1)
-        {
-            foreach (var angle2 in anglesOfT2)
-            {
-                if (angle1.GetValue() == angle2.GetValue())
-                    equals.Add((angle1, angle2));
-            }
-        }
-
-        foreach ((TAngle a1, TAngle a2) in equals)
-        {
-            if (a1.Segment1 == null || a1.Segment2 == null || a2.Segment1 == null || a2.Segment2 == null) continue;
-            if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue())
-            {
-                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2)).AddReferences(
-                    all.EnsuredGet(a1.Segment1.GetValue(), Relation.EQUALS, a2.Segment1.GetValue()),
-                    all.EnsuredGet(a1.GetValue(), Relation.EQUALS, a2.GetValue()),
-                    all.EnsuredGet(a1.Segment2.GetValue(), Relation.EQUALS, a2.Segment2.GetValue())
-                );
-            }
-            else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue())
-            {
-                yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1)).AddReferences(
-                    all.EnsuredGet(a1.Segment1.GetValue(), Relation.EQUALS, a2.Segment2.GetValue()),
-                    all.EnsuredGet(a1.GetValue(), Relation.EQUALS, a2.GetValue()),
-                    all.EnsuredGet(a1.Segment2.GetValue(), Relation.EQUALS, a2.Segment1.GetValue())
-                );
-            }
-        }
-    }
-
-    [Reason(Reason.TRIANGLE_CONGRUENCY_A_S_A)]
-    public static IEnumerable<Detail> TriangleCongruencyVia_ASA(TTriangle triangle1, TTriangle triangle2)
-    {
-        TokenHelpers.Validate(triangle1, triangle2);
-        var all = triangle1.ParentPool.AvailableDetails;
-        var sidesOfT1 = triangle1.Sides;
-        var sidesOfT2 = triangle2.Sides;
-        var equals = new List<(TSegment, TSegment)>();
-        foreach (var side1 in sidesOfT1)
-        {
-            foreach (var side2 in sidesOfT2)
-            {
-                if (side1.GetValue() == side2.GetValue())
-                    equals.Add((side1, side2));
-            }
-        }
-
-        foreach ((TSegment s1, TSegment s2) in equals)
-        {
-            if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue())
-            {
-                yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V1)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V2))).AddReferences(
-                    all.EnsuredGet(triangle1.GetAngleOf(s1.V1).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V1).GetValue()),
-                    all.EnsuredGet(s1.GetValue(), Relation.EQUALS, s2.GetValue()),
-                    all.EnsuredGet(triangle1.GetAngleOf(s1.V2).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V2).GetValue())
-
-                );
-            }
-            else if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue())
-            {
-                yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V2)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V1))).AddReferences(
-                    all.EnsuredGet(triangle1.GetAngleOf(s1.V1).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V2).GetValue()),
-                    all.EnsuredGet(s1.GetValue(), Relation.EQUALS, s2.GetValue()),
-                    all.EnsuredGet(triangle1.GetAngleOf(s1.V2).GetValue(), Relation.EQUALS, triangle2.GetAngleOf(s2.V1).GetValue())
-                );
-            }
-        }
-    }
-
-    [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_S)]
-    public static IEnumerable<Detail> TriangleCongruencyVia_SSS(TTriangle triangle1, TTriangle triangle2)
-    {
-        TokenHelpers.Validate(triangle1, triangle2);
-        var all = triangle1.ParentPool.AvailableDetails;
-        var equalPairs = new List<(TSegment, TSegment)>();
-        foreach (var side1 in triangle1.Sides)
-        {
-            foreach (var side2 in triangle2.Sides)
-            {
-                if (side1.GetValue() != side2.GetValue()) return E();
-                equalPairs.Add((side1, side2));
-            }
-        }
-
-        var uniquePairs = new List<(TSegment, TSegment)>();
-        if (equalPairs.Count > 3)
-        {
-            foreach (var pair in equalPairs)
-            {
-                bool isUnique = true;
-
-                foreach (var uniquePair in uniquePairs)
-                {
-                    if (pair.Item1 == uniquePair.Item1 || pair.Item1 == uniquePair.Item2 ||
-                        pair.Item2 == uniquePair.Item1 || pair.Item2 == uniquePair.Item2)
+                    foreach (TSegment bisector in bisectors)
                     {
-                        isUnique = false;
-                        break;
+                        if (bisector.IsParallel(otherSide))
+                            yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
+                                triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
+                                triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
+                            );
                     }
                 }
-
-                if (isUnique) uniquePairs.Add(pair);
-                if (uniquePairs.Count == 3) break;
             }
         }
 
-        return new[]
+        [Reason(Reason.LINE_INTERSECTS_SIDES_PARALLEL_THIRD_HALF_THIRD_LENGTH_IS_MIDSEGMENT)]
+        public static IEnumerable<Detail> ExtractMidSegments(TTriangle triangle)
         {
+            foreach (TSegment side in triangle.Sides)
+            {
+                var intersectors = side.GetIntersectors();
+                var otherSides = triangle.Sides.Except(side);
+                foreach (TSegment otherSide in otherSides)
+                {
+                    foreach (TSegment intersector in intersectors)
+                    {
+                        if (intersector.IsParallel(otherSide) && intersector.GetValue() == new TValue($"{intersector.GetValue()} / 2"))
+                            yield return intersector.MidSegment(triangle).AddReferences(
+                                triangle.ParentPool.AvailableDetails.Get(intersector, Relation.INTERSECTS, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Intersect` detail used, but not found"),
+                                triangle.ParentPool.AvailableDetails.Get(intersector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Parallel` detail used, but not found"),
+                                triangle.ParentPool.AvailableDetails.EnsuredGet(intersector, Relation.EQUALS, new TValue($"{intersector.GetValue()} / 2"))
+                            );
+                    }
+                }
+            }
+        }
+
+        /*                                                                                                                                       
+
+            ██████████████                ███                                             ████             
+            █::██::::██::█                                                                █::█             
+            ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
+                 █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
+                 █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
+                 █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
+                 █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
+               █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
+               ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
+                                                                            ████:     █::█                  
+                                                                             █::::██::::█                  
+                                                                              ███:::::█                    
+                                                                                 █████:                     
+        */
+
+        [Reason(Reason.ISOSCELES_PERPENDICULAR_ANGLEBISECTOR_BISECTOR)]
+        public static IEnumerable<Detail> MergedAngleBisectorPerpendicularAndBisector(TTriangle triangle)
+        {
+            if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
+
+            var headAngle = triangle.GetIsoscelesHeadAngle();
+            var baseSide = triangle.GetIsoscelesBaseSide();
+
+            var potentials = triangle.ParentPool.AvailableDetails.GetMany((Relation.BISECTS, Relation.PERPENDICULAR), baseSide).Where(x => x.Right is TSegment);
+            var potentials2 = triangle.ParentPool.AvailableDetails.GetMany(baseSide, Relation.PERPENDICULAR);
+            var potentials3 = triangle.ParentPool.AvailableDetails.GetMany(Relation.BISECTS, headAngle);
+
+            var details = new List<Detail>();
+
+            foreach (var potential in potentials)
+            {
+                if (potential.Left is not TSegment) continue;
+                var seg = (potential.Left as TSegment)!;
+                if (potential.Operator != Relation.PERPENDICULAR) details.Add(seg.Perpendicular(baseSide).AddReferences(potential));
+                if (potential.Operator != Relation.BISECTS) details.Add(seg.Bisects(baseSide).AddReferences(potential));
+                details.Add(seg.Bisects(headAngle).AddReferences(potential));
+            }
+            foreach (var potential in potentials2)
+            {
+                if (potential.Right is not TSegment) continue;
+                var seg = (potential.Right as TSegment)!;
+
+                details.Add(seg.Bisects(baseSide).AddReferences(potential));
+                details.Add(seg.Bisects(headAngle).AddReferences(potential));
+            }
+            foreach (var potential in potentials3)
+            {
+                if (potential.Left is not TSegment) continue;
+                var seg = (potential.Left as TSegment)!;
+
+                details.Add(seg.Bisects(baseSide).AddReferences(potential));
+                details.Add(seg.Perpendicular(baseSide).AddReferences(potential));
+            }
+            return details.ToArray();
+        }
+
+        [Reason(Reason.TRIANGLE_ANGLEBISECTOR_PERPENDICULAR_IS_ISOSCELES)]
+        public static IEnumerable<Detail> IsTriangleIsosceles_A(TTriangle triangle)
+        {
+            var all = triangle.ParentPool.AvailableDetails;
+            var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
+            if (!angleBisectors.Any()) return E();
+            var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
+
+            foreach (var bisectorDetail in angleBisectors)
+            {
+                var seg = (bisectorDetail.Left as TSegment)!;
+                if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
+                {
+                    return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
+                }
+            }
+
+            return E();
+        }
+
+        [Reason(Reason.TRIANGLE_ANGLEBISECTOR_BISECTOR_IS_ISOSCELES)]
+        public static IEnumerable<Detail> IsTriangleIsosceles_B(TTriangle triangle)
+        {
+            var all = triangle.ParentPool.AvailableDetails;
+            var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
+            if (!angleBisectors.Any()) return E();
+            var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
+
+            foreach (var angleBisectorDetail in angleBisectors)
+            {
+                var seg = (angleBisectorDetail.Left as TSegment)!;
+                if (bisectors.Any(x => x.Left == seg))
+                {
+                    return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(angleBisectorDetail, bisectors.First(x => x.Right == seg || x.Left == seg)) };
+                }
+            }
+
+            return E();
+        }
+
+
+
+        [Reason(Reason.TRIANGLE_PERPENDICULAR_BISECTOR_IS_ISOSCELES)]
+        public static IEnumerable<Detail> IsTriangleIsosceles_C(TTriangle triangle)
+        {
+            var all = triangle.ParentPool.AvailableDetails;
+            var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
+            if (!bisectors.Any()) return E();
+            var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
+
+            foreach (var bisectorDetail in bisectors)
+            {
+                var seg = (bisectorDetail.Left as TSegment)!;
+                if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
+                {
+                    return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
+                }
+            }
+
+            return E();
+        }
+
+        [Reason(Reason.TRIANGLE_CONGRUENCY_S_A_S)]
+        public static IEnumerable<Detail> TriangleCongruencyVia_SAS(TTriangle triangle1, TTriangle triangle2)
+        {
+            TokenHelpers.Validate(triangle1, triangle2);
+            var anglesOfT1 = triangle1.GetAngles();
+            var anglesOfT2 = triangle2.GetAngles();
+            var equals = new List<(TAngle, TAngle)>();
+            foreach (var angle1 in anglesOfT1)
+            {
+                foreach (var angle2 in anglesOfT2)
+                {
+                    if (angle1.GetValue() == angle2.GetValue())
+                        equals.Add((angle1, angle2));
+                }
+            }
+
+            foreach ((TAngle a1, TAngle a2) in equals)
+            {
+                if (a1.Segment1 == null || a1.Segment2 == null || a2.Segment1 == null || a2.Segment2 == null) continue;
+                if (a1.Segment1.GetValue() == a2.Segment1.GetValue() && a1.Segment2.GetValue() == a2.Segment2.GetValue())
+                {
+                    yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment1), (a1, a2), (a1.Segment2, a2.Segment2)).AddReferences(
+                        a1.Segment1.GetEqualityDetail(a2.Segment1),
+                        a1.GetEqualityDetail(a2),
+                        a1.Segment2.GetEqualityDetail(a2.Segment2)
+    
+                    );
+                }
+                else if (a1.Segment1.GetValue() == a2.Segment2.GetValue() && a1.Segment2.GetValue() == a2.Segment1.GetValue())
+                {
+                    yield return triangle1.Congruent(triangle2, (a1.Segment1, a2.Segment2), (a1, a2), (a1.Segment2, a2.Segment1)).AddReferences(
+                        a1.Segment1.GetEqualityDetail(a2.Segment2),
+                        a1.GetEqualityDetail(a2),
+                        a1.Segment2.GetEqualityDetail(a2.Segment1)
+                    );
+                }
+            }
+        }
+
+        [Reason(Reason.TRIANGLE_CONGRUENCY_A_S_A)]
+        public static IEnumerable<Detail> TriangleCongruencyVia_ASA(TTriangle triangle1, TTriangle triangle2)
+        {
+            TokenHelpers.Validate(triangle1, triangle2);
+            var sidesOfT1 = triangle1.Sides;
+            var sidesOfT2 = triangle2.Sides;
+            var equals = new List<(TSegment, TSegment)>();
+            foreach (var side1 in sidesOfT1)
+            {
+                foreach (var side2 in sidesOfT2)
+                {
+                    if (side1.GetValue() == side2.GetValue())
+                        equals.Add((side1, side2));
+                }
+            }
+
+            foreach ((TSegment s1, TSegment s2) in equals)
+            {
+                if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue())
+                {
+                    yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V1)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V2))).AddReferences(
+                        triangle1.GetAngleOf(s1.V1).GetEqualityDetail(triangle2.GetAngleOf(s2.V1)),
+                        s1.GetEqualityDetail(s2),
+                        triangle1.GetAngleOf(s1.V2).GetEqualityDetail(triangle2.GetAngleOf(s2.V2))
+    
+                    );
+                }
+                else if (triangle1.GetAngleOf(s1.V1).GetValue() == triangle2.GetAngleOf(s2.V2).GetValue() && triangle1.GetAngleOf(s1.V2).GetValue() == triangle2.GetAngleOf(s2.V1).GetValue())
+                {
+                    yield return triangle1.Congruent(triangle2, (triangle1.GetAngleOf(s1.V1), triangle2.GetAngleOf(s2.V2)), (s1, s2), (triangle1.GetAngleOf(s1.V2), triangle2.GetAngleOf(s2.V1))).AddReferences(
+                        triangle1.GetAngleOf(s1.V1).GetEqualityDetail(triangle2.GetAngleOf(s2.V2)),
+                        s1.GetEqualityDetail(s2),
+                        triangle1.GetAngleOf(s1.V2).GetEqualityDetail(triangle2.GetAngleOf(s2.V1))
+                    );
+                }
+            }
+        }
+
+        [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_S)]
+        public static IEnumerable<Detail> TriangleCongruencyVia_SSS(TTriangle triangle1, TTriangle triangle2)
+        {
+            TokenHelpers.Validate(triangle1, triangle2);
+            var equalPairs = new List<(TSegment, TSegment)>();
+            foreach (var side1 in triangle1.Sides)
+            {
+                foreach (var side2 in triangle2.Sides)
+                {
+                    if (side1.GetValue() != side2.GetValue()) return E();
+                    equalPairs.Add((side1, side2));
+                }
+            }
+
+            var uniquePairs = new List<(TSegment, TSegment)>();
+            if (equalPairs.Count > 3)
+            {
+                foreach (var pair in equalPairs)
+                {
+                    bool isUnique = true;
+
+                    foreach (var uniquePair in uniquePairs)
+                    {
+                        if (pair.Item1 == uniquePair.Item1 || pair.Item1 == uniquePair.Item2 ||
+                            pair.Item2 == uniquePair.Item1 || pair.Item2 == uniquePair.Item2)
+                        {
+                            isUnique = false;
+                            break;
+                        }
+                    }
+
+                    if (isUnique) uniquePairs.Add(pair);
+                    if (uniquePairs.Count == 3) break;
+                }
+            }
+
+            return new[]
+            {
             triangle1.Congruent(triangle2, uniquePairs[0], uniquePairs[1], uniquePairs[2]).AddReferences(
-                all.EnsuredUnorderedGet(uniquePairs[0].Item1, Relation.EQUALS, uniquePairs[0].Item2),
-                all.EnsuredUnorderedGet(uniquePairs[1].Item1, Relation.EQUALS, uniquePairs[1].Item2),
-                all.EnsuredUnorderedGet(uniquePairs[2].Item1, Relation.EQUALS, uniquePairs[2].Item2)
+                uniquePairs[0].Item1.GetEqualityDetail(uniquePairs[0].Item2),
+                uniquePairs[1].Item1.GetEqualityDetail(uniquePairs[1].Item2),
+                uniquePairs[2].Item1.GetEqualityDetail(uniquePairs[2].Item2)
             )
         };
-    }
-
-    [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_A)]
-    public static IEnumerable<Detail> TriangleCongruencyVia_SSA(TTriangle triangle1, TTriangle triangle2)
-    {
-        TokenHelpers.Validate(triangle1, triangle2);
-        var all = triangle1.ParentPool.AvailableDetails;
-        TAngle big1 = null!, big2 = null!;
-
-        foreach (var a in triangle1.GetAngles())
-        {
-            if (big1 == null) big1 = a;
-            else if (a.GetValue() > big1.GetValue()) big1 = a;
-        }
-        foreach (var a in triangle2.GetAngles())
-        {
-            if (big2 == null) big2 = a;
-            else if (a.GetValue() > big2.GetValue()) big2 = a;
         }
 
-        TSegment opp1 = triangle1.GetOppositeSegment(big1), opp2 = triangle2.GetOppositeSegment(big2);
-
-        if (big1.GetValue() != big2.GetValue()) return E();
-        if (opp1.GetValue() != opp2.GetValue()) return E();
-
-        var sides1 = triangle1.Sides.Except(opp1).Select(s => s.GetValue()).ToArray();
-        var sides2 = triangle2.Sides.Except(opp2).Select(s => s.GetValue()).ToArray();
-        var s1 = triangle1.Sides.Except(opp1).ToArray();
-        var s2 = triangle2.Sides.Except(opp2).ToArray();
-        (TSegment, TSegment) otherSides = (null!, null!);
-        if (sides1[0] == sides2[0]) otherSides = (s1[0], s2[0]);
-        else if (sides1[0] == sides2[1]) otherSides = (s1[0], s2[1]);
-        else if (sides1[1] == sides2[0]) otherSides = (s1[1], s2[0]);
-        else if (sides1[1] == sides2[1]) otherSides = (s1[1], s2[1]);
-        else return E();
-
-        return new[]
+        [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_A)]
+        public static IEnumerable<Detail> TriangleCongruencyVia_SSA(TTriangle triangle1, TTriangle triangle2)
         {
+            TokenHelpers.Validate(triangle1, triangle2);
+            var all = triangle1.ParentPool.AvailableDetails;
+            TAngle big1 = null!, big2 = null!;
+
+            foreach (var a in triangle1.GetAngles())
+            {
+                if (big1 == null) big1 = a;
+                else if (a.GetValue() > big1.GetValue()) big1 = a;
+            }
+            foreach (var a in triangle2.GetAngles())
+            {
+                if (big2 == null) big2 = a;
+                else if (a.GetValue() > big2.GetValue()) big2 = a;
+            }
+
+            TSegment opp1 = triangle1.GetOppositeSegment(big1), opp2 = triangle2.GetOppositeSegment(big2);
+
+            if (big1.GetValue() != big2.GetValue()) return E();
+            if (opp1.GetValue() != opp2.GetValue()) return E();
+
+            var sides1 = triangle1.Sides.Except(opp1).Select(s => s.GetValue()).ToArray();
+            var sides2 = triangle2.Sides.Except(opp2).Select(s => s.GetValue()).ToArray();
+            var s1 = triangle1.Sides.Except(opp1).ToArray();
+            var s2 = triangle2.Sides.Except(opp2).ToArray();
+            (TSegment, TSegment) otherSides = (null!, null!);
+            if (sides1[0] == sides2[0]) otherSides = (s1[0], s2[0]);
+            else if (sides1[0] == sides2[1]) otherSides = (s1[0], s2[1]);
+            else if (sides1[1] == sides2[0]) otherSides = (s1[1], s2[0]);
+            else if (sides1[1] == sides2[1]) otherSides = (s1[1], s2[1]);
+            else return E();
+
+            return new[]
+            {
             triangle1.Congruent(triangle2, otherSides, (opp1, opp2), (big1, big2)).AddReferences(
-                all.EnsuredUnorderedGet(otherSides.Item1, Relation.EQUALS, otherSides.Item2),
-                all.EnsuredUnorderedGet(opp1, Relation.EQUALS, opp2),
-                all.EnsuredUnorderedGet(big1, Relation.EQUALS, big2)
+                otherSides.Item1.GetEqualityDetail(otherSides.Item2),
+                opp1.GetEqualityDetail(opp2),
+                big1.GetEqualityDetail(big2)
             )
         };
-    }
-    /*                                                                            
-                                                                            ████████
-           █████████████                                                    █::::::█
-         ██:::::::::::::██                                                  █::::::█
-        █::::::█   █::::::█ ██████    ██████    █████████████       █████████:::::█ 
-        █:::::█     █:::::█ █::::█    █::::█    █████████:::::█  █::::::::::::::::█ 
-        █:::::█     █:::::█ █::::█    █::::█      ███████:::::█ █::::::█    █:::::█ 
-        █:::::█  ████:::::█ █::::█    █::::█   █::::████::::::█ █:::::█     █:::::█ 
-        █:::::::██::::::::█ █:::::::::::::::███::::█    █:::::█ █::::::█████::::::██
-           ██:::::::::::█     ██::::::::██:::█ █::::::::::██:::█  █:::::::::███::::█
-             █████████:::██     ████████  ████  ██████████  ████   █████████   █████
-                     █::::█
-                      ██████                                                        
-    */
+        }
+        /*                                                                            
+                                                                                ████████
+               █████████████                                                    █::::::█
+             ██:::::::::::::██                                                  █::::::█
+            █::::::█   █::::::█ ██████    ██████    █████████████       █████████:::::█ 
+            █:::::█     █:::::█ █::::█    █::::█    █████████:::::█  █::::::::::::::::█ 
+            █:::::█     █:::::█ █::::█    █::::█      ███████:::::█ █::::::█    █:::::█ 
+            █:::::█  ████:::::█ █::::█    █::::█   █::::████::::::█ █:::::█     █:::::█ 
+            █:::::::██::::::::█ █:::::::::::::::███::::█    █:::::█ █::::::█████::::::██
+               ██:::::::::::█     ██::::::::██:::█ █::::::::::██:::█  █:::::::::███::::█
+                 █████████:::██     ████████  ████  ██████████  ████   █████████   █████
+                         █::::█
+                          ██████                                                        
+        */
 
-    [Reason(Reason.KITE_MAIN_DIAGONAL_BISECTS_ANGLE_BISECTS_DIAGONAL)]
-    public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad)
-    {
+        [Reason(Reason.KITE_MAIN_DIAGONAL_BISECTS_ANGLE_BISECTS_DIAGONAL)]
+        public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad)
+        {
 
-        var details = new List<Detail>();
+            var details = new List<Detail>();
 
-        if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_KITE)) return E();
-        var kiteDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_KITE);
+            if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_KITE)) return E();
+            var kiteDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_KITE);
 
-        TVertex o1 = ((TAngle)kiteDetail.SideProducts[0]).Origin, o2 = ((TAngle)kiteDetail.SideProducts[1]).Origin;
-        var createAuxDetail = false;
-        if (!o1.Relations.Contains(o2)) createAuxDetail = true;
-        var d1 = o1.GetOrCreateSegment(o2);
-        if (createAuxDetail) details.Add(o1.Connect(o2).MakeAuxiliary());
+            TVertex o1 = ((TAngle)kiteDetail.SideProducts[0]).Origin, o2 = ((TAngle)kiteDetail.SideProducts[1]).Origin;
+            var createAuxDetail = false;
+            if (!o1.Relations.Contains(o2)) createAuxDetail = true;
+            var d1 = o1.GetOrCreateSegment(o2);
+            if (createAuxDetail) details.Add(o1.Connect(o2).MarkAuxiliary());
 
-        var otherVertices = quad.Vertices.Except(o1, o2).Cast<TVertex>().ToArray();
+            var otherVertices = quad.Vertices.Except(o1, o2).Cast<TVertex>().ToArray();
 
-        TVertex v1 = otherVertices[0], v2 = otherVertices[1];
-        createAuxDetail = false;
-        if (!v1.Relations.Contains(v2)) createAuxDetail = true;
-        var d2 = v1.GetOrCreateSegment(v2);
-        if (createAuxDetail) details.Add(v1.Connect(v2).MakeAuxiliary());
+            TVertex v1 = otherVertices[0], v2 = otherVertices[1];
+            createAuxDetail = false;
+            if (!v1.Relations.Contains(v2)) createAuxDetail = true;
+            var d2 = v1.GetOrCreateSegment(v2);
+            if (createAuxDetail) details.Add(v1.Connect(v2).MarkAuxiliary());
 
-        return new[] {
+            return new[] {
             d1.Bisects(d2).AddReferences(kiteDetail),
             d1.Bisects((TAngle)kiteDetail.SideProducts[0]).AddReferences(kiteDetail),
             d1.Bisects((TAngle)kiteDetail.SideProducts[1]).AddReferences(kiteDetail)
         };
+        }
+
+
+        /*                                                                                                 
+
+                   █████████  █████                                ███████                     
+               █:::::::::::█  █████                                █:::::█                     
+              █::::█████:::█                                       █:::::█                     
+             █::::█    █████ ██████ ████   ███████      ██████████  ██::::█     ████████████    
+            █::::█            █:::█ █::::::::::::::█  █:::::::::::█  █::::█  █::::::█████:::::██
+            █::::█            █:::█ ██:::::████:::::██::::::███:::█  █::::█ █::::::█     █:::::█
+            █::::█            █:::█  █::::█          █::::█          █::::█ █::::::███████████  
+              █::::█████:::█ █:::::█ █::::█          █::::::███:::█ █::::::██::::::::█          
+               █:::::::::::█ █:::::█ █::::█           █:::::::::::█ █::::::█ █::::::::████████  
+                   █████████ ███████ ██████             ██████████ █████████    ██████████████ 
+        */
     }
-
-
-    /*                                                                                                 
-
-               █████████  █████                                ███████                     
-           █:::::::::::█  █████                                █:::::█                     
-          █::::█████:::█                                       █:::::█                     
-         █::::█    █████ ██████ ████   ███████      ██████████  ██::::█     ████████████    
-        █::::█            █:::█ █::::::::::::::█  █:::::::::::█  █::::█  █::::::█████:::::██
-        █::::█            █:::█ ██:::::████:::::██::::::███:::█  █::::█ █::::::█     █:::::█
-        █::::█            █:::█  █::::█          █::::█          █::::█ █::::::███████████  
-          █::::█████:::█ █:::::█ █::::█          █::::::███:::█ █::::::██::::::::█          
-           █:::::::::::█ █:::::█ █::::█           █:::::::::::█ █::::::█ █::::::::████████  
-               █████████ ███████ ██████             ██████████ █████████    ██████████████ 
-    */
-}
