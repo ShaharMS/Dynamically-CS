@@ -27,7 +27,7 @@ public static class DetailQuickCreator
     public static Detail Bisects(this TVertex s1, TSegment s2) => new(s1, Relation.BISECTS, s2);
     public static Detail Bisects(this TSegment s1, TSegment s2, TVertex c) => new(s1, Relation.BISECTS, s2, c);
     public static Detail Bisects(this TSegment s, TAngle a) => new(s, Relation.BISECTS, a);
-    public static Detail MidSegment(this TSegment s, TTriangle t) => new(s, Relation.MIDSEGMENT, t);
+    public static Detail MidSegment(this TSegment s, TTriangle t, TSegment s1) => new(s, Relation.MIDSEGMENT, t, s1);
 
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
 

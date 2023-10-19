@@ -80,4 +80,9 @@ public class TValue : ExerciseToken
     public static bool operator !=(TValue a, TValue b) {
         return !a.Equals(b);
     }
+
+    public static TValue operator +(TValue a, TValue b) => new() { Value = a.Value + b.Value};
+    public static TValue operator -(TValue a, TValue b) => new() { Value = a.Value - b.Value};
+    public static TValue operator *(TValue a, TValue b) => new() { Value = a.Value * b.Value};
+    public static TValue operator /(TValue a, TValue b) => new() { Value = a.Value / b.Value};
 }

@@ -23,18 +23,18 @@ public class Extractor
 
     /*                                                                                                   
                                                                                         
-                ███                                        ███████                     
-               █:::█                                       █:::::█                     
-              █:::::█     ████ ████████      ████████   ███ █::::█     ████████████    
-             █::█ █::█    █::::::::::::██  █::::::::::::::█ █::::█  █::::::█████:::::██
-            █::█   █::█     █::::████::::██::::█     █:::█  █::::█ █:::::::█████::::::█
-           █:::::::::::█    █:::█    █:::██::::█     █:::█  █::::█ █::::::███████████  
-          █::█       █::█   █:::█    █:::██::::::█████:::█ █::::::██::::::::█          
-         █::█         █::█  █:::█    █:::█ █:::::::::::::█ █::::::█ █::::::::████████  
-        ████           ████ █████    █████   ████████::::█ ████████    ██████████████  
-                                           █████:      █:::█                             
-                                            █:::::███:::::█                             
-                                              ███::::::███                              
+                █████                                        ███████                     
+               █:::::█                                       █:::::█                     
+              █:::::::█     ████ ████████      ████████   ███ █::::█     ████████████    
+             █:::█ █:::█    █::::::::::::██  █::::::::::::::█ █::::█  █::::::█████:::::██
+            █:::█   █:::█     █::::████::::██::::█     █:::█  █::::█ █:::::::█████::::::█
+           █:::::::::::::█    █:::█    █:::██::::█     █:::█  █::::█ █::::::███████████  
+          █:::█       █:::█   █:::█    █:::██::::::█████:::█ █::::::██::::::::█          
+         █:::█         █:::█  █:::█    █:::█ █:::::::::::::█ █::::::█ █::::::::████████  
+        █████           █████ █████    █████   ████████::::█ ████████    ██████████████  
+                                            ████:      █:::█                             
+                                             █::::███:::::█                             
+                                               ██::::::███                              
                                                  ██████                                 
     */
 
@@ -147,6 +147,251 @@ public class Extractor
         return details.ToArray();
     }
 
+    [Reason(Reason.CORRESPONDING_ANGLES_EQUAL)]
+    public static IEnumerable<Detail> CorrespondingAnglesOnParallels(TSegment seg1, TSegment seg2, TSegment intersector) {
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
+
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
+
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
+        {
+            /*
+             This means the segments V1 & v2 are "aligned" with each █████:
+                
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                if (potential1.GetValue() == potential2.GetValue())
+                    yield return potential1.EqualsVal(potential2).AddReferences(
+                        pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                    );
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each █████:
+                
+                              V2
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+                          V1
+            */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                    yield return potential1.EqualsVal(potential2).AddReferences(
+                        pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                    );
+        }
+    }
+
+    [Reason(Reason.ALTERNATING_ANGLES_EQUAL)]
+    public static IEnumerable<Detail> AlternatingAnglesOnParallels(TSegment seg1, TSegment seg2, TSegment intersector)
+    {
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
+
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
+
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
+        {
+            /*
+             This means the segments V1 & v2 are "aligned" with each █████:
+
+                              V2
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+                          V1
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                yield return potential1.EqualsVal(potential2).AddReferences(
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                );
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each █████:
+            
+                              V2
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+                          V1
+            */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                yield return potential1.EqualsVal(potential2).AddReferences(
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                );
+        }
+    }
+
+    
+
+    [Reason(Reason.COINTERIOR_ANGLES_180)]
+    public static IEnumerable<Detail> CointeriorAnglesOnParallels(TSegment seg1, TSegment seg2, TSegment intersector)
+    {
+        TokenHelpers.Validate(seg1, seg2, intersector);
+        var pool = intersector.ParentPool;
+
+        var interSeg1Intersector = intersector.GetOrCreateIntersectionPoint(seg1);
+        var interSeg2Intersector = intersector.GetOrCreateIntersectionPoint(seg2);
+
+        if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
+        {
+            /*
+             This means the segments V1 & v2 are "aligned" with each █████:
+
+                              V2
+                              /
+                   V1--------/----V2
+                            /
+                      V1---/-------------V2
+                          V1
+             */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                yield return (potential1.GetValue() + potential2.GetValue()).EqualsVal(new TValue(180)).AddReferences(
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                );
+        }
+        else
+        {
+            /*
+             This means the segments V1 & v2 are not "aligned" with each █████:
+            
+                              V2
+                              /
+                   V2--------/----V1
+                            /
+                      V1---/-------------V2
+                          V1
+            */
+
+            (TAngle, TAngle)[] potentialPairs = new[] {
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
+            };
+            foreach (var (potential1, potential2) in potentialPairs)
+                yield return (potential1.GetValue() + potential2.GetValue()).EqualsVal(new TValue(180)).AddReferences(
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                );
+        }
+    }
+
+    /*                                                                                                                             
+
+        █████████                                                             ███      █████          
+        █:::::::█                                                          █::::█      █:::█          
+          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+          █:::█         █:::::█   █::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                         █████    █:::█                               
+                                                          █:::::█:::::█                               
+                                                            ███::::███                                
+    */
+
+    // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
+
+    [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
+        public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
+        {
+            return new[]
+            {
+            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
+            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
+            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
+        };
+        }
+
+        [Reason(Reason.LINE_BISECTS_SIDE_PARALLEL_OTHER_BISECTS_THIRD)]
+        public static IEnumerable<Detail> MidsegmentProperties_A(TTriangle triangle)
+        {
+            foreach (TSegment side in triangle.Sides)
+            {
+                var bisectors = side.GetBisectors();
+                var otherSides = triangle.Sides.Except(side);
+                foreach (TSegment otherSide in otherSides)
+                {
+                    foreach (TSegment bisector in bisectors)
+                    {
+                        if (bisector.IsParallel(otherSide))
+                            yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
+                                triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
+                                triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
+                            );
+                    }
+                }
+            }
+        }
+
+    /*
+                                                                                                                                                    
+          ██████████ 
+        █:::████::::█                                                                           ████         
+        █:::█    ███                                                                            █::█          
+         █::████       █████████     █████  ██   █████  ███████    ████████   ████ ███████  █████::█████    
+          ███::::██  █::█████:::██ █:::::::::██:::::::█::::::::█ █:::████:::███:::::::::::█ █::::::::::█    
+                █:::██:::█   █::::██::█   █::█ █:::███::::███:::██::::█  █::::█  █:::████:::█    █::█        
+        ███     █:::██::█████████  █::█   █::█ █::█   █::█   █::██:::████████    █::█    █::█    █::█        
+        █::██████:::██::::█        █::::███::█ █::█   █::█   █::██:::::█         █::█    █::█    █:::██::█
+        █:::::::::██   █::::::::█    ::::::::█ █::█   █::█   █::█  █::::::::█    █::█    █::█     █:::::█
+         ██████████     █████████    █████:::█ ████   ████   ████   ████████     ████    ████      █████  
+                                   ███    █::█                                                                       
+                                    █:::█::::█                                                                       
+                                     █::::███                                                                          
+    */
+    
+
     [Reason(Reason.MIDSEGMENT_PARALLEL_OTHER_TRIANGLE_SIDE)]
     public static IEnumerable<Detail> ParallelizeMidSegmentToSide(TTriangle triangle)
     {
@@ -166,7 +411,7 @@ public class Extractor
         if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
         {
             /*
-             This means the segments V1 & v2 are "aligned" with each other:
+             This means the segments V1 & v2 are "aligned" with each █████:
                 
                               /
                    V1--------/----V2
@@ -187,7 +432,7 @@ public class Extractor
         else
         {
             /*
-             This means the segments V1 & v2 are not "aligned" with each other:
+             This means the segments V1 & v2 are not "aligned" with each █████:
                 
                               V2
                               /
@@ -221,7 +466,7 @@ public class Extractor
         if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
         {
             /*
-             This means the segments V1 & v2 are "aligned" with each other:
+             This means the segments V1 & v2 are "aligned" with each █████:
 
                               V2
                               /
@@ -244,7 +489,7 @@ public class Extractor
         else
         {
             /*
-             This means the segments V1 & v2 are not "aligned" with each other:
+             This means the segments V1 & v2 are not "aligned" with each █████:
             
                               V2
                               /
@@ -278,7 +523,7 @@ public class Extractor
         if (pool.QuestionDiagram.WillPotentiallyIntersect((seg1.V1.Id, seg2.V1.Id), (seg1.V2.Id, seg2.V2.Id)))
         {
             /*
-             This means the segments V1 & v2 are "aligned" with each other:
+             This means the segments V1 & v2 are "aligned" with each █████:
 
                               V2
                               /
@@ -290,18 +535,18 @@ public class Extractor
 
             (TAngle, TAngle)[] potentialPairs = new[] {
                 (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
-                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
-                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
-                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
             };
             foreach (var (potential1, potential2) in potentialPairs)
-                if (potential1.GetValue() == potential2.GetValue())
+                if (potential1.GetValue() + potential2.GetValue() == new TValue(180))
                     yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
         }
         else
         {
             /*
-             This means the segments V1 & v2 are not "aligned" with each other:
+             This means the segments V1 & v2 are not "aligned" with each █████:
             
                               V2
                               /
@@ -312,23 +557,24 @@ public class Extractor
             */
 
             (TAngle, TAngle)[] potentialPairs = new[] {
-                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
-                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
-                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1)),
-                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2))
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V1), interSeg2Intersector.GetAngle(intersector.V2, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V1, seg1.V2), interSeg2Intersector.GetAngle(intersector.V2, seg2.V1)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V1), interSeg2Intersector.GetAngle(intersector.V1, seg2.V2)),
+                (interSeg1Intersector.GetAngle(intersector.V2, seg1.V2), interSeg2Intersector.GetAngle(intersector.V1, seg2.V1))
             };
             foreach (var (potential1, potential2) in potentialPairs)
-                if (potential1.GetValue() == potential2.GetValue())
+                if (potential1.GetValue() + potential2.GetValue() == new TValue(180))
                     yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
         }
     }
+
     /*                                                                                                                             
 
         █████████                                                             ███      █████          
         █:::::::█                                                          █::::█      █:::█          
           █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
           █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-          █:::█         █:::::█████::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+          █:::█         █:::::█   █::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
           █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
         ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
         █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
@@ -384,7 +630,7 @@ public class Extractor
                     foreach (TSegment intersector in intersectors)
                     {
                         if (intersector.IsParallel(otherSide) && intersector.GetValue() == new TValue($"{intersector.GetValue()} / 2"))
-                            yield return intersector.MidSegment(triangle).AddReferences(
+                            yield return intersector.MidSegment(triangle, otherSide).AddReferences(
                                 triangle.ParentPool.AvailableDetails.Get(intersector, Relation.INTERSECTS, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Intersect` detail used, but not found"),
                                 triangle.ParentPool.AvailableDetails.Get(intersector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Parallel` detail used, but not found"),
                                 triangle.ParentPool.AvailableDetails.EnsuredGet(intersector, Relation.EQUALS, new TValue($"{intersector.GetValue()} / 2"))
