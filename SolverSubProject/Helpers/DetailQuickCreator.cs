@@ -39,7 +39,13 @@ public static class DetailQuickCreator
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TSegment, TSegment) sides3) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_S, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, sides3.Item1, sides3.Item2);
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TAngle, TAngle) angles) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_A, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, angles.Item1, angles.Item2);
 
-    public static Detail EqualsVal(this ExerciseToken a, ExerciseToken b) => new(a, Relation.EQUALS, b);
+    public static Detail MarkParallelogram(this TQuad quad) => new(quad, Relation.QUAD_PARALLELOGRAM);
+    public static Detail MarkRhombus(this TQuad quad) => new(quad, Relation.QUAD_RHOMBUS);
+    public static Detail MarkRectangle(this TQuad quad) => new(quad, Relation.QUAD_RECTANGLE);
+
+
+    public static Detail EqualsVal(this TValue a, TValue b) => new(a, Relation.EQUALS, b);
+    public static Detail EqualsVal(this ExerciseToken a, ExerciseToken b) => new(new TValue(a.Id), Relation.EQUALS, new TValue(b.Id));
     public static Detail Different(this TAngle a, TAngle b) => new(a, Relation.NOTEQUALS, b);
     public static Detail Larger(this ExerciseToken a, ExerciseToken b) => new(a, Relation.LARGER, b);
     public static Detail Smaller(this ExerciseToken a, ExerciseToken b) => new(a, Relation.SMALLER, b);
@@ -67,6 +73,9 @@ public static class DetailQuickCreator
 
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Left == a && x.Right == b);
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Any(x => x.Operator == r && x.Left == a);
+ 
+    public static bool UnorderedHas(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && ((x.Left == a && x.Right == b) || (x.Left == b && x.Right == a)));
+    public static bool UnorderedHas(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Any(x => x.Operator == r && (x.Left == a || x.Right == a));
 
     public static Detail? Get(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a && x.Right == b);
     public static Detail? Get(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.FirstOrDefault(x => x.Operator == r && x.Left == a);

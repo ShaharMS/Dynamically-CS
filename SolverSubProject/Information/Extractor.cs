@@ -10,11 +10,13 @@ namespace SolverSubProject.Information;
 /// <br/>
 /// Categories are sorted by the potential detail, for example, a check for similar peripheral angles on arc will be placed under "Angle", and not "Circle".
 /// The ordering within each category is only by the reason's index.
-/// <br/>
-/// Parallels & perpendiculars will appear under "Angle", not "Length".
-/// <br/>
-/// if something is oddly specific and outputs many types of details (for example - kite main diagonal), it would be placed under its related shape, and not category.
-/// <br/>
+/// <br/><br/>Exceptions:
+/// 
+/// <list type="bullet">
+///     <item>Parallels and perpendiculars will appear under "Segment", and not "Angle".</item>
+///     <item>if something is specific to a type of shape (for example - kite main diagonal), it would be placed under its related shape, and not category.</item>
+/// </list>
+/// <br/><br/>
 /// The reason used to infer each detail is marked in every method as an attribute.
 /// </summary>
 public class Extractor
@@ -897,7 +899,7 @@ public class Extractor
     */
 
     [Reason(Reason.KITE_MAIN_DIAGONAL_BISECTS_ANGLE_BISECTS_DIAGONAL)]
-    public static IEnumerable<Detail> KiteMainDiagonalBisection(TQuad quad)
+    public static IEnumerable<Detail> KiteProperties_A(TQuad quad)
     {
 
         var details = new List<Detail>();
@@ -929,10 +931,181 @@ public class Extractor
     [Reason(Reason.PARALLELOGRAM_OPPOSITE_ANGLES_EQUAL)]
     public static IEnumerable<Detail> ParallelogramProperties_A(TQuad parallelogram)
     {
+        if (!parallelogram.ParentPool.AvailableDetails.Has(parallelogram, Relation.QUAD_PARALLELOGRAM)) return E();
         var parallelogramDetail = parallelogram.ParentPool.AvailableDetails.EnsuredGet(parallelogram, Relation.QUAD_PARALLELOGRAM);
-        
+        return new[]
+        {
+            parallelogram.V1V2V3.EqualsVal(parallelogram.V1V4V3).AddReferences(parallelogramDetail),
+            parallelogram.V2V1V4.EqualsVal(parallelogram.V2V3V4).AddReferences(parallelogramDetail),
+        };
     }
- 
+
+    [Reason(Reason.PARALLELOGRAM_OPPOSITE_SIDES_EQUAL)]
+    public static IEnumerable<Detail> ParallelogramProperties_B(TQuad parallelogram)
+    {
+        if (!parallelogram.ParentPool.AvailableDetails.Has(parallelogram, Relation.QUAD_PARALLELOGRAM)) return E();
+        var parallelogramDetail = parallelogram.ParentPool.AvailableDetails.EnsuredGet(parallelogram, Relation.QUAD_PARALLELOGRAM);
+        return new[]
+        {
+            parallelogram.V1V2.EqualsVal(parallelogram.V3V4).AddReferences(parallelogramDetail),
+            parallelogram.V2V3.EqualsVal(parallelogram.V1V4).AddReferences(parallelogramDetail),
+        };
+    }
+
+    [Reason(Reason.PARALLELOGRAM_DIAGONALS_BISECT_EACH_OTHER)]
+    public static IEnumerable<Detail> ParallelogramProperties_C(TQuad parallelogram)
+    {
+        if (!parallelogram.ParentPool.AvailableDetails.Has(parallelogram, Relation.QUAD_PARALLELOGRAM)) return E();
+        var parallelogramDetail = parallelogram.ParentPool.AvailableDetails.EnsuredGet(parallelogram, Relation.QUAD_PARALLELOGRAM);
+        return new[]
+        {
+            parallelogram.V1.GetOrCreateSegment(parallelogram.V3).EqualsVal(parallelogram.V2.GetOrCreateSegment(parallelogram.V4)).AddReferences(parallelogramDetail)
+        };
+    }
+
+    [Reason(Reason.QUAD_OPPOSITE_ANGLES_EQUAL_PARALLELOGRAM)]
+    public static IEnumerable<Detail> IsQuadParallelogram_A(TQuad quad)
+    {
+        if (quad.V1V2V3.GetValue() == quad.V1V4V3.GetValue() && quad.V2V1V4.GetValue() == quad.V2V3V4.GetValue())
+            return new[] {
+                quad.MarkParallelogram().AddReferences(
+                    quad.V1V2V3.GetEqualityDetail(quad.V1V4V3),
+                    quad.V2V1V4.GetEqualityDetail(quad.V2V3V4)
+                )
+            };
+        return E();
+    }
+
+    [Reason(Reason.QUAD_OPPOSITE_SIDES_EQUAL_PARALLELOGRAM)]
+    public static IEnumerable<Detail> IsQuadParallelogram_B(TQuad quad)
+    {
+        if (quad.V1V2.GetValue() == quad.V3V4.GetValue() && quad.V2V3.GetValue() == quad.V1V4.GetValue())
+            return new[] {
+                quad.MarkParallelogram().AddReferences(
+                    quad.V1V2.GetEqualityDetail(quad.V3V4),
+                    quad.V2V3.GetEqualityDetail(quad.V1V4)
+                )
+            };
+        return E();
+    }
+
+    [Reason(Reason.QUAD_OPPOSITE_PAIR_PARALLEL_EQUAL_PARALLELOGRAM)]
+    public static IEnumerable<Detail> IsQuadParallelogram_C(TQuad quad)
+    {
+        if (quad.V1V2.GetValue() == quad.V3V4.GetValue() && quad.V1V2.IsParallel(quad.V3V4))
+            return new[] {
+                quad.MarkParallelogram().AddReferences(
+                    quad.V1V2.GetEqualityDetail(quad.V3V4),
+                    quad.ParentPool.AvailableDetails.EnsuredUnorderedGet(quad.V1V2, Relation.PARALLEL, quad.V3V4)
+                )
+            };
+        if (quad.V2V3.GetValue() == quad.V1V4.GetValue() && quad.V2V3.IsParallel(quad.V1V4))
+            return new[] {
+                quad.MarkParallelogram().AddReferences(
+                    quad.V2V3.GetEqualityDetail(quad.V1V4),
+                    quad.ParentPool.AvailableDetails.EnsuredUnorderedGet(quad.V2V3, Relation.PARALLEL, quad.V1V4)
+                )
+            };
+        return E();
+    }
+
+    [Reason(Reason.QUAD_DIAGONALS_BISECT_EACH_OTHER_PARALLELOGRAM)]
+    public static IEnumerable<Detail> IsQuadParallelogram_D(TQuad quad)
+    {
+        var diagonal1 = quad.V1.GetOrCreateSegment(quad.V3);
+        var diagonal2 = quad.V2.GetOrCreateSegment(quad.V4);
+        if (diagonal1.IsBisecting(diagonal2) && diagonal2.IsBisecting(diagonal1))    
+            return new[] {
+                quad.MarkParallelogram().AddReferences(
+                    quad.ParentPool.AvailableDetails.EnsuredGet(diagonal1, Relation.BISECTS, diagonal2),
+                    quad.ParentPool.AvailableDetails.EnsuredGet(diagonal2, Relation.BISECTS, diagonal1)
+                )
+            };
+        return E();
+    }
+
+    [Reason(Reason.RHOMBUS_DIAGONALS_BISECT_EACH_OTHER)]
+    public static IEnumerable<Detail> RhombusProperties_A(TQuad rhombus)
+    {
+        if (!rhombus.ParentPool.AvailableDetails.Has(rhombus, Relation.QUAD_RHOMBUS)) return E();
+        var rhombusDetail = rhombus.ParentPool.AvailableDetails.EnsuredGet(rhombus, Relation.QUAD_RHOMBUS);
+
+        return new[]
+        {
+            rhombus.V1.GetOrCreateSegment(rhombus.V3).Bisects(rhombus.V2.GetOrCreateSegment(rhombus.V4)).AddReferences(rhombusDetail),
+            rhombus.V2.GetOrCreateSegment(rhombus.V4).Bisects(rhombus.V1.GetOrCreateSegment(rhombus.V3)).AddReferences(rhombusDetail)
+        };
+    }
+
+    [Reason(Reason.PARALLELOGRAM_DIAGONAL_ANGLE_BISECTOR_RHOMBUS)]
+    public static IEnumerable<Detail> IsParallelogramRhombus_A(TQuad quad)
+    {
+        if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_PARALLELOGRAM)) return E();
+        var parallelogramDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_PARALLELOGRAM);
+        TSegment diagonal1 = quad.V1.GetOrCreateSegment(quad.V3), diagonal2 = quad.V2.GetOrCreateSegment(quad.V4);
+        if (diagonal1.IsBisecting(quad.V2V1V4)) return new[] { quad.MarkRhombus().AddReferences(parallelogramDetail, quad.ParentPool.AvailableDetails.EnsuredGet(diagonal1, Relation.BISECTS, quad.V2V1V4)) };
+        if (diagonal1.IsBisecting(quad.V2V3V4)) return new[] { quad.MarkRhombus().AddReferences(parallelogramDetail, quad.ParentPool.AvailableDetails.EnsuredGet(diagonal1, Relation.BISECTS, quad.V2V3V4)) };
+        if (diagonal2.IsBisecting(quad.V1V2V3)) return new[] { quad.MarkRhombus().AddReferences(parallelogramDetail, quad.ParentPool.AvailableDetails.EnsuredGet(diagonal2, Relation.BISECTS, quad.V1V2V3)) };
+        if (diagonal2.IsBisecting(quad.V1V4V3)) return new[] { quad.MarkRhombus().AddReferences(parallelogramDetail, quad.ParentPool.AvailableDetails.EnsuredGet(diagonal2, Relation.BISECTS, quad.V1V4V3)) };
+        return E();
+    }
+
+    [Reason(Reason.RHOMBUS_DIAGONALS_PERPENDICULAR)]
+    public static IEnumerable<Detail> RhombusProperties_B(TQuad rhombus)
+    {
+        if (!rhombus.ParentPool.AvailableDetails.Has(rhombus, Relation.QUAD_RHOMBUS)) return E();
+        var rhombusDetail = rhombus.ParentPool.AvailableDetails.EnsuredGet(rhombus, Relation.QUAD_RHOMBUS);
+        return new[] {
+            rhombus.V1.GetOrCreateSegment(rhombus.V3).Perpendicular(rhombus.V2.GetOrCreateSegment(rhombus.V4)).AddReferences(rhombusDetail)
+        };
+    }
+
+    [Reason(Reason.PARALLELOGRAM_DIAGONALS_PERPENDICULAR_RHOMBUS)]
+    public static IEnumerable<Detail> IsParallelogramRhombus_B(TQuad quad)
+    {
+        if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_PARALLELOGRAM)) return E();
+        var parallelogramDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_PARALLELOGRAM);
+        TSegment diagonal1 = quad.V1.GetOrCreateSegment(quad.V3), diagonal2 = quad.V2.GetOrCreateSegment(quad.V4);
+        if (diagonal1.IsPerpendicular(diagonal2)) return new[] { quad.MarkRhombus().AddReferences(parallelogramDetail, quad.ParentPool.AvailableDetails.EnsuredUnorderedGet(diagonal1, Relation.PERPENDICULAR, diagonal2)) };
+        return E();
+    }
+
+    [Reason(Reason.RECTANGLE_DIAGONALS_EQUAL)]
+    public static IEnumerable<Detail> RectangleProperties_A(TQuad rectangle)
+    {
+        if (!rectangle.ParentPool.AvailableDetails.Has(rectangle, Relation.QUAD_RECTANGLE)) return E();
+        var rectangleDetail = rectangle.ParentPool.AvailableDetails.EnsuredGet(rectangle, Relation.QUAD_RECTANGLE);
+        return new[] {
+            rectangle.V1.GetOrCreateSegment(rectangle.V3).EqualsVal(rectangle.V2.GetOrCreateSegment(rectangle.V4)).AddReferences(rectangleDetail)
+        };
+    }
+
+    [Reason(Reason.PARALLELOGRAM_DIAGONALS_EQUAL_RECTANGLE)]
+    public static IEnumerable<Detail> IsParallelogramRectangle_A(TQuad quad)
+    {
+        if (!quad.ParentPool.AvailableDetails.Has(quad, Relation.QUAD_PARALLELOGRAM)) return E();
+        var parallelogramDetail = quad.ParentPool.AvailableDetails.EnsuredGet(quad, Relation.QUAD_PARALLELOGRAM);
+        TSegment diagonal1 = quad.V1.GetOrCreateSegment(quad.V3), diagonal2 = quad.V2.GetOrCreateSegment(quad.V4);
+        if (diagonal1.GetValue() == diagonal2.GetValue()) return new[] { quad.MarkRectangle().AddReferences(parallelogramDetail, diagonal1.GetEqualityDetail(diagonal2)) };
+        return E();
+    }
+
+    [Reason(Reason.ISOSTRAPEZOID_BASE_ANGLES_EQUAL)]
+    public static IEnumerable<Detail> IsoscelesTrapezoidProperties_A(TQuad isoscelesTrapezoid)
+    {
+        if (!isoscelesTrapezoid.ParentPool.AvailableDetails.Has(isoscelesTrapezoid, Relation.QUAD_ISOSCELES_TRAPEZOID)) return E();
+        var isoscelesTrapezoidDetail = isoscelesTrapezoid.ParentPool.AvailableDetails.EnsuredGet(isoscelesTrapezoid, Relation.QUAD_ISOSCELES_TRAPEZOID);
+        return new[] {
+            isoscelesTrapezoid.V1V2V3.EqualsVal(isoscelesTrapezoid.V2V1V4).AddReferences(isoscelesTrapezoidDetail),
+            isoscelesTrapezoid.V2V3V4.EqualsVal(isoscelesTrapezoid.V1V4V3).AddReferences(isoscelesTrapezoidDetail)
+        };
+    }
+
+
+
+
+
+
     /*                                                                                                 
 
                █████████  █████                                ███████                     

@@ -99,6 +99,22 @@ public static partial class TokenHelpers
         return segment.ParentPool.AvailableDetails.Has(segment, Relation.PARALLEL, element);
     }
 
+    public static IEnumerable<TSegment> GetPerpendiculars(this TSegment segment)
+    {
+        foreach (var x in
+                segment.ParentPool.AvailableDetails.GetMany(Relation.PERPENDICULAR, segment).Concat(
+                    segment.ParentPool.AvailableDetails.GetMany(segment, Relation.PERPENDICULAR)
+                ).ToHashSet()
+            ) yield return (TSegment)x.Left;
+    }
+
+    public static bool IsPerpendicular(this TSegment segment, ExerciseToken element)
+    {
+        Validate(segment, element);
+        return segment.ParentPool.AvailableDetails.UnorderedHas(segment, Relation.PERPENDICULAR, element);
+    }
+
+
     public static TVertex GetOrCreateIntersectionPoint(this TSegment segment1, TSegment segment2)
     {
         Validate(segment1, segment2);
