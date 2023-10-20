@@ -1,4 +1,5 @@
-﻿using Dynamically.Backend;
+﻿using Antlr4.Runtime.Misc;
+using Dynamically.Backend;
 using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
 using SolverSubProject.Information;
@@ -39,9 +40,14 @@ public static class DetailQuickCreator
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TSegment, TSegment) sides3) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_S, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, sides3.Item1, sides3.Item2);
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TAngle, TAngle) angles) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_A, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, angles.Item1, angles.Item2);
 
-    public static Detail MarkParallelogram(this TQuad quad) => new(quad, Relation.QUAD_PARALLELOGRAM);
+    public static Detail MarkParallelogram(this TQuad quad, ValueTuple<TSegment,TSegment> pair1, ValueTuple<TSegment, TSegment> pair2) => new(quad, Relation.QUAD_PARALLELOGRAM) { SideProducts = pair1.ToArray<ExerciseToken>().Concat(pair2.ToArray<ExerciseToken>()).ToList() };
     public static Detail MarkRhombus(this TQuad quad) => new(quad, Relation.QUAD_RHOMBUS);
-    public static Detail MarkRectangle(this TQuad quad) => new(quad, Relation.QUAD_RECTANGLE);
+    public static Detail MarkRectangle(this TQuad quad, ValueTuple<TSegment, TSegment> pair1, ValueTuple<TSegment, TSegment> pair2) => new(quad, Relation.QUAD_RECTANGLE) { SideProducts = pair1.ToArray<ExerciseToken>().Concat(pair2.ToArray<ExerciseToken>()).ToList() };
+    public static Detail MarkTrapezoid(this TQuad quad, ValueTuple<TSegment, TSegment> parallels) => new(quad, Relation.QUAD_TRAPEZOID) { SideProducts = parallels.ToArray<ExerciseToken>().ToList()};
+    public static Detail MarkSquare(this TQuad quad) => new(quad, Relation.QUAD_SQUARE);
+    public static Detail MarkKite(this TQuad quad, TAngle headAngle) => new(quad, Relation.QUAD_KITE) { SideProducts = new() { headAngle, quad.GetOppositeAngle(headAngle)} };
+    public static Detail MarkIsoscelesTrapezoid(this TQuad quad, ValueTuple<TSegment, TSegment> parallels, ValueTuple<TSegment, TSegment> equals) => new(quad, Relation.QUAD_ISOSCELES_TRAPEZOID) { SideProducts = parallels.ToArray<ExerciseToken>().Concat(equals.ToArray<ExerciseToken>()).ToList() };
+
 
 
     public static Detail EqualsVal(this TValue a, TValue b) => new(a, Relation.EQUALS, b);

@@ -81,8 +81,12 @@ public class TValue : ExerciseToken
         return !a.Equals(b);
     }
 
-    public static TValue operator +(TValue a, TValue b) => new() { Value = a.Value + b.Value};
-    public static TValue operator -(TValue a, TValue b) => new() { Value = a.Value - b.Value};
-    public static TValue operator *(TValue a, TValue b) => new() { Value = a.Value * b.Value};
-    public static TValue operator /(TValue a, TValue b) => new() { Value = a.Value / b.Value};
+    public static TValue operator +(TValue a, TValue b) => new() { Value = a.Value + b.Value };
+    public static TValue operator +(TValue a, double b) => new() { Value = a.Value + b};
+    public static TValue operator -(TValue a, TValue b) => new() { Value = a.Value - b.Value };
+    public static TValue operator -(TValue a, double b) => new() { Value = a.Value - b };
+    public static TValue operator *(TValue a, TValue b) => new() { Value = a.Value * b.Value };
+    public static TValue operator *(TValue a, double b) => new() { Value = a.Value * b };
+    public static TValue operator /(TValue a, TValue b) => new() { Value = a.Value / b.Value };
+    public static TValue operator /(TValue a, double b) => new() { Value = a.Value / b };
 }
