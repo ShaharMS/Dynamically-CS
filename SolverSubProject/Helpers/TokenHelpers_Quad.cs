@@ -11,6 +11,14 @@ namespace Dynamically.Solver.Helpers;
 
 public static partial class TokenHelpers
 {
+    public static TAngle GetAngle(this TQuad quad, TVertex vertex) {
+        Validate(quad, vertex);
+        if (vertex == quad.V1) return quad.V2V1V4;
+        if (vertex == quad.V2) return quad.V1V2V3;
+        if (vertex == quad.V3) return quad.V2V3V4;
+        if (vertex == quad.V4) return quad.V1V4V3;
+        throw new ArgumentException("provided vertex must be one of the quad's vertices", nameof(vertex));
+    }
     public static TAngle GetOppositeAngle(this TQuad quad, TAngle angle)
     {
         Validate(quad, angle);

@@ -38,7 +38,8 @@ public static partial class TokenHelpers
     {
         foreach (var detail in token.ParentPool.AvailableDetails)
         {
-            if (detail.Operator == Relation.EQUALS && detail.Left == token) return (TValue)detail.Right;
+            if (detail.Operator == Relation.EQUALS && (detail.Left == token)) return (TValue)detail.Right;
+            if (detail.Operator == Relation.EQUALS && (detail.Right == token)) return (TValue)detail.Left;
         }
 
         var val = new TValue(token.Id)
@@ -47,6 +48,16 @@ public static partial class TokenHelpers
         };
 
         return val;
+    }
+    public static Detail? GetValueDetail(this ExerciseToken token)
+    {
+        foreach (var detail in token.ParentPool.AvailableDetails)
+        {
+            if (detail.Operator == Relation.EQUALS && (detail.Left == token)) return detail;
+            if (detail.Operator == Relation.EQUALS && (detail.Right == token)) return detail;
+        }
+
+        return null;
     }
 
     /// <summary>

@@ -46,7 +46,7 @@ public class Extractor
         if (!angle.HasAdjacentAngles()) return E();
 
         var adjacentAngles = angle.GetAdjacentAngles();
-        return adjacentAngles.Select(a => a.EqualsVal(new TValue($"180\\deg - {a}") { ParentPool = a.ParentPool })).ToArray();
+        return adjacentAngles.Select(a => a.GetValue().EqualsVal(new TValue($"180\\deg - {a}") { ParentPool = a.ParentPool })).ToArray();
     }
 
     [Reason(Reason.VERTEX_ANGLES_EQUAL)]
@@ -55,7 +55,7 @@ public class Extractor
         if (!angle.HasVertexAngle()) return E();
         var vertexAngle = angle.GetVertexAngle();
         if (vertexAngle == null) return E();
-        return new[] { vertexAngle.EqualsVal(angle) };
+        return new[] { vertexAngle.GetValue().EqualsVal(angle.GetValue()) };
     }
 
 
@@ -968,7 +968,7 @@ public class Extractor
     {
         if (quad.V1V2V3.GetValue() == quad.V1V4V3.GetValue() && quad.V2V1V4.GetValue() == quad.V2V3V4.GetValue())
             return new[] {
-                quad.MarkParallelogram((quad.V1V2, quad.V3V4), (quad.V2V3, quad.V1V4)).AddReferences(
+                quad.MarkParallelogram().AddReferences(
                     quad.V1V2V3.GetEqualityDetail(quad.V1V4V3),
                     quad.V2V1V4.GetEqualityDetail(quad.V2V3V4)
                 )
@@ -981,7 +981,7 @@ public class Extractor
     {
         if (quad.V1V2.GetValue() == quad.V3V4.GetValue() && quad.V2V3.GetValue() == quad.V1V4.GetValue())
             return new[] {
-                quad.MarkParallelogram((quad.V1V2, quad.V3V4), (quad.V2V3, quad.V1V4)).AddReferences(
+                quad.MarkParallelogram().AddReferences(
                     quad.V1V2.GetEqualityDetail(quad.V3V4),
                     quad.V2V3.GetEqualityDetail(quad.V1V4)
                 )
@@ -994,14 +994,14 @@ public class Extractor
     {
         if (quad.V1V2.GetValue() == quad.V3V4.GetValue() && quad.V1V2.IsParallel(quad.V3V4))
             return new[] {
-                quad.MarkParallelogram((quad.V1V2, quad.V3V4), (quad.V2V3, quad.V1V4)).AddReferences(
+                quad.MarkParallelogram().AddReferences(
                     quad.V1V2.GetEqualityDetail(quad.V3V4),
                     quad.ParentPool.AvailableDetails.EnsuredUnorderedGet(quad.V1V2, Relation.PARALLEL, quad.V3V4)
                 )
             };
         if (quad.V2V3.GetValue() == quad.V1V4.GetValue() && quad.V2V3.IsParallel(quad.V1V4))
             return new[] {
-                quad.MarkParallelogram((quad.V2V3, quad.V1V4), (quad.V1V2, quad.V3V4)).AddReferences(
+                quad.MarkParallelogram().AddReferences(
                     quad.V2V3.GetEqualityDetail(quad.V1V4),
                     quad.ParentPool.AvailableDetails.EnsuredUnorderedGet(quad.V2V3, Relation.PARALLEL, quad.V1V4)
                 )
@@ -1016,7 +1016,7 @@ public class Extractor
         var diagonal2 = quad.V2.GetOrCreateSegment(quad.V4);
         if (diagonal1.IsBisecting(diagonal2) && diagonal2.IsBisecting(diagonal1))    
             return new[] {
-                quad.MarkParallelogram((quad.V1V2, quad.V3V4),(quad.V2V3, quad.V1V4)).AddReferences(
+                quad.MarkParallelogram().AddReferences(
                     quad.ParentPool.AvailableDetails.EnsuredGet(diagonal1, Relation.BISECTS, diagonal2),
                     quad.ParentPool.AvailableDetails.EnsuredGet(diagonal2, Relation.BISECTS, diagonal1)
                 )
@@ -1107,8 +1107,15 @@ public class Extractor
         if (!trapezoid.ParentPool.AvailableDetails.Has(trapezoid, Relation.QUAD_TRAPEZOID)) return E();
         var trapezoidDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
 
-        if (trapezoid.V1V2V3.GetValue() == trapezoid.V2V1V4.GetValue()) return new[] { trapezoid.MarkIsoscelesTrapezoid(()).AddReferences(trapezoidDetail, trapezoid.V1V2V3.GetEqualityDetail(trapezoid.V2V1V4)) };
-        if (trapezoid.V2V3V4.GetValue() == trapezoid.V1V4V3.GetValue()) return new[] { trapezoid.MarkIsoscelesTrapezoid().AddReferences(trapezoidDetail, trapezoid.V2V3V4.GetEqualityDetail(trapezoid.V1V4V3)) };
+        IEnumerable<(TSegment segment, TAngle angle1, TAngle angle2)> baseAngles = trapezoid.GetTrapezoidBases().Select(x => (x, trapezoid.GetAngle(x.V1), trapezoid.GetAngle(x.V1)));
+
+        foreach (var (segment, angle1, angle2) in baseAngles) {
+            if (angle1.GetValue() == angle2.GetValue()) {
+                return new [] {
+                    trapezoid.MarkIsoscelesTrapezoid((trapezoid.GetTrapezoidBases().First(), trapezoid.GetTrapezoidBases().Last())).AddReferences(trapezoidDetail, angle1.GetEqualityDetail(angle2))
+                };
+            }
+        }
         return E();
     }
 
@@ -1127,7 +1134,8 @@ public class Extractor
     {
         if (!trapezoid.ParentPool.AvailableDetails.Has(trapezoid, Relation.QUAD_TRAPEZOID)) return E();
         var trapezoidDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
-        if (trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetValue() == trapezoid.V2.GetOrCreateSegment(trapezoid.V4).GetValue()) return new[] { trapezoid.MarkIsoscelesTrapezoid().AddReferences(trapezoidDetail, trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetEqualityDetail(trapezoid.V2.GetOrCreateSegment(trapezoid.V4))) };
+        var bases = trapezoid.GetTrapezoidBases();
+        if (trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetValue() == trapezoid.V2.GetOrCreateSegment(trapezoid.V4).GetValue()) return new[] { trapezoid.MarkIsoscelesTrapezoid((bases.First(), bases.Last())).AddReferences(trapezoidDetail, trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetEqualityDetail(trapezoid.V2.GetOrCreateSegment(trapezoid.V4))) };
         return E();
     }
 
@@ -1140,8 +1148,21 @@ public class Extractor
         var midsegmentsData = trapezoid.GetMidSegmentsWithOpposites();
         foreach (var (midsegment, opposites) in midsegmentsData)
         {
-            if (opposites.First().IsParallel(opposites.Last()))
-                yield return midsegment.EqualsVal((opposites.First().GetValue() + opposites.Last().GetValue()) / 2);
+            var midsegmentDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(midsegment, Relation.MIDSEGMENT, trapezoid)
+            if (opposites.First().IsParallel(opposites.Last())) {
+                yield return midsegment.EqualsVal((opposites.First().GetValue() + opposites.Last().GetValue()) / 2).AddReferences(
+                    trapezoidDetail,
+                    midsegmentDetail
+                );
+                yield return midsegment.Parallel(opposites.First()).AddReferences(
+                    trapezoidDetail,
+                    midsegmentDetail
+                );
+                yield return midsegment.Parallel(opposites.Last()).AddReferences(
+                    trapezoidDetail,
+                    midsegmentDetail
+                );
+            }
         }
     }
 

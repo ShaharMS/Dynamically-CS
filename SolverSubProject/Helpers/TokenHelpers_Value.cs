@@ -10,5 +10,4 @@ namespace Dynamically.Solver.Helpers;
 
 public static partial class TokenHelpers
 {
-    
 }
