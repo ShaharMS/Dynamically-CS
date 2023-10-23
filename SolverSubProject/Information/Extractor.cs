@@ -55,7 +55,7 @@ public class Extractor
         if (!angle.HasVertexAngle()) return E();
         var vertexAngle = angle.GetVertexAngle();
         if (vertexAngle == null) return E();
-        return new[] { vertexAngle.GetValue().EqualsVal(angle.GetValue()) };
+        return new[] { vertexAngle.EqualsVal(angle) };
     }
 
 
@@ -66,19 +66,19 @@ public class Extractor
         if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
         {
             details.Add(
-                triangle.V1V3V2.EqualsVal(triangle.V1V2V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
+                triangle.V1V3V2.EqualsVal(triangle.V1V2V3).AddReferences(triangle.V1V2.GetEqualityDetail(triangle.V1V3))
             );
         }
         if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
         {
             details.Add(
-                triangle.V1V3V2.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V2, Relation.EQUALS, triangle.V2V3))
+                triangle.V1V3V2.EqualsVal(triangle.V2V1V3).AddReferences(triangle.V1V2.GetEqualityDetail(triangle.V2V3))
             );
         }
         if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
         {
             details.Add(
-                triangle.V1V2V3.EqualsVal(triangle.V2V1V3).AddReferences(triangle.ParentPool.AvailableDetails.EnsuredGet(triangle.V1V3, Relation.EQUALS, triangle.V2V3))
+                triangle.V1V2V3.EqualsVal(triangle.V2V1V3).AddReferences(triangle.V1V3.GetEqualityDetail(triangle.V2V3))
             );
         }
         return details.ToArray();
@@ -95,8 +95,7 @@ public class Extractor
         TAngle opposite1 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[0]);
         TAngle opposite2 = triangle.GetOppositeAngle((TSegment)equalSides.SideProducts[1]);
 
-        var detail = opposite1.EqualsVal(opposite2).AddReferences(equalSides);
-        return new[] { detail };
+        return new[] { opposite1.EqualsVal(opposite2).AddReferences(equalSides) };
     }
 
     // public static IEnumerable<Detail> BiggerSideLargerAngleAt(TTriangle triangle)
@@ -178,7 +177,8 @@ public class Extractor
             foreach (var (potential1, potential2) in potentialPairs)
                 if (potential1.GetValue() == potential2.GetValue())
                     yield return potential1.EqualsVal(potential2).AddReferences(
-                        pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                        pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2),
+                        potential1.GetEqualityDetail(potential2)
                     );
         }
         else
@@ -298,7 +298,8 @@ public class Extractor
             };
             foreach (var (potential1, potential2) in potentialPairs)
                 yield return (potential1.GetValue() + potential2.GetValue()).EqualsVal(new TValue(180)).AddReferences(
-                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2),
+                    potential1.GetValueDetail(), potential2.GetValueDetail()
                 );
         }
         else
@@ -322,7 +323,8 @@ public class Extractor
             };
             foreach (var (potential1, potential2) in potentialPairs)
                 yield return (potential1.GetValue() + potential2.GetValue()).EqualsVal(new TValue(180)).AddReferences(
-                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2)
+                    pool.AvailableDetails.EnsuredUnorderedGet(seg1, Relation.PARALLEL, seg2),
+                    potential1.GetValueDetail(), potential2.GetValueDetail()
                 );
         }
     }
@@ -887,9 +889,9 @@ public class Extractor
                                                                             ████████
            █████████████                                                    █::::::█
          ██:::::::::::::██                                                  █::::::█
-        █::::::█   █::::::█ ██████    ██████    █████████████       █████████:::::█ 
-        █:::::█     █:::::█ █::::█    █::::█    █████████:::::█  █::::::::::::::::█ 
-        █:::::█     █:::::█ █::::█    █::::█      ███████:::::█ █::::::█    █:::::█ 
+        █::::::█   █::::::█ ██████    ██████   ██████████████       █████████:::::█ 
+        █:::::█     █:::::█ █::::█    █::::█   █████ ████:::::█  █::::::::::::::::█ 
+        █:::::█     █:::::█ █::::█    █::::█          ███:::::█ █::::::█    █:::::█ 
         █:::::█  ████:::::█ █::::█    █::::█   █::::████::::::█ █:::::█     █:::::█ 
         █:::::::██::::::::█ █:::::::::::::::███::::█    █:::::█ █::::::█████::::::██
            ██:::::::::::█     ██::::::::██:::█ █::::::::::██:::█  █:::::::::███::::█
@@ -1148,11 +1150,13 @@ public class Extractor
         var midsegmentsData = trapezoid.GetMidSegmentsWithOpposites();
         foreach (var (midsegment, opposites) in midsegmentsData)
         {
-            var midsegmentDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(midsegment, Relation.MIDSEGMENT, trapezoid)
+            var midsegmentDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(midsegment, Relation.MIDSEGMENT, trapezoid);
             if (opposites.First().IsParallel(opposites.Last())) {
                 yield return midsegment.EqualsVal((opposites.First().GetValue() + opposites.Last().GetValue()) / 2).AddReferences(
                     trapezoidDetail,
-                    midsegmentDetail
+                    midsegmentDetail,
+                    opposites.First().GetValueDetail(),
+                    opposites.Last().GetValueDetail()
                 );
                 yield return midsegment.Parallel(opposites.First()).AddReferences(
                     trapezoidDetail,
@@ -1177,9 +1181,9 @@ public class Extractor
 
     /*                                                                                                 
 
-               █████████  █████                                ███████                     
-           █:::::::::::█  █████                                █:::::█                     
-          █::::█████:::█                                       █:::::█                     
+               █████████  █████                                 ███████                     
+           █:::::::::::█  █████                                 █:::::█                     
+          █::::█████:::█                                        █:::::█                     
          █::::█    █████ ██████ ████   ███████      ██████████  ██::::█     ████████████    
         █::::█            █:::█ █::::::::::::::█  █:::::::::::█  █::::█  █::::::█████:::::██
         █::::█            █:::█ ██:::::████:::::██::::::███:::█  █::::█ █::::::█     █:::::█
