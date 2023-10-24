@@ -109,28 +109,28 @@ public enum Relation
     /// <summary>
     /// <list type="bullet">
     ///     <item>Value, Value - <b>All elements should be converted to <c>TValue</c> via <c>element.GetValue()</c></b></item>
-    ///     <item>0 or more side products - left operand can be smaller than one or more elements</item>
+    ///     <item>No side products</item>
     /// </list>
     /// </summary>
     LARGER,
     /// <summary>
     /// <list type="bullet">
     ///     <item>Value, Value - <b>All elements should be converted to <c>TValue</c> via <c>element.GetValue()</c></b></item>
-    ///     <item>0 or more side products - left operand can be larger than one or more elements</item>
+    ///     <item>No side products</item>
     /// </list>
     /// </summary>
     SMALLER,
     /// <summary>
     /// <list type="bullet">
     ///     <item>Value, Value - <b>All elements should be converted to <c>TValue</c> via <c>element.GetValue()</c></b></item>
-    ///     <item>0 or more side products - left operand can be equal/larger than one or more elements</item>
+    ///     <item>No side products</item>
     /// </list>
     /// </summary>
     EQLARGER,
     /// <summary>
     /// <list type="bullet">
     ///     <item>Value, Value - <b>All elements should be converted to <c>TValue</c> via <c>element.GetValue()</c></b></item>
-    ///     <item>0 or more side products - left operand can be equal/smaller than one or more elements</item>
+    ///     <item>No side products</item>
     /// </list>
     /// </summary>
     EQSMALLER,

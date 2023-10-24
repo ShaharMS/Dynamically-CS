@@ -67,34 +67,7 @@ public static partial class TokenHelpers
     /// <param name="token"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static Detail GetEqualityDetail(this ExerciseToken token1, ExerciseToken token2) {
-        Validate(token1, token2);
-        var details = token1.ParentPool.AvailableDetails;
-        List<(Detail, IEnumerable<TValue>)> token1Equalities = new(), token2Equalities = new();
-        foreach (var detail in details.GetMany(Relation.EQUALS)) {
-            if (detail.IncludedElements.ContainsSome(token1.GetValue(), new TValue(token1.Id)) && detail.IncludedElements.ContainsSome(token2.GetValue(), new TValue(token2.Id)))
-                return detail;
-            if (detail.IncludedElements.ContainsSome(token1.GetValue(), new TValue(token1.Id))) {
-                token1Equalities.Add((detail, detail.IncludedElements.Except(token1.GetValue(), new TValue(token1.Id)).Cast<TValue>()));
-            }
-            if (!detail.IncludedElements.ContainsSome(token2.GetValue(), new TValue(token2.Id)))
-            {
-                token2Equalities.Add((detail, detail.IncludedElements.Except(token2.GetValue(), new TValue(token2.Id)).Cast<TValue>()));
-            }
-        }
-
-        foreach (var (detail1, values1) in token1Equalities)
-        {
-            foreach (var (detail2, values2) in token2Equalities)
-            {
-                if (detail1 == detail2) throw new Exception("Details which reference two exclusive values should not be equal");
-                if (values1.Intersect(values2).Any()) return token1.EqualsVal(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(detail1, detail2);
-            }
-        }
-        throw new ArgumentException($"Equality detail requested, but wasn't found. are {token1} and {token1} equal?");
-    }
-
-    public static Detail GetRatioDetail(this ExerciseToken token1, ExerciseToken token2)
+    public static Detail GetEqualityDetail(this ExerciseToken token1, ExerciseToken token2)
     {
         Validate(token1, token2);
         var details = token1.ParentPool.AvailableDetails;
@@ -113,5 +86,52 @@ public static partial class TokenHelpers
             }
         }
 
-        public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;
+        foreach (var (detail1, values1) in token1Equalities)
+        {
+            foreach (var (detail2, values2) in token2Equalities)
+            {
+                if (detail1 == detail2) return detail1;
+                if (values1.Intersect(values2).Any()) return token1.EqualsVal(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(detail1, detail2);
+            }
+        }
+        throw new ArgumentException($"Equality detail requested, but wasn't found. are {token1} and {token1} equal?");
+    }
+
+    /// <param name="type">Can be of type:
+    ///     <list type="bullet">
+    ///         <item><see cref="Relation.LARGER"/></item>
+    ///         <item><see cref="Relation.SMALLER"/></item>
+    ///         <item><see cref="Relation.EQLARGER"/></item>
+    ///         <item><see cref="Relation.EQSMALLER"/></item>
+    ///     </list>
+    /// </param>
+    /// <returns></returns>
+    public static Detail GetRatioDetail(this ExerciseToken token1, ExerciseToken token2, Relation type)
+    {
+        Validate(token1, token2);
+        var details = token1.ParentPool.AvailableDetails;
+
+        if (details.Has(token1, type, token2)) return details.EnsuredGet(token1, type, token2);
+        else
+        {
+            switch (type)
+            {
+                case Relation.LARGER: 
+                    if (token1.GetValue() > token2.GetValue()) return token1.Larger(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(token1.GetValueDetail(), token2.GetValueDetail());
+                    break;
+                case Relation.SMALLER:
+                    if (token1.GetValue() < token2.GetValue()) return token1.Smaller(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(token1.GetValueDetail(), token2.GetValueDetail());
+                    break;
+                case Relation.EQLARGER:
+                    if (token1.GetValue() >= token2.GetValue()) return token1.Larger(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(token1.GetValueDetail(), token2.GetValueDetail());
+                    break;
+                case Relation.EQSMALLER:
+                    if (token1.GetValue() <= token2.GetValue()) return token1.Smaller(token2).MarkReasonExplicit(Reason.TRANSITIVITY).AddReferences(token1.GetValueDetail(), token2.GetValueDetail());
+                    break;
+                default:
+                    throw new ArgumentException("given relation type is not of type LARGER, SMALLER, EQLARGER or EQSMALLER", nameof(type));
+            }
+        }
+    }
+    public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;
 }
