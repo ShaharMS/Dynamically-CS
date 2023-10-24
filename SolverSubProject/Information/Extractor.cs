@@ -46,7 +46,9 @@ public class Extractor
         if (!angle.HasAdjacentAngles()) return E();
 
         var adjacentAngles = angle.GetAdjacentAngles();
-        return adjacentAngles.Select(a => a.GetValue().EqualsVal(new TValue($"180\\deg - {a}") { ParentPool = a.ParentPool })).ToArray();
+        return adjacentAngles.Select(
+            a => a.GetValue().EqualsVal(new TValue($"180\\deg - {a.GetValue()}") { ParentPool = a.ParentPool }).AddReferences(a.GetValueDetail())
+        ).ToArray();
     }
 
     [Reason(Reason.VERTEX_ANGLES_EQUAL)]
@@ -103,9 +105,9 @@ public class Extractor
     [Reason(Reason.TRIANGLE_ANGLE_SUM_180)]
     public static IEnumerable<Detail> EvaluateAngleSumWithinTriangle(TTriangle triangle)
     {
-        var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3} - {triangle.V1V3V2}") { ParentPool = triangle.ParentPool });
-        var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V3V2}") { ParentPool = triangle.ParentPool });
-        var detail3 = triangle.V1V3V2.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3} - {triangle.V1V2V3}") { ParentPool = triangle.ParentPool });
+        var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3.GetValue()} - {triangle.V1V3V2.GetValue()}") { ParentPool = triangle.ParentPool }).AddReferences(triangle.V1V2V3.GetValueDetail(), triangle.V1V3V2.GetValueDetail());
+        var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3.GetValue()} - {triangle.V1V3V2.GetValue()}") { ParentPool = triangle.ParentPool }).AddReferences(triangle.V2V1V3.GetValueDetail(), triangle.V1V3V2.GetValueDetail());
+        var detail3 = triangle.V1V3V2.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3.GetValue()} - {triangle.V1V2V3.GetValue()}") { ParentPool = triangle.ParentPool }).AddReferences(triangle.V2V1V3.GetValueDetail(), triangle.V1V2V3.GetValueDetail());
 
         return new[] { detail1, detail2, detail3 };
     }
@@ -130,7 +132,7 @@ public class Extractor
             if (currentSegmentExtensionVertex != null)
             {
                 var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
-                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}")));
+                details.Add(angle.EqualsVal(angle1.GetValue() + angle2.GetValue()).AddReferences(angle1.GetValueDetail(), angle2.GetValueDetail()));
             }
 
             currentSegment = segments.ElementAt(1);
@@ -141,7 +143,7 @@ public class Extractor
             if (currentSegmentExtensionVertex != null)
             {
                 var angle = vertex.GetAngle(currentSegmentExtensionVertex, (TVertex)thirdAngleVertex);
-                details.Add(angle.EqualsVal(new TValue($"{angle1} + {angle2}")));
+                details.Add(angle.EqualsVal(angle1.GetValue() + angle2.GetValue()).AddReferences(angle1.GetValueDetail(), angle2.GetValueDetail()));
             }
         }
 
@@ -356,9 +358,9 @@ public class Extractor
     {
         return new[]
         {
-            triangle.V1V2.Smaller(new TValue($"{triangle.V1V3} + {triangle.V2V3}")),
-            triangle.V1V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V2V3}")),
-            triangle.V2V3.Smaller(new TValue($"{triangle.V1V2} + {triangle.V1V3}"))
+            triangle.V1V2.Smaller(triangle.V1V3.GetValue() + triangle.V2V3.GetValue()).AddReferences(triangle.V1V3.GetValueDetail(), triangle.V2V3.GetValueDetail()),
+            triangle.V1V3.Smaller(triangle.V1V2.GetValue() + triangle.V2V3.GetValue()).AddReferences(triangle.V1V2.GetValueDetail(), triangle.V2V3.GetValueDetail()),
+            triangle.V2V3.Smaller(triangle.V1V2.GetValue() + triangle.V1V3.GetValue()).AddReferences(triangle.V1V2.GetValueDetail(), triangle.V1V3.GetValueDetail())
         };
     }
 
@@ -383,7 +385,7 @@ public class Extractor
                     if (bisector.IsParallel(otherSide))
                         yield return bisector.Bisects(otherSides.Except(otherSide).First()).AddReferences(
                             triangle.ParentPool.AvailableDetails.EnsuredGet(bisector, Relation.BISECTS, side),
-                            triangle.ParentPool.AvailableDetails.Get(bisector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, bisector) ?? throw new Exception("`Parallel` detail used, but not found")
+                            triangle.ParentPool.AvailableDetails.EnsuredUnorderedGet(bisector, Relation.PARALLEL, otherSide)
                         );
                 }
             }
@@ -532,7 +534,7 @@ public class Extractor
             };
             foreach (var (potential1, potential2) in potentialPairs)
                 if (potential1.GetValue() + potential2.GetValue() == new TValue(180))
-                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetValueDetail(), potential2.GetValueDetail());
         }
         else
         {
@@ -555,7 +557,7 @@ public class Extractor
             };
             foreach (var (potential1, potential2) in potentialPairs)
                 if (potential1.GetValue() + potential2.GetValue() == new TValue(180))
-                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetEqualityDetail(potential2));
+                    yield return seg1.Parallel(seg2).AddReferences(potential1.GetValueDetail(), potential2.GetValueDetail());
         }
     }
 
@@ -588,11 +590,11 @@ public class Extractor
             {
                 foreach (TSegment intersector in intersectors)
                 {
-                    if (intersector.IsParallel(otherSide) && intersector.GetValue() == new TValue($"{intersector.GetValue()} / 2"))
+                    if (intersector.IsParallel(otherSide) && intersector.GetValue() == otherSide.GetValue() / 2)
                         yield return intersector.MidSegment(triangle, otherSide).AddReferences(
-                            triangle.ParentPool.AvailableDetails.UnorderedGet(intersector, Relation.INTERSECTS, otherSide) ?? throw new Exception("`Intersect` detail used, but not found"),
-                            triangle.ParentPool.AvailableDetails.Get(intersector, Relation.PARALLEL, otherSide) ?? triangle.ParentPool.AvailableDetails.Get(otherSide, Relation.PARALLEL, intersector) ?? throw new Exception("`Parallel` detail used, but not found"),
-                            triangle.ParentPool.AvailableDetails.EnsuredGet(intersector, Relation.EQUALS, new TValue($"{intersector.GetValue()} / 2"))
+                            triangle.ParentPool.AvailableDetails.EnsuredUnorderedGet(intersector, Relation.INTERSECTS, otherSide),
+                            triangle.ParentPool.AvailableDetails.EnsuredUnorderedGet(intersector, Relation.PARALLEL, otherSide),
+                            intersector.GetEqualityDetail(otherSide.GetValue() / 2)
                         );
                 }
             }
@@ -661,20 +663,13 @@ public class Extractor
     public static IEnumerable<Detail> IsTriangleIsosceles_A(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
-        var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
-        if (!angleBisectors.Any()) return E();
-        var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
-
-        foreach (var bisectorDetail in angleBisectors)
-        {
-            var seg = (bisectorDetail.Left as TSegment)!;
-            if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
-            }
+        TSegment? potential1 = all.GetMany(Relation.BISECTS, triangle.V1V2V3).Select(x => (TSegment)x.Left).Intersect(all.UnorderedGetMany(triangle.V1V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left)).FirstOrDefault();
+        TSegment? potential2 = all.GetMany(Relation.BISECTS, triangle.V2V1V3).Select(x => (TSegment)x.Left).Intersect(all.UnorderedGetMany(triangle.V2V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left)).FirstOrDefault();
+        TSegment? potential3 = all.GetMany(Relation.BISECTS, triangle.V1V3V2).Select(x => (TSegment)x.Right).Intersect(all.UnorderedGetMany(triangle.V1V2, Relation.PERPENDICULAR).Select(x => (TSegment)x.Right)).FirstOrDefault();
+        
+        if (potential1 != null) {
+            yield return triangle.MarkIsosceles().AddReferences()
         }
-
-        return E();
     }
 
     [Reason(Reason.TRIANGLE_ANGLEBISECTOR_BISECTOR_IS_ISOSCELES)]
