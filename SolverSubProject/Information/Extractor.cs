@@ -665,10 +665,19 @@ public class Extractor
         var all = triangle.ParentPool.AvailableDetails;
         TSegment? potential1 = all.GetMany(Relation.BISECTS, triangle.V1V2V3).Select(x => (TSegment)x.Left).Intersect(all.UnorderedGetMany(triangle.V1V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left)).FirstOrDefault();
         TSegment? potential2 = all.GetMany(Relation.BISECTS, triangle.V2V1V3).Select(x => (TSegment)x.Left).Intersect(all.UnorderedGetMany(triangle.V2V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left)).FirstOrDefault();
-        TSegment? potential3 = all.GetMany(Relation.BISECTS, triangle.V1V3V2).Select(x => (TSegment)x.Right).Intersect(all.UnorderedGetMany(triangle.V1V2, Relation.PERPENDICULAR).Select(x => (TSegment)x.Right)).FirstOrDefault();
-        
-        if (potential1 != null) {
-            yield return triangle.MarkIsosceles().AddReferences()
+        TSegment? potential3 = all.GetMany(Relation.BISECTS, triangle.V1V3V2).Select(x => (TSegment)x.Left).Intersect(all.UnorderedGetMany(triangle.V1V2, Relation.PERPENDICULAR).Select(x => (TSegment)x.Right)).FirstOrDefault();
+
+        if (potential1 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V2V3)).AddReferences(all.EnsuredGet(potential1, Relation.BISECTS, triangle.V1V2V3), all.EnsuredUnorderedGet(potential1, Relation.PERPENDICULAR, triangle.V1V3));
+        }
+        if (potential2 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V1V3)).AddReferences(all.EnsuredGet(potential2, Relation.BISECTS, triangle.V2V1V3), all.EnsuredUnorderedGet(potential2, Relation.PERPENDICULAR, triangle.V2V3));
+        }
+        if (potential3 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V3, triangle.V2V3)).AddReferences(all.EnsuredGet(potential3, Relation.BISECTS, triangle.V1V3V2), all.EnsuredUnorderedGet(potential3, Relation.PERPENDICULAR, triangle.V1V2));
         }
     }
 
@@ -676,42 +685,44 @@ public class Extractor
     public static IEnumerable<Detail> IsTriangleIsosceles_B(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
-        var angleBisectors = all.GetMany(Relation.BISECTS, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2);
-        if (!angleBisectors.Any()) return E();
-        var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
+        TSegment? potential1 = all.GetMany(Relation.BISECTS, triangle.V1V2V3).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V1V3).Select(x => (TSegment)x.Right)).FirstOrDefault();
+        TSegment? potential2 = all.GetMany(Relation.BISECTS, triangle.V2V1V3).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V2V3).Select(x => (TSegment)x.Right)).FirstOrDefault();
+        TSegment? potential3 = all.GetMany(Relation.BISECTS, triangle.V1V3V2).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V1V2).Select(x => (TSegment)x.Right)).FirstOrDefault();
 
-        foreach (var angleBisectorDetail in angleBisectors)
+        if (potential1 != null)
         {
-            var seg = (angleBisectorDetail.Left as TSegment)!;
-            if (bisectors.Any(x => x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(angleBisectorDetail, bisectors.First(x => x.Right == seg || x.Left == seg)) };
-            }
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V2V3)).AddReferences(all.EnsuredGet(potential1, Relation.BISECTS, triangle.V1V2V3), all.EnsuredGet(potential1, Relation.BISECTS, triangle.V1V3));
         }
-
-        return E();
+        if (potential2 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V1V3)).AddReferences(all.EnsuredGet(potential2, Relation.BISECTS, triangle.V2V1V3), all.EnsuredGet(potential2, Relation.BISECTS, triangle.V2V3));
+        }
+        if (potential3 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V3, triangle.V2V3)).AddReferences(all.EnsuredGet(potential3, Relation.BISECTS, triangle.V1V3V2), all.EnsuredGet(potential3, Relation.BISECTS, triangle.V1V2));
+        }
     }
-
-
 
     [Reason(Reason.TRIANGLE_PERPENDICULAR_BISECTOR_IS_ISOSCELES)]
     public static IEnumerable<Detail> IsTriangleIsosceles_C(TTriangle triangle)
     {
         var all = triangle.ParentPool.AvailableDetails;
-        var bisectors = all.GetMany(Relation.BISECTS, triangle.V1V2, triangle.V2V3, triangle.V1V3);
-        if (!bisectors.Any()) return E();
-        var perpendiculars = all.GetMany(Relation.PERPENDICULAR, triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2).Concat(all.GetMany((triangle.V1V2V3, triangle.V2V1V3, triangle.V1V3V2), Relation.PERPENDICULAR)).FilterSimilars();
+        TSegment? potential1 = all.UnorderedGetMany(triangle.V1V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V1V3).Select(x => (TSegment)x.Right)).FirstOrDefault();
+        TSegment? potential2 = all.UnorderedGetMany(triangle.V2V3, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V2V3).Select(x => (TSegment)x.Right)).FirstOrDefault();
+        TSegment? potential3 = all.UnorderedGetMany(triangle.V1V2, Relation.PERPENDICULAR).Select(x => (TSegment)x.Left).Intersect(all.GetMany(Relation.BISECTS, triangle.V1V2).Select(x => (TSegment)x.Right)).FirstOrDefault();
 
-        foreach (var bisectorDetail in bisectors)
+        if (potential1 != null)
         {
-            var seg = (bisectorDetail.Left as TSegment)!;
-            if (perpendiculars.Any(x => x.Right == seg || x.Left == seg))
-            {
-                return new[] { new Detail(triangle, Relation.TRIANGLE_ISOSCELES).AddReferences(bisectorDetail, perpendiculars.First(x => x.Right == seg || x.Left == seg)) };
-            }
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V2V3)).AddReferences(all.EnsuredUnorderedGet(potential1, Relation.PERPENDICULAR, triangle.V1V3), all.EnsuredGet(potential1, Relation.BISECTS, triangle.V1V3));
         }
-
-        return E();
+        if (potential2 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V2, triangle.V1V3)).AddReferences(all.EnsuredUnorderedGet(potential2, Relation.PERPENDICULAR, triangle.V2V3), all.EnsuredGet(potential2, Relation.BISECTS, triangle.V2V3));
+        }
+        if (potential3 != null)
+        {
+            yield return triangle.MarkIsosceles((triangle.V1V3, triangle.V2V3)).AddReferences(all.EnsuredUnorderedGet(potential3, Relation.PERPENDICULAR, triangle.V1V2), all.EnsuredGet(potential3, Relation.BISECTS, triangle.V1V2));
+        }
     }
 
     [Reason(Reason.TRIANGLE_CONGRUENCY_S_A_S)]
