@@ -62,7 +62,7 @@ public class Extractor
 
 
     [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
-    public static IEnumerable<Detail> EqualSidesEqualAngles(TTriangle triangle)
+    public static IEnumerable<Detail> TriangleProperties_A(TTriangle triangle)
     {
         var details = new List<Detail>();
         if (triangle.ParentPool.AvailableDetails.Has(triangle.V1V2, Relation.EQUALS, triangle.V1V3))
@@ -87,7 +87,7 @@ public class Extractor
     }
 
     [Reason(Reason.ISOSCELES_BASE_ANGLES_EQUAL)]
-    public static IEnumerable<Detail> EquateIsoscelesBaseAngles(TTriangle triangle)
+    public static IEnumerable<Detail> IsoscelesTriangleProperties_A(TTriangle triangle)
     {
         if (!triangle.ParentPool.AvailableDetails.Has(triangle, Relation.TRIANGLE_ISOSCELES)) return E();
 
@@ -100,10 +100,11 @@ public class Extractor
         return new[] { opposite1.EqualsVal(opposite2).AddReferences(equalSides) };
     }
 
-    // public static IEnumerable<Detail> BiggerSideLargerAngleAt(TTriangle triangle)
+    // [Reason(Reason.TRIANGLE_BIGGER_SIDE_LARGER_ANGLE)]
+    // public static IEnumerable<Detail> TriangleProperties_B(TTriangle triangle)
 
     [Reason(Reason.TRIANGLE_ANGLE_SUM_180)]
-    public static IEnumerable<Detail> EvaluateAngleSumWithinTriangle(TTriangle triangle)
+    public static IEnumerable<Detail> TriangleProperties_D(TTriangle triangle)
     {
         var detail1 = triangle.V2V1V3.EqualsVal(new TValue($"180\\deg - {triangle.V1V2V3.GetValue()} - {triangle.V1V3V2.GetValue()}") { ParentPool = triangle.ParentPool }).AddReferences(triangle.V1V2V3.GetValueDetail(), triangle.V1V3V2.GetValueDetail());
         var detail2 = triangle.V1V2V3.EqualsVal(new TValue($"180\\deg - {triangle.V2V1V3.GetValue()} - {triangle.V1V3V2.GetValue()}") { ParentPool = triangle.ParentPool }).AddReferences(triangle.V2V1V3.GetValueDetail(), triangle.V1V3V2.GetValueDetail());
@@ -354,7 +355,7 @@ public class Extractor
     // public static IEnumerable<Detail> LargerAngleBiggerSideAt(TTriangle triangle)
 
     [Reason(Reason.TRIANGLE_SUM_TWO_SIDES_LARGER_THIRD)]
-    public static IEnumerable<Detail> TriangleSumTwoSidesLargerThird(TTriangle triangle)
+    public static IEnumerable<Detail> TriangleProperties_C(TTriangle triangle)
     {
         return new[]
         {
@@ -914,6 +915,11 @@ public class Extractor
                 );
             }
         }
+    }
+    [Reason(Reason.TRIANGLE_BISECTORS_INTERSECT_RATIO_1_FAR_2_CLOSE)]
+    public static IEnumerable<Detail> TriangleProperties_B(TTriangle triangle)
+    {
+
     }
     /*                                                                            
                                                                             ████████
