@@ -848,6 +848,7 @@ public class Extractor
         };
     }
 
+    // TODO: revisit this, > and < operators on values are a little complicated
     [Reason(Reason.TRIANGLE_CONGRUENCY_S_S_A)]
     public static IEnumerable<Detail> TriangleCongruencyVia_SSA(TTriangle triangle1, TTriangle triangle2)
     {
@@ -890,6 +891,29 @@ public class Extractor
                 big1.GetEqualityDetail(big2)
             )
         };
+    }
+
+    [Reason(Reason.TRIANGLE_BISECTORS_INTERSECT)]
+    public static IEnumerable<Detail> TriangleProperties_A(TTriangle triangle)
+    {
+        var all = triangle.ParentPool.AvailableDetails;
+
+        var bisectors = triangle.Sides
+            .Select(s => (s.GetBisectors(), triangle.GetOppositeVertex(s), s))
+            .Select(triple => (triple.Item1.Where(bisector => bisector.Parts.Contains(triple.Item2)), triple.Item3))
+            .Select(pair => from bisector in pair.Item1 select (bisector, side: pair.Item2))
+            .SelectMany(item => item);
+
+        foreach (var pair in bisectors)
+        {
+            foreach (var pair2 in bisectors.Except(pair))
+            {
+                yield return pair.bisector.Intersects(pair2.bisector).AddReferences(
+                    all.EnsuredGet(pair.bisector, Relation.BISECTS, pair.side),
+                    all.EnsuredGet(pair2.bisector, Relation.BISECTS, pair2.side)
+                );
+            }
+        }
     }
     /*                                                                            
                                                                             ████████
@@ -1103,9 +1127,14 @@ public class Extractor
     {
         if (!isoscelesTrapezoid.ParentPool.AvailableDetails.Has(isoscelesTrapezoid, Relation.QUAD_ISOSCELES_TRAPEZOID)) return E();
         var isoscelesTrapezoidDetail = isoscelesTrapezoid.ParentPool.AvailableDetails.EnsuredGet(isoscelesTrapezoid, Relation.QUAD_ISOSCELES_TRAPEZOID);
+        
+        var bases = isoscelesTrapezoid.GetTrapezoidBases();
+        var pair1 = (isoscelesTrapezoid.GetAngle(bases.First().V1), isoscelesTrapezoid.GetAngle(bases.First().V2));
+        var pair2 = (isoscelesTrapezoid.GetAngle(bases.Last().V1), isoscelesTrapezoid.GetAngle(bases.Last().V2));
+
         return new[] {
-            isoscelesTrapezoid.V1V2V3.EqualsVal(isoscelesTrapezoid.V2V1V4).AddReferences(isoscelesTrapezoidDetail),
-            isoscelesTrapezoid.V2V3V4.EqualsVal(isoscelesTrapezoid.V1V4V3).AddReferences(isoscelesTrapezoidDetail)
+            pair1.Item1.EqualsVal(pair1.Item2).AddReferences(isoscelesTrapezoidDetail),
+            pair2.Item1.EqualsVal(pair2.Item2).AddReferences(isoscelesTrapezoidDetail)
         };
     }
 
@@ -1143,7 +1172,8 @@ public class Extractor
         if (!trapezoid.ParentPool.AvailableDetails.Has(trapezoid, Relation.QUAD_TRAPEZOID)) return E();
         var trapezoidDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
         var bases = trapezoid.GetTrapezoidBases();
-        if (trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetValue() == trapezoid.V2.GetOrCreateSegment(trapezoid.V4).GetValue()) return new[] { trapezoid.MarkIsoscelesTrapezoid((bases.First(), bases.Last())).AddReferences(trapezoidDetail, trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetEqualityDetail(trapezoid.V2.GetOrCreateSegment(trapezoid.V4))) };
+        if (trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetValue() == trapezoid.V2.GetOrCreateSegment(trapezoid.V4).GetValue()) 
+            return new[] { trapezoid.MarkIsoscelesTrapezoid((bases.First(), bases.Last())).AddReferences(trapezoidDetail, trapezoid.V1.GetOrCreateSegment(trapezoid.V3).GetEqualityDetail(trapezoid.V2.GetOrCreateSegment(trapezoid.V4))) };
         return E();
     }
 
@@ -1153,11 +1183,12 @@ public class Extractor
         if (!trapezoid.ParentPool.AvailableDetails.Has(trapezoid, Relation.QUAD_TRAPEZOID)) yield break;
         var trapezoidDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
 
+        var trapezoidBases = trapezoid.GetTrapezoidBases();
         var midsegmentsData = trapezoid.GetMidSegmentsWithOpposites();
         foreach (var (midsegment, opposites) in midsegmentsData)
         {
             var midsegmentDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(midsegment, Relation.MIDSEGMENT, trapezoid);
-            if (opposites.First().IsParallel(opposites.Last())) {
+            if (trapezoidBases.ContainsMany(trapezoidBases)) {
                 yield return midsegment.EqualsVal((opposites.First().GetValue() + opposites.Last().GetValue()) / 2).AddReferences(
                     trapezoidDetail,
                     midsegmentDetail,
@@ -1179,10 +1210,30 @@ public class Extractor
     [Reason(Reason.TRAPEZOID_LINE_BISECTS_SIDE_PARALLEL_BASES_IS_MIDSEGMENT)]
     public static IEnumerable<Detail> TrapezoidProperties_B(TQuad trapezoid)
     {
-        if (!trapezoid.ParentPool.AvailableDetails.Has(trapezoid, Relation.QUAD_TRAPEZOID)) yield break;
-        var trapezoidDetail = trapezoid.ParentPool.AvailableDetails.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
+        var all = trapezoid.ParentPool.AvailableDetails;
+        if (!all.Has(trapezoid, Relation.QUAD_TRAPEZOID)) yield break;
+        var trapezoidDetail = all.EnsuredGet(trapezoid, Relation.QUAD_TRAPEZOID);
 
-        var bases = trapezoid.GetTrapezoidBases();
+        var trapezoidBases = trapezoid.GetTrapezoidBases();
+        var trapezoidSides = trapezoid.GetTrapezoidSides();
+
+        foreach (var side in trapezoidSides)
+        {
+            var bisectors = side.GetBisectors();
+            foreach (var bisector in bisectors)
+            {
+                if (bisector.IsParallel(trapezoidBases.First()) && bisector.IsParallel(trapezoidBases.Last()))
+                {
+                    yield return bisector.MidSegment(trapezoid, trapezoidSides.First(), trapezoidSides.Last()).AddReferences(
+                        trapezoidDetail,
+                        all.EnsuredGet(bisector, Relation.BISECTS, side),
+                        all.EnsuredGet(bisector, Relation.PARALLEL, trapezoidBases.First()),
+                        all.EnsuredGet(bisector, Relation.PARALLEL, trapezoidBases.Last())
+
+                    );
+                }
+            }
+        }
     }
 
     /*                                                                                                 
