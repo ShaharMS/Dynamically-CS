@@ -12,6 +12,7 @@ using CSharpMath;
 using Avalonia;
 using Avalonia.Input;
 using Avalonia.Controls.Presenters;
+using Avalonia.Media;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
@@ -24,51 +25,91 @@ public class MathTextBox : Canvas
     {
         get => TextBox.Text; set => TextBox.Text = value;
     }
+
+    public new double Width
+    {
+        get => base.Width;
+        set
+        {
+            base.Width = value;
+            TextBox.Width = value;
+            MathView.Width = value;
+        }
+    }
+
+    public new double Height
+    {
+        get => TextBox.Height.Max(MathView.Height);
+        set
+        {
+            base.Height = value;
+        }
+    }
+
     public MathTextBox()
     {
         TextBox = new TextBox
         {
             Opacity = 0,
-            TextWrapping = Avalonia.Media.TextWrapping.NoWrap,
+            TextWrapping = TextWrapping.NoWrap,
             AcceptsReturn = true,
         };
         MathView = new MathView
         {
             FontSize = (float)TextBox.FontSize,
             DisplacementX = (float)TextBox.FontSize / 4,
+            TextAlignment = CSharpMath.Rendering.FrontEnd.TextAlignment.Left,
+            HighlightColor = Colors.Red,
         };
 
         TextBox.PropertyChanged += (s, e) =>
         {
             if (e.Property.Name != nameof(TextBox.Text) || MathView == null) return;
             MathView.LaTeX = Latex.Latex.Latexify(TextBox.Text ?? "");
-            Log.WriteVar(TextBox.Text, MathView.LaTeX, Latex.Latex.Debugify(TextBox.Text ?? ""));
             MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
-
             //PrintDebugPosition();
         };
         TextBox.LayoutUpdated += (s, e) =>
         {
+            Log.WriteVar(MathView.Bounds.Height);
             // Second pass, incase the first didnt catch the bounds update
             MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
         };
+        TextBox.PropertyChanged += (s, e) =>
+        {
+            if (e.Property.Name != nameof(TextBox.Bounds)) return;
+            if (TextBox.Opacity == 1) Height = TextBox.Bounds.Height;
+            else Height = MathView.Bounds.Height;
+        };
+
         TextBox.LostFocus += (s, e) =>
         {
             TextBox.Opacity = 0;
             MathView.Opacity = 1;
+            
+            Height = MathView.Bounds.Height;
         };
         EventHandler<GotFocusEventArgs> giveFocus = (s, e) =>
         {
-            MathView.Opacity = 0;
+            MathView.Opacity = 0.1;
             TextBox.Opacity = 1;
             TextBox.Focus();
+
+            Height = TextBox.Bounds.Height;
         };
 
-        MathView.GotFocus += giveFocus;
         TextBox.GotFocus += giveFocus;
+        MathView.GotFocus += giveFocus;
 
         MathView.PointerEnter += (_, _) => Cursor = new Cursor(StandardCursorType.Ibeam);
         MathView.PointerLeave += (_, _) => Cursor = Cursor.Default;
+
+        MathView.PropertyChanged += (s, e) =>
+        {
+            if (e.Property.Name != nameof(MathView.Bounds)) return;
+            if (TextBox.Opacity == 1) Height = TextBox.Bounds.Height;
+            else Height = MathView.Bounds.Height;
+        };
 
         MainWindow.Instance.AddHandler(PointerPressedEvent, (_, e) =>
         {
@@ -80,13 +121,14 @@ public class MathTextBox : Canvas
             }
             else MainWindow.BigScreen.Focus();
         }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
-
-        this.SetPosition(100, 100);
-        TextBox.SetPosition(0, 0); MathView.SetPosition(0, 0);
+        TextBox.SetPosition(0, 0);
 
 
         Children.Add(MathView); Children.Add(TextBox);
-        AttachedToVisualTree += (_, _) => TextBox.Text = TextBox.Text;
+        AttachedToVisualTree += (_, _) =>
+        {
+            TextBox.Text = TextBox.Text;
+        };
     }
 
     public virtual int CaretPositionFromPoint(Point point) {

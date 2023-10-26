@@ -122,7 +122,7 @@ public class SolutionTable : Canvas
                 {
                     ChildrenQueued = new List<Control>
                     {
-                        new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"Statement{i + 1}" },
+                        new MathTextBox { Text = $"Statement{i + 1}" },
                         new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"Reason{i + 1}" },
                         new TextBox { TextWrapping = TextWrapping.Wrap, AcceptsReturn = true, Text = $"From{i + 1}" }
                     }
@@ -182,7 +182,7 @@ public class SolutionTable : Canvas
             if (HasFroms) ((dynamic)r.VisualRow.Children[2]).Width = FromsWidth;
         }
         if (double.IsNaN(VisualList.Height)) VisualList.Height = totalHeight;
-        else VisualList.Height = VisualList.Height.Max(totalHeight);
+        else VisualList.Height = totalHeight;
         VisualList.Width = StatementsWidth + ReasonsWidth + FromsWidth;
     }
 }

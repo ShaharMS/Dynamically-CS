@@ -42,8 +42,10 @@ public class TableRow : Canvas
     public SolutionTable Table;
 
     public TableRowHandle Handle;
+
     public TableRow(SolutionTable table) : base()
     {
+        _vr = new HDock();
         Width = table.Width;
         Height = 20;
 

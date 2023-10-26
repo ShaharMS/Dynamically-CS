@@ -27,8 +27,6 @@
 		<PackageReference Include="CSharpMath.Avalonia" Version="0.5.1" />
 		<PackageReference Include="CSharpMath.Evaluation" Version="0.5.1" />
 		<PackageReference Include="XamlNameReferenceGenerator" Version="1.6.1" />
-		<ProjectReference Include="C:\Users\shaha\Desktop\Github\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> <!-- PC, ignore error on laptop -->
-		<ProjectReference Include="C:\Users\shahar\Documents\GitHub\CalculationPrecisionResolver\CalculationPrecisionResolver\CalculationPrecisionResolver.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" /> <!-- laptop, ignore error on PC -->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,6 +43,13 @@
 
 	<ItemGroup>
 		<AvaloniaResource Include="Assets\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <AvaloniaXaml Remove="SolverSubProject\**" />
+	  <Compile Remove="SolverSubProject\**" />
+	  <EmbeddedResource Remove="SolverSubProject\**" />
+	  <None Remove="SolverSubProject\**" />
 	</ItemGroup>
 
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">

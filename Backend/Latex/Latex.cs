@@ -164,7 +164,12 @@ public class Latex
                     post.Remove(lookbehind);
                 }
                 if (i + 1 == pre.Count) post.Add(new Division(lookbehind, new Identifier("")));
-                else post.Add(new Division(lookbehind, pre[i + 1]));
+                else
+                {
+                    var lookahead = pre[i + 1];
+                    if (lookahead is Closure closure) lookahead = new Closure(prettyDivision(closure.Tokens), closure.Parenthesis.open, closure.Parenthesis.close);
+                    post.Add(new Division(lookbehind, lookahead));
+                }
                 i++;
             }
             else if (token is Closure closure) post.Add(new Closure(prettyDivision(closure.Tokens), closure.Parenthesis.open, closure.Parenthesis.close));
