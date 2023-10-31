@@ -10,11 +10,11 @@ public enum Relation
 {
     /// <summary>
     /// <list type="bullet">
-    ///     <item>Segment, Segment</item>
+    ///     <item>ExerciseToken - used for auxiliaries with no extra info</item>
     ///     <item>No side products</item>
     /// </list>
     /// </summary>
-    CONNECTED,
+    NEW,
     /// <summary>
     /// <list type="bullet">
     ///     <item>Vertex, Segment | Vertex, Circle</item>
@@ -75,7 +75,7 @@ public enum Relation
     PARALLEL,
     /// <summary>
     /// <list type="bullet">
-    ///     <item>Segment, Triangle, Segment, Quad</item>
+    ///     <item>Segment, Triangle | Segment, Quad</item>
     ///     <item> Two scenarios:
     ///         <list type="number">
     ///             <item>On <c>Segment, Triangle</c>, one side product - the other side</item>
@@ -85,6 +85,20 @@ public enum Relation
     /// </list>
     /// </summary>
     MIDSEGMENT,
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Vertex, Triangle</item>
+    ///     <item>No side products</item>
+    /// </list>
+    /// </summary>
+    BISECTOR_INTERSECTION,
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Vertex, Triangle</item>
+    ///     <item>No side products</item>
+    /// </list>
+    /// </summary>
+    ANGLEBISECTOR_INTERSECTION,
     /// <summary>
     /// <list type="bullet">
     ///     <item>Segment, Segment</item>

@@ -12,7 +12,6 @@ namespace Dynamically.Solver.Helpers;
 
 public static class DetailQuickCreator
 {
-    public static Detail Connect(this TVertex v1, TVertex v2) => new(v1, Relation.CONNECTED, v2);
     public static Detail On(this TVertex v1, TSegment s1) => new(v1, Relation.ON, s1);
     public static Detail Middle(this TVertex v1, TSegment s1) => new(v1, Relation.MIDDLE, s1);
     public static Detail Tangent(this TSegment s, TCircle c) => new(s, Relation.TANGENT, c);
@@ -28,6 +27,8 @@ public static class DetailQuickCreator
     public static Detail Bisects(this TSegment s, TAngle a) => new(s, Relation.BISECTS, a);
     public static Detail MidSegment(this TSegment s, TTriangle t, TSegment s1) => new(s, Relation.MIDSEGMENT, t, s1);
     public static Detail MidSegment(this TSegment s, TQuad q, TSegment s1, TSegment s2) => new(s, Relation.MIDSEGMENT, q, s1, s2);
+    public static Detail BisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.BISECTOR_INTERSECTION, t);
+    public static Detail AngleBisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.ANGLEBISECTOR_INTERSECTION, q);
 
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
 
@@ -39,7 +40,10 @@ public static class DetailQuickCreator
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TSegment, TSegment) sides3) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_S, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, sides3.Item1, sides3.Item2);
     public static Detail Congruent(this TTriangle t1, TTriangle t2, (TSegment, TSegment) sides1, (TSegment, TSegment) sides2, (TAngle, TAngle) angles) => new(t1, Relation.TRIANGLE_CONGRUENCY_S_S_A, t2, sides1.Item1, sides1.Item2, sides2.Item1, sides2.Item2, angles.Item1, angles.Item2);
 
-    public static Detail MarkIsosceles(this TTriangle triangle, ValueTuple<TSegment, TSegment> equals) => new(triangle, Relation.TRIANGLE_ISOSCELES) {}
+    public static Detail MarkAuxiliary(this ExerciseToken s) => new Detail(s, Relation.NEW) { DefinesAuxiliary = true };
+
+
+    public static Detail MarkIsosceles(this TTriangle triangle, ValueTuple<TSegment, TSegment> equals) => new(triangle, Relation.TRIANGLE_ISOSCELES) { SideProducts = new() { equals.Item1, equals.Item2} };
 
     public static Detail MarkParallelogram(this TQuad quad) => new(quad, Relation.QUAD_PARALLELOGRAM) { SideProducts = new() {quad.V1V2, quad.V3V4, quad.V2V3, quad.V1V4} };
     public static Detail MarkRhombus(this TQuad quad) => new(quad, Relation.QUAD_RHOMBUS);
@@ -75,7 +79,6 @@ public static class DetailQuickCreator
         return detail;
     }
 
-    public static Detail MarkAuxiliary(this Detail s) { s.DefinesAuxiliary = true; return s; }
     public static Detail MarkReasonExplicit(this Detail s, Reason reason) { s.Reason = reason; return s; }
 
 

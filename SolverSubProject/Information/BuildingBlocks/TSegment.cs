@@ -29,7 +29,7 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
 
     /// <summary>
     /// <code>
-    /// <br/>            V1 / 
+    /// <br/>              V1 / 
     /// <br/>                /
     /// <br/>               / V2
     /// <br/>              / 
@@ -44,6 +44,8 @@ public class TSegment : ExerciseToken, IMountable, IConstructed
 
     public TVertex V1 {get => (TVertex)Parts.First(); }
     public TVertex V2 {get => (TVertex)Parts.Last(); }
+
+    public TVertex[] Vertices => new[] { V1, V2 };
 
     public TSegment(TVertex first, TVertex last)
     {
