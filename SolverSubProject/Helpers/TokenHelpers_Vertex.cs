@@ -25,4 +25,9 @@ public static partial class TokenHelpers
         seg.ParentPool.AddDetail(detail);
         return (seg, detail);
     }
+
+    public static IEnumerable<TAngle> GetAngles(this TVertex vertex)
+    {
+        return vertex.ParentPool.Elements.Where(x => x is TAngle angle && angle.Origin == vertex).Cast<TAngle>();
+    }
 }

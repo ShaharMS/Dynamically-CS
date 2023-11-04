@@ -1,6 +1,7 @@
 ﻿using Dynamically.Backend;
 using Dynamically.Solver.Details;
 using Dynamically.Solver.Information.BuildingBlocks;
+using HonkSharp.Functional;
 using SolverSubProject.Information;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ public static class DetailQuickCreator
     public static Detail MidSegment(this TSegment s, TTriangle t, TSegment s1) => new(s, Relation.MIDSEGMENT, t, s1);
     public static Detail MidSegment(this TSegment s, TQuad q, TSegment s1, TSegment s2) => new(s, Relation.MIDSEGMENT, q, s1, s2);
     public static Detail BisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.BISECTOR_INTERSECTION, t);
-    public static Detail AngleBisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.ANGLEBISECTOR_INTERSECTION, q);
+    public static Detail AngleBisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.ANGLEBISECTOR_INTERSECTION, t);
 
     public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
 
@@ -74,6 +75,8 @@ public static class DetailQuickCreator
         return detail;
     }
 
+    public static Detail AddReferences(this Detail detail, IEnumerable<Detail> Refs) => AddReferences(detail, Refs.ToArray());
+
     public static Detail AddSideProducts(this Detail detail, params ExerciseToken[] SideProducts) {
         detail.SideProducts.AddRange(SideProducts);
         return detail;
@@ -84,7 +87,8 @@ public static class DetailQuickCreator
 
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Left == a && x.Right == b);
     public static bool Has(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Any(x => x.Operator == r && x.Left == a);
- 
+    public static bool Has(this List<Detail> availableDetails, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && x.Right == b);
+
     public static bool UnorderedHas(this List<Detail> availableDetails, ExerciseToken a, Relation r, ExerciseToken b) => availableDetails.Any(x => x.Operator == r && ((x.Left == a && x.Right == b) || (x.Left == b && x.Right == a)));
     public static bool UnorderedHas(this List<Detail> availableDetails, ExerciseToken a, Relation r) => availableDetails.Any(x => x.Operator == r && (x.Left == a || x.Right == a));
 

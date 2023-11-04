@@ -429,6 +429,66 @@ public class Extractor
         }
     }
 
+    [Reason(Reason.POINT_ON_ANGLEBISECTOR_EQUAL_DISTANCE_TO_SIDES)]
+    public static IEnumerable<Detail?> AngleBisectorProperties_A(TSegment angleBisector)
+    {
+        var mounts = angleBisector.AllMounts.Where(x => x is TVertex).Cast<TVertex>();
+
+        var anglesBisected = angleBisector.ParentPool.AvailableDetails.GetMany(angleBisector, Relation.BISECTS)
+            .Where(x => x.Right is TAngle)
+            .Select(x => x.Right as TAngle);
+
+        return E(); // Todo: figure out how to approach this, returning distances is impossible and creating a bunch of perpendiculars doesnt make sense.
+    }
+
+    [Reason(Reason.POINT_IN_EQUAL_DISTANCE_TO_SIDES_IS_ON_ANGLEBISECTOR)]
+    public static IEnumerable<Detail?> IsSegmentAngleBisector_A(TSegment angleBisector)
+    {
+        var mounts = angleBisector.AllMounts.Where(x => x is TVertex).Cast<TVertex>();
+
+        var anglesV1 = angleBisector.V1.GetAngles();
+        var anglesV2 = angleBisector.V2.GetAngles();
+
+        foreach (var mount in mounts)
+        {
+            foreach (var angle in anglesV1)
+            {
+                TSegment segment1 = angle.Segment1, segment2 = angle.Segment2;
+                List<Detail?> detail1 = new(), detail2 = new();
+
+                List<TSegment> segment1MountsSegment = segment1.AllMounts.Where(x => x is TVertex)
+                    .Cast<TVertex>()
+                    .Select(x => x.GetOrCreateSegment(mount))
+                    .Select(x => { detail1.Add(x.Item2); return x.Item1; })
+                    .ToList();
+                    
+                List<TValue> segment1MountsLength = segment1MountsSegment.Select(x => { return x.GetValue(); }).ToList();
+
+                List<TSegment> segment2MountsSegment = segment2.AllMounts.Where(x => x is TVertex)
+                    .Cast<TVertex>()
+                    .Select(x => x.GetOrCreateSegment(mount))
+                    .Select(x => { detail2.Add(x.Item2); return x.Item1; })
+                    .ToList();
+                    
+                List<TValue> segment2MountsLength = segment2MountsSegment.Select(x => { return x.GetValue(); }).ToList();
+
+                var intersection = segment1MountsLength.Intersect(segment2MountsLength);
+
+                if (intersection.Any())
+                {
+                    yield return angleBisector.Bisects(angle)
+                        .AddReferences(detail1.FilterNulls())
+                        .AddReferences(detail2.FilterNulls())
+                        .AddReferences(
+                            segment1MountsSegment.ElementAt(segment1MountsLength.IndexOf(intersection.First())).GetValueDetail(),
+                            segment2MountsSegment.ElementAt(segment2MountsLength.IndexOf(intersection.First())).GetValueDetail(),
+                            segment1MountsSegment.ElementAt(segment1MountsLength.IndexOf(intersection.First())).GetEqualityDetail(segment2MountsSegment.ElementAt(segment2MountsLength.IndexOf(intersection.First())))
+                        );
+                }
+
+            }
+        }
+    }
     /*                                                                                                                             
 
         █████████                                                             ███      █████          
@@ -930,7 +990,6 @@ public class Extractor
         {
             foreach (var pair2 in bisectors.Except(pair))
             {
-                if (pair.bisector.Overlaps(pair2.bisector)) continue;
                 yield return pair.bisector.Intersects(pair2.bisector, vertex).AddReferences(
                     all.EnsuredGet(pair.bisector, Relation.BISECTS, pair.side),
                     all.EnsuredGet(pair2.bisector, Relation.BISECTS, pair2.side)
@@ -940,9 +999,10 @@ public class Extractor
 
 
         yield return vertex.BisectorIntersection(triangle).AddReferences(
-        // Todo - Lazy rn ;)
+            from pair in bisectors select all.EnsuredGet(pair.bisector, Relation.BISECTS, pair.side)
         );
     }
+
     [Reason(Reason.TRIANGLE_BISECTORS_INTERSECT_RATIO_1_FAR_2_CLOSE)]
     public static IEnumerable<Detail?> TriangleProperties_K(TTriangle triangle)
     {
@@ -1348,4 +1408,11 @@ public class Extractor
            █:::::::::::█ █:::::█ █::::█           █:::::::::::█ █::::::█ █::::::::████████  
                █████████ ███████ ██████             ██████████ █████████    ██████████████ 
     */
+    [Reason(Reason.TRIANGLE_ANGLEBISECTORS_INTERSECT_INCIRCLE_CENTER)]
+
+    public static IEnumerable<Detail?> AngleBisectorIntersectionProperties_A(TTriangle triangle)
+    {
+        if (!triangle.ParentPool.AvailableDetails.Has(Relation.ANGLEBISECTOR_INTERSECTION, triangle)) return E();
+
+    }
 }
