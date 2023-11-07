@@ -12,7 +12,7 @@ public abstract class Formula
 {
     public List<Action> OnChange = new();
     public List<Action<double, double, double, double>> OnMoved = new();
-    public List<Joint> Followers = new();
+    public List<Vertex> Followers = new();
 
     public bool queueRemoval = false;
     public abstract double[] SolveForX(double y);
@@ -54,14 +54,14 @@ public abstract class Formula
         OnChange.Add(UpdateFollowers);
     }
 
-    public virtual void AddFollower(Joint joint)
+    public virtual void AddFollower(Vertex joint)
     {
         Followers.Add(joint);
         joint.PositioningByFormula.Add(UpdateJointPosition);
         joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
     }
 
-    public virtual void RemoveFollower(Joint joint)
+    public virtual void RemoveFollower(Vertex joint)
     {
         Followers.Remove(joint);
         joint.PositioningByFormula.Remove(UpdateJointPosition);

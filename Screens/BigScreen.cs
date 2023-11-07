@@ -93,24 +93,24 @@ public class BigScreen : DraggableGraphic
         }
     }
 
-    public void HandleCreateConnection(Joint from, Joint potential, Dictionary<Role, List<object>>? requiresRoles = null)
+    public void HandleCreateConnection(Vertex from, Vertex potential, Dictionary<Role, List<object>>? requiresRoles = null)
     {
-        var filtered = new List<Joint>();
+        var filtered = new List<Vertex>();
         if (requiresRoles != null)
         {
-            foreach (var j in Joint.all)
+            foreach (var j in Vertex.all)
             {
                 if (j.Roles.Has(requiresRoles)) filtered.Add(j);
             }
         }
-        else filtered = Joint.all;
+        else filtered = Vertex.all;
         filtered.Remove(potential);
 
 
         potential.ForceStartDrag(MainWindow.Mouse);
         var current = potential;
 
-        var alreadyDisconnected = new List<Joint>();
+        var alreadyDisconnected = new List<Vertex>();
         foreach (var j in filtered) if (!j.IsConnectedTo(from)) alreadyDisconnected.Add(j);
         from.Connect(current);
 
@@ -155,7 +155,7 @@ public class BigScreen : DraggableGraphic
 #pragma warning restore CS8604 // Possible null reference argument.
             } else
             {
-                if (!Joint.all.Contains(potential)) Joint.all.Add(potential); // Todo - shouldnt be necessary, need to resolve later
+                if (!Vertex.all.Contains(potential)) Vertex.all.Add(potential); // Todo - shouldnt be necessary, need to resolve later
 #pragma warning disable CS8604 // Possible null reference argument.
                 potential.CreateBoardRelationsWith(from, from.GetConnectionTo(potential));
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -189,7 +189,7 @@ public class BigScreen : DraggableGraphic
         }
 
         if (FocusedObject is BigScreen) Log.Write("No object is focused");
-        else if (FocusedObject is Joint joint) Log.Write($"{joint.Id} Is Focused");
+        else if (FocusedObject is Vertex joint) Log.Write($"{joint.Id} Is Focused");
         else if (FocusedObject is Segment connection) Log.Write($"{connection} Is Focused");
         else if (FocusedObject is Angle angle) Log.Write($"{angle} Is Focused");
         else if (FocusedObject is Circle circle) Log.Write($"Circle {circle} Is Focused");
@@ -258,7 +258,7 @@ public class BigScreen : DraggableGraphic
         }
         /*
         if (HoveredObject is BigScreen) Log.Write("No object is hovered");
-        else if (HoveredObject is Joint joint) Log.Write($"{joint.Id} Is Hovered");
+        else if (HoveredObject is Vertex joint) Log.Write($"{joint.Id} Is Hovered");
         else if (HoveredObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
         else if (HoveredObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Hovered");

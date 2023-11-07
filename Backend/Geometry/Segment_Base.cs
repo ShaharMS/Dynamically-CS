@@ -53,10 +53,10 @@ public partial class Segment : DraggableGraphic
         }
     }
 
-    public Joint joint1 { get; private set; }
-    public Joint joint2 { get; private set;}
+    public Vertex joint1 { get; private set; }
+    public Vertex joint2 { get; private set;}
 
-    public List<Action<Joint, Joint>> OnRemoved = new();
+    public List<Action<Vertex, Vertex>> OnRemoved = new();
     public RoleMap Roles { get; set; }
 
     double org1X;
@@ -106,7 +106,7 @@ public partial class Segment : DraggableGraphic
     }
 
     Action labelUpdater = () => { };
-    public Segment(Joint f, Joint t)
+    public Segment(Vertex f, Vertex t)
     {
         joint1 = f;
         joint2 = t;
@@ -190,7 +190,7 @@ public partial class Segment : DraggableGraphic
         InvalidateVisual();
     }
 
-    public Segment ReplaceJoint(Joint joint, Joint by)
+    public Segment ReplaceJoint(Vertex joint, Vertex by)
     {
         if (joint1 == joint)
         {

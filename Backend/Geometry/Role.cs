@@ -9,7 +9,7 @@ namespace Dynamically.Backend.Geometry;
 
 public enum Role
 {
-    // Joint
+    // Vertex
     RAY_On,
 
     SEGMENT_Corner,

@@ -63,14 +63,14 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
         return joint1 == s.joint1 || joint1 == s.joint2 || joint2 == s.joint1 || joint2 == s.joint2;
     }
 
-    public Joint? GetSharedJoint(Segment s)
+    public Vertex? GetSharedJoint(Segment s)
     {
         if (s.joint1 == joint1 || s.joint2 == joint1) return joint1;
         if (s.joint1 == joint2 || s.joint2 == joint2) return joint2;
         return null;
     }
 
-    public bool Contains(Joint joint)
+    public bool Contains(Vertex joint)
     {
         return joint1 == joint || joint2 == joint;
     }
@@ -80,7 +80,7 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
         return segment.Contains(joint1) && segment.Contains(joint2);
     }
 
-    public bool HasMounted(Joint joint)
+    public bool HasMounted(Vertex joint)
     {
         return Formula.Followers.Contains(joint) || MiddleFormula.Followers.Contains(joint);
     }

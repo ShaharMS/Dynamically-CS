@@ -263,9 +263,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     ir.Click += (sender, e) =>
                     {
                         var ang = details.Split(",")[0].Remove(0, 1);
-                        var main = Joint.GetJointById(ang[1]);
-                        var v1 = Joint.GetJointById(ang[0]);
-                        var v2 = Joint.GetJointById(ang[2]);
+                        var main = Vertex.GetJointById(ang[1]);
+                        var v1 = Vertex.GetJointById(ang[0]);
+                        var v2 = Vertex.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.ISOSCELES_RIGHT, v1, main, v2);
                         Regenerate();
@@ -283,16 +283,16 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                         var joints = string.Join("", details.Split(" = "));
                         var dict = new Dictionary<char, int>();
                         foreach (char c in joints) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
-                        Joint? main = null, v1 = null, v2 = null;
+                        Vertex? main = null, v1 = null, v2 = null;
 
                         foreach (KeyValuePair<char, int> pair in dict)
                         {
                             if (pair.Value == 1)
                             {
-                                if (v1 == null) v1 = Joint.GetJointById(pair.Key);
-                                else if (v2 == null) v2 = Joint.GetJointById(pair.Key);
+                                if (v1 == null) v1 = Vertex.GetJointById(pair.Key);
+                                else if (v2 == null) v2 = Vertex.GetJointById(pair.Key);
                             }
-                            else main = Joint.GetJointById(pair.Key);
+                            else main = Vertex.GetJointById(pair.Key);
                         }
 
                         if (v1 == null || main == null || v2 == null) return;
@@ -310,9 +310,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     r.Click += (sender, e) =>
                     {
                         var ang = details.Remove(0, 1);
-                        var main = Joint.GetJointById(ang[1]);
-                        var v1 = Joint.GetJointById(ang[0]);
-                        var v2 = Joint.GetJointById(ang[2]);
+                        var main = Vertex.GetJointById(ang[1]);
+                        var v1 = Vertex.GetJointById(ang[0]);
+                        var v2 = Vertex.GetJointById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.RIGHT, v1, main, v2);
                         Regenerate();

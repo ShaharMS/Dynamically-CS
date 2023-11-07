@@ -35,8 +35,8 @@ public partial class Angle : DraggableGraphic
     }
     
 
-    Joint _c;
-    public Joint Center
+    Vertex _c;
+    public Vertex Center
     {
         get => _c;
         set
@@ -46,8 +46,8 @@ public partial class Angle : DraggableGraphic
             _c.OnMoved.Add(__updateAngle);
         }
     }
-    Joint _j1;
-    public Joint joint1
+    Vertex _j1;
+    public Vertex joint1
     {
         get => _j1;
         set
@@ -57,8 +57,8 @@ public partial class Angle : DraggableGraphic
             _j1.OnMoved.Add(__updateAngle);
         }
     }
-    Joint _j2;
-    public Joint joint2
+    Vertex _j2;
+    public Vertex joint2
     {
         get => _j2;
         set
@@ -99,7 +99,7 @@ public partial class Angle : DraggableGraphic
 
     Action labelUpdater = () => { };
 
-    public Angle(Joint v1, Joint c, Joint v2, bool large = false)
+    public Angle(Vertex v1, Vertex c, Vertex v2, bool large = false)
     {
         _c = c;
         _j1 = v1;
@@ -131,7 +131,7 @@ public partial class Angle : DraggableGraphic
 
         Children.Add(Label);
 
-        foreach (Joint v in new[] { v1, v2, c }) v.OnRemoved.Add((_, _) => { RemoveFromBoard(); });
+        foreach (Vertex v in new[] { v1, v2, c }) v.OnRemoved.Add((_, _) => { RemoveFromBoard(); });
 
 
 
@@ -229,7 +229,7 @@ public partial class Angle : DraggableGraphic
         var x = Center.X + len * Math.Cos(middleAngle);
         var y = Center.Y + len * Math.Sin(middleAngle);
         
-        var nj = new Joint(x, y);
+        var nj = new Vertex(x, y);
         nj.Roles.AddToRole(Role.RAY_On, BisectorRay);
         var segment = Center.Connect(nj);
         segment.Roles.AddToRole(Role.ANGLE_Bisector, this);
@@ -239,7 +239,7 @@ public partial class Angle : DraggableGraphic
 
     public double GetBisectorRadians() =>((Center.RadiansTo(joint1) + Center.RadiansTo(joint2) + Math.PI) % (2 * Math.PI) - Math.PI) / 2;
 
-    public static bool Exists(Joint center, Joint j1, Joint j2)
+    public static bool Exists(Vertex center, Vertex j1, Vertex j2)
     {
         if (center == j1 || j1 == j2 || center == j2) return false;
         foreach (Angle a in all)
@@ -251,11 +251,11 @@ public partial class Angle : DraggableGraphic
 
     public static bool Exists(char cid, char id1, char id2)
     {
-        var c = Joint.GetJointById(cid);
+        var c = Vertex.GetJointById(cid);
         if (c == null) return false;
-        var j1 = Joint.GetJointById(id1);
+        var j1 = Vertex.GetJointById(id1);
         if (j1 == null) return false;
-        var j2 = Joint.GetJointById(id2);
+        var j2 = Vertex.GetJointById(id2);
         if (j2 == null) return false;
         return Exists(c, j1, j2);
     }

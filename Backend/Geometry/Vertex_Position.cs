@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint
+public partial class Vertex
 {
     bool _anchored;
     public bool Anchored
@@ -23,8 +23,8 @@ public partial class Joint
 
     public override bool Draggable { get => base.Draggable && !Anchored; set => base.Draggable = value; }
 
-    public override double X { get => base.X; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Joint {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
-    public override double Y { get => base.Y; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Joint {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
+    public override double X { get => base.X; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Vertex {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
+    public override double Y { get => base.Y; set { if (dispatchingOnMoved) throw new ConstraintException($"Cannot edit Vertex {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
 
     public List<Func<double, double, (double X, double Y)>> PositioningByFormula = new();
 

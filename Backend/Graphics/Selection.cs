@@ -38,17 +38,17 @@ public class Selection : DraggableGraphic, IStringifyable
             double offsetX = x - px, offsetY = y - py;
             foreach (var item in EncapsulatedElements)
             {
-                if (item is not Joint) continue;
+                if (item is not Vertex) continue;
                 item.X += offsetX;
                 item.Y += offsetY;
             }
-            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnMovedEvents();
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnMovedEvents();
         });
         OnDragStart.Add(() => {
-            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnDragStartEvents();
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDragStartEvents();
         });
         OnDragged.Add((_, _, _ ,_) => {
-            foreach (var item in EncapsulatedElements) if (item is Joint) item.DispatchOnDraggedEvents();
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDraggedEvents();
         });
 
         ContextMenu = new ContextMenu();
@@ -66,7 +66,7 @@ public class Selection : DraggableGraphic, IStringifyable
             return;
         }
 
-        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
             item.Opacity = 1;
 
         MainWindow.BigScreen.FocusedObject = this;
@@ -80,7 +80,7 @@ public class Selection : DraggableGraphic, IStringifyable
         var pos = e.GetPosition(MainWindow.BigScreen);
         ex = pos.X; ey = pos.Y;
         var rect = Rect; // Use getter once.
-        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
         {
             if (item.EncapsulatedWithin(rect))
             {
@@ -114,7 +114,7 @@ public class Selection : DraggableGraphic, IStringifyable
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Selection = null;
         EncapsulatedElements.Clear();
-        foreach (var element in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (var element in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
         {
             element.Opacity = 1;
         }

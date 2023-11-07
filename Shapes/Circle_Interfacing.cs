@@ -78,7 +78,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         return radius * radius * Math.PI;
     }
 
-    public bool Contains(Joint joint)
+    public bool Contains(Vertex joint)
     {
         return joint == center;
     }
@@ -88,7 +88,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         return false;
     }
 
-    public bool HasMounted(Joint joint)
+    public bool HasMounted(Vertex joint)
     {
         return joint.Roles.Has(Role.CIRCLE_On, this);
     }

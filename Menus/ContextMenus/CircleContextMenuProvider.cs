@@ -36,7 +36,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         Defaults = new List<Control>
         {
             Defaults_Dismantle(),
-            Defaults_Remove()
+            Defaults_HideCenter()
         };
     }
 
@@ -93,17 +93,18 @@ public class CircleContextMenuProvider : ContextMenuProvider
     }
 
 
-    MenuItem Defaults_Remove()
+    MenuItem Defaults_HideCenter()
     {
-        var remove = new MenuItem
+        var hide = new MenuItem
         {
-            Header = $"Remove {Subject.center.ToString(true)}"
+            Header = Subject.center.Hidden ? $"Show Center ({Subject.center.ToString()})" : $"Hide Center ({Subject.center.ToString()})"
         };
-        remove.Click += (sender, e) =>
+        hide.Click += (sender, e) =>
         {
-            Subject.center.RemoveFromBoard();
+            Subject.center.Hidden = !Subject.center.Hidden;
+            Regenerate();
         };
-        return remove;
+        return hide;
     }
 
     // -------------------------------------------------------
@@ -120,7 +121,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.BigScreen.HandleCreateConnection(Subject.center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
@@ -137,11 +138,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.BigScreen.HandleCreateConnection(Subject.center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
-            var j1 = new Joint(j.X - (j.X - Subject.center.X) * 2, j.Y - (j.Y - Subject.center.Y) * 2);
+            var j1 = new Vertex(j.X - (j.X - Subject.center.X) * 2, j.Y - (j.Y - Subject.center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);
             j1.Connect(Subject.center);
 
@@ -172,11 +173,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
                 item.Click += (_, _) =>
                 {
                     Point[] intersections = Subject.Formula.Intersect(element.Formula);
-                    List<Joint> existing = Subject.Formula.Followers.Intersect((List<Joint>)element.Formula.Followers).ToList();
+                    List<Vertex> existing = Subject.Formula.Followers.Intersect((List<Vertex>)element.Formula.Followers).ToList();
                     foreach (var p in intersections)
                     {
                         if (existing.ContainsRoughly(p)) continue;
-                        var j = new Joint(p);
+                        var j = new Vertex(p);
                         j.X = p.X; j.Y = p.Y;
                         if (element is Circle) j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                         else j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);

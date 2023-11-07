@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable
+public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable
 {
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
@@ -19,7 +19,7 @@ public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuPr
     /// </summary>
     public RoleMap Roles { get; set; }
 
-    public JointContextMenuProvider Provider { get; }
+    public VertexContextMenuProvider Provider { get; }
 
     public void reposition()
     {
@@ -52,7 +52,7 @@ public partial class Joint : IDrawable, IContextMenuSupporter<JointContextMenuPr
     public string ToString(bool descriptive)
     {
         if (!descriptive) return ToString();
-        return "Joint " + Id;
+        return "Vertex " + Id;
     }
 
     public bool EncapsulatedWithin(Rect rect)

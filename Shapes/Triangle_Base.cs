@@ -22,9 +22,9 @@ public partial class Triangle : DraggableGraphic
 
     public static readonly List<Triangle> all = new();
 
-    public Joint joint1;
-    public Joint joint2;
-    public Joint joint3;
+    public Vertex joint1;
+    public Vertex joint2;
+    public Vertex joint3;
 
     public Segment con12;
     public Segment con13;
@@ -43,7 +43,7 @@ public partial class Triangle : DraggableGraphic
     public Circle? circumcircle;
     public Circle? incircle;
 //public EquilateralTriangleFormula EquilateralFormula;
-    public Triangle(Joint j1, Joint j2, Joint j3)
+    public Triangle(Vertex j1, Vertex j2, Vertex j3)
     {
         if (Exists(j1, j2, j3)) return;
 
@@ -109,7 +109,7 @@ public partial class Triangle : DraggableGraphic
     {
         var stats = GetCircleStats();
 
-        var circle = new Circle(new Joint(stats.x, stats.y), stats.r);
+        var circle = new Circle(new Vertex(stats.x, stats.y), stats.r);
         circle.center.Draggable = false;
         circle.Draggable = false;
         incircle = circle;
@@ -213,12 +213,12 @@ public partial class Triangle : DraggableGraphic
         }
     }
 
-    public bool IsDefinedBy(Joint j1, Joint j2, Joint j3)
+    public bool IsDefinedBy(Vertex j1, Vertex j2, Vertex j3)
     {
-        var arr = new Joint[] { j1, j2, j3 };
+        var arr = new Vertex[] { j1, j2, j3 };
         return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3);
     }
-    public static bool Exists(Joint j1, Joint j2, Joint j3)
+    public static bool Exists(Vertex j1, Vertex j2, Vertex j3)
     {
         foreach (var triangle in all)
         {
@@ -228,11 +228,11 @@ public partial class Triangle : DraggableGraphic
     }
     public static bool Exists(char cid, char id1, char id2)
     {
-        var c = Joint.GetJointById(cid);
+        var c = Vertex.GetJointById(cid);
         if (c == null) return false;
-        var j1 = Joint.GetJointById(id1);
+        var j1 = Vertex.GetJointById(id1);
         if (j1 == null) return false;
-        var j2 = Joint.GetJointById(id2);
+        var j2 = Vertex.GetJointById(id2);
         if (j2 == null) return false;
         return Exists(c, j1, j2);
     }

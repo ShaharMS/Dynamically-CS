@@ -224,11 +224,11 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     {
         var c = new MenuItem
         {
-            Header = "Create Interior Joint"
+            Header = "Create Interior Vertex"
         };
         c.Click += (o, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
 
             j.ForceStartDrag(MainWindow.Mouse);
@@ -245,7 +245,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         m.Click += (o, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
         };
 
@@ -260,12 +260,12 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MakeStraight()
     {
-        List<Joint> candidatesj1 = new(), candidatesj2 = new();
-        foreach (Joint j in Subject.joint1.Relations)
+        List<Vertex> candidatesj1 = new(), candidatesj2 = new();
+        foreach (Vertex j in Subject.joint1.Relations)
         {
             if (Tools.QualifiesForStraighten(Subject.joint2, j, Subject.joint1) && Math.Abs(Subject.joint1.DegreesTo(j) - Subject.joint2.DegreesTo(Subject.joint1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
         }
-        foreach (Joint j in Subject.joint2.Relations)
+        foreach (Vertex j in Subject.joint2.Relations)
         {
             if (Tools.QualifiesForStraighten(Subject.joint1, j, Subject.joint2) && Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
         }
@@ -280,7 +280,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             };
             item.Click += (sender, e) =>
             {
-                Joint j1 = Subject.joint1, j2 = Subject.joint2;
+                Vertex j1 = Subject.joint1, j2 = Subject.joint2;
                 j1.Disconnect(j2, joint);
                 j1.Roles.AddToRole(Role.SEGMENT_On, j2.Connect(joint));
             };
@@ -295,7 +295,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             };
             item.Click += (sender, e) =>
             {
-                Joint j1 = Subject.joint1, j2 = Subject.joint2;
+                Vertex j1 = Subject.joint1, j2 = Subject.joint2;
                 var followers = Subject.Formula.Followers.ToList().Concat(Subject.MiddleFormula.Followers);
                 var prev = j2.GetConnectionTo(joint);
                 if (prev != null)
@@ -385,18 +385,18 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                 {
                     if (element is Segment)
                     {
-                        var j = new Joint(0, 0);
+                        var j = new Vertex(0, 0);
                         j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
                         j.Roles.AddToRole(Role.SEGMENT_On, Subject);
                     }
                     else
                     { // element is Circle
                         Point[] intersections = Subject.Formula.Intersect(element.Formula);
-                        List<Joint> existing = Subject.Formula.Followers.Intersect((List<Joint>)element.Formula.Followers).ToList();
+                        List<Vertex> existing = Subject.Formula.Followers.Intersect((List<Vertex>)element.Formula.Followers).ToList();
                         foreach (var p in intersections)
                         {
                             if (existing.ContainsRoughly(p)) continue;
-                            var j = new Joint(p);
+                            var j = new Vertex(p);
                             j.X = p.X; j.Y = p.Y;
                             j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                             j.Roles.AddToRole(Role.SEGMENT_On, Subject);

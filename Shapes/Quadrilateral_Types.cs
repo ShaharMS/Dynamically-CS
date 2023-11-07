@@ -16,7 +16,7 @@ public partial class Quadrilateral
     /// ABC most similar to 90deg, position of B is preserved.
     /// length of side is Avg of AB and BC
     /// </summary>
-    public void MakeSquareRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeSquareRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
 
@@ -37,7 +37,7 @@ public partial class Quadrilateral
         D.Y = C.Y + dist * Math.Sin(radBA + remainingGap / 2 * oppose);
     }
 
-    public void MakeRhombusRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeRhombusRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
 
@@ -52,7 +52,7 @@ public partial class Quadrilateral
         CD?.SetLength(length, CD.joint1 == C);
     }
 
-    public void MakeRectangleRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeRectangleRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
 
@@ -73,7 +73,7 @@ public partial class Quadrilateral
         D.Y = C.Y + length1 * Math.Sin(radBA + remainingGap / 2 * oppose);
     }
 
-    public void MakeParallelogramRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeParallelogramRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
@@ -83,7 +83,7 @@ public partial class Quadrilateral
         D.Y = A.Y + B.DistanceTo(C) * Math.Sin(radBC);
     }
 
-    public void MakeKiteRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeKiteRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         double length1 = (A.DistanceTo(B) + C.DistanceTo(B)) / 2, length2 = (A.DistanceTo(D) + C.DistanceTo(D)) / 2;
@@ -104,7 +104,7 @@ public partial class Quadrilateral
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    public void MakeTrapezoidRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
@@ -119,7 +119,7 @@ public partial class Quadrilateral
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    public void MakeIsoscelesTrapezoidRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeIsoscelesTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
@@ -134,7 +134,7 @@ public partial class Quadrilateral
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    public void MakeRightTrapezoidRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeRightTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
@@ -151,7 +151,7 @@ public partial class Quadrilateral
         D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
         D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
     }
-    public void ForceType(QuadrilateralType type, Joint A, Joint B, Joint C)
+    public void ForceType(QuadrilateralType type, Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { joint1, joint2, joint3, joint4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         Point a, b, c, d;
@@ -214,8 +214,8 @@ public partial class Quadrilateral
                         similarity3 = adjacents[2].Item1.Length.GetSimilarityPercentage(adjacents[2].Item2.Length),
                         similarity4 = adjacents[3].Item1.Length.GetSimilarityPercentage(adjacents[3].Item2.Length);
                 var similar = similarity1.Min(similarity2).Min(similarity3).Min(similarity4);
-                IEnumerable<Joint> set = new List<Joint>();
-                Joint? focus = null;
+                IEnumerable<Vertex> set = new List<Vertex>();
+                Vertex? focus = null;
                 if (similar == similarity1)
                 {
                     set = new[] { adjacents[0].Item1.joint1, adjacents[0].Item1.joint2, adjacents[0].Item2.joint1, adjacents[0].Item2.joint2 }.Where(x => x != adjacents[0].Item1.GetSharedJoint(adjacents[0].Item2));

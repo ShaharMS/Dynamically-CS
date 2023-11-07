@@ -20,10 +20,10 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint : DraggableGraphic
+public partial class Vertex : DraggableGraphic
 {
 
-    public static readonly List<Joint> all = new();
+    public static readonly List<Vertex> all = new();
 
 
     public char _id = 'A';
@@ -62,8 +62,8 @@ public partial class Joint : DraggableGraphic
         }
     }
 
-    public Joint(Point p) : this(p.X, p.Y) { }
-    public Joint(double x, double y, char id = '_')
+    public Vertex(Point p) : this(p.X, p.Y) { }
+    public Vertex(double x, double y, char id = '_')
     {
 
         IdDisplay = new Label()
@@ -88,7 +88,7 @@ public partial class Joint : DraggableGraphic
         Y = y;
 
         ContextMenu = new ContextMenu();
-        Provider = new JointContextMenuProvider(this, ContextMenu);
+        Provider = new VertexContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
         OnMoved.Add((double _, double _, double _, double _) => reposition());
@@ -183,11 +183,11 @@ public partial class Joint : DraggableGraphic
         MainWindow.regenAll(0, 0, 0, 0);
     }
 
-    public static implicit operator Point(Joint joint) { return new Point(joint.X, joint.Y); }
-    public static implicit operator Joint(Point point) { return new Joint(point.X, point.Y); }
+    public static implicit operator Point(Vertex joint) { return new Point(joint.X, joint.Y); }
+    public static implicit operator Vertex(Point point) { return new Vertex(point.X, point.Y); }
 
 
-    public static Joint? GetJointById(char id)
+    public static Vertex? GetJointById(char id)
     {
         foreach (var joint in all)
         {

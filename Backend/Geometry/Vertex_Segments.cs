@@ -9,13 +9,13 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Joint
+public partial class Vertex
 {
     public List<Segment> Connections = new();
 
-    public List<Joint> Relations = new();
+    public List<Vertex> Relations = new();
 
-    public Segment Connect(Joint to, bool updateRelations = true)
+    public Segment Connect(Vertex to, bool updateRelations = true)
     {
         // Don'q connect something twice
         foreach (Segment c in Connections.Concat(to.Connections))
@@ -37,10 +37,10 @@ public partial class Joint
         return connection;
     }
 
-    public List<Segment> Connect(params Joint[] joints)
+    public List<Segment> Connect(params Vertex[] joints)
     {
         var cons = new List<Segment>();
-        foreach (Joint joint in joints)
+        foreach (Vertex joint in joints)
         {
             var doNothing = false;
             // Don'q connect something twice
@@ -68,18 +68,18 @@ public partial class Joint
         return cons;
     }
 
-    public bool IsConnectedTo(Joint joint)
+    public bool IsConnectedTo(Vertex joint)
     {
         if (this == joint) return false;
         foreach (Segment c in Connections)
         {
-            Joint[] js = new[] { c.joint1, c.joint2 };
+            Vertex[] js = new[] { c.joint1, c.joint2 };
             if (js.Contains(joint) && js.Contains(this)) return true;
         }
         return false;
     }
 
-    public Segment? GetConnectionTo(Joint to)
+    public Segment? GetConnectionTo(Vertex to)
     {
         foreach (Segment c in Connections.Concat(to.Connections))
         {
@@ -88,7 +88,7 @@ public partial class Joint
         return null;
     }
 
-    public void Disconnect(Joint joint)
+    public void Disconnect(Vertex joint)
     {
         var past = Connections.ToList();
         foreach (Segment c in past)
@@ -117,9 +117,9 @@ public partial class Joint
         }
     }
 
-    public void Disconnect(params Joint[] joints)
+    public void Disconnect(params Vertex[] joints)
     {
-        foreach (Joint joint in joints)
+        foreach (Vertex joint in joints)
         {
             var past = Connections.ToList();
             foreach (Segment c in past)
@@ -180,7 +180,7 @@ public partial class Joint
         RepositionText();
     }
 
-    public void CreateBoardRelationsWith(Joint joint, Segment segment)
+    public void CreateBoardRelationsWith(Vertex joint, Segment segment)
     {
         // Basic connection info
 
@@ -244,10 +244,10 @@ public partial class Joint
             }
         }
         // Fourth case - connection a line and forming a quadrilateral
-        foreach (Joint other1 in this.Relations.ToArray())
+        foreach (Vertex other1 in this.Relations.ToArray())
         {
             if (other1 == joint) continue;
-            foreach (Joint other2 in joint.Relations.ToArray())
+            foreach (Vertex other2 in joint.Relations.ToArray())
             {
                 if (other2 == this) continue;
                 if (other1 == other2) continue;

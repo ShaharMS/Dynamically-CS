@@ -71,7 +71,7 @@ public class MathTextBox : Canvas
         };
         TextBox.LayoutUpdated += (s, e) =>
         {
-            Log.WriteVar(MathView.Bounds.Height);
+            //Log.WriteVar(MathView.Bounds.Height);
             // Second pass, incase the first didnt catch the bounds update
             MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
         };

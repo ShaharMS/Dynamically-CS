@@ -31,7 +31,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
         MainWindow.BigScreen.Children.Remove(this);
     }
 
-    public void __Disment(Joint z, Joint x)
+    public void __Disment(Vertex z, Vertex x)
     {
         _ = z; _ = x;
         Dismantle();
@@ -86,7 +86,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
         return double.NaN;
     }
-    public bool Contains(Joint joint)
+    public bool Contains(Vertex joint)
     {
         return joint == joint1 || joint == joint2 || joint == joint3 || joint == joint4;
     }
@@ -96,7 +96,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
         return segment == con1 || segment == con2 || segment == con3 || segment == con4;
     }
 
-    public bool HasMounted(Joint joint)
+    public bool HasMounted(Vertex joint)
     {
         return false;
     }

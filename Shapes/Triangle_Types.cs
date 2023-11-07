@@ -15,14 +15,14 @@ namespace Dynamically.Shapes;
 public partial class Triangle
 {
     private Point EQ_temp_incircle_center = new Point(-1, -1);
-    private void Equilateral_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
+    private void Equilateral_OnJointMove(Vertex moved, Vertex other1, Vertex other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
         if (moved.Anchored || other1.Anchored || other2.Anchored) return;
         var center = EQ_temp_incircle_center;
         var len = center.DistanceTo(moved);
         var angle = center.RadiansTo(moved);
-        var arr = new Joint[2];
+        var arr = new Vertex[2];
 
         if (angle.RadiansBetween(center.RadiansTo(other1), true) > angle.RadiansBetween(center.RadiansTo(other2), true)) arr = new[] { other1, other2 };
         else arr = new[] { other2, other1 };
@@ -35,8 +35,8 @@ public partial class Triangle
         }
     }
 
-    private Joint R_origin;
-    private void Right_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
+    private Vertex R_origin;
+    private void Right_OnJointMove(Vertex moved, Vertex other1, Vertex other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
 
@@ -121,9 +121,9 @@ public partial class Triangle
 
     }
 
-    private Joint ISO_origin;
+    private Vertex ISO_origin;
 
-    private void Isoceles_OnJointMove(Joint moved, Joint other1, Joint other2, double px, double py)
+    private void Isoceles_OnJointMove(Vertex moved, Vertex other1, Vertex other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;
 
@@ -139,7 +139,7 @@ public partial class Triangle
             return;
         }
 
-        Joint j1 = other1, j2 = other2;
+        Vertex j1 = other1, j2 = other2;
         if (j1 == ISO_origin) j1 = moved;
         else if (j2 == ISO_origin) j2 = moved;
 
@@ -165,7 +165,7 @@ public partial class Triangle
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    public void MakeRightRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeRightRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         // ∠ABC is the most similar to 90deg, therefore it should be preserved.
 
@@ -193,7 +193,7 @@ public partial class Triangle
     /// <param name="A"></param>
     /// <param name="B"></param>
     /// <param name="C"></param>
-    public void MakeIsoscelesRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeIsoscelesRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         // ∠ABC is the head angle, therefore its position should be preserved, and should be where the two equals start from.
         // We'll do this by averaging AB and BC, resetting their length, and BC will 
@@ -212,7 +212,7 @@ public partial class Triangle
         ISO_origin = B;
         // Now, After equating the two sides, we're pretty much dones - we've reached teh definition of an isoceles Triangle
     }
-    public void MakeEquilateralRelativeToABC(Joint A, Joint B, Joint C)
+    public void MakeEquilateralRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         // AB and BC are the most similar to each other, so B was chosen. Now, reset the angle
 
@@ -232,11 +232,11 @@ public partial class Triangle
         EQ_temp_incircle_center = new Point(GetCircleStats().x, GetCircleStats().y);
     }
 
-    public void MakeIsoscelesRightRelativeToABC(Joint A, Joint B, Joint C) {
+    public void MakeIsoscelesRightRelativeToABC(Vertex A, Vertex B, Vertex C) {
         MakeRightRelativeToABC(A, B, C);
         MakeIsoscelesRelativeToABC(A, B, C);
     }
-    public void ForceType(TriangleType type, Joint A, Joint B, Joint C) {
+    public void ForceType(TriangleType type, Vertex A, Vertex B, Vertex C) {
         Point a, b, c;
         _type = type;
         do {

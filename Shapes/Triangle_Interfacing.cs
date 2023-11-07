@@ -59,7 +59,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, px, py);
     }
 
-    public void __Disment(Joint z, Joint x)
+    public void __Disment(Vertex z, Vertex x)
     {
         _ = z; _ = x;
         Dismantle();
@@ -119,7 +119,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     }
 
 
-    public bool Contains(Joint joint)
+    public bool Contains(Vertex joint)
     {
         return joint == joint1 || joint == joint2 || joint == joint3;
     }
@@ -129,7 +129,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         return segment == con12 || segment == con13 || segment == con23;
     }
 
-    public bool HasMounted(Joint joint)
+    public bool HasMounted(Vertex joint)
     {
         return false;
     }

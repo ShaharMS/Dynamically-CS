@@ -10,7 +10,7 @@ namespace Dynamically.Formulas;
 
 public class PointFormula : Formula
 {
-    Joint? _driver;
+    Vertex? _driver;
     double _x;    
     public double X
     {
@@ -32,13 +32,13 @@ public class PointFormula : Formula
 
     public PointFormula(Point p) : this(p.X, p.Y) { }
 
-    public PointFormula(Joint j) : this(j.X, j.Y)
+    public PointFormula(Vertex j) : this(j.X, j.Y)
     {
         _driver = j;
         j.OnMoved.Add(Move);
     }
 
-    public void Set(Joint j)
+    public void Set(Vertex j)
     {
         if (_driver != null) _driver.OnMoved.Remove(Move);
         _driver = j;

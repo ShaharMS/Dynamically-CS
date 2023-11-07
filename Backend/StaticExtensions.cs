@@ -22,21 +22,21 @@ public static class StaticExtensions
         return Math.Sqrt(x * x + y * y);
     }
 
-    public static double DistanceTo(this Joint from, Joint to)
+    public static double DistanceTo(this Vertex from, Vertex to)
     {
         double x = from.X - to.X;
         double y = from.Y - to.Y;
         return Math.Sqrt(x * x + y * y);
     }
 
-    public static double DistanceTo(this Joint from, Point to)
+    public static double DistanceTo(this Vertex from, Point to)
     {
         double x = from.X - to.X;
         double y = from.Y - to.Y;
         return Math.Sqrt(x * x + y * y);
     }
 
-    public static double DistanceTo(this Joint from, double X, double Y)
+    public static double DistanceTo(this Vertex from, double X, double Y)
     {
         double x = from.X - X;
         double y = from.Y - Y;
@@ -62,7 +62,7 @@ public static class StaticExtensions
         double y = from.Item2 - to.Y;
         return Math.Sqrt(x * x + y * y);
     }
-    public static double DistanceTo(this (double, double) from, Joint to)
+    public static double DistanceTo(this (double, double) from, Vertex to)
     {
         double x = from.Item1 - to.X;
         double y = from.Item2 - to.Y;
@@ -80,7 +80,7 @@ public static class StaticExtensions
         return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p) ?? new Point(double.NaN, double.NaN)) : double.NaN;
     }
 
-    public static double DistanceTo(this Formula from, Joint j)
+    public static double DistanceTo(this Formula from, Vertex j)
     {
         return DistanceTo(from, j);
     }
@@ -96,7 +96,7 @@ public static class StaticExtensions
         return angleInDegrees;
     }
 
-    public static double DegreesTo(this Joint from, Point to)
+    public static double DegreesTo(this Vertex from, Point to)
     {
         double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
         double angleInDegrees = angleInRadians * (180.0 / Math.PI);
@@ -111,14 +111,14 @@ public static class StaticExtensions
         return angleInRadians;
     }
 
-    public static double RadiansTo(this Joint from, Point to)
+    public static double RadiansTo(this Vertex from, Point to)
     {
         double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
         if (angleInRadians < 0) angleInRadians += Math.PI * 2;
         return angleInRadians;
     }
     public static double RadiansTo(this Point from, double x, double y) => RadiansTo(from, new Point(x, y));
-    public static double RadiansTo(this Joint from, double x, double y) => RadiansTo(from, new Point(x, y));
+    public static double RadiansTo(this Vertex from, double x, double y) => RadiansTo(from, new Point(x, y));
 
     public static double Pow(this double b, double exponent)
     {
@@ -188,18 +188,18 @@ public static class StaticExtensions
     }
 
     public static bool RoughlyEquals(this Point p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Joint p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Vertex p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Point p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Joint p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this (double X, double Y) p, Joint o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Point p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Vertex p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this (double X, double Y) p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
 
     public static bool RoughlyEquals(this Point p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Joint p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Vertex p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
 
     public static bool RoughlyEquals(this Point p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
-    public static bool RoughlyEquals(this Joint p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
+    public static bool RoughlyEquals(this Vertex p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
     public static bool RoughlyEquals(this (double X, double Y) p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
 
     public static bool RoughlyEquals(this double a, double b) => Math.Abs(a - b) < 0.0001;
@@ -221,13 +221,13 @@ public static class StaticExtensions
     public static bool ContainsRoughly(this IEnumerable<int> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<int> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<double> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Joint> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Joint> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Joint> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Point> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<Point> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<Point> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Joint value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
 
@@ -243,7 +243,7 @@ public static class StaticExtensions
                 }
                 break;
             case EQUALITY_OP_TYPE.ROUGH:
-                if (obj is not int && obj is not double && obj is not Point && obj is not Joint && obj is not Tuple<double, double>) goto case EQUALITY_OP_TYPE.REFERENCE;
+                if (obj is not int && obj is not double && obj is not Point && obj is not Vertex && obj is not Tuple<double, double>) goto case EQUALITY_OP_TYPE.REFERENCE;
                 foreach (dynamic other in others)
                 {
                     if (RoughlyEquals(obj as dynamic, other)) return false;

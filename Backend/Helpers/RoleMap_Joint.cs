@@ -14,7 +14,7 @@ namespace Dynamically.Backend.Helpers;
 #pragma warning disable CA1822
 public partial class RoleMap
 {
-    private void Joint__AddToRole<T>(Role role, T item, Joint Subject)
+    private void Joint__AddToRole<T>(Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -39,7 +39,7 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_On:
                 (item as Circle).Formula.AddFollower(Subject);
-                foreach (Joint joint in Subject.Relations) {
+                foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         Subject.CreateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
                     }
@@ -50,7 +50,7 @@ public partial class RoleMap
                 Subject.OnDragStart.Add((item as Circle).__circle_Moving);
                 Subject.OnDragged.Add((item as Circle).__circle_StopMoving);
                 Subject.OnRemoved.Add((item as Circle).__circle_Remove);
-                foreach (Joint joint in Subject.Relations) {
+                foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         Subject.CreateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
                     }
@@ -76,7 +76,7 @@ public partial class RoleMap
         }
     }
 
-    private void Joint__RemoveFromRole<T>(Role role, T item, Joint Subject)
+    private void Joint__RemoveFromRole<T>(Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -100,7 +100,7 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_On:
                 (item as Circle).Formula.RemoveFollower(Subject);
-                foreach (Joint joint in Subject.Relations) {
+                foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         // try for both diameter & chord
                         Subject.GetConnectionTo(joint).Roles.RemoveFromRole(Role.CIRCLE_Chord, item);
@@ -114,7 +114,7 @@ public partial class RoleMap
                 (item as Circle).center.OnDragStart.Remove((item as Circle).__circle_Moving);
                 (item as Circle).center.OnDragged.Remove((item as Circle).__circle_StopMoving);
                 (item as Circle).center.OnRemoved.Remove((item as Circle).__circle_Remove);
-                foreach (Joint joint in Subject.Relations) {
+                foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         joint.Roles.RemoveFromRole(Role.CIRCLE_On, item);
                         Subject.GetConnectionTo(joint).Roles.RemoveFromRole(Role.CIRCLE_Radius, item);
@@ -141,7 +141,7 @@ public partial class RoleMap
         }
     }
 
-    private void Joint__TransferRole<T>(Joint From, Role role, T item, Joint Subject)
+    private void Joint__TransferRole<T>(Vertex From, Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -168,7 +168,7 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_On:
                 (item as Circle).Formula.RemoveFollower(From);
-                foreach (Joint joint in Subject.Relations)
+                foreach (Vertex joint in Subject.Relations)
                 {
                     if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
                     {
@@ -176,7 +176,7 @@ public partial class RoleMap
                     }
                 } 
                 (item as Circle).Formula.AddFollower(Subject);
-                foreach (Joint joint in Subject.Relations)
+                foreach (Vertex joint in Subject.Relations)
                 {
                     if (joint.Roles.Has((Role.CIRCLE_On, Role.CIRCLE_Center), item))
                     {
@@ -186,7 +186,7 @@ public partial class RoleMap
                 break;
             case Role.CIRCLE_Center:
                 (item as Circle).Set(Subject, (item as Circle).radius);
-                foreach (Joint joint in Subject.Relations)
+                foreach (Vertex joint in Subject.Relations)
                 {
                     if (joint.Roles.Has(Role.CIRCLE_On, item))
                     {

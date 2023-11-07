@@ -19,8 +19,8 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
     public static readonly List<EllipseBase> all = new();
 
-    private Joint _f1;
-    public Joint focal1
+    private Vertex _f1;
+    public Vertex focal1
     {
         get => _f1;
         set
@@ -33,8 +33,8 @@ public class EllipseBase : DraggableGraphic, IDrawable
         }
     }
 
-    private Joint _f2;
-    public Joint focal2
+    private Vertex _f2;
+    public Vertex focal2
     {
         get => _f2;
         set
@@ -59,7 +59,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
     public double distanceSum;
 
     internal Ring ring;
-    public EllipseBase(Joint f1, Joint f2, double dSum)
+    public EllipseBase(Vertex f1, Vertex f2, double dSum)
     {
         _f1 = f1;
         _f2 = f2;

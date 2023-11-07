@@ -14,7 +14,7 @@ namespace Dynamically.Backend.Helpers;
 
 class Tools
 {
-    public static Circle CircleFrom3Joints(Joint joint1, Joint joint2, Joint joint3)
+    public static Circle CircleFrom3Joints(Vertex joint1, Vertex joint2, Vertex joint3)
     {
         void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
         {
@@ -57,7 +57,7 @@ class Tools
         double dx = center.X - joint1.X;
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
-        var c = new Joint(center.X, center.Y);
+        var c = new Vertex(center.X, center.Y);
         Circle circle = new Circle(c, radius);
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
@@ -119,7 +119,7 @@ class Tools
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
-        var c = new Joint(center.X, center.Y);
+        var c = new Vertex(center.X, center.Y);
         Circle circle = new Circle(c, radius);
 
         return circle;
@@ -141,9 +141,9 @@ class Tools
     {
         var common = s1.GetSharedJoint(s2);
         if (common == null) return double.NaN;
-        var others = new HashSet<Joint> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        var others = new HashSet<Vertex> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
         others.Remove(common);
-        Joint other1 = others.First(), other2 = others.Last();
+        Vertex other1 = others.First(), other2 = others.Last();
 
         double angle1 = Math.Atan2(other1.Y - common.Y, other1.X - common.X);
         double angle2 = Math.Atan2(other2.Y - common.Y, other2.X - common.X);
@@ -171,9 +171,9 @@ class Tools
     {
         var common = s1.GetSharedJoint(s2);
         if (common == null) return double.NaN;
-        var others = new HashSet<Joint> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        var others = new HashSet<Vertex> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
         others.Remove(common);
-        Joint other1 = others.First(), other2 = others.Last();
+        Vertex other1 = others.First(), other2 = others.Last();
 
         double angle1 = Math.Atan2(other1.Y - common.Y, other1.X - common.X);
         double angle2 = Math.Atan2(other2.Y - common.Y, other2.X - common.X);
@@ -185,7 +185,7 @@ class Tools
         return angle;
     }
 
-    public static bool QualifiesForMerge(Joint j1, Joint j2)
+    public static bool QualifiesForMerge(Vertex j1, Vertex j2)
     {
         // Case 1: CIRCLE_center & CIRCLE_on
         var a1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
@@ -226,7 +226,7 @@ class Tools
         return true;
     }
 
-    public static bool QualifiesForMount(Joint j, dynamic shape)
+    public static bool QualifiesForMount(Vertex j, dynamic shape)
     {
         if (shape is Circle circle)
         {
@@ -255,7 +255,7 @@ class Tools
         return true;
     }
 
-    public static bool QualifiesForStraighten(Joint v1, Joint v2, Joint common) 
+    public static bool QualifiesForStraighten(Vertex v1, Vertex v2, Vertex common) 
     {
         // Case 1: 2 radii -> diameter
         foreach (Circle circle in common.Roles.Access<Circle>(Role.CIRCLE_Center)) {

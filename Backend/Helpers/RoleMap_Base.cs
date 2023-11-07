@@ -33,7 +33,7 @@ public partial class RoleMap
         return underlying.GetEnumerator();
     }
 
-    public Either<Joint, Segment> Subject;
+    public Either<Vertex, Segment> Subject;
 
     public int Count { get; private set; }
     public List<object> this[Role role]
@@ -47,7 +47,7 @@ public partial class RoleMap
         }
     }
 
-    public RoleMap(Either<Joint, Segment> subject) : base()
+    public RoleMap(Either<Vertex, Segment> subject) : base()
     {
         Subject = subject;
         Count = 0;
@@ -148,7 +148,7 @@ public partial class RoleMap
         else underlying[role] = new List<object> { item };
         if (underlying[role].Count == 1) Count++;
 
-        if (Subject.Is<Joint>())  Joint__AddToRole(role, item, Subject.L());
+        if (Subject.Is<Vertex>())  Joint__AddToRole(role, item, Subject.L());
         else Segment__AddToRole(role, item, Subject.R());
 
         return item;
@@ -160,7 +160,7 @@ public partial class RoleMap
         if (list.Count == 1) Count--;
         underlying[role].Remove(item);
 
-        if (Subject.Is<Joint>()) Joint__RemoveFromRole(role, item, Subject.L());
+        if (Subject.Is<Vertex>()) Joint__RemoveFromRole(role, item, Subject.L());
         else Segment__RemoveFromRole(role, item, Subject.R());
         
 
@@ -189,7 +189,7 @@ public partial class RoleMap
                 else underlying[role] = new List<object> { item };
                 if (underlying[role].Count == 1) Count++;
 
-                if (Subject.Is<Joint>()) Joint__TransferRole(Roles.Subject.L(), role, item, Subject.L());
+                if (Subject.Is<Vertex>()) Joint__TransferRole(Roles.Subject.L(), role, item, Subject.L());
                 else Segment__TransferRole(Roles.Subject.R(), role, item, Subject.R());
             }
         }

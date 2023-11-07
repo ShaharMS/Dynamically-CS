@@ -9,9 +9,9 @@ namespace Dynamically.Backend.Helpers;
 
 public class IDGenerator
 {
-    static readonly List<Joint> ids = new();
+    static readonly List<Vertex> ids = new();
 
-    public static void GenerateFor(Joint j)
+    public static void GenerateFor(Vertex j)
     {
         char letter = 'A';
         bool changed;
@@ -33,7 +33,7 @@ public class IDGenerator
         ids.Add(j);
     }
 
-    public static void Remove(Joint j)
+    public static void Remove(Vertex j)
     {
         ids.Remove(j);
     }

@@ -52,20 +52,20 @@ public partial class MainWindow : Window
         
         Menus.TopMenu.applyDefaultStyling();
 
-        var j0 = new Joint(130, 30);
-        var j = new Joint(30, 30);
+        var j0 = new Vertex(130, 30);
+        var j = new Vertex(30, 30);
         j.Connect(j0);
-        var j11 = new Joint(120, 90);
+        var j11 = new Vertex(120, 90);
         j11.Connect(j);
-        var t = new Triangle(new Joint(570, 20), new Joint(750, 10), new Joint(860, 220));
+        var t = new Triangle(new Vertex(570, 20), new Vertex(750, 10), new Vertex(860, 220));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 
-        var t4 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
+        var t4 = new Triangle(new Vertex(70, 500), new Vertex(250, 570), new Vertex(160, 370));
         t4.Type = TriangleType.EQUILATERAL;
-        var t6 = new Triangle(new Joint(70, 500), new Joint(250, 570), new Joint(160, 370));
+        var t6 = new Triangle(new Vertex(70, 500), new Vertex(250, 570), new Vertex(160, 370));
 
-        var q1 = new Quadrilateral(new Joint(600, 350), new Joint(900, 300), new Joint(600, 450), new Joint(900, 600));
+        var q1 = new Quadrilateral(new Vertex(600, 350), new Vertex(900, 300), new Vertex(600, 450), new Vertex(900, 600));
 
 
         new Angle(j0, j, j11);
@@ -77,7 +77,7 @@ public partial class MainWindow : Window
 
 
 
-        foreach (DraggableGraphic obj in Joint.all.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.all)) obj.OnDragged.Add(regenAll);
+        foreach (DraggableGraphic obj in Vertex.all.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.all)) obj.OnDragged.Add(regenAll);
 
         BigScreen.Refresh();
          
@@ -93,7 +93,7 @@ public partial class MainWindow : Window
 
     public static void regenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        foreach (dynamic item in Joint.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
         {
             item.Provider.Regenerate();
         }

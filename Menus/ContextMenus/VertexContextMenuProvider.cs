@@ -23,11 +23,11 @@ using System.Threading;
 
 namespace Dynamically.Menus.ContextMenus;
 
-public class JointContextMenuProvider : ContextMenuProvider
+public class VertexContextMenuProvider : ContextMenuProvider
 {
 
-    public Joint Subject {get => _sub; set => _sub = value; }
-    public JointContextMenuProvider(Joint joint, ContextMenu menu)
+    public Vertex Subject {get => _sub; set => _sub = value; }
+    public VertexContextMenuProvider(Vertex joint, ContextMenu menu)
     {
         Subject = joint;
         Menu = menu;
@@ -167,7 +167,7 @@ public class JointContextMenuProvider : ContextMenuProvider
 
         connect.Click += (s, args) =>
         {
-            var potential = new Joint(MainWindow.Mouse.GetPosition(null));
+            var potential = new Vertex(MainWindow.Mouse.GetPosition(null));
             MainWindow.BigScreen.HandleCreateConnection(Subject, potential);
         };
 
@@ -252,9 +252,9 @@ public class JointContextMenuProvider : ContextMenuProvider
     MenuItem Suggestions_MarkAngle()
     {
         var items = new List<string>();
-            foreach(Joint j1 in Joint.all)
+            foreach(Vertex j1 in Vertex.all)
             {
-                foreach (Joint j2 in Joint.all)
+                foreach (Vertex j2 in Vertex.all)
                 {
                     if (Subject == j1 || Subject == j2 || j1 == j2) continue;
                     if (Angle.Exists(Subject, j1, j2)) continue;
@@ -287,9 +287,9 @@ public class JointContextMenuProvider : ContextMenuProvider
             var arr = ac.Text.ToCharArray();
             if (arr.Length == 3)
             {
-                var j1 = Joint.GetJointById(arr[0]);
-                var c = Joint.GetJointById(arr[1]);
-                var j2 = Joint.GetJointById(arr[2]);
+                var j1 = Vertex.GetJointById(arr[0]);
+                var c = Vertex.GetJointById(arr[1]);
+                var j2 = Vertex.GetJointById(arr[2]);
                 if (j1 != null && j2 != null && c != null && j1 != j2 && j1 != c && j2 != c)
                 {
                     _ = new Angle(j1, c, j2);
@@ -331,7 +331,7 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
@@ -350,11 +350,11 @@ public class JointContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Joint(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
-            var j1 = new Joint(j.X - (j.X - circle.center.X) * 2, j.Y - (j.Y - circle.center.Y) * 2);
+            var j1 = new Vertex(j.X - (j.X - circle.center.X) * 2, j.Y - (j.Y - circle.center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);
             j1.Connect(Subject);
 
@@ -369,11 +369,11 @@ public class JointContextMenuProvider : ContextMenuProvider
     // ----------------------Recommended----------------------
     // -------------------------------------------------------
 
-    class C : IComparer<Joint>
+    class C : IComparer<Vertex>
     {
-        Joint Subject;
-        public C(Joint j) { Subject = j; }
-        public int Compare(Joint? x, Joint? y)
+        Vertex Subject;
+        public C(Vertex j) { Subject = j; }
+        public int Compare(Vertex? x, Vertex? y)
         {
             if (y == null || x == null) return int.MaxValue;
             return (int)(Subject.DistanceTo(x) - Subject.DistanceTo(y));
@@ -382,8 +382,8 @@ public class JointContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MergeJoints()
     {
-        List<Joint> veryCloseTo = new();
-        foreach (var j in Joint.all)
+        List<Vertex> veryCloseTo = new();
+        foreach (var j in Vertex.all)
         {
             if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
         }

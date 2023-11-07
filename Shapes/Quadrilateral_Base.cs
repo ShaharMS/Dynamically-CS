@@ -23,10 +23,10 @@ public partial class Quadrilateral : DraggableGraphic
 {
     public static readonly List<Quadrilateral> all = new();
 
-    public Joint joint1;
-    public Joint joint2;
-    public Joint joint3;
-    public Joint joint4;
+    public Vertex joint1;
+    public Vertex joint2;
+    public Vertex joint3;
+    public Vertex joint4;
 
     Func<double> _degrees1;
     Func<double> _degrees2;
@@ -42,10 +42,10 @@ public partial class Quadrilateral : DraggableGraphic
     public double radians3 { get => _degrees3().ToRadians(); }
     public double radians4 { get => _degrees4().ToRadians(); }
 
-    public Joint[] angle1Joints;
-    public Joint[] angle2Joints;
-    public Joint[] angle3Joints;
-    public Joint[] angle4Joints;
+    public Vertex[] angle1Joints;
+    public Vertex[] angle2Joints;
+    public Vertex[] angle3Joints;
+    public Vertex[] angle4Joints;
 
 
     public Segment con1;
@@ -69,7 +69,7 @@ public partial class Quadrilateral : DraggableGraphic
     public Circle? incircle;
 
 #pragma warning disable CS8618
-    public Quadrilateral(Joint j1, Joint j2, Joint j3, Joint j4)
+    public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4)
     {
         joint1 = j1;
         joint2 = j2;
@@ -170,9 +170,9 @@ public partial class Quadrilateral : DraggableGraphic
         }
     }
 
-    public bool IsDefinedBy(Joint j1, Joint j2, Joint j3, Joint j4)
+    public bool IsDefinedBy(Vertex j1, Vertex j2, Vertex j3, Vertex j4)
     {
-        var arr = new Joint[] { j1, j2, j3, j4 };
+        var arr = new Vertex[] { j1, j2, j3, j4 };
         return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3) && arr.Contains(joint4);
     }
     }

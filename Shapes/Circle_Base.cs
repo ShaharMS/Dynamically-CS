@@ -24,7 +24,7 @@ public partial class Circle : EllipseBase
     public static new readonly List<Circle> all = new();
 
 
-    public Joint center;
+    public Vertex center;
 
     public List<Action<double, double>> onResize = new();
 
@@ -50,7 +50,7 @@ public partial class Circle : EllipseBase
         }
     }
 
-    public Circle(Joint center, double radius) : base(center, center, radius * 2)
+    public Circle(Vertex center, double radius) : base(center, center, radius * 2)
     {
         this.radius = radius;
         this.center = center;
@@ -80,7 +80,7 @@ public partial class Circle : EllipseBase
         center.reposition();
     }
 
-    public void Set(Joint center, double radius)
+    public void Set(Vertex center, double radius)
     {
         center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
         center.Draggable = this.center.Draggable;
@@ -92,7 +92,7 @@ public partial class Circle : EllipseBase
         UpdateFormula();
     }
 
-    public void Set(Joint joint1, Joint joint2, Joint joint3)
+    public void Set(Vertex joint1, Vertex joint2, Vertex joint3)
     {
         Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
         {
