@@ -166,11 +166,28 @@ public enum Relation
 
     /// <summary>
     /// <list type="bullet">
-    ///     <item>Vertex</item>
+    ///     <item>Vertex, Circle - only use for circles without a predefined center</item>
     ///     <item>No side products</item>
     /// </list>
     /// </summary>
-    CIRCLE,
+    CIRCLE_CENTER,
+
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Circle, Triangle | Circle, Quad</item>
+    ///     <item>No side products</item>
+    /// </list>
+    /// </summary>
+    INCIRCLE,
+
+    /// <summary>
+    /// <list type="bullet">
+    ///     <item>Circle, Triangle | Circle, Quad</item>
+    ///     <item>No side products</item>
+    /// </list>
+    /// </summary>
+    CIRCUMCIRCLE,
 
 
 

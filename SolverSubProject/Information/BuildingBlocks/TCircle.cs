@@ -12,12 +12,6 @@ public class TCircle : ExerciseToken, IMountable
 {
     public List<ExerciseToken> AllMounts { get; }
 
-    public List<SVertexOnCircleAtAngle> MountsAtAngle = new();
-    public List<TSegment> Intersectors = new();
-    public List<TSegment> Tangents = new();
-    public List<TSegment> Radii = new();
-    public List<TSegment> Diameters = new();
-    public List<TSegment> Chords = new();
     public List<TVertex> Centers = new();
 
     public TCircle(string id)
@@ -34,5 +28,12 @@ public class TCircle : ExerciseToken, IMountable
         Centers.Add(center);
         center.Circles.Add(this);
         Id = $"●{center.Id}{(center.Circles.Count > 0 ? $"_{center.Circles.Count}" : "")}";
+    }
+
+    public TCircle(params TVertex[] mounts)
+    {
+        AllMounts = new();
+        AllMounts.AddRange(mounts);
+        Id = "●" + mounts.Select(x => x.Id).Aggregate((a, b) => $"{a}{b}");
     }
 }

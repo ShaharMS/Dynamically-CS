@@ -31,7 +31,12 @@ public static class DetailQuickCreator
     public static Detail BisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.BISECTOR_INTERSECTION, t);
     public static Detail AngleBisectorIntersection(this TVertex v, TTriangle t) => new(v, Relation.ANGLEBISECTOR_INTERSECTION, t);
 
-    public static Detail Circle(this TVertex v) => new(v, Relation.CIRCLE);
+    public static Detail Incircle(this TCircle c, TTriangle t) => new(c, Relation.INCIRCLE, t);
+    public static Detail Incircle(this TCircle c, TQuad q) => new(c, Relation.INCIRCLE, q);
+    public static Detail CircumCircle(this TCircle c, TTriangle t) => new(c, Relation.CIRCUMCIRCLE, t);
+    public static Detail CircumCircle(this TCircle c, TQuad q) => new(c, Relation.CIRCUMCIRCLE, q);
+
+    public static Detail CircleCenter(this TVertex v, TCircle c) => new(v, Relation.CIRCLE_CENTER, c);
 
     public static Detail Right(this TAngle a) => new(a, Relation.EQUALS, new TValue(90));
     public static Detail Flat(this TAngle a) => new(a, Relation.EQUALS, new TValue(180));

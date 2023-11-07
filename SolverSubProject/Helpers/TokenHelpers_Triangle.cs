@@ -88,4 +88,17 @@ public static partial class TokenHelpers
     public static (TSegment midSegment, TSegment opposite)[] GetMidSegmentsWithOpposites(this TTriangle triangle) {
         return triangle.ParentPool.AvailableDetails.GetMany(Relation.MIDSEGMENT, triangle).Select(x => (x.Left, x.SideProducts[0])).Cast<(TSegment midSegment, TSegment opposite)>().ToArray();
     }
-}
+
+    public static TCircle GetIncircle(this TTriangle triangle)
+    {
+        if (!triangle.ParentPool.AvailableDetails.Has(Relation.INCIRCLE, triangle))
+            throw new ArgumentException("Provided triangle must have an incircle", nameof(triangle));
+        return (TCircle)triangle.ParentPool.AvailableDetails.EnsuredGet(Relation.INCIRCLE, triangle).Left;
+    }
+
+    public static TCircle GetCircumcircle(this TTriangle triangle)
+    {
+        if (!triangle.ParentPool.AvailableDetails.Has(Relation.CIRCUMCIRCLE, triangle))
+            throw new ArgumentException("Provided triangle must have a circumcircle", nameof(triangle));
+        return (TCircle)triangle.ParentPool.AvailableDetails.EnsuredGet(Relation.CIRCUMCIRCLE, triangle).Left;
+    }

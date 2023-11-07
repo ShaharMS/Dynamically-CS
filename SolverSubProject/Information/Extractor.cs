@@ -1412,7 +1412,32 @@ public class Extractor
 
     public static IEnumerable<Detail?> AngleBisectorIntersectionProperties_A(TTriangle triangle)
     {
-        if (!triangle.ParentPool.AvailableDetails.Has(Relation.ANGLEBISECTOR_INTERSECTION, triangle)) return E();
+        var all = triangle.ParentPool.AvailableDetails;
+        if (!all.Has(Relation.ANGLEBISECTOR_INTERSECTION, triangle)) yield break;
 
+        var angleBisectorIntersectionDetail = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Relation.ANGLEBISECTOR_INTERSECTION);
+        if (!all.Has(Relation.INCIRCLE, triangle))
+        {
+            var incircle = new TCircle((TVertex)angleBisectorIntersectionDetail.Left)
+            {
+                IsAuxiliary = true
+            };
+            yield return incircle.Incircle(triangle).AddReferences(angleBisectorIntersectionDetail, new Detail(incircle, Relation.NEW));
+        } else
+        {
+            var incircleDetail = all.EnsuredGet(Relation.INCIRCLE, triangle);
+            var incircle = (incircleDetail.Left as TCircle)!;
+            if (incircle.Centers.Count == 0) yield return (angleBisectorIntersectionDetail.Left as TVertex)!.CircleCenter(incircle).AddReferences(angleBisectorIntersectionDetail, incircleDetail);
+        }
+    }
+
+    [Reason(Reason.EVERY_TRIANGLE_HAS_INCIRCLE)]
+    public static IEnumerable<Detail?> TriangleProperties_C(TTriangle triangle)
+    {
+        if (triangle.ParentPool.AvailableDetails.Has(Relation.INCIRCLE, triangle)) yield break;
+        var circle = new TCircle(Array.Empty<TVertex>()) {
+            IsAuxiliary = true
+        };
+        yield return circle.Incircle(triangle).AddReferences(new Detail(circle, Relation.NEW));
     }
 }
