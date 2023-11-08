@@ -35,7 +35,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
             Incircle.Center.Roles.RemoveFromRole(Role.TRIANGLE_InCircleCenter, this);
         }
 
-        if (Circumcircle != null) Circumcircle.Center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
+        Circumcircle?.Center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
 
         foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
         {
@@ -85,10 +85,10 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     public string ToString(bool descriptive)
     {
         if (!descriptive) return ToString();
-        return $"{typeToString(Type)} " + ToString();
+        return $"{TypeToString(Type)} " + ToString();
     }
 
-    private string typeToString(TriangleType type) => type != TriangleType.SCALENE ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Triangle";
+    private string TypeToString(TriangleType type) => type != TriangleType.SCALENE ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Triangle";
 
     public override double Area()
     {

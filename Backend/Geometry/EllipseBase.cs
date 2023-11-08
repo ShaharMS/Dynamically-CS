@@ -113,7 +113,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
     internal class Ring : DraggableGraphic
     {
         public static readonly List<Ring> All = new();
-        private EllipseBase Ellipse;
+        public EllipseBase Ellipse;
 
         public Ring(EllipseBase el)
         {

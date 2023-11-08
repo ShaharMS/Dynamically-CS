@@ -114,7 +114,7 @@ public class SegmentFormula : Formula
         });
     }
 
-    public RayFormula CastToRay() => new RayFormula(X1, Y1, X2, Y2);
+    public RayFormula CastToRay() => new(X1, Y1, X2, Y2);
 
     public Point? Intersect(SegmentFormula formula)
     {

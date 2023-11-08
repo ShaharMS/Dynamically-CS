@@ -14,12 +14,12 @@ public class ItemLoader : MenuItem
 {
     public Queue<Func<Control>> Tasks;
 
-    private MenuItem loadingItem = new();
+    readonly MenuItem loadingItem = new();
 
     public bool Working { get; private set; }
 
     readonly StackPanel h;
-    public ItemLoader(ContextMenu parent, params Func<Control>[] tasks)
+    public ItemLoader(params Func<Control>[] tasks)
     {
         
         loadingItem = new MenuItem
@@ -44,7 +44,10 @@ public class ItemLoader : MenuItem
 
     public void AddItems(params Func<Control>[] funcs)
     {
-        Tasks.Concat(new Queue<Func<Control>>(funcs));
+        foreach (var item in funcs)
+        {
+            Tasks.Enqueue(item);
+        }
         if (!Working) Work();
     }
 

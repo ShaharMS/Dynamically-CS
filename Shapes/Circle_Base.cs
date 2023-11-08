@@ -92,23 +92,24 @@ public partial class Circle : EllipseBase
         UpdateFormula();
     }
 
+    static Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
+    {
+        // Get the segments' parameters.
+        double dx12 = p2.X - p1.X;
+        double dy12 = p2.Y - p1.Y;
+        double dx34 = p4.X - p3.X;
+        double dy34 = p4.Y - p3.Y;
+
+        // Solve for t1 and t2
+        double denominator = (dy12 * dx34 - dx12 * dy34);
+
+        double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
+        // Find the point of intersection.
+        return new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
+    }
+
     public void Set(Vertex joint1, Vertex joint2, Vertex joint3)
     {
-        Point FindIntersection(Point p1, Point p2, Point p3, Point p4)
-        {
-            // Get the segments' parameters.
-            double dx12 = p2.X - p1.X;
-            double dy12 = p2.Y - p1.Y;
-            double dx34 = p4.X - p3.X;
-            double dy34 = p4.Y - p3.Y;
-
-            // Solve for t1 and t2
-            double denominator = (dy12 * dx34 - dx12 * dy34);
-
-            double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
-            // Find the point of intersection.
-            return new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
-        }
 
         // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;

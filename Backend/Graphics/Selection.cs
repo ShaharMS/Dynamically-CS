@@ -17,13 +17,13 @@ namespace Dynamically.Backend.Graphics;
 
 public class Selection : DraggableGraphic, IStringifyable
 {
-    double sx;
-    double sy;
+    readonly double sx;
+    readonly double sy;
 
-    double ex;
-    double ey;
+    private double ex;
+    private double ey;
 
-    public Rect Rect { get => new Rect(sx.Min(ex), sy.Min(ey), Math.Abs(sx - ex), Math.Abs(sy - ey)); }
+    public Rect Rect { get => new(sx.Min(ex), sy.Min(ey), Math.Abs(sx - ex), Math.Abs(sy - ey)); }
 
     public HashSet<DraggableGraphic> EncapsulatedElements = new();
 

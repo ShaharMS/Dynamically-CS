@@ -50,9 +50,10 @@ namespace Dynamically
             AvaloniaXamlLoader.Load(this);
         }
 
-        public static uint Indent = 0;
 
-        public static void Write(params object?[] text)
+        public static uint Indent { get; set; } = 0;
+
+    public static void Write(params object?[] text)
         {
             Instance.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
             if (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)

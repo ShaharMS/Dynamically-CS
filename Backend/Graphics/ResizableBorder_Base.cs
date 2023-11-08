@@ -35,7 +35,7 @@ public partial class ResizableBorder : Border
 	double tWidth;
 	double tHeight;
 
-    double cornerDistance = 5;
+    static readonly double CORNER_DISTANCE = 5;
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
@@ -52,20 +52,20 @@ public partial class ResizableBorder : Border
 
             foreach (var l in OnResizeStart) l();
 
-            if (Bounds.TopLeft.DistanceTo(mousePoint) < cornerDistance) startResizeTopLeft(e);
-            else if (Bounds.TopRight.DistanceTo(mousePoint) < cornerDistance) startResizeTopRight(e);
-            else if (Bounds.BottomLeft.DistanceTo(mousePoint) < cornerDistance) startResizeBottomLeft(e);
-            else if (Bounds.BottomRight.DistanceTo(mousePoint) < cornerDistance) startResizeBottomRight(e);
-            else if (Math.Abs(Bounds.Top - mousePoint.Y) < cornerDistance) startResizeTop(e);
-            else if (Math.Abs(Bounds.Bottom - mousePoint.Y) < cornerDistance) startResizeBottom(e);
-            else if (Math.Abs(Bounds.Left - mousePoint.X) < cornerDistance) startResizeLeft(e);
-            else if (Math.Abs(Bounds.Right - mousePoint.X) < cornerDistance) startResizeRight(e);
+            if (Bounds.TopLeft.DistanceTo(mousePoint) < CORNER_DISTANCE) StartResizeTopLeft(e);
+            else if (Bounds.TopRight.DistanceTo(mousePoint) < CORNER_DISTANCE) StartResizeTopRight(e);
+            else if (Bounds.BottomLeft.DistanceTo(mousePoint) < CORNER_DISTANCE) StartResizeBottomLeft(e);
+            else if (Bounds.BottomRight.DistanceTo(mousePoint) < CORNER_DISTANCE) StartResizeBottomRight(e);
+            else if (Math.Abs(Bounds.Top - mousePoint.Y) < CORNER_DISTANCE) StartResizeTop(e);
+            else if (Math.Abs(Bounds.Bottom - mousePoint.Y) < CORNER_DISTANCE) StartResizeBottom(e);
+            else if (Math.Abs(Bounds.Left - mousePoint.X) < CORNER_DISTANCE) StartResizeLeft(e);
+            else if (Math.Abs(Bounds.Right - mousePoint.X) < CORNER_DISTANCE) StartResizeRight(e);
 
         }
     }
 
 
-    void setPrevStats()
+    void SetPrevStats()
     {
         tX = X;
         tY = Y;
@@ -73,7 +73,7 @@ public partial class ResizableBorder : Border
         tHeight = ((dynamic)Child).Height;
     }
 
-    public void startResizeTopLeft(PointerPressedEventArgs e)
+    public void StartResizeTopLeft(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -83,7 +83,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -116,7 +116,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeTopRight(PointerPressedEventArgs e)
+    public void StartResizeTopRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -126,7 +126,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -165,7 +165,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeBottomLeft(PointerEventArgs e)
+    public void StartResizeBottomLeft(PointerEventArgs e)
     {
         var p = new
         {
@@ -175,7 +175,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -207,7 +207,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeBottomRight(PointerPressedEventArgs e)
+    public void StartResizeBottomRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -217,7 +217,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -249,7 +249,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeLeft(PointerPressedEventArgs e)
+    public void StartResizeLeft(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -259,7 +259,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -286,7 +286,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeRight(PointerPressedEventArgs e)
+    public void StartResizeRight(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -296,7 +296,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -322,7 +322,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeTop(PointerPressedEventArgs e)
+    public void StartResizeTop(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -332,7 +332,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {
@@ -359,7 +359,7 @@ public partial class ResizableBorder : Border
         MainWindow.Instance.AddHandler(PointerMovedEvent, res, RoutingStrategies.Tunnel);
     }
 
-    public void startResizeBottom(PointerPressedEventArgs e)
+    public void StartResizeBottom(PointerPressedEventArgs e)
     {
         var p = new
         {
@@ -369,7 +369,7 @@ public partial class ResizableBorder : Border
             h = ((dynamic)Child).Height // gutter
 
         };
-        setPrevStats();
+        SetPrevStats();
 
         void res(object? sender, PointerEventArgs e)
         {

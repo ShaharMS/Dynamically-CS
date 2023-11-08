@@ -13,8 +13,8 @@ public class TableHandle : DraggableGraphic
 {
     public SolutionTable Table;
     
-    private Label label;
-    private Border border;
+    readonly Label label;
+    readonly Border border;
 
     public new double Width {
         get => border.Bounds.Width;

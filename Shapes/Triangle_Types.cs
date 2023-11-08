@@ -14,7 +14,7 @@ namespace Dynamically.Shapes;
 
 public partial class Triangle
 {
-    private Point EQ_temp_incircle_center = new Point(-1, -1);
+    private Point EQ_temp_incircle_center = new(-1, -1);
     private void Equilateral_OnJointMove(Vertex moved, Vertex other1, Vertex other2, double px, double py)
     {
         if (moved.X == px && moved.Y == py) return;

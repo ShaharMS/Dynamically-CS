@@ -40,7 +40,7 @@ public class PointFormula : Formula
 
     public void Set(Vertex j)
     {
-        if (_driver != null) _driver.OnMoved.Remove(Move);
+        _driver?.OnMoved.Remove(Move);
         _driver = j;
         j.OnMoved.Add(Move);
         Move(j.X, j.Y);

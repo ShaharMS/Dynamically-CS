@@ -12,13 +12,13 @@
 				<MenuItem Header="_New"/>
 				<MenuItem IsEnabled="False" Header="_Open..."/>
 				<Separator/>
-				<MenuItem Header="_Exit"/>
+				<MenuItem Header="Exit"/>
 			</MenuItem>
-			<MenuItem Header="_Edit">
+			<MenuItem Header="Edit">
 				<MenuItem Header="Copy"/>
 				<MenuItem Header="Paste"/>
 			</MenuItem>
-			<MenuItem Header="_Create">
+			<MenuItem Header="Create">
 				<MenuItem Header="Point">
 					<MenuItem.Icon>
 						<Image Source="avares://Dynamically/Assets/Light/Menu/point.png"/>
@@ -30,7 +30,7 @@
 					</MenuItem.Icon>
 				</MenuItem>
 				<Separator/>
-				<MenuItem Header="_Triangles">
+				<MenuItem Header="Triangles">
 					<MenuItem Header="Equilateral">
 						<MenuItem.Icon>
 							<Image Source="avares://Dynamically/Assets/Light/Menu/equilateral.png"/>
@@ -52,7 +52,7 @@
 						</MenuItem.Icon>
 					</MenuItem>
 				</MenuItem>
-				<MenuItem Header="_Quadrilaterals">
+				<MenuItem Header="Quadrilaterals">
 					<MenuItem Header="Square">
 						<MenuItem.Icon>
 							<Image Source="avares://Dynamically/Assets/Light/Menu/square.png"/>
@@ -83,6 +83,16 @@
 							<Image Source="avares://Dynamically/Assets/Light/Menu/quadrilateral.png"/>
 						</MenuItem.Icon>
 					</MenuItem>
+          <MenuItem Header="Right Trapezoid">
+            <MenuItem.Icon>
+              <Image Source="avares://Dynamically/Assets/Light/Menu/rightTrapezoid.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
+          <MenuItem Header="Isosceles Trapezoid">
+            <MenuItem.Icon>
+              <Image Source="avares://Dynamically/Assets/Light/Menu/isoscelesTrapezoid.png"/>
+            </MenuItem.Icon>
+          </MenuItem>
 				</MenuItem>
 			</MenuItem>
 		</Menu>

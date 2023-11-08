@@ -373,7 +373,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
 
     class C : IComparer<Vertex>
     {
-        Vertex Subject;
+        readonly Vertex Subject;
         public C(Vertex j) { Subject = j; }
         public int Compare(Vertex? x, Vertex? y)
         {

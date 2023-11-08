@@ -14,28 +14,30 @@ namespace Dynamically.Backend.Helpers;
 
 class Tools
 {
+    static void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
+    {
+        // Get the segments' parameters.
+        double dx12 = p2.X - p1.X;
+        double dy12 = p2.Y - p1.Y;
+        double dx34 = p4.X - p3.X;
+        double dy34 = p4.Y - p3.Y;
+
+        // Solve for b1 and b2
+        double denominator = (dy12 * dx34 - dx12 * dy34);
+
+        double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
+        double t2 = ((p3.X - p1.X) * dy12 + (p1.Y - p3.Y) * dx12) / -denominator;
+
+        // Find the point of intersection.
+        intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
+
+        // The segments intersect if b1 and b2 are between 0 and 1.
+        segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
+    }
+
     public static Circle CircleFrom3Joints(Vertex joint1, Vertex joint2, Vertex joint3)
     {
-        void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
-        {
-            // Get the segments' parameters.
-            double dx12 = p2.X - p1.X;
-            double dy12 = p2.Y - p1.Y;
-            double dx34 = p4.X - p3.X;
-            double dy34 = p4.Y - p3.Y;
 
-            // Solve for b1 and b2
-            double denominator = (dy12 * dx34 - dx12 * dy34);
-
-            double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
-            double t2 = ((p3.X - p1.X) * dy12 + (p1.Y - p3.Y) * dx12) / -denominator;
-
-            // Find the point of intersection.
-            intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
-
-            // The segments intersect if b1 and b2 are between 0 and 1.
-            segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
-        }
 
         // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;
@@ -58,7 +60,7 @@ class Tools
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
         var c = new Vertex(center.X, center.Y);
-        Circle circle = new Circle(c, radius);
+        Circle circle = new(c, radius);
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
         {
@@ -70,26 +72,6 @@ class Tools
 
     public static Circle CircleFrom3Points(Point joint1, Point joint2, Point joint3)
     {
-        void FindIntersection(Point p1, Point p2, Point p3, Point p4, out bool segments_intersect, out Point intersection)
-        {
-            // Get the segments' parameters.
-            double dx12 = p2.X - p1.X;
-            double dy12 = p2.Y - p1.Y;
-            double dx34 = p4.X - p3.X;
-            double dy34 = p4.Y - p3.Y;
-
-            // Solve for b1 and b2
-            double denominator = (dy12 * dx34 - dx12 * dy34);
-
-            double t1 = ((p1.X - p3.X) * dy34 + (p3.Y - p1.Y) * dx34) / denominator;
-            double t2 = ((p3.X - p1.X) * dy12 + (p1.Y - p3.Y) * dx12) / -denominator;
-
-            // Find the point of intersection.
-            intersection = new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
-
-            // The segments intersect if b1 and b2 are between 0 and 1.
-            segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
-        }
 
         // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;
@@ -113,7 +95,7 @@ class Tools
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
         var c = new Vertex(center.X, center.Y);
-        Circle circle = new Circle(c, radius);
+        Circle circle = new(c, radius);
 
         return circle;
     }
@@ -183,31 +165,31 @@ class Tools
         // Case 1: CIRCLE_center & CIRCLE_on
         var a1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
         var a2 = j2.Roles.Access<Circle>(Role.CIRCLE_On);
-        if (a1.Intersect(a2).Count() != 0) return false;
+        if (a1.Intersect(a2).Any()) return false;
         a1 = j1.Roles.Access<Circle>(Role.CIRCLE_On);
         a2 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
-        if (a1.Intersect(a2).Count() != 0) return false;
+        if (a1.Intersect(a2).Any()) return false;
 
         // Case 2: Circum & Incircle
         var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
         var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        if (e1.Intersect(e2).Count() != 0) return false;
+        if (e1.Intersect(e2).Any()) return false;
         e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
         e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        if (e1.Intersect(e2).Count() != 0) return false;
+        if (e1.Intersect(e2).Any()) return false;
 
         // Case 3: corners of the same Triangle
         var b1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
         var b2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
-        if (b1.Intersect(b2).Count() != 0) return false;
+        if (b1.Intersect(b2).Any()) return false;
 
         // Case 4: Triangle corner & in\Circumcircle Center
         var c1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
         var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
-        if (c1.Intersect(c2).Count() != 0) return false;
+        if (c1.Intersect(c2).Any()) return false;
         c1 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
         c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
-        if (c1.Intersect(c2).Count() != 0) return false;
+        if (c1.Intersect(c2).Any()) return false;
 
         // Case 5: Triangle corner & in/Circumcircle on
 
@@ -237,41 +219,43 @@ class Tools
             // Case S1: Center & circle chord (stack overflow)
             var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
             var a2 = segment.Roles.Access<Circle>(Role.CIRCLE_Chord);
-            if (a1.Intersect(a2).Count() != 0) return false;
+            if (a1.Intersect(a2).Any()) return false;
 
             // Case S2: Triangle corner & side
             var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
             var b2 = segment.Roles.Access<Triangle>(Role.TRIANGLE_Side);
-            if (b1.Intersect(b2).Count() != 0) return false;
+            if (b1.Intersect(b2).Any()) return false;
         }
 
         return true;
     }
 
-    public static bool QualifiesForStraighten(Vertex v1, Vertex v2, Vertex common) 
+    public static bool QualifiesForStraighten(Vertex v1, Vertex v2, Vertex common)
     {
         // Case 1: 2 radii -> diameter
-        foreach (Circle circle in common.Roles.Access<Circle>(Role.CIRCLE_Center)) {
+        foreach (Circle circle in common.Roles.Access<Circle>(Role.CIRCLE_Center))
+        {
             if (v1.Roles.Has(Role.CIRCLE_On, circle) && v2.Roles.Has(Role.CIRCLE_On, circle)) return false;
         }
 
         return true;
     }
+
+    static double NormalizeAngle(double angle)
+    {
+        while (angle < 0)
+        {
+            angle += 2 * Math.PI;
+        }
+        while (angle >= 2 * Math.PI)
+        {
+            angle -= 2 * Math.PI;
+        }
+        return angle;
+    }
+
     public static double[] OrderRadiansBySmallArc(double rad1, double rad2)
     {
-        double NormalizeAngle(double angle)
-        {
-            while (angle < 0)
-            {
-                angle += 2 * Math.PI;
-            }
-            while (angle >= 2 * Math.PI)
-            {
-                angle -= 2 * Math.PI;
-            }
-            return angle;
-        }
-
         // Normalize angles to be between 0 and 2 * PI
         rad1 = NormalizeAngle(rad1);
         rad2 = NormalizeAngle(rad2);

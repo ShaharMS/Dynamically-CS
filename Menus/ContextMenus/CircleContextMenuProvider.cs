@@ -97,7 +97,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
     {
         var hide = new MenuItem
         {
-            Header = Subject.Center.Hidden ? $"Show Center ({Subject.Center.ToString()})" : $"Hide Center ({Subject.Center.ToString()})"
+            Header = Subject.Center.Hidden ? $"Show Center ({Subject.Center})" : $"Hide Center ({Subject.Center})"
         };
         hide.Click += (sender, e) =>
         {

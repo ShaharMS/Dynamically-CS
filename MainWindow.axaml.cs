@@ -31,9 +31,9 @@ public partial class MainWindow : Window
 
     public static BigScreen BigScreen { get; private set; }
 
-    public static bool Debug = true;
+    public static bool Debug { get; set; } = true;
 
-    public static PointerEventArgs Mouse { get; set; }
+public static PointerEventArgs Mouse { get; set; }
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainWindow()
@@ -68,7 +68,7 @@ public partial class MainWindow : Window
         var q1 = new Quadrilateral(new Vertex(600, 350), new Vertex(900, 300), new Vertex(600, 450), new Vertex(900, 600));
 
 
-        new Angle(j0, j, j11);
+        _ = new Angle(j0, j, j11);
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
@@ -83,7 +83,7 @@ public partial class MainWindow : Window
          
         RegenAll(0, 0, 0, 0);
 
-        new BottomNote("Application Started!");
+        _ = new BottomNote("Application Started!");
         BigScreen.Children.Add(new SolutionTable(true));
         BigScreen.Children.Add(new MathTextBox());
 
