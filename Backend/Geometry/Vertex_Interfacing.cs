@@ -14,22 +14,22 @@ public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenu
 {
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
-    /// for example, given a circle, and a Triangle formed with one joint being the center, 
+    /// for example, given a circle, and a Triangle formed with one joint being the Center, 
     /// the joint's <c>Roles</c> map would contain the circle and the Triangle. <br />
     /// </summary>
     public RoleMap Roles { get; set; }
 
     public VertexContextMenuProvider Provider { get; }
 
-    public void reposition()
+    public void Reposition()
     {
         // Position is validated, now redraw connections & place text
         // text is placed in the middle of the biggest angle at the distance of fontSize + 4
         foreach (Segment c in Connections)
         {
             c.InvalidateVisual();
-            if (c.joint1 == this) c.joint2.RepositionText();
-            else c.joint1.RepositionText();
+            if (c.Vertex1 == this) c.Vertex2.RepositionText();
+            else c.Vertex1.RepositionText();
         }
         RepositionText();
     }

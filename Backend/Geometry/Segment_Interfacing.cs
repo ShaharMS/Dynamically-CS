@@ -20,17 +20,17 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
     public SegmentContextMenuProvider Provider { get; }
 
 
-    public void reposition()
+    public void Reposition()
     {
-        org1X = joint1.X;
-        org1Y = joint1.Y;
-        org2X = joint2.X;
-        org2Y = joint2.Y;
+        org1X = Vertex1.X;
+        org1Y = Vertex1.Y;
+        org2X = Vertex2.X;
+        org2Y = Vertex2.Y;
     }
 
     public override string ToString()
     {
-        return ((char)Math.Min(joint1.Id, joint2.Id)).ToString() + ((char)Math.Max(joint1.Id, joint2.Id)).ToString();
+        return ((char)Math.Min(Vertex1.Id, Vertex2.Id)).ToString() + ((char)Math.Max(Vertex1.Id, Vertex2.Id)).ToString();
     }
 
     public string ToString(bool descriptive)
@@ -48,36 +48,36 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
     public void __reposition(double z, double x, double c, double v)
     {
         _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
-        reposition();
+        Reposition();
     }
 
     public void __repositionLabel(double z, double x, double c, double v)
     {
         _ = z; _ = x; _ = c; _ = v; // Suppress unused params warning
-        Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
-        Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
+        Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
+        Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
     }
 
     public bool SharesJointWith(Segment s)
     {
-        return joint1 == s.joint1 || joint1 == s.joint2 || joint2 == s.joint1 || joint2 == s.joint2;
+        return Vertex1 == s.Vertex1 || Vertex1 == s.Vertex2 || Vertex2 == s.Vertex1 || Vertex2 == s.Vertex2;
     }
 
     public Vertex? GetSharedJoint(Segment s)
     {
-        if (s.joint1 == joint1 || s.joint2 == joint1) return joint1;
-        if (s.joint1 == joint2 || s.joint2 == joint2) return joint2;
+        if (s.Vertex1 == Vertex1 || s.Vertex2 == Vertex1) return Vertex1;
+        if (s.Vertex1 == Vertex2 || s.Vertex2 == Vertex2) return Vertex2;
         return null;
     }
 
     public bool Contains(Vertex joint)
     {
-        return joint1 == joint || joint2 == joint;
+        return Vertex1 == joint || Vertex2 == joint;
     }
 
     public bool Contains(Segment segment)
     {
-        return segment.Contains(joint1) && segment.Contains(joint2);
+        return segment.Contains(Vertex1) && segment.Contains(Vertex2);
     }
 
     public bool HasMounted(Vertex joint)
@@ -92,12 +92,12 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
 
     public void Dismantle()
     {
-        joint1.Disconnect(joint2);
+        Vertex1.Disconnect(Vertex2);
         MainWindow.BigScreen.Children.Remove(Label);
     }
 #pragma warning restore IDE1006
     public bool EncapsulatedWithin(Rect rect)
     {
-        return joint1.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect);
+        return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect);
     }
 }

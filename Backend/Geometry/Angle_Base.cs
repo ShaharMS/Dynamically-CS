@@ -19,11 +19,11 @@ namespace Dynamically.Backend.Geometry;
 public partial class Angle : DraggableGraphic
 {
 
-    public static readonly List<Angle> all = new();
+    public static readonly List<Angle> All = new();
 
     public double DefaultDistance
     {
-        get => Math.Min(50, Math.Min(Center.DistanceTo(joint1), Center.DistanceTo(joint2)) * 0.8);
+        get => Math.Min(50, Math.Min(Center.DistanceTo(Vertex1), Center.DistanceTo(Vertex2)) * 0.8);
     }
 
     public new double Opacity {
@@ -46,26 +46,26 @@ public partial class Angle : DraggableGraphic
             _c.OnMoved.Add(__updateAngle);
         }
     }
-    Vertex _j1;
-    public Vertex joint1
+    Vertex _v1;
+    public Vertex Vertex1
     {
-        get => _j1;
+        get => _v1;
         set
         {
-            _j1.OnMoved.Remove(__updateAngle);
-            _j1 = value;
-            _j1.OnMoved.Add(__updateAngle);
+            _v1.OnMoved.Remove(__updateAngle);
+            _v1 = value;
+            _v1.OnMoved.Add(__updateAngle);
         }
     }
-    Vertex _j2;
-    public Vertex joint2
+    Vertex _v2;
+    public Vertex Vertex2
     {
-        get => _j2;
+        get => _v2;
         set
         {
-            _j2.OnMoved.Remove(__updateAngle);
-            _j2 = value;
-            _j2.OnMoved.Add(__updateAngle);
+            _v2.OnMoved.Remove(__updateAngle);
+            _v2 = value;
+            _v2.OnMoved.Add(__updateAngle);
         }
     }
     public double Degrees { get; private set; }
@@ -97,16 +97,14 @@ public partial class Angle : DraggableGraphic
         }
     }
 
-    Action labelUpdater = () => { };
-
     public Angle(Vertex v1, Vertex c, Vertex v2, bool large = false)
     {
         _c = c;
-        _j1 = v1;
-        _j2 = v2;
+        _v1 = v1;
+        _v2 = v2;
         Center = c;
-        joint1 = v1;
-        joint2 = v2;
+        Vertex1 = v1;
+        Vertex2 = v2;
         _large = large;
 
         Draggable = false;
@@ -145,16 +143,16 @@ public partial class Angle : DraggableGraphic
 
         this.SetPosition(0, 0);
 
-        all.Add(this);
+        All.Add(this);
     }
 
     public override void Render(DrawingContext context)
     {
-        Degrees = Tools.GetDegreesBetween3Points(joint1, Center, joint2);
+        Degrees = Tools.GetDegreesBetween3Points(Vertex1, Center, Vertex2);
         if ((Degrees > 180 && !Large) || (Degrees < 180 && Large)) Degrees = 360 - Degrees;
         Radians = Degrees.ToRadians();
 
-        var order = Tools.OrderRadiansBySmallArc(Center.RadiansTo(joint1), Center.RadiansTo(joint2));
+        var order = Tools.OrderRadiansBySmallArc(Center.RadiansTo(Vertex1), Center.RadiansTo(Vertex2));
         if (Large) order = order.Reverse().ToArray();
         var start = order[0];
         var end = order[1];
@@ -225,7 +223,7 @@ public partial class Angle : DraggableGraphic
 
     public Segment GenerateBisector() {
         double middleAngle = GetBisectorRadians();
-        var len = (Center.DistanceTo(joint1) + Center.DistanceTo(joint2)) / 2;
+        var len = (Center.DistanceTo(Vertex1) + Center.DistanceTo(Vertex2)) / 2;
         var x = Center.X + len * Math.Cos(middleAngle);
         var y = Center.Y + len * Math.Sin(middleAngle);
         
@@ -237,14 +235,14 @@ public partial class Angle : DraggableGraphic
         return segment;
     }
 
-    public double GetBisectorRadians() =>((Center.RadiansTo(joint1) + Center.RadiansTo(joint2) + Math.PI) % (2 * Math.PI) - Math.PI) / 2;
+    public double GetBisectorRadians() =>((Center.RadiansTo(Vertex1) + Center.RadiansTo(Vertex2) + Math.PI) % (2 * Math.PI) - Math.PI) / 2;
 
     public static bool Exists(Vertex center, Vertex j1, Vertex j2)
     {
         if (center == j1 || j1 == j2 || center == j2) return false;
-        foreach (Angle a in all)
+        foreach (Angle a in All)
         {
-            if (a.Center == center && ((a.joint1 == j1 && a.joint2 == j2) || (a.joint1 == j2 && a.joint2 == j1))) return true;
+            if (a.Center == center && ((a.Vertex1 == j1 && a.Vertex2 == j2) || (a.Vertex1 == j2 && a.Vertex2 == j1))) return true;
         }
         return false;
     }
@@ -270,7 +268,7 @@ public partial class Angle : DraggableGraphic
 
     public void RemoveFromBoard()
     {
-        all.Remove(this);
+        All.Remove(this);
         MainWindow.BigScreen.Children.Remove(this);
     }
 }

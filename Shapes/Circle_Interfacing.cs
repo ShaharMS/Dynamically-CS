@@ -24,14 +24,14 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         {
             follower.Roles.RemoveFromRole(Role.CIRCLE_On, this);
         }
-        Formula.queueRemoval = true;
+        Formula.QueueRemoval = true;
         onResize.Clear();
-        Circle.all.Remove(this);
-        EllipseBase.all.Remove(this);
+        Circle.All.Remove(this);
+        EllipseBase.All.Remove(this);
 
         foreach (var l in OnRemoved) l();
 
-        MainWindow.BigScreen.Children.Remove(ring);
+        MainWindow.BigScreen.Children.Remove(Ring);
         MainWindow.BigScreen.Children.Remove(this);
     }
     public void __circle_OnChange(double z, double x, double c, double v)
@@ -60,7 +60,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public override string ToString()
     {
-        return $"●{center.Id}";
+        return $"●{Center.Id}";
     }
     public string ToString(bool descriptive)
     {
@@ -70,17 +70,17 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public override bool Overlaps(Point point)
     {
-        return center.DistanceTo(point) < radius;
+        return Center.DistanceTo(point) < Radius;
     }
 
     public override double Area()
     {
-        return radius * radius * Math.PI;
+        return Radius * Radius * Math.PI;
     }
 
     public bool Contains(Vertex joint)
     {
-        return joint == center;
+        return joint == Center;
     }
 
     public bool Contains(Segment segment)
@@ -100,8 +100,8 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public bool EncapsulatedWithin(Rect rect)
     {
-        foreach (var border in new[] {rect.Top, rect.Bottom}) if (center.DistanceTo(new Point(center.X, border)) < radius) return false;
-        foreach (var border in new[] {rect.Left, rect.Right}) if (center.DistanceTo(new Point(border, center.Y)) < radius) return false;
-        return rect.Contains(center);
+        foreach (var border in new[] {rect.Top, rect.Bottom}) if (Center.DistanceTo(new Point(Center.X, border)) < Radius) return false;
+        foreach (var border in new[] {rect.Left, rect.Right}) if (Center.DistanceTo(new Point(border, Center.Y)) < Radius) return false;
+        return rect.Contains(Center);
     }
 }

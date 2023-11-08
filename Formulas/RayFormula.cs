@@ -16,7 +16,7 @@ namespace Dynamically.Formulas;
 public class RayFormula : Formula
 {
     double _yIntercept;
-    public double yIntercept
+    public double YIntercept
     {
         get => _yIntercept;
         set
@@ -27,7 +27,7 @@ public class RayFormula : Formula
         }
     }
     double _slope;
-    public double slope
+    public double Slope
     {
         get => _slope;
         set
@@ -38,93 +38,93 @@ public class RayFormula : Formula
     }
 
     /// <summary>
-    /// Useful when dealing with vertical rays, which cannot be represented accurately using slope & yItntercept.
+    /// Useful when dealing with vertical rays, which cannot be represented accurately using Slope & yItntercept.
     /// Only set when defining the ray using a point.
     /// </summary>
     public Point? ReferencePoint { get; private set; }
 
     public RayFormula(double yIntercept, double slope) : base()
     {
-        this.yIntercept = yIntercept;
-        this.slope = slope;
+        YIntercept = yIntercept;
+        Slope = slope;
     }
 
     public RayFormula(Point pointOnRay, double slope) : base()
     { 
         if (pointOnRay.X > 0)
         {
-            yIntercept = pointOnRay.Y - (slope * pointOnRay.X);
+            YIntercept = pointOnRay.Y - (slope * pointOnRay.X);
         }
         else
         {
-            yIntercept = pointOnRay.Y + (slope * pointOnRay.X);
+            YIntercept = pointOnRay.Y + (slope * pointOnRay.X);
         }
-        this.slope = slope;
+        this.Slope = slope;
     }
 
     public RayFormula(Point p1, Point p2) : base()
     {
-        slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+        Slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)
         {
-            yIntercept = p1.Y - (slope * p1.X);
+            YIntercept = p1.Y - (Slope * p1.X);
         }
         else
         {
-            yIntercept = p1.Y + (slope * p1.X);
+            YIntercept = p1.Y + (Slope * p1.X);
         }
         ReferencePoint = p1;
     }
 
     public RayFormula(double x1, double y1, double x2, double y2) : base() 
     {
-        slope = (y2 - y1) / (x2 - x1);
+        Slope = (y2 - y1) / (x2 - x1);
         if (x1 > 0)
         {
-            yIntercept = y1 - (slope * x1);
+            YIntercept = y1 - (Slope * x1);
         }
         else
         {
-            yIntercept = y1 + (slope * x1);
+            YIntercept = y1 + (Slope * x1);
         }
         ReferencePoint = new Point(x1, y1);
     }
 
     /// <summary>
-    /// Keeps slope
+    /// Keeps Slope
     /// </summary>
     /// <param name="point"></param>
     public void ChangePositionByPoint(Point point)
     {
         if (point.X > 0)
         {
-            yIntercept = point.Y - (slope * point.X);
+            YIntercept = point.Y - (Slope * point.X);
         }
         else
         {
-            yIntercept = point.Y + (slope * point.X);
+            YIntercept = point.Y + (Slope * point.X);
         }
         ReferencePoint = point;
     }
 
     public void Set(Point p1, Point p2)
     {
-        slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+        Slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)
         {
-            yIntercept = p1.Y - (slope * p1.X);
+            YIntercept = p1.Y - (Slope * p1.X);
         }
         else
         {
-            yIntercept = p1.Y + (slope * p1.X);
+            YIntercept = p1.Y + (Slope * p1.X);
         }
         ReferencePoint = p1;
     }
 
     public void Set(double yIntercept, double slope)
     {
-        this.yIntercept = yIntercept;
-        this.slope = slope;
+        this.YIntercept = yIntercept;
+        this.Slope = slope;
         ReferencePoint = null;
     }
 
@@ -132,22 +132,22 @@ public class RayFormula : Formula
     {
         if (pointOnRay.X > 0)
         {
-            yIntercept = pointOnRay.Y - (slope * pointOnRay.X);
+            YIntercept = pointOnRay.Y - (slope * pointOnRay.X);
         }
         else
         {
-            yIntercept = pointOnRay.Y + (slope * pointOnRay.X);
+            YIntercept = pointOnRay.Y + (slope * pointOnRay.X);
         }
-        this.slope = slope;
+        this.Slope = slope;
         ReferencePoint = pointOnRay;
     }
 
     public Point? Intersect(RayFormula formula)
     {
         if (formula == null) return null;
-        if (formula.slope.RoughlyEquals(slope)) return null;
+        if (formula.Slope.RoughlyEquals(Slope)) return null;
 
-        var X = (yIntercept - formula._yIntercept) / (formula.slope - slope);
+        var X = (YIntercept - formula._yIntercept) / (formula.Slope - Slope);
         var Y = SolveForY(X);
 
         if (Y.Length == 0) return null;
@@ -158,11 +158,11 @@ public class RayFormula : Formula
 
     public Point[] Intersect(CircleFormula formula)
     {
-        var m = slope;
-        var c = yIntercept;
-        var a = formula.centerX;
-        var b = formula.centerY;
-        var r = formula.radius;
+        var m = Slope;
+        var c = YIntercept;
+        var a = formula.CenterX;
+        var b = formula.CenterY;
+        var r = formula.Radius;
 
         var A = (m * m + 1);
         var B = (2 * (m * (c - b) - a));
@@ -193,21 +193,21 @@ public class RayFormula : Formula
     }
     public override Point? GetClosestOnFormula(double x, double y)
     {
-        double nSlope = -1 / slope;
+        double nSlope = -1 / Slope;
         var nRay = new RayFormula(new Point(x, y), nSlope);
         return Intersect(nRay);
     }
 
     public override double[] SolveForX(double y)
     {
-        if (double.IsNaN((y - yIntercept) / slope)) return Array.Empty<double>();
-        return new double[] {(y - yIntercept) / slope};
+        if (double.IsNaN((y - YIntercept) / Slope)) return Array.Empty<double>();
+        return new double[] {(y - YIntercept) / Slope};
     }
 
     public override double[] SolveForY(double x)
     {
-        if (double.IsNaN(slope * x + yIntercept)) return Array.Empty<double>();
-        return new double[] {slope * x + yIntercept};
+        if (double.IsNaN(Slope * x + YIntercept)) return Array.Empty<double>();
+        return new double[] {Slope * x + YIntercept};
     }
 
     public override void Move(double x, double y)
@@ -215,11 +215,11 @@ public class RayFormula : Formula
         var pYI = _yIntercept;
         if (x > 0)
         {
-            _yIntercept = y - (slope * x);
+            _yIntercept = y - (Slope * x);
         }
         else
         {
-            _yIntercept = y + (slope * x);
+            _yIntercept = y + (Slope * x);
         }
         foreach (var l in OnMoved) l(0, pYI, 0, _yIntercept);
         foreach (var l in OnChange) l();

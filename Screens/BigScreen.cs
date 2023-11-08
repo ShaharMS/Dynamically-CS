@@ -98,12 +98,12 @@ public class BigScreen : DraggableGraphic
         var filtered = new List<Vertex>();
         if (requiresRoles != null)
         {
-            foreach (var j in Vertex.all)
+            foreach (var j in Vertex.All)
             {
                 if (j.Roles.Has(requiresRoles)) filtered.Add(j);
             }
         }
-        else filtered = Vertex.all;
+        else filtered = Vertex.All;
         filtered.Remove(potential);
 
 
@@ -155,7 +155,7 @@ public class BigScreen : DraggableGraphic
 #pragma warning restore CS8604 // Possible null reference argument.
             } else
             {
-                if (!Vertex.all.Contains(potential)) Vertex.all.Add(potential); // Todo - shouldnt be necessary, need to resolve later
+                if (!Vertex.All.Contains(potential)) Vertex.All.Add(potential); // Todo - shouldnt be necessary, need to resolve later
 #pragma warning disable CS8604 // Possible null reference argument.
                 potential.CreateBoardRelationsWith(from, from.GetConnectionTo(potential));
 #pragma warning restore CS8604 // Possible null reference argument.
@@ -164,7 +164,7 @@ public class BigScreen : DraggableGraphic
             MainWindow.Instance.PointerMoved -= EvalConnection;
             MainWindow.Instance.PointerReleased -= Finish;
 
-            MainWindow.regenAll(0,0,0,0);
+            MainWindow.RegenAll(0,0,0,0);
         }
 
         MainWindow.Instance.PointerMoved += EvalConnection;
@@ -184,7 +184,7 @@ public class BigScreen : DraggableGraphic
         {
             if (child is DraggableGraphic draggable && draggable.IsHovered)
             {
-                FocusedObject = draggable; // Automatically handles IsFocused on all objects
+                FocusedObject = draggable; // Automatically handles IsFocused on All objects
             }
         }
 
@@ -195,7 +195,7 @@ public class BigScreen : DraggableGraphic
         else if (FocusedObject is Circle circle) Log.Write($"Circle {circle} Is Focused");
         else if (FocusedObject is Triangle triangle) Log.Write($"Triangle {triangle} Is Focused");
         else if (FocusedObject is Quadrilateral quadrilateral) Log.Write($"Quadrilateral {quadrilateral} Is Focused");
-        else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Focused");
+        else if (FocusedObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.Focal1.Id}{ellipse.Focal2.Id} Is Focused");
         else if (FocusedObject is Selection selection) Log.Write($"Selection {selection} Is Focused");
 
         if (FocusedObject is not Backend.Graphics.Selection) Selection?.Cancel();
@@ -259,9 +259,9 @@ public class BigScreen : DraggableGraphic
         /*
         if (HoveredObject is BigScreen) Log.Write("No object is hovered");
         else if (HoveredObject is Vertex joint) Log.Write($"{joint.Id} Is Hovered");
-        else if (HoveredObject is Segment connection) Log.Write($"{connection.joint1.Id}{connection.joint2.Id} Is Hovered");
+        else if (HoveredObject is Segment connection) Log.Write($"{connection.Vertex1.Id}{connection.Vertex2.Id} Is Hovered");
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
-        else if (HoveredObject is EllipseBase ellipse) Log.Write($"Ellipse {ellipse.focal1.Id}{ellipse.focal2.Id} Is Hovered");
+        else if (HoveredObject is EllipseBase Ellipse) Log.Write($"Ellipse {Ellipse.Focal1.Id}{Ellipse.Focal2.Id} Is Hovered");
         */
     }
 

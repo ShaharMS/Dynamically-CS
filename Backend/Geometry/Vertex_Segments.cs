@@ -20,7 +20,7 @@ public partial class Vertex
         // Don'q connect something twice
         foreach (Segment c in Connections.Concat(to.Connections))
         {
-            if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
+            if ((c.Vertex1 == this && c.Vertex2 == to) || (c.Vertex2 == this && c.Vertex1 == to)) return c;
         }
 
         var connection = new Segment(this, to);
@@ -30,8 +30,8 @@ public partial class Vertex
         Relations.Add(to);
         to.Relations.Add(this);
 
-        reposition();
-        to.reposition();
+        Reposition();
+        to.Reposition();
 
         if (updateRelations) CreateBoardRelationsWith(to, connection);
         return connection;
@@ -46,7 +46,7 @@ public partial class Vertex
             // Don'q connect something twice
             foreach (Segment c in Connections.Concat(joint.Connections))
             {
-                if ((c.joint1 == this && c.joint2 == joint) || (c.joint2 == this && c.joint1 == joint))
+                if ((c.Vertex1 == this && c.Vertex2 == joint) || (c.Vertex2 == this && c.Vertex1 == joint))
                     doNothing = true;
             }
 
@@ -60,11 +60,11 @@ public partial class Vertex
                 Relations.Add(joint);
                 joint.Relations.Add(this);
 
-                joint.reposition();
+                joint.Reposition();
                 CreateBoardRelationsWith(joint, connection);
             }
         }
-        reposition();
+        Reposition();
         return cons;
     }
 
@@ -73,7 +73,7 @@ public partial class Vertex
         if (this == joint) return false;
         foreach (Segment c in Connections)
         {
-            Vertex[] js = new[] { c.joint1, c.joint2 };
+            Vertex[] js = new[] { c.Vertex1, c.Vertex2 };
             if (js.Contains(joint) && js.Contains(this)) return true;
         }
         return false;
@@ -83,7 +83,7 @@ public partial class Vertex
     {
         foreach (Segment c in Connections.Concat(to.Connections))
         {
-            if ((c.joint1 == this && c.joint2 == to) || (c.joint2 == this && c.joint1 == to)) return c;
+            if ((c.Vertex1 == this && c.Vertex2 == to) || (c.Vertex2 == this && c.Vertex1 == to)) return c;
         }
         return null;
     }
@@ -93,7 +93,7 @@ public partial class Vertex
         var past = Connections.ToList();
         foreach (Segment c in past)
         {
-            if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+            if (c.Vertex1 == this && c.Vertex2 == joint || c.Vertex1 == joint && c.Vertex2 == this)
             {
                 Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 Connections.Remove(c);
@@ -103,7 +103,7 @@ public partial class Vertex
         var past2 = joint.Connections.ToList();
         foreach (Segment c in past2)
         {
-            if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+            if (c.Vertex1 == this && c.Vertex2 == joint || c.Vertex1 == joint && c.Vertex2 == this)
             {
                 joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                 joint.Connections.Remove(c);
@@ -124,7 +124,7 @@ public partial class Vertex
             var past = Connections.ToList();
             foreach (Segment c in past)
             {
-                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+                if (c.Vertex1 == this && c.Vertex2 == joint || c.Vertex1 == joint && c.Vertex2 == this)
                 {
                     Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     Connections.Remove(c);
@@ -135,7 +135,7 @@ public partial class Vertex
             var past2 = joint.Connections.ToList();
             foreach (Segment c in past2)
             {
-                if (c.joint1 == this && c.joint2 == joint || c.joint1 == joint && c.joint2 == this)
+                if (c.Vertex1 == this && c.Vertex2 == joint || c.Vertex1 == joint && c.Vertex2 == this)
                 {
                     joint.Roles.RemoveFromRole(Role.SEGMENT_Corner, c);
                     joint.Connections.Remove(c);
@@ -158,21 +158,21 @@ public partial class Vertex
         foreach (Segment c in Connections)
         {
             MainWindow.BigScreen.Children.Remove(c);
-            if (c.joint1 != this) c.joint1.Connections.Remove(c);
-            else c.joint2.Connections.Remove(c);
-            if (c.joint1 != this) c.joint1.Relations.Remove(c.joint2);
-            else c.joint2.Relations.Remove(c.joint1);
-            if (c.joint1 != this) c.joint1.RepositionText();
-            else c.joint2.RepositionText();
+            if (c.Vertex1 != this) c.Vertex1.Connections.Remove(c);
+            else c.Vertex2.Connections.Remove(c);
+            if (c.Vertex1 != this) c.Vertex1.Relations.Remove(c.Vertex2);
+            else c.Vertex2.Relations.Remove(c.Vertex1);
+            if (c.Vertex1 != this) c.Vertex1.RepositionText();
+            else c.Vertex2.RepositionText();
 
-            c.joint1.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // One of them is `this`
-            c.joint2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
+            c.Vertex1.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // One of them is `this`
+            c.Vertex2.Roles.RemoveFromRole(Role.SEGMENT_Corner, c); // The other is the second joint
 
             c.Formula.RemoveAllFollowers();
             c.MiddleFormula.RemoveAllFollowers();
             Segment.all.Remove(c);
 
-            foreach (var l in c.OnRemoved) l(c.joint1, c.joint2);
+            foreach (var l in c.OnRemoved) l(c.Vertex1, c.Vertex2);
 
         }
         Connections.Clear();
@@ -184,7 +184,7 @@ public partial class Vertex
     {
         // Basic connection info
 
-        //First check - radius
+        //First check - Radius
 
         if ((joint.Roles.Has(Role.CIRCLE_On) && Roles.Has(Role.CIRCLE_Center)) || joint.Roles.Has(Role.CIRCLE_Center) && Roles.Has(Role.CIRCLE_On))
         {
@@ -203,15 +203,15 @@ public partial class Vertex
             {
                 if (Roles.Has(Role.CIRCLE_On, circle))
                 {
-                    if (joint.DistanceTo(this) == circle.radius * 2 && joint.RadiansTo(circle.center) == circle.center.RadiansTo(this))
+                    if (joint.DistanceTo(this) == circle.Radius * 2 && joint.RadiansTo(circle.Center) == circle.Center.RadiansTo(this))
                     {
                         segment.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
                         /* 
                             This causes a crash, since making a diameter already connects its
-                            edges to the circle, which dispatches onMoved on the center, and adding SEGMENT_Center
+                            edges to the circle, which dispatches onMoved on the Center, and adding SEGMENT_Center
                             also does this, during onMoved is dispatched, which is disallowed.
                         */
-                        //circle.center.Roles.AddToRole(Role.SEGMENT_Center, segment);
+                        //circle.Center.Roles.AddToRole(Role.SEGMENT_Center, segment);
                     } 
                     else segment.Roles.AddToRole(Role.CIRCLE_Chord, circle);
                 }
@@ -221,7 +221,7 @@ public partial class Vertex
         // Third case - connecting a line and forming a Triangle
         foreach (Segment c in Connections.ToArray())
         {
-            var other = c.joint1 == this ? c.joint2 : c.joint1;
+            var other = c.Vertex1 == this ? c.Vertex2 : c.Vertex1;
 
             
 

@@ -12,7 +12,7 @@ public class CircleFormula : Formula
 {
     public bool Moving;
     double _radius;
-    public double radius
+    public double Radius
     {
         get => _radius;
         set
@@ -22,7 +22,7 @@ public class CircleFormula : Formula
         }
     }
     double _centerX;
-    public double centerX
+    public double CenterX
     {
         get => _centerX;
         set
@@ -35,7 +35,7 @@ public class CircleFormula : Formula
     }
 
     double _centerY;
-    public double centerY
+    public double CenterY
     {
         get => _centerY;
         set
@@ -47,9 +47,9 @@ public class CircleFormula : Formula
     }
     public CircleFormula(double radius, double centerX, double centerY) : base()
     {
-        this.radius = radius;
-        this.centerX = centerX;
-        this.centerY = centerY;
+        Radius = radius;
+        CenterX = centerX;
+        CenterY = centerY;
     }
 
     public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) { }
@@ -59,12 +59,12 @@ public class CircleFormula : Formula
 
     public Point[] Intersect(CircleFormula formula)
     {
-        var a = centerX;
-        var b = centerY;
-        var c = formula.centerX;
-        var d = formula.centerY;
-        var r1 = radius;
-        var r2 = formula.radius;
+        var a = CenterX;
+        var b = CenterY;
+        var c = formula.CenterX;
+        var d = formula.CenterY;
+        var r1 = Radius;
+        var r2 = formula.Radius;
 
         // we can extract the ray on which the 0-2 points of collision reside:
         var handleRay = new RayFormula((a * a + b * b + r2 * r2 - c * c - d * d - r1 * r1) / (2 * (b - d)), (c - a) / (b - d));
@@ -78,17 +78,17 @@ public class CircleFormula : Formula
 
     public override double[] SolveForX(double y)
     {
-        if (y > centerY + radius || y < centerY - radius) return Array.Empty<double>();
-        var x1 = centerX - Math.Sqrt(-(centerY - y).Pow(2) + radius.Pow(2));
-        var x2 = centerX + Math.Sqrt(-(centerY - y).Pow(2) + radius.Pow(2));
+        if (y > CenterY + Radius || y < CenterY - Radius) return Array.Empty<double>();
+        var x1 = CenterX - Math.Sqrt(-(CenterY - y).Pow(2) + Radius.Pow(2));
+        var x2 = CenterX + Math.Sqrt(-(CenterY - y).Pow(2) + Radius.Pow(2));
         return new[] { x1, x2 };
     }
 
     public override double[] SolveForY(double x)
     {
-        if (x > centerX + radius || x < centerX - radius) return Array.Empty<double>();
-        var y1 = centerY - Math.Sqrt(-(centerX - x).Pow(2) + radius.Pow(2));
-        var y2 = centerY + Math.Sqrt(-(centerX - x).Pow(2) + radius.Pow(2));
+        if (x > CenterX + Radius || x < CenterX - Radius) return Array.Empty<double>();
+        var y1 = CenterY - Math.Sqrt(-(CenterX - x).Pow(2) + Radius.Pow(2));
+        var y2 = CenterY + Math.Sqrt(-(CenterX - x).Pow(2) + Radius.Pow(2));
         return new[] { y1, y2 };
     }
 
@@ -101,12 +101,12 @@ public class CircleFormula : Formula
     public override Point? GetClosestOnFormula(double px, double py)
     {
         //Avoid divide by 0 error:
-        if (px.RoughlyEquals(centerX) && py.RoughlyEquals(centerY)) return null;
-        double vX = px - centerX;
-        double vY = py - centerY;
+        if (px.RoughlyEquals(CenterX) && py.RoughlyEquals(CenterY)) return null;
+        double vX = px - CenterX;
+        double vY = py - CenterY;
         double magV = Math.Sqrt(vX * vX + vY * vY);
-        double aX = centerX + vX / magV * radius;
-        double aY = centerY + vY / magV * radius;
+        double aX = CenterX + vX / magV * Radius;
+        double aY = CenterY + vY / magV * Radius;
         return new Point(aX, aY);
     }
 

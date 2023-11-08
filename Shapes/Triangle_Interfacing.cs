@@ -19,30 +19,30 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     public void Dismantle()
     {
         Type = TriangleType.SCALENE; // Remove position modifiers
-        if (joint1.GotRemoved) joint1.Disconnect(joint2, joint3);
-        if (joint2.GotRemoved) joint2.Disconnect(joint1, joint3);
-        if (joint3.GotRemoved) joint3.Disconnect(joint2, joint1);
+        if (Vertex1.GotRemoved) Vertex1.Disconnect(Vertex2, Vertex3);
+        if (Vertex2.GotRemoved) Vertex2.Disconnect(Vertex1, Vertex3);
+        if (Vertex3.GotRemoved) Vertex3.Disconnect(Vertex2, Vertex1);
 
-        foreach (var j in new[] { joint1, joint2, joint3 })
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
         {
             j.OnMoved.Remove(__RecalculateInCircle);
         }
 
-        if (incircle != null)
+        if (Incircle != null)
         {
-            incircle.Draggable = true;
-            incircle.center.Draggable = true;
-            incircle.center.Roles.RemoveFromRole(Role.TRIANGLE_InCircleCenter, this);
+            Incircle.Draggable = true;
+            Incircle.Center.Draggable = true;
+            Incircle.Center.Roles.RemoveFromRole(Role.TRIANGLE_InCircleCenter, this);
         }
 
-        if (circumcircle != null) circumcircle.center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
+        if (Circumcircle != null) Circumcircle.Center.Roles.RemoveFromRole(Role.TRIANGLE_CircumCircleCenter, this);
 
-        foreach (var j in new[] { joint1, joint2, joint3 })
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
         {
             j.Roles.RemoveFromRole(Role.TRIANGLE_Corner, this);
         }
 
-        Triangle.all.Remove(this);
+        Triangle.All.Remove(this);
         MainWindow.BigScreen.Children.Remove(this);
     }
 
@@ -50,13 +50,13 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     public void __RecalculateInCircle(double ux, double uy, double px, double py)
     {
         var stats = GetCircleStats();
-        if (incircle == null) return;
-        incircle.center.X = stats.x;
-        incircle.center.Y = stats.y;
-        incircle.radius = stats.r;
-        incircle.UpdateFormula();
-        incircle.InvalidateVisual();
-        foreach (var listener in incircle.center.OnMoved) listener(incircle.center.X, incircle.center.Y, px, py);
+        if (Incircle == null) return;
+        Incircle.Center.X = stats.x;
+        Incircle.Center.Y = stats.y;
+        Incircle.Radius = stats.r;
+        Incircle.UpdateFormula();
+        Incircle.InvalidateVisual();
+        foreach (var listener in Incircle.Center.OnMoved) listener(Incircle.Center.X, Incircle.Center.Y, px, py);
     }
 
     public void __Disment(Vertex z, Vertex x)
@@ -79,7 +79,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public override string ToString()
     {
-        return $"△{joint1.Id}{joint2.Id}{joint3.Id}";
+        return $"△{Vertex1.Id}{Vertex2.Id}{Vertex3.Id}";
     }
 
     public string ToString(bool descriptive)
@@ -92,27 +92,27 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public override double Area()
     {
-        return con12.Length * con23.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetween3Points(joint1, joint2, joint3))) / 2;
+        return Segment12.Length * Segment23.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetween3Points(Vertex1, Vertex2, Vertex3))) / 2;
     }
 
 
     public override bool Overlaps(Point p)
     {
-        double areaABC = 0.5 * Math.Abs(joint1.X * (joint2.Y - joint3.Y) +
-                                       joint2.X * (joint3.Y - joint1.Y) +
-                                       joint3.X * (joint1.Y - joint2.Y));
+        double areaABC = 0.5 * Math.Abs(Vertex1.X * (Vertex2.Y - Vertex3.Y) +
+                                       Vertex2.X * (Vertex3.Y - Vertex1.Y) +
+                                       Vertex3.X * (Vertex1.Y - Vertex2.Y));
 
-        double areaPBC = 0.5 * Math.Abs(p.X * (joint2.Y - joint3.Y) +
-                                      joint2.X * (joint3.Y - p.Y) +
-                                      joint3.X * (p.Y - joint2.Y));
+        double areaPBC = 0.5 * Math.Abs(p.X * (Vertex2.Y - Vertex3.Y) +
+                                      Vertex2.X * (Vertex3.Y - p.Y) +
+                                      Vertex3.X * (p.Y - Vertex2.Y));
 
-        double areaPCA = 0.5 * Math.Abs(joint1.X * (p.Y - joint3.Y) +
-                                      p.X * (joint3.Y - joint1.Y) +
-                                      joint3.X * (joint1.Y - p.Y));
+        double areaPCA = 0.5 * Math.Abs(Vertex1.X * (p.Y - Vertex3.Y) +
+                                      p.X * (Vertex3.Y - Vertex1.Y) +
+                                      Vertex3.X * (Vertex1.Y - p.Y));
 
-        double areaPAB = 0.5 * Math.Abs(joint1.X * (joint2.Y - p.Y) +
-                                      joint2.X * (p.Y - joint1.Y) +
-                                      p.X * (joint1.Y - joint2.Y));
+        double areaPAB = 0.5 * Math.Abs(Vertex1.X * (Vertex2.Y - p.Y) +
+                                      Vertex2.X * (p.Y - Vertex1.Y) +
+                                      p.X * (Vertex1.Y - Vertex2.Y));
 
         // If the sum of the sub-Triangle areas is equal to the Triangle area, the point is inside the Triangle
         return Math.Abs(areaPBC + areaPCA + areaPAB - areaABC) < 0.0001; // Adjust epsilon as needed for floating-point comparison
@@ -121,12 +121,12 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public bool Contains(Vertex joint)
     {
-        return joint == joint1 || joint == joint2 || joint == joint3;
+        return joint == Vertex1 || joint == Vertex2 || joint == Vertex3;
     }
 
     public bool Contains(Segment segment)
     {
-        return segment == con12 || segment == con13 || segment == con23;
+        return segment == Segment12 || segment == Segment13 || segment == Segment23;
     }
 
     public bool HasMounted(Vertex joint)
@@ -141,6 +141,6 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public bool EncapsulatedWithin(Rect rect)
     {
-        return joint1.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect) && joint3.EncapsulatedWithin(rect);
+        return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect) && Vertex3.EncapsulatedWithin(rect);
     }
 }

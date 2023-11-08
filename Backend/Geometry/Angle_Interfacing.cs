@@ -14,12 +14,13 @@ public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSup
     public AngleContextMenuProvider Provider { get; }
     private void __updateAngle(double z, double x, double c, double v)
     {
+        _ = z; _ = x; _ = c; _ = v;
         BisectorRay.Set(Center, Math.Tan(GetBisectorRadians()));
         InvalidateVisual();
     }
     public override string ToString()
     {
-        return $"∠{joint1}{Center}{joint2}";
+        return $"∠{Vertex1}{Center}{Vertex2}";
     }
     public string ToString(bool descriptive)
     {
@@ -33,6 +34,6 @@ public partial class Angle : IStringifyable, ISupportsAdjacency, IContextMenuSup
 
     public bool EncapsulatedWithin(Rect rect)
     {
-        return joint1.EncapsulatedWithin(rect) && Center.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect);
+        return Vertex1.EncapsulatedWithin(rect) && Center.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect);
     }
 }

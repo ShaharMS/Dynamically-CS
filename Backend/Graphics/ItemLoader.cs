@@ -18,7 +18,7 @@ public class ItemLoader : MenuItem
 
     public bool Working { get; private set; }
 
-    StackPanel h;
+    readonly StackPanel h;
     public ItemLoader(ContextMenu parent, params Func<Control>[] tasks)
     {
         

@@ -77,11 +77,11 @@ public partial class MainWindow : Window
 
 
 
-        foreach (DraggableGraphic obj in Vertex.all.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.all)) obj.OnDragged.Add(regenAll);
+        foreach (DraggableGraphic obj in Vertex.All.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.All)) obj.OnDragged.Add(RegenAll);
 
         BigScreen.Refresh();
          
-        regenAll(0, 0, 0, 0);
+        RegenAll(0, 0, 0, 0);
 
         new BottomNote("Application Started!");
         BigScreen.Children.Add(new SolutionTable(true));
@@ -91,9 +91,9 @@ public partial class MainWindow : Window
 
     }
 
-    public static void regenAll(double z, double x, double c, double v) {
+    public static void RegenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             item.Provider.Regenerate();
         }

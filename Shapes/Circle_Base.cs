@@ -21,22 +21,22 @@ namespace Dynamically.Shapes;
 public partial class Circle : EllipseBase
 {
 
-    public static new readonly List<Circle> all = new();
+    public static new readonly List<Circle> All = new();
 
 
-    public Vertex center;
+    public Vertex Center;
 
     public List<Action<double, double>> onResize = new();
 
     public List<Action> OnRemoved = new();
 
-    public double radius
+    public double Radius
     {
-        get => distanceSum / 2;
+        get => DistanceSum / 2;
         set
         {
-            double prev = distanceSum / 2;
-            distanceSum = value * 2;
+            double prev = DistanceSum / 2;
+            DistanceSum = value * 2;
             UpdateFormula();
             foreach (var l in onResize) l(value, prev);
         }
@@ -46,30 +46,30 @@ public partial class Circle : EllipseBase
         get => base.Opacity;
         set {
             base.Opacity = value;
-            ring.Opacity = value;
+            Ring.Opacity = value;
         }
     }
 
     public Circle(Vertex center, double radius) : base(center, center, radius * 2)
     {
-        this.radius = radius;
-        this.center = center;
+        this.Radius = radius;
+        this.Center = center;
         Formula = new CircleFormula(radius, center.X, center.Y);
 
-        all.Add(this);
+        All.Add(this);
 
         OnMoved.Add((x, y, px, py) =>
         {
-            double pcx = this.center.X, pcy = this.center.Y;
-            this.center.X += x - px;
-            this.center.Y += y - py;
-            this.center.DispatchOnMovedEvents(this.center.X, this.center.Y, pcx, pcy);
+            double pcx = this.Center.X, pcy = this.Center.Y;
+            this.Center.X += x - px;
+            this.Center.Y += y - py;
+            this.Center.DispatchOnMovedEvents(this.Center.X, this.Center.Y, pcx, pcy);
             this.SetPosition(0, 0);
         });
         OnMoved.Add(__circle_OnChange);
         OnDragStart.Add(__circle_Moving);
         OnDragged.Add(__circle_StopMoving);
-        OnDragged.Add(MainWindow.regenAll);
+        OnDragged.Add(MainWindow.RegenAll);
 
 
         ContextMenu = new ContextMenu();
@@ -77,18 +77,18 @@ public partial class Circle : EllipseBase
         ContextMenu.Items = Provider.Items;
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
-        center.reposition();
+        center.Reposition();
     }
 
     public void Set(Vertex center, double radius)
     {
         center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
-        center.Draggable = this.center.Draggable;
-        this.center = center;
-        focal1 = this.center;
-        focal2 = this.center;
+        center.Draggable = this.Center.Draggable;
+        this.Center = center;
+        Focal1 = this.Center;
+        Focal2 = this.Center;
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
-        this.radius = radius;
+        this.Radius = radius;
         UpdateFormula();
     }
 
@@ -110,7 +110,7 @@ public partial class Circle : EllipseBase
             return new Point(p1.X + dx12 * t1, p1.Y + dy12 * t1);
         }
 
-        // Get the perpendicular bisector of (x1, y1) and (x2, y2).
+        // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;
         double y1 = (joint2.Y + joint1.Y) / 2;
         double dy1 = joint2.X - joint1.X;
@@ -138,24 +138,24 @@ public partial class Circle : EllipseBase
     public void UpdateFormula()
     {
         if (Formula == null) return;
-        Formula.centerX = center.X;
-        Formula.centerY = center.Y;
-        Formula.radius = radius;
+        Formula.CenterX = Center.X;
+        Formula.CenterY = Center.Y;
+        Formula.Radius = Radius;
     }
 
     public override double GetClosenessToCenter(Point point)
     {
-        return point.DistanceTo(center);
+        return point.DistanceTo(Center);
     }
     public override void Render(DrawingContext context)
     {
         if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
         {
-            context.DrawEllipse(UIColors.ShapeHoverFill, null, center, radius, radius);
+            context.DrawEllipse(UIColors.ShapeHoverFill, null, Center, Radius, Radius);
         }
         else
         {
-            context.DrawEllipse(UIColors.ShapeFill, null, center, radius, radius);
+            context.DrawEllipse(UIColors.ShapeFill, null, Center, Radius, Radius);
         }
         base.Render(context);
     }

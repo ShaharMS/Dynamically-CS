@@ -40,7 +40,7 @@ public class SolutionTable : Canvas
 
     public bool HasFroms;
 
-    ResizableBorder border;
+    readonly ResizableBorder border;
 
     public TableHandle Handle;
 

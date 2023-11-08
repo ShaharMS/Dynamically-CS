@@ -27,8 +27,8 @@ public partial class RoleMap
                 var s1 = item as Segment;
                 Subject.OnDragged.Add(s1.__reposition);
                 Subject.OnMoved.Add(s1.__repositionLabel);
-                s1.joint1.Relations.Remove(s1.joint2);
-                s1.joint2.Relations.Remove(s1.joint1);
+                s1.Vertex1.Relations.Remove(s1.Vertex2);
+                s1.Vertex2.Relations.Remove(s1.Vertex1);
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.AddFollower(Subject);
@@ -57,10 +57,10 @@ public partial class RoleMap
                 }
                 break;
             case Role.TRIANGLE_CircumCircleCenter:
-                (item as Triangle).circumcircle.OnRemoved.Add(() => (item as Triangle).circumcircle = null);
+                (item as Triangle).Circumcircle.OnRemoved.Add(() => (item as Triangle).Circumcircle = null);
                 break;
             case Role.TRIANGLE_InCircleCenter:
-                (item as Triangle).incircle.OnRemoved.Add(() => (item as Triangle).incircle = null);
+                (item as Triangle).Incircle.OnRemoved.Add(() => (item as Triangle).Incircle = null);
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
@@ -88,8 +88,8 @@ public partial class RoleMap
             case Role.SEGMENT_Corner:
                 var s1 = item as Segment;
                 Subject.OnDragged.Remove(s1.__reposition);
-                s1.joint1.Relations.Remove(s1.joint2);
-                s1.joint2.Relations.Remove(s1.joint1);
+                s1.Vertex1.Relations.Remove(s1.Vertex2);
+                s1.Vertex2.Relations.Remove(s1.Vertex1);
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.RemoveFollower(Subject);
@@ -110,10 +110,10 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                (item as Circle).center.OnMoved.Remove((item as Circle).__circle_OnChange);
-                (item as Circle).center.OnDragStart.Remove((item as Circle).__circle_Moving);
-                (item as Circle).center.OnDragged.Remove((item as Circle).__circle_StopMoving);
-                (item as Circle).center.OnRemoved.Remove((item as Circle).__circle_Remove);
+                (item as Circle).Center.OnMoved.Remove((item as Circle).__circle_OnChange);
+                (item as Circle).Center.OnDragStart.Remove((item as Circle).__circle_Moving);
+                (item as Circle).Center.OnDragged.Remove((item as Circle).__circle_StopMoving);
+                (item as Circle).Center.OnRemoved.Remove((item as Circle).__circle_Remove);
                 foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         joint.Roles.RemoveFromRole(Role.CIRCLE_On, item);
@@ -122,10 +122,10 @@ public partial class RoleMap
                 }
                 break;
             case Role.TRIANGLE_CircumCircleCenter:
-                (item as Triangle).circumcircle.OnRemoved.Remove(() => (item as Triangle).circumcircle = null);
+                (item as Triangle).Circumcircle.OnRemoved.Remove(() => (item as Triangle).Circumcircle = null);
                 break;
             case Role.TRIANGLE_InCircleCenter:
-                (item as Triangle).incircle.OnRemoved.Remove(() => (item as Triangle).incircle = null);
+                (item as Triangle).Incircle.OnRemoved.Remove(() => (item as Triangle).Incircle = null);
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
@@ -185,7 +185,7 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                (item as Circle).Set(Subject, (item as Circle).radius);
+                (item as Circle).Set(Subject, (item as Circle).Radius);
                 foreach (Vertex joint in Subject.Relations)
                 {
                     if (joint.Roles.Has(Role.CIRCLE_On, item))
@@ -200,20 +200,20 @@ public partial class RoleMap
                 var t1 = item as Triangle;
 
                 char? id = null;
-                if (t1.incircle != null)
+                if (t1.Incircle != null)
                 {
-                    t1.incircle.Dismantle();
-                    id = t1.incircle.center.Id;
-                    t1.incircle.center.RemoveFromBoard();
+                    t1.Incircle.Dismantle();
+                    id = t1.Incircle.Center.Id;
+                    t1.Incircle.Center.RemoveFromBoard();
                 }
 
-                if (t1.joint1 == From) t1.joint1 = Subject;
-                else if (t1.joint2 == From) t1.joint2 = Subject;
-                else if (t1.joint3 == From) t1.joint3 = Subject;
+                if (t1.Vertex1 == From) t1.Vertex1 = Subject;
+                else if (t1.Vertex2 == From) t1.Vertex2 = Subject;
+                else if (t1.Vertex3 == From) t1.Vertex3 = Subject;
 
-                t1.con12.ReplaceJoint(From, Subject);
-                t1.con23.ReplaceJoint(From, Subject);
-                t1.con13.ReplaceJoint(From, Subject);
+                t1.Segment12.ReplaceJoint(From, Subject);
+                t1.Segment23.ReplaceJoint(From, Subject);
+                t1.Segment13.ReplaceJoint(From, Subject);
 
                 if (From.OnMoved.Contains(t1.__RecalculateInCircle))
                 {
@@ -230,7 +230,7 @@ public partial class RoleMap
                 if (id != null)
                 {
                     t1.GenerateInCircle();
-                    t1.incircle.center.Id = id.Value;
+                    t1.Incircle.Center.Id = id.Value;
                 }
                 break;
             default: break;

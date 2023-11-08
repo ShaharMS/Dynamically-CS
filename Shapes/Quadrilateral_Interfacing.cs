@@ -21,13 +21,13 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
     public void Dismantle()
     {
-        con1.Dismantle();
-        con2.Dismantle();
-        con3.Dismantle();
-        con4.Dismantle();
+        Con1.Dismantle();
+        Con2.Dismantle();
+        Con3.Dismantle();
+        Con4.Dismantle();
 
-        all.Remove(this);
-        MainWindow.regenAll(0, 0, 0, 0);
+        All.Remove(this);
+        MainWindow.RegenAll(0, 0, 0, 0);
         MainWindow.BigScreen.Children.Remove(this);
     }
 
@@ -53,12 +53,12 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
         var rayCast = new RayFormula(p, 0);
 
         int intersections = 0;
-        foreach (var f in new[] { con1, con2, con3, con4 })
+        foreach (var f in new[] { Con1, Con2, Con3, Con4 })
         {
             var i = f.Formula.Intersect(rayCast);
             if (i != null && i?.X >= p.X) intersections++;
         }
-        foreach (var j in new[] { joint1, joint2, joint3, joint4 })
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3, Vertex4 })
         {
             if (p.RoughlyEquals(j))
             {
@@ -71,29 +71,29 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
     public override double Area()
     {
-        if (con1.SharesJointWith(con2))
+        if (Con1.SharesJointWith(Con2))
         {
             return
-                con1.Length * con2.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con2))) / 2 +
-                con3.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con3, con4))) / 2;
+                Con1.Length * Con2.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(Con1, Con2))) / 2 +
+                Con3.Length * Con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(Con3, Con4))) / 2;
         }
-        else if (con1.SharesJointWith(con3))
+        else if (Con1.SharesJointWith(Con3))
         {
             return
-                con1.Length * con3.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con1, con3))) / 2 +
-                con2.Length * con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(con2, con4))) / 2;
+                Con1.Length * Con3.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(Con1, Con3))) / 2 +
+                Con2.Length * Con4.Length * Math.Abs(Math.Sin(Tools.GetRadiansBetweenConnections(Con2, Con4))) / 2;
         }
 
         return double.NaN;
     }
     public bool Contains(Vertex joint)
     {
-        return joint == joint1 || joint == joint2 || joint == joint3 || joint == joint4;
+        return joint == Vertex1 || joint == Vertex2 || joint == Vertex3 || joint == Vertex4;
     }
 
     public bool Contains(Segment segment)
     {
-        return segment == con1 || segment == con2 || segment == con3 || segment == con4;
+        return segment == Con1 || segment == Con2 || segment == Con3 || segment == Con4;
     }
 
     public bool HasMounted(Vertex joint)
@@ -108,19 +108,19 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
     public override string ToString()
     {
-        return $"{joint1.Id}{joint2.Id}{joint3.Id}{joint4.Id}";
+        return $"{Vertex1.Id}{Vertex2.Id}{Vertex3.Id}{Vertex4.Id}";
     }
 
     public string ToString(bool descriptive)
     {
         if (!descriptive) return ToString();
-        return $"{typeToString(Type)} " + ToString();
+        return $"{TypeToString(Type)} " + ToString();
     }
 
-    private string typeToString(QuadrilateralType type) => type != QuadrilateralType.IRREGULAR ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Quadrilateral";
+    private string TypeToString(QuadrilateralType type) => type != QuadrilateralType.IRREGULAR ? new CultureInfo("en-US", false).TextInfo.ToTitleCase(type.ToString().ToLower().Replace('_', ' ')) : "Quadrilateral";
 
     public bool EncapsulatedWithin(Rect rect)
     {
-        return joint1.EncapsulatedWithin(rect) && joint2.EncapsulatedWithin(rect) && joint3.EncapsulatedWithin(rect) && joint4.EncapsulatedWithin(rect);
+        return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect) && Vertex3.EncapsulatedWithin(rect) && Vertex4.EncapsulatedWithin(rect);
     }
 }

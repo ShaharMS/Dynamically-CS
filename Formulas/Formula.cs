@@ -14,7 +14,7 @@ public abstract class Formula
     public List<Action<double, double, double, double>> OnMoved = new();
     public List<Vertex> Followers = new();
 
-    public bool queueRemoval = false;
+    public bool QueueRemoval = false;
     public abstract double[] SolveForX(double y);
     public abstract double[] SolveForY(double x);
 
@@ -43,7 +43,7 @@ public abstract class Formula
     {
         OnMoved.Add((curX, curY, preX, preY) => {
             foreach (var joint in Followers) {
-                // If a formula moves an element encapsulated within the current selection,
+                // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
                 if (MainWindow.BigScreen.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;
                 joint.X = joint.X - preX + curX;

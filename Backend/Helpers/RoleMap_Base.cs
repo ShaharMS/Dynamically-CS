@@ -26,11 +26,11 @@ public partial class RoleMap
         return m;
     }
 
-    public Dictionary<Role, List<object>> underlying = new();
+    public Dictionary<Role, List<object>> Underlying = new();
 
     public Dictionary<Role, List<object>>.Enumerator GetEnumerator()
     {
-        return underlying.GetEnumerator();
+        return Underlying.GetEnumerator();
     }
 
     public Either<Vertex, Segment> Subject;
@@ -43,7 +43,7 @@ public partial class RoleMap
         {
             if (!Has(role) && value.Count > 0) Count++;
             else if (Has(role) && value.Count == 0) Count--;
-            underlying[role] = value;
+            Underlying[role] = value;
         }
     }
 
@@ -55,11 +55,11 @@ public partial class RoleMap
 
     public List<T> Access<T>(Role role)
     {
-        if (underlying.ContainsKey(role)) return underlying[role].Cast<T>().ToList();
+        if (Underlying.ContainsKey(role)) return Underlying[role].Cast<T>().ToList();
         else
         {
-            underlying[role] = new List<object>();
-            return underlying[role].Cast<T>().ToList();
+            Underlying[role] = new List<object>();
+            return Underlying[role].Cast<T>().ToList();
         }
     }
 
@@ -135,7 +135,7 @@ public partial class RoleMap
 
     public void Clear()
     {
-        foreach (var role in underlying.Keys)
+        foreach (var role in Underlying.Keys)
         {
             ClearRole<object>(role);
         }
@@ -144,9 +144,9 @@ public partial class RoleMap
     public T AddToRole<T>(Role role, T item)
     {
         if (Has(role, item)) return item;
-        if (underlying.ContainsKey(role)) underlying[role].Add(item);
-        else underlying[role] = new List<object> { item };
-        if (underlying[role].Count == 1) Count++;
+        if (Underlying.ContainsKey(role)) Underlying[role].Add(item);
+        else Underlying[role] = new List<object> { item };
+        if (Underlying[role].Count == 1) Count++;
 
         if (Subject.Is<Vertex>())  Joint__AddToRole(role, item, Subject.L());
         else Segment__AddToRole(role, item, Subject.R());
@@ -158,7 +158,7 @@ public partial class RoleMap
         var list = Access<T>(role);
         if (list.Count == 0 || !list.Contains(item)) return item;
         if (list.Count == 1) Count--;
-        underlying[role].Remove(item);
+        Underlying[role].Remove(item);
 
         if (Subject.Is<Vertex>()) Joint__RemoveFromRole(role, item, Subject.L());
         else Segment__RemoveFromRole(role, item, Subject.R());
@@ -181,13 +181,13 @@ public partial class RoleMap
                 var list = Roles.Access<dynamic>(role);
                 if (list.Count == 0 || !list.Contains(item)) continue;
                 if (list.Count == 1) Roles.Count--;
-                Roles.underlying[role].Remove(item);
+                Roles.Underlying[role].Remove(item);
 
                 // Add to this:
                 if (Has(role, item)) continue;
-                if (underlying.ContainsKey(role)) underlying[role].Add(item);
-                else underlying[role] = new List<object> { item };
-                if (underlying[role].Count == 1) Count++;
+                if (Underlying.ContainsKey(role)) Underlying[role].Add(item);
+                else Underlying[role] = new List<object> { item };
+                if (Underlying[role].Count == 1) Count++;
 
                 if (Subject.Is<Vertex>()) Joint__TransferRole(Roles.Subject.L(), role, item, Subject.L());
                 else Segment__TransferRole(Roles.Subject.R(), role, item, Subject.R());

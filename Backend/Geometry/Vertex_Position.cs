@@ -36,7 +36,7 @@ public partial class Vertex
 
     /// <summary>
     /// Dispatches OnMoved events & updates position according to existing formulas. 
-    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -58,7 +58,7 @@ public partial class Vertex
 
                 if (initialX != null && initialY != null)
                 {
-                    var p = new RatioOnSegmentFormula(new SegmentFormula(initialX.Value, initialY.Value, X, Y), 0.5).pointOnRatio;
+                    var p = new RatioOnSegmentFormula(new SegmentFormula(initialX.Value, initialY.Value, X, Y), 0.5).PointOnRatio;
                     X = p.X;
                     Y = p.Y;
                     initialX = initialY = null;
@@ -85,6 +85,6 @@ public partial class Vertex
             }
             dispatchingOnMoved = false; 
         }
-        reposition();
+        Reposition();
     }
 }

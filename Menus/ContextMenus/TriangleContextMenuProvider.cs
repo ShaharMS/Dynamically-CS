@@ -88,9 +88,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         };
         rotate.Click += (sender, e) =>
         {
-            Point p1 = new(Subject.joint1.X, Subject.joint1.Y), p2 = new(Subject.joint2.X, Subject.joint2.Y), p3 = new(Subject.joint3.X, Subject.joint3.Y);
+            Point p1 = new(Subject.Vertex1.X, Subject.Vertex1.Y), p2 = new(Subject.Vertex2.X, Subject.Vertex2.Y), p3 = new(Subject.Vertex3.X, Subject.Vertex3.Y);
             Point rotationCenter = Subject.GetIncircleCenter();
-            double dist1 = Subject.joint1.DistanceTo(rotationCenter), dist2 = Subject.joint2.DistanceTo(rotationCenter), dist3 = Subject.joint3.DistanceTo(rotationCenter);
+            double dist1 = Subject.Vertex1.DistanceTo(rotationCenter), dist2 = Subject.Vertex2.DistanceTo(rotationCenter), dist3 = Subject.Vertex3.DistanceTo(rotationCenter);
             double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
 
             double rad1 = rotationCenter.RadiansTo(p1), rad2 = rotationCenter.RadiansTo(p2), rad3 = rotationCenter.RadiansTo(p3);
@@ -98,10 +98,10 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             void Move(object? sender, PointerEventArgs args)
             {
                 var currentRotation = rotationCenter.RadiansTo(args.GetPosition(null)) - initialRotationRad;
-                Subject.joint1.X = rotationCenter.X + dist1 * Math.Cos(rad1 + currentRotation); Subject.joint1.Y = rotationCenter.Y + dist1 * Math.Sin(rad1 + currentRotation);
-                Subject.joint2.X = rotationCenter.X + dist2 * Math.Cos(rad2 + currentRotation); Subject.joint2.Y = rotationCenter.Y + dist2 * Math.Sin(rad2 + currentRotation);
-                Subject.joint3.X = rotationCenter.X + dist3 * Math.Cos(rad3 + currentRotation); Subject.joint3.Y = rotationCenter.Y + dist3 * Math.Sin(rad3 + currentRotation);
-                Subject.joint1.DispatchOnMovedEvents(); Subject.joint2.DispatchOnMovedEvents(); Subject.joint3.DispatchOnMovedEvents();
+                Subject.Vertex1.X = rotationCenter.X + dist1 * Math.Cos(rad1 + currentRotation); Subject.Vertex1.Y = rotationCenter.Y + dist1 * Math.Sin(rad1 + currentRotation);
+                Subject.Vertex2.X = rotationCenter.X + dist2 * Math.Cos(rad2 + currentRotation); Subject.Vertex2.Y = rotationCenter.Y + dist2 * Math.Sin(rad2 + currentRotation);
+                Subject.Vertex3.X = rotationCenter.X + dist3 * Math.Cos(rad3 + currentRotation); Subject.Vertex3.Y = rotationCenter.Y + dist3 * Math.Sin(rad3 + currentRotation);
+                Subject.Vertex1.DispatchOnMovedEvents(); Subject.Vertex2.DispatchOnMovedEvents(); Subject.Vertex3.DispatchOnMovedEvents();
             }
 
             void Finish(object? sender, PointerPressedEventArgs arg)
@@ -172,11 +172,11 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     {
         var remove = new MenuItem
         {
-            Header = $"Remove {Subject.joint1}, {Subject.joint2} & {Subject.joint3}"
+            Header = $"Remove {Subject.Vertex1}, {Subject.Vertex2} & {Subject.Vertex3}"
         };
         remove.Click += (sender, e) =>
         {
-            foreach (var item in new[] { Subject.joint3, Subject.joint1, Subject.joint2 }) item.RemoveFromBoard();
+            foreach (var item in new[] { Subject.Vertex3, Subject.Vertex1, Subject.Vertex2 }) item.RemoveFromBoard();
         };
         return remove;
     }
@@ -187,12 +187,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
 
     MenuItem Sgest_GenerateCircumCircle()
     {
-        if (Subject.circumcircle != null)
+        if (Subject.Circumcircle != null)
         {
             return new MenuItem
             {
-                Header = $"Circum-Circle {Subject.circumcircle}",
-                Items = Subject.circumcircle.Provider.ItemsWithoutAdjacents
+                Header = $"Circum-Circle {Subject.Circumcircle}",
+                Items = Subject.Circumcircle.Provider.ItemsWithoutAdjacents
             };
         }
         var circum = new MenuItem
@@ -208,12 +208,12 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     MenuItem Sgest_GenerateInCircle()
     {
 
-        if (Subject.incircle != null)
+        if (Subject.Incircle != null)
         {
             return new MenuItem
             {
-                Header = $"Incircle {Subject.incircle}",
-                Items = Subject.incircle.Provider.ItemsWithoutAdjacents
+                Header = $"Incircle {Subject.Incircle}",
+                Items = Subject.Incircle.Provider.ItemsWithoutAdjacents
 
             };
         }

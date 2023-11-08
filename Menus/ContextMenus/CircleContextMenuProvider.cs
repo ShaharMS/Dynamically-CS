@@ -97,11 +97,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
     {
         var hide = new MenuItem
         {
-            Header = Subject.center.Hidden ? $"Show Center ({Subject.center.ToString()})" : $"Hide Center ({Subject.center.ToString()})"
+            Header = Subject.Center.Hidden ? $"Show Center ({Subject.Center.ToString()})" : $"Hide Center ({Subject.Center.ToString()})"
         };
         hide.Click += (sender, e) =>
         {
-            Subject.center.Hidden = !Subject.center.Hidden;
+            Subject.Center.Hidden = !Subject.Center.Hidden;
             Regenerate();
         };
         return hide;
@@ -123,7 +123,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.BigScreen.HandleCreateConnection(Subject.center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            MainWindow.BigScreen.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
 
         return item;
@@ -140,11 +140,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(BigScreen.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.BigScreen.HandleCreateConnection(Subject.center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            MainWindow.BigScreen.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
-            var j1 = new Vertex(j.X - (j.X - Subject.center.X) * 2, j.Y - (j.Y - Subject.center.Y) * 2);
+            var j1 = new Vertex(j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            j1.Connect(Subject.center);
+            j1.Connect(Subject.Center);
 
             j.Connect(j1).Roles.AddToRole(Role.CIRCLE_Diameter, Subject);
         };
@@ -155,15 +155,15 @@ public class CircleContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MarkIntersection()
     {
-        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.all).ToList();
+        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.All).ToList();
 
         scanList.Remove(Subject);
 
         List<MenuItem> intersections = new();
         foreach (var element in scanList)
         {
-            if (element is Segment s && (Subject.Formula.Followers.ContainsMany(s.joint1, s.joint2) || s.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (s.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
-            if (element is Circle circle && (((Point)circle.center).RoughlyEquals(Subject.center) || circle.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (circle.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
+            if (element is Segment s && (Subject.Formula.Followers.ContainsMany(s.Vertex1, s.Vertex2) || s.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (s.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
+            if (element is Circle circle && (((Point)circle.Center).RoughlyEquals(Subject.Center) || circle.Formula.Followers.Intersect(Subject.Formula.Followers).Count() >= (circle.Formula.Intersect(Subject.Formula)?.Length ?? 0))) continue;
             if (Subject.Formula.Intersects(element.Formula))
             {
                 var item = new MenuItem
@@ -177,8 +177,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
                     foreach (var p in intersections)
                     {
                         if (existing.ContainsRoughly(p)) continue;
-                        var j = new Vertex(p);
-                        j.X = p.X; j.Y = p.Y;
+                        var j = new Vertex(p)
+                        {
+                            X = p.X,
+                            Y = p.Y
+                        };
                         if (element is Circle) j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                         else j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
                         j.Roles.AddToRole(Role.CIRCLE_On, Subject);

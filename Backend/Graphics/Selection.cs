@@ -66,7 +66,7 @@ public class Selection : DraggableGraphic, IStringifyable
             return;
         }
 
-        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
             item.Opacity = 1;
 
         MainWindow.BigScreen.FocusedObject = this;
@@ -80,7 +80,7 @@ public class Selection : DraggableGraphic, IStringifyable
         var pos = e.GetPosition(MainWindow.BigScreen);
         ex = pos.X; ey = pos.Y;
         var rect = Rect; // Use getter once.
-        foreach (dynamic item in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             if (item.EncapsulatedWithin(rect))
             {
@@ -114,7 +114,7 @@ public class Selection : DraggableGraphic, IStringifyable
         MainWindow.BigScreen.Children.Remove(this);
         MainWindow.BigScreen.Selection = null;
         EncapsulatedElements.Clear();
-        foreach (var element in Vertex.all.Concat<dynamic>(Segment.all).Concat(Triangle.all).Concat(Quadrilateral.all).Concat(Circle.all).Concat(Angle.all))
+        foreach (var element in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             element.Opacity = 1;
         }

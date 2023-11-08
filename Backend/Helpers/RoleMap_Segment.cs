@@ -20,17 +20,17 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
+                Subject.Vertex1.OnMoved.Add((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint1.CurrentlyDragging) return;
-                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
-                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex1.CurrentlyDragging) return;
+                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
+                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
                 });
-                Subject.joint2.OnMoved.Add((cx, cy, _, _) =>
+                Subject.Vertex2.OnMoved.Add((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint2.CurrentlyDragging) return;
-                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
-                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex2.CurrentlyDragging) return;
+                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
+                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
                 }); // TODO: fix this, OnMoved functions cant manipulate positions (testing, may be incorrect)
                 break;
             // Triangle
@@ -55,17 +55,17 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                Subject.Vertex1.OnMoved.Remove((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint1.CurrentlyDragging) return;
-                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
-                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex1.CurrentlyDragging) return;
+                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
+                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
                 });
-                Subject.joint2.OnMoved.Remove((cx, cy, _, _) =>
+                Subject.Vertex2.OnMoved.Remove((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint2.CurrentlyDragging) return;
-                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
-                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex2.CurrentlyDragging) return;
+                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
+                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
                 });
                 break;
             case Role.TRIANGLE_Side:
@@ -91,29 +91,29 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                From.joint1.OnMoved.Remove((cx, cy, _, _) =>
+                From.Vertex1.OnMoved.Remove((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint1.CurrentlyDragging) return;
-                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
-                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex1.CurrentlyDragging) return;
+                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
+                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
                 });
-                From.joint2.OnMoved.Remove((cx, cy, _, _) =>
+                From.Vertex2.OnMoved.Remove((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint2.CurrentlyDragging) return;
-                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
-                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex2.CurrentlyDragging) return;
+                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
+                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
                 });
-                Subject.joint1.OnMoved.Add((cx, cy, _, _) =>
+                Subject.Vertex1.OnMoved.Add((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint1.CurrentlyDragging) return;
-                    Subject.joint2.X = Subject.joint1.X - (Subject.joint1.X - c1.center.X) * 2;
-                    Subject.joint2.Y = Subject.joint1.Y - (Subject.joint1.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex1.CurrentlyDragging) return;
+                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
+                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
                 });
-                Subject.joint2.OnMoved.Add((cx, cy, _, _) =>
+                Subject.Vertex2.OnMoved.Add((cx, cy, _, _) =>
                 {
-                    if (!Subject.joint2.CurrentlyDragging) return;
-                    Subject.joint1.X = Subject.joint2.X - (Subject.joint2.X - c1.center.X) * 2;
-                    Subject.joint1.Y = Subject.joint2.Y - (Subject.joint2.Y - c1.center.Y) * 2;
+                    if (!Subject.Vertex2.CurrentlyDragging) return;
+                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
+                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
                 });
                 break;
             // Triangle

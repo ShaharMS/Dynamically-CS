@@ -26,7 +26,7 @@ public partial class DraggableGraphic : Canvas
     private Point _startMousePosition;
 
     /// <summary>
-    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
@@ -51,7 +51,7 @@ public partial class DraggableGraphic : Canvas
     }
 
     /// <summary>
-    /// when a parameter provided is null, or isnt provided, its reset to current X & Y coords.
+    /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>
     /// <param name="x"></param>
     /// <param name="y"></param>

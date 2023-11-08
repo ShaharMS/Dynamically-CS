@@ -15,7 +15,7 @@ namespace Dynamically
 {
     public partial class Log : Window
     {
-        public static readonly Log current = new();
+        public static readonly Log Instance = new();
         private readonly TextBlock consoleTextBlock;
         private readonly ScrollViewer scrollViewer;
         public Log()
@@ -23,8 +23,8 @@ namespace Dynamically
             InitializeComponent();
             consoleTextBlock = new TextBlock
             {
-                Width = this.Width,
-                Height = this.Height - 30,
+                Width = Width,
+                Height = Height - 30,
                 FontSize = 16,
                 Text = "Application start!\n--------------------------------\n"
             };
@@ -40,8 +40,8 @@ namespace Dynamically
 
             LayoutUpdated += (_, _) =>
             {
-                scrollViewer.Width = this.Width;
-                scrollViewer.Height = this.Height;
+                scrollViewer.Width = Width;
+                scrollViewer.Height = Height;
             };
         }
 
@@ -54,15 +54,15 @@ namespace Dynamically
 
         public static void Write(params object?[] text)
         {
-            current.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
-            if (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+            Instance.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
+            if (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
             {
-                while (current.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+                while (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
                 {
-                    current.consoleTextBlock.Text = current.consoleTextBlock.Text.Remove(0, 1);
+                    Instance.consoleTextBlock.Text = Instance.consoleTextBlock.Text.Remove(0, 1);
                 }
             }
-            current.scrollViewer.ScrollToEnd();
+            Instance.scrollViewer.ScrollToEnd();
         }
         
         /// <summary>

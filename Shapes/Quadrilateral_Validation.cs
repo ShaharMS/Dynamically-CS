@@ -54,57 +54,57 @@ public partial class Quadrilateral {
 
     static void AssignAngles(Quadrilateral quad)
     {
-        Segment s1 = quad.con1, s2 = quad.con2, s3 = quad.con3, s4 = quad.con4;
+        Segment s1 = quad.Con1, s2 = quad.Con2, s3 = quad.Con3, s4 = quad.Con4;
         if (s1.SharesJointWith(s2))
         {
             quad._degrees1 = () => Tools.GetDegreesBetweenConnections(s1, s2, true);
-            quad.angle1Joints = new HashSet<Vertex> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 }.Where(x => x != s1.GetSharedJoint(s2)).ToList().InsertR(1, s1.GetSharedJoint(s2)).ToArray();
+            quad.Angle1Joints = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s2.Vertex1, s2.Vertex2 }.Where(x => x != s1.GetSharedJoint(s2)).ToList().InsertR(1, s1.GetSharedJoint(s2)).ToArray();
             quad._degrees2 = () => Tools.GetDegreesBetweenConnections(s3, s4, true);
-            quad.angle2Joints = new HashSet<Vertex> { s3.joint1, s3.joint2, s4.joint1, s4.joint2 }.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
+            quad.Angle2Joints = new HashSet<Vertex> { s3.Vertex1, s3.Vertex2, s4.Vertex1, s4.Vertex2 }.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
             if (s2.SharesJointWith(s3))
             {
                 quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s3, true);
-                quad.angle3Joints = new HashSet<Vertex>{s3.joint1, s3.joint2, s2.joint1, s2.joint2}.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
+                quad.Angle3Joints = new HashSet<Vertex>{s3.Vertex1, s3.Vertex2, s2.Vertex1, s2.Vertex2}.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
                 quad._degrees4 = () => Tools.GetDegreesBetweenConnections(s1, s4, true);
-                quad.angle4Joints = new HashSet<Vertex>{s1.joint1, s1.joint2, s4.joint1, s4.joint2}.Where(x => x != s1.GetSharedJoint(s4)).ToList().InsertR(1, s1.GetSharedJoint(s4)).ToArray();
+                quad.Angle4Joints = new HashSet<Vertex>{s1.Vertex1, s1.Vertex2, s4.Vertex1, s4.Vertex2}.Where(x => x != s1.GetSharedJoint(s4)).ToList().InsertR(1, s1.GetSharedJoint(s4)).ToArray();
             }
             else
             {
                 quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s4, true);
-                quad.angle3Joints = new HashSet<Vertex> { s4.joint1, s4.joint2, s2.joint1, s2.joint2 }.Where(x => x != s4.GetSharedJoint(s2)).ToList().InsertR(1, s4.GetSharedJoint(s2)).ToArray<Vertex>();
+                quad.Angle3Joints = new HashSet<Vertex> { s4.Vertex1, s4.Vertex2, s2.Vertex1, s2.Vertex2 }.Where(x => x != s4.GetSharedJoint(s2)).ToList().InsertR(1, s4.GetSharedJoint(s2)).ToArray<Vertex>();
                 quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s1, s3, true);
-                quad.angle4Joints = new HashSet<Vertex> { s3.joint1, s3.joint2, s1.joint1, s1.joint2 }.Where(x => x != s1.GetSharedJoint(s3)).ToList().InsertR(1, s1.GetSharedJoint(s3)).ToArray();
+                quad.Angle4Joints = new HashSet<Vertex> { s3.Vertex1, s3.Vertex2, s1.Vertex1, s1.Vertex2 }.Where(x => x != s1.GetSharedJoint(s3)).ToList().InsertR(1, s1.GetSharedJoint(s3)).ToArray();
             }
         }
         else
         { // there is only one case in which s1 does not share with s2. in which case, s3 and s4 must share with both s1 and s2.
             quad._degrees1 = () => Tools.GetDegreesBetweenConnections(s1, s3, true);
-            quad.angle1Joints = new HashSet<Vertex> { s1.joint1, s1.joint2, s3.joint1, s3.joint2 }.Where(x => x != s1.GetSharedJoint(s3)).ToList().InsertR(1, s1.GetSharedJoint(s3)).ToArray();
+            quad.Angle1Joints = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s3.Vertex1, s3.Vertex2 }.Where(x => x != s1.GetSharedJoint(s3)).ToList().InsertR(1, s1.GetSharedJoint(s3)).ToArray();
             quad._degrees2 = () => Tools.GetDegreesBetweenConnections(s2, s4, true);
-            quad.angle2Joints = new HashSet<Vertex> { s4.joint1, s4.joint2, s2.joint1, s2.joint2 }.Where(x => x != s4.GetSharedJoint(s2)).ToList().InsertR(1, s4.GetSharedJoint(s2)).ToArray();
+            quad.Angle2Joints = new HashSet<Vertex> { s4.Vertex1, s4.Vertex2, s2.Vertex1, s2.Vertex2 }.Where(x => x != s4.GetSharedJoint(s2)).ToList().InsertR(1, s4.GetSharedJoint(s2)).ToArray();
             quad._degrees3 = () => Tools.GetDegreesBetweenConnections(s2, s3, true);
-            quad.angle3Joints = new HashSet<Vertex> { s3.joint1, s3.joint2, s2.joint1, s2.joint2 }.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
+            quad.Angle3Joints = new HashSet<Vertex> { s3.Vertex1, s3.Vertex2, s2.Vertex1, s2.Vertex2 }.Where(x => x != s3.GetSharedJoint(s2)).ToList().InsertR(1, s3.GetSharedJoint(s2)).ToArray();
             quad._degrees4 = () => Tools.GetDegreesBetweenConnections(s1, s4, true);
-            quad.angle4Joints = new HashSet<Vertex> { s1.joint1, s1.joint2, s4.joint1, s4.joint2 }.Where(x => x != s1.GetSharedJoint(s4)).ToList().InsertR(1, s1.GetSharedJoint(s4)).ToArray();
+            quad.Angle4Joints = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s4.Vertex1, s4.Vertex2 }.Where(x => x != s1.GetSharedJoint(s4)).ToList().InsertR(1, s1.GetSharedJoint(s4)).ToArray();
         }
     }
 
     static void AssignSegmentData(Quadrilateral quad)
     {
-        if (!quad.con1.SharesJointWith(quad.con3))
+        if (!quad.Con1.SharesJointWith(quad.Con3))
         {
-            quad.opposites = new Tuple<Segment, Segment>[] { new(quad.con1, quad.con3), new(quad.con2, quad.con4) };
-            quad.adjacents = new Tuple<Segment, Segment>[] { new(quad.con1, quad.con2), new(quad.con3, quad.con4), new(quad.con3, quad.con2), new(quad.con1, quad.con4) };
+            quad.Opposites = new Tuple<Segment, Segment>[] { new(quad.Con1, quad.Con3), new(quad.Con2, quad.Con4) };
+            quad.Adjacents = new Tuple<Segment, Segment>[] { new(quad.Con1, quad.Con2), new(quad.Con3, quad.Con4), new(quad.Con3, quad.Con2), new(quad.Con1, quad.Con4) };
         }
-        else if (!quad.con1.SharesJointWith(quad.con2))
+        else if (!quad.Con1.SharesJointWith(quad.Con2))
         {
-            quad.opposites = new Tuple<Segment, Segment>[] { new(quad.con1, quad.con2), new(quad.con3, quad.con4) };
-            quad.adjacents = new Tuple<Segment, Segment>[] { new(quad.con1, quad.con3), new(quad.con2, quad.con4), new(quad.con3, quad.con2), new(quad.con1, quad.con4) };
+            quad.Opposites = new Tuple<Segment, Segment>[] { new(quad.Con1, quad.Con2), new(quad.Con3, quad.Con4) };
+            quad.Adjacents = new Tuple<Segment, Segment>[] { new(quad.Con1, quad.Con3), new(quad.Con2, quad.Con4), new(quad.Con3, quad.Con2), new(quad.Con1, quad.Con4) };
         } 
         else
         {
-            quad.opposites = new Tuple<Segment, Segment>[] { new(quad.con2, quad.con3), new(quad.con1, quad.con4) };
-            quad.adjacents = new Tuple<Segment, Segment>[] { new(quad.con1, quad.con3), new(quad.con3, quad.con4), new(quad.con1, quad.con2), new(quad.con2, quad.con4) };
+            quad.Opposites = new Tuple<Segment, Segment>[] { new(quad.Con2, quad.Con3), new(quad.Con1, quad.Con4) };
+            quad.Adjacents = new Tuple<Segment, Segment>[] { new(quad.Con1, quad.Con3), new(quad.Con3, quad.Con4), new(quad.Con1, quad.Con2), new(quad.Con2, quad.Con4) };
         }
     }
 }

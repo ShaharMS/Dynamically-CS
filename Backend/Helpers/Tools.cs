@@ -37,7 +37,7 @@ class Tools
             segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
         }
 
-        // Get the perpendicular bisector of (x1, y1) and (x2, y2).
+        // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;
         double y1 = (joint2.Y + joint1.Y) / 2;
         double dy1 = joint2.X - joint1.X;
@@ -89,16 +89,9 @@ class Tools
 
             // The segments intersect if b1 and b2 are between 0 and 1.
             segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
-
-            // Find the closest points on the segments.
-            if (t1 < 0) t1 = 0;
-            else if (t1 > 1) t1 = 1;
-
-            if (t2 < 0) t2 = 0;
-            else if (t2 > 1) t2 = 1;
         }
 
-        // Get the perpendicular bisector of (x1, y1) and (x2, y2).
+        // Get the perpendicular bisector of (X1, y1) and (x2, y2).
         double x1 = (joint2.X + joint1.X) / 2;
         double y1 = (joint2.Y + joint1.Y) / 2;
         double dy1 = joint2.X - joint1.X;
@@ -141,7 +134,7 @@ class Tools
     {
         var common = s1.GetSharedJoint(s2);
         if (common == null) return double.NaN;
-        var others = new HashSet<Vertex> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        var others = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s2.Vertex1, s2.Vertex2 };
         others.Remove(common);
         Vertex other1 = others.First(), other2 = others.Last();
 
@@ -171,7 +164,7 @@ class Tools
     {
         var common = s1.GetSharedJoint(s2);
         if (common == null) return double.NaN;
-        var others = new HashSet<Vertex> { s1.joint1, s1.joint2, s2.joint1, s2.joint2 };
+        var others = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s2.Vertex1, s2.Vertex2 };
         others.Remove(common);
         Vertex other1 = others.First(), other2 = others.Last();
 
@@ -208,19 +201,19 @@ class Tools
         var b2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
         if (b1.Intersect(b2).Count() != 0) return false;
 
-        // Case 4: Triangle corner & in\circumcircle center
+        // Case 4: Triangle corner & in\Circumcircle Center
         var c1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
-        var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Count() != 0) return false;
         c1 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
-        c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Count() != 0) return false;
 
-        // Case 5: Triangle corner & in/circumcircle on
+        // Case 5: Triangle corner & in/Circumcircle on
 
-        var d1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        var d1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
         if (d1.Contains(j2)) return false;
-        var d2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.incircle, t.circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        var d2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
         if (d2.Contains(j1)) return false;
 
         return true;
@@ -230,18 +223,18 @@ class Tools
     {
         if (shape is Circle circle)
         {
-            // Case C1: center & its circle
+            // Case C1: Center & its circle
             var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
             if (a1.Contains(circle)) return false;
 
-            // Case C2: Triangle corner & incircle
-            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => t.incircle).Where(item => item != null).Cast<Circle>();
+            // Case C2: Triangle corner & Incircle
+            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => t.Incircle).Where(item => item != null).Cast<Circle>();
             if (b1.Contains(circle)) return false;
         }
 
         if (shape is Segment segment)
         {
-            // Case S1: center & circle chord (stack overflow)
+            // Case S1: Center & circle chord (stack overflow)
             var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
             var a2 = segment.Roles.Access<Circle>(Role.CIRCLE_Chord);
             if (a1.Intersect(a2).Count() != 0) return false;

@@ -26,8 +26,8 @@ public class TableRowHandle : DraggableGraphic
         }
     }
 
-    private Label label;
-    private Border border;
+    private readonly Label label;
+    private readonly Border border;
     public new double Width {
         get => border.Bounds.Width;
         set => border.Width = value;

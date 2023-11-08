@@ -37,7 +37,7 @@ public class TableRow : Canvas
             border.Child = _vr;
         }
     }
-    Border border;
+    readonly Border border;
 
     public SolutionTable Table;
 

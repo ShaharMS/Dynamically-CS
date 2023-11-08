@@ -8,5 +8,5 @@ namespace Dynamically.Backend.Interfaces;
 
 public interface IDrawable
 {
-    public void reposition();
+    public void Reposition();
 }

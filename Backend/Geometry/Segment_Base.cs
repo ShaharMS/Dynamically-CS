@@ -26,8 +26,8 @@ public partial class Segment : DraggableGraphic
 
     public bool Anchored
     {
-        get => joint1.Anchored && joint2.Anchored;
-        set => joint1.Anchored = joint2.Anchored = value;
+        get => Vertex1.Anchored && Vertex2.Anchored;
+        set => Vertex1.Anchored = Vertex2.Anchored = value;
     }
 
     bool _aux;
@@ -53,8 +53,8 @@ public partial class Segment : DraggableGraphic
         }
     }
 
-    public Vertex joint1 { get; private set; }
-    public Vertex joint2 { get; private set;}
+    public Vertex Vertex1 { get; private set; }
+    public Vertex Vertex2 { get; private set;}
 
     public List<Action<Vertex, Vertex>> OnRemoved = new();
     public RoleMap Roles { get; set; }
@@ -77,27 +77,27 @@ public partial class Segment : DraggableGraphic
             switch (value)
             {
                 case SegmentTextDisplay.LENGTH_EXACT:
-                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
-                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex1.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex2.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex2.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     labelUpdater = () => Label.Content = "" + Math.Round(Length, 3);
-                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
-                    if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!Vertex1.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex1.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!Vertex2.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex2.OnMoved.Add((_, _, _, _) => labelUpdater());
                     labelUpdater();
                     break;
                 case SegmentTextDisplay.LENGTH_ROUND:
-                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
-                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex1.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex2.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex2.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     labelUpdater = () => Label.Content = "" + Math.Round(Length);
-                    if (!joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Add((_, _, _, _) => labelUpdater());
-                    if (!joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!Vertex1.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex1.OnMoved.Add((_, _, _, _) => labelUpdater());
+                    if (!Vertex2.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex2.OnMoved.Add((_, _, _, _) => labelUpdater());
                     labelUpdater();
                     break;
                 case SegmentTextDisplay.PARAM:
                 case SegmentTextDisplay.CUSTOM:
                 case SegmentTextDisplay.LENGTH_GIVEN:
                 case SegmentTextDisplay.NONE:
-                    if (joint1.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint1.OnMoved.Remove((_, _, _, _) => labelUpdater());
-                    if (joint2.OnMoved.Contains((_, _, _, _) => labelUpdater())) joint2.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex1.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex1.OnMoved.Remove((_, _, _, _) => labelUpdater());
+                    if (Vertex2.OnMoved.Contains((_, _, _, _) => labelUpdater())) Vertex2.OnMoved.Remove((_, _, _, _) => labelUpdater());
                     labelUpdater = () => { };
                     break;
             }
@@ -108,10 +108,10 @@ public partial class Segment : DraggableGraphic
     Action labelUpdater = () => { };
     public Segment(Vertex f, Vertex t)
     {
-        joint1 = f;
-        joint2 = t;
-        joint1.Roles.AddToRole(Role.SEGMENT_Corner, this);
-        joint2.Roles.AddToRole(Role.SEGMENT_Corner, this);
+        Vertex1 = f;
+        Vertex2 = t;
+        Vertex1.Roles.AddToRole(Role.SEGMENT_Corner, this);
+        Vertex2.Roles.AddToRole(Role.SEGMENT_Corner, this);
         org1X = f.X;
         org1Y = f.Y;
         org2X = t.X;
@@ -151,36 +151,36 @@ public partial class Segment : DraggableGraphic
 
         OnMoved.Add((_, _, _, _) =>
         {
-            joint1.CurrentlyDragging = joint2.CurrentlyDragging = true;
-            if (joint1.Anchored || joint2.Anchored)
+            Vertex1.CurrentlyDragging = Vertex2.CurrentlyDragging = true;
+            if (Vertex1.Anchored || Vertex2.Anchored)
             {
                 this.SetPosition(0, 0);
                 return;
             }
-            var pj1X = joint1.X; var pj2X = joint2.X;
-            var pj1Y = joint1.Y; var pj2Y = joint2.Y;
-            joint1.X = org1X + X;
-            joint2.X = org2X + X;
-            joint1.Y = org1Y + Y;
-            joint2.Y = org2Y + Y;
+            var pj1X = Vertex1.X; var pj2X = Vertex2.X;
+            var pj1Y = Vertex1.Y; var pj2Y = Vertex2.Y;
+            Vertex1.X = org1X + X;
+            Vertex2.X = org2X + X;
+            Vertex1.Y = org1Y + Y;
+            Vertex2.Y = org2Y + Y;
             X = 0; Y = 0;
-            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, pj1X, pj1Y);
-            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, pj2X, pj2Y);
-            Canvas.SetLeft(Label, MiddleFormula.pointOnRatio.X - Label.GuessTextWidth() / 2);
-            Canvas.SetTop(Label, MiddleFormula.pointOnRatio.Y - Label.Height / 2);
+            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, pj1X, pj1Y);
+            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, pj2X, pj2Y);
+            Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
+            Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
             InvalidateVisual();
         });
 
         OnDragged.Add((double cx, double cy, double prx, double pry) =>
         {
-            joint1.CurrentlyDragging = joint2.CurrentlyDragging = false;
-            joint1.DispatchOnDraggedEvents();
-            joint2.DispatchOnDraggedEvents();
-            joint1.InvalidateVisual();
-            joint2.InvalidateVisual();
-            reposition();
+            Vertex1.CurrentlyDragging = Vertex2.CurrentlyDragging = false;
+            Vertex1.DispatchOnDraggedEvents();
+            Vertex2.DispatchOnDraggedEvents();
+            Vertex1.InvalidateVisual();
+            Vertex2.InvalidateVisual();
+            Reposition();
         });
-        OnDragged.Add(MainWindow.regenAll);
+        OnDragged.Add(MainWindow.RegenAll);
 
 
         all.Add(this);
@@ -192,25 +192,25 @@ public partial class Segment : DraggableGraphic
 
     public Segment ReplaceJoint(Vertex joint, Vertex by)
     {
-        if (joint1 == joint)
+        if (Vertex1 == joint)
         {
-            joint1.Connections.Remove(this);
-            joint1.Relations.Remove(joint2);
-            joint1 = by;
-            joint1.Connections.Add(this);
-            joint1.Relations.Add(joint2);
+            Vertex1.Connections.Remove(this);
+            Vertex1.Relations.Remove(Vertex2);
+            Vertex1 = by;
+            Vertex1.Connections.Add(this);
+            Vertex1.Relations.Add(Vertex2);
 
-            joint1.CreateBoardRelationsWith(joint2, this);
+            Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }
-        else if (joint2 == joint)
+        else if (Vertex2 == joint)
         {
-            joint2.Connections.Remove(this);
-            joint2.Relations.Remove(joint1);
-            joint2 = by;
-            joint2.Connections.Add(this);
-            joint2.Relations.Add(joint1);
+            Vertex2.Connections.Remove(this);
+            Vertex2.Relations.Remove(Vertex1);
+            Vertex2 = by;
+            Vertex2.Connections.Add(this);
+            Vertex2.Relations.Add(Vertex1);
 
-            joint1.CreateBoardRelationsWith(joint2, this);
+            Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }
         InvalidateVisual();
         return this;
@@ -219,7 +219,7 @@ public partial class Segment : DraggableGraphic
     public override void Render(DrawingContext context)
     {
         // Label
-        Label.RenderTransform = new RotateTransform(Math.Atan(Formula.slope) * 180 / Math.PI);
+        Label.RenderTransform = new RotateTransform(Math.Atan(Formula.Slope) * 180 / Math.PI);
         
 
         // Graphic is cleared
@@ -229,10 +229,10 @@ public partial class Segment : DraggableGraphic
             Thickness = UIDesign.ConnectionGraphicWidth,
         };
         if (IsAuxiliary) pen.DashStyle = DashStyle.Dash;
-        context.DrawLine(pen, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
+        context.DrawLine(pen, new Point(Vertex1.X, Vertex1.Y), new Point(Vertex2.X, Vertex2.Y));
         // padding for easier dragging
         var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5);
-        context.DrawLine(pen2, new Point(joint1.X, joint1.Y), new Point(joint2.X, joint2.Y));
+        context.DrawLine(pen2, new Point(Vertex1.X, Vertex1.Y), new Point(Vertex2.X, Vertex2.Y));
 
     }
 

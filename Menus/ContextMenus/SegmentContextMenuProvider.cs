@@ -91,7 +91,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             Header = $"Disconnect {Subject}"
         };
 
-        m.Click += (s, e) => { Subject.joint1.Disconnect(Subject.joint2); };
+        m.Click += (s, e) => { Subject.Vertex1.Disconnect(Subject.Vertex2); };
 
         return m;
     }
@@ -261,13 +261,13 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     MenuItem? Recom_MakeStraight()
     {
         List<Vertex> candidatesj1 = new(), candidatesj2 = new();
-        foreach (Vertex j in Subject.joint1.Relations)
+        foreach (Vertex j in Subject.Vertex1.Relations)
         {
-            if (Tools.QualifiesForStraighten(Subject.joint2, j, Subject.joint1) && Math.Abs(Subject.joint1.DegreesTo(j) - Subject.joint2.DegreesTo(Subject.joint1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.Vertex2, j, Subject.Vertex1) && Math.Abs(Subject.Vertex1.DegreesTo(j) - Subject.Vertex2.DegreesTo(Subject.Vertex1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
         }
-        foreach (Vertex j in Subject.joint2.Relations)
+        foreach (Vertex j in Subject.Vertex2.Relations)
         {
-            if (Tools.QualifiesForStraighten(Subject.joint1, j, Subject.joint2) && Math.Abs(Subject.joint2.DegreesTo(j) - Subject.joint1.DegreesTo(Subject.joint2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.Vertex1, j, Subject.Vertex2) && Math.Abs(Subject.Vertex2.DegreesTo(j) - Subject.Vertex1.DegreesTo(Subject.Vertex2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
         }
 
         var items = new List<MenuItem>();
@@ -276,11 +276,11 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             var item = new MenuItem
             {
-                Header = $"Straighten {(joint.Id > Subject.joint2.Id ? $"{Subject.joint2.Id}{joint.Id}" : $"{joint.Id}{Subject.joint2.Id}")}"
+                Header = $"Straighten {(joint.Id > Subject.Vertex2.Id ? $"{Subject.Vertex2.Id}{joint.Id}" : $"{joint.Id}{Subject.Vertex2.Id}")}"
             };
             item.Click += (sender, e) =>
             {
-                Vertex j1 = Subject.joint1, j2 = Subject.joint2;
+                Vertex j1 = Subject.Vertex1, j2 = Subject.Vertex2;
                 j1.Disconnect(j2, joint);
                 j1.Roles.AddToRole(Role.SEGMENT_On, j2.Connect(joint));
             };
@@ -291,11 +291,11 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             var item = new MenuItem
             {
-                Header = $"Straighten {(joint.Id > Subject.joint1.Id ? $"{Subject.joint1.Id}{joint.Id}" : $"{joint.Id}{Subject.joint1.Id}")}"
+                Header = $"Straighten {(joint.Id > Subject.Vertex1.Id ? $"{Subject.Vertex1.Id}{joint.Id}" : $"{joint.Id}{Subject.Vertex1.Id}")}"
             };
             item.Click += (sender, e) =>
             {
-                Vertex j1 = Subject.joint1, j2 = Subject.joint2;
+                Vertex j1 = Subject.Vertex1, j2 = Subject.Vertex2;
                 var followers = Subject.Formula.Followers.ToList().Concat(Subject.MiddleFormula.Followers);
                 var prev = j2.GetConnectionTo(joint);
                 if (prev != null)
@@ -332,7 +332,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
     {
         if (!Subject.Roles.Has(Role.CIRCLE_Chord) || Subject.Roles.CountOf(Role.CIRCLE_Chord) > 1) return null;
         var circle = Subject.Roles.Access<Circle>(Role.CIRCLE_Chord)[0];
-        if (circle == null || Subject.Length < circle.radius * Settings.MakeDiameterLengthRatio) return null;
+        if (circle == null || Subject.Length < circle.Radius * Settings.MakeDiameterLengthRatio) return null;
         var item = new MenuItem
         {
             Header = $"Make Diameter ({circle})"
@@ -342,23 +342,23 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             Subject.Roles.RemoveFromRole(Role.CIRCLE_Chord, circle);
             Subject.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
             // Don't wait for user gesture, update position right after click
-            // Place the diameter at a position that makes sense - same slope and a bit longer
-            var slope = Subject.Formula.slope;
-            var ray = new RayFormula(circle.center, slope);
-            var j1pos = ray.GetClosestOnFormula(Subject.joint1);
+            // Place the diameter at a position that makes sense - same Slope and a bit longer
+            var slope = Subject.Formula.Slope;
+            var ray = new RayFormula(circle.Center, slope);
+            var j1pos = ray.GetClosestOnFormula(Subject.Vertex1);
             if (j1pos != null)
             {
-                Subject.joint1.X = j1pos.Value.X;
-                Subject.joint1.Y = j1pos.Value.Y;
+                Subject.Vertex1.X = j1pos.Value.X;
+                Subject.Vertex1.Y = j1pos.Value.Y;
             }
-            var j2pos = ray.GetClosestOnFormula(Subject.joint2);
+            var j2pos = ray.GetClosestOnFormula(Subject.Vertex2);
             if (j2pos != null)
             {
-                Subject.joint2.X = j2pos.Value.X;
-                Subject.joint2.Y = j2pos.Value.Y;
+                Subject.Vertex2.X = j2pos.Value.X;
+                Subject.Vertex2.Y = j2pos.Value.Y;
             }
-            Subject.joint1.DispatchOnMovedEvents(Subject.joint1.X, Subject.joint1.Y, Subject.joint1.X, Subject.joint1.Y);
-            Subject.joint2.DispatchOnMovedEvents(Subject.joint2.X, Subject.joint2.Y, Subject.joint2.X, Subject.joint2.Y);
+            Subject.Vertex1.DispatchOnMovedEvents(Subject.Vertex1.X, Subject.Vertex1.Y, Subject.Vertex1.X, Subject.Vertex1.Y);
+            Subject.Vertex2.DispatchOnMovedEvents(Subject.Vertex2.X, Subject.Vertex2.Y, Subject.Vertex2.X, Subject.Vertex2.Y);
             Regenerate();
         };
         return item;
@@ -366,7 +366,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MarkIntersection()
     {
-        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.all).ToList();
+        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.All).ToList();
 
         scanList.Remove(Subject);
 
@@ -376,7 +376,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             if (Subject.Formula.Intersects(element.Formula))
             {
                 if (element is Segment seg && (seg.SharesJointWith(Subject) || seg.Formula.Followers.Intersect(Subject.Formula.Followers).Count() == 1)) continue;
-                if (element is Circle c && (c.Formula.Followers.ContainsMany(Subject.joint1, Subject.joint2) || Subject.Formula.Followers.Intersect(c.Formula.Followers).Count() >= (Subject.Formula.Intersect(c.Formula)?.Length ?? 0))) continue;
+                if (element is Circle c && (c.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2) || Subject.Formula.Followers.Intersect(c.Formula.Followers).Count() >= (Subject.Formula.Intersect(c.Formula)?.Length ?? 0))) continue;
                 var item = new MenuItem
                 {
                     Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"
@@ -429,7 +429,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         string Keys()
         {
             var s = "";
-            foreach (var role in Subject.Roles.underlying.Keys)
+            foreach (var role in Subject.Roles.Underlying.Keys)
             {
                 if (Subject.Roles.CountOf(role) == 0) continue;
                 s += role.ToString();

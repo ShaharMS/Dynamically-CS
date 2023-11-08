@@ -23,7 +23,7 @@ namespace Dynamically.Backend.Geometry;
 public partial class Vertex : DraggableGraphic
 {
 
-    public static readonly List<Vertex> all = new();
+    public static readonly List<Vertex> All = new();
 
 
     public char _id = 'A';
@@ -76,7 +76,7 @@ public partial class Vertex : DraggableGraphic
         };
         
         if (id == '_') IDGenerator.GenerateFor(this);
-        else this.Id = id;
+        else Id = id;
 
         Roles = new RoleMap(this);
 
@@ -91,13 +91,13 @@ public partial class Vertex : DraggableGraphic
         Provider = new VertexContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
-        OnMoved.Add((double _, double _, double _, double _) => reposition());
-        OnDragged.Add(MainWindow.regenAll);
+        OnMoved.Add((double _, double _, double _, double _) => Reposition());
+        OnDragged.Add(MainWindow.RegenAll);
 
         InvalidateVisual();
         RepositionText();
 
-        all.Add(this);
+        All.Add(this);
 
         MainWindow.BigScreen.Children.Add(this);
 
@@ -113,13 +113,13 @@ public partial class Vertex : DraggableGraphic
         {
             foreach (Segment c in Connections)
             {
-                if (c.joint1 == this)
+                if (c.Vertex1 == this)
                 {
-                    degs[i] = new Point(c.joint1.X, c.joint1.Y).DegreesTo(c.joint2);
+                    degs[i] = new Point(c.Vertex1.X, c.Vertex1.Y).DegreesTo(c.Vertex2);
                 }
-                else if (c.joint2 == this)
+                else if (c.Vertex2 == this)
                 {
-                    degs[i] = new Point(c.joint2.X, c.joint2.Y).DegreesTo(c.joint1);
+                    degs[i] = new Point(c.Vertex2.X, c.Vertex2.Y).DegreesTo(c.Vertex1);
                 }
                 i++;
             }
@@ -178,9 +178,9 @@ public partial class Vertex : DraggableGraphic
 
         OnRemoved.Clear();
 
-        all.Remove(this);
+        All.Remove(this);
 
-        MainWindow.regenAll(0, 0, 0, 0);
+        MainWindow.RegenAll(0, 0, 0, 0);
     }
 
     public static implicit operator Point(Vertex joint) { return new Point(joint.X, joint.Y); }
@@ -189,7 +189,7 @@ public partial class Vertex : DraggableGraphic
 
     public static Vertex? GetJointById(char id)
     {
-        foreach (var joint in all)
+        foreach (var joint in All)
         {
             if (joint.Id == id) return joint;
         }

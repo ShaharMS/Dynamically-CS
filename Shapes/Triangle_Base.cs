@@ -20,15 +20,15 @@ namespace Dynamically.Shapes;
 public partial class Triangle : DraggableGraphic
 {
 
-    public static readonly List<Triangle> all = new();
+    public static readonly List<Triangle> All = new();
 
-    public Vertex joint1;
-    public Vertex joint2;
-    public Vertex joint3;
+    public Vertex Vertex1;
+    public Vertex Vertex2;
+    public Vertex Vertex3;
 
-    public Segment con12;
-    public Segment con13;
-    public Segment con23;
+    public Segment Segment12;
+    public Segment Segment13;
+    public Segment Segment23;
 
 
     TriangleType _type = TriangleType.SCALENE;
@@ -40,28 +40,28 @@ public partial class Triangle : DraggableGraphic
     }
 
 
-    public Circle? circumcircle;
-    public Circle? incircle;
-//public EquilateralTriangleFormula EquilateralFormula;
+    public Circle? Circumcircle;
+    public Circle? Incircle;
+
     public Triangle(Vertex j1, Vertex j2, Vertex j3)
     {
         if (Exists(j1, j2, j3)) return;
 
-        joint1 = j1;
-        joint2 = j2;
-        joint3 = j3;
+        Vertex1 = j1;
+        Vertex2 = j2;
+        Vertex3 = j3;
 
-        all.Add(this);
+        All.Add(this);
 
 
-        con12 = joint1.Connect(joint2);
-        con13 = joint1.Connect(joint3);
-        con23 = joint2.Connect(joint3);
+        Segment12 = Vertex1.Connect(Vertex2);
+        Segment13 = Vertex1.Connect(Vertex3);
+        Segment23 = Vertex2.Connect(Vertex3);
 
-        foreach (var j in new[] { joint1, joint2, joint3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
-        foreach (var con in new[] { con12, con13, con23 }) con.Roles.AddToRole(Role.TRIANGLE_Side, this);
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 }) j.Roles.AddToRole(Role.TRIANGLE_Corner, this);
+        foreach (var con in new[] { Segment12, Segment13, Segment23 }) con.Roles.AddToRole(Role.TRIANGLE_Side, this);
 
-        foreach (var j in new[] { joint1, joint2, joint3 }) j.reposition();
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 }) j.Reposition();
 
 
         ContextMenu = new ContextMenu();
@@ -70,39 +70,39 @@ public partial class Triangle : DraggableGraphic
 
         OnMoved.Add((x, y, px, py) =>
         {
-            if (joint1.Anchored || joint2.Anchored || joint3.Anchored)
+            if (Vertex1.Anchored || Vertex2.Anchored || Vertex3.Anchored)
             {
                 this.SetPosition(0, 0);
                 return;
             }
-            joint1.X += x - px;
-            joint2.X += x - px;
-            joint3.X += x - px;
-            joint1.Y += y - py;
-            joint2.Y += y - py;
-            joint3.Y += y - py;
+            Vertex1.X += x - px;
+            Vertex2.X += x - px;
+            Vertex3.X += x - px;
+            Vertex1.Y += y - py;
+            Vertex2.Y += y - py;
+            Vertex3.Y += y - py;
             EQ_temp_incircle_center = new Point(EQ_temp_incircle_center.X + x - px, EQ_temp_incircle_center.Y + y - py);
-            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, joint1.X, joint1.Y);
-            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, joint2.X, joint2.Y);
-            joint3.DispatchOnMovedEvents(joint3.X, joint3.Y, joint3.X, joint3.Y);
-            con12.reposition();
-            con13.reposition();
-            con23.reposition();
+            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, Vertex1.X, Vertex1.Y);
+            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, Vertex2.X, Vertex2.Y);
+            Vertex3.DispatchOnMovedEvents(Vertex3.X, Vertex3.Y, Vertex3.X, Vertex3.Y);
+            Segment12.Reposition();
+            Segment13.Reposition();
+            Segment23.Reposition();
             this.SetPosition(0, 0);
         });
-        OnDragged.Add(MainWindow.regenAll);
+        OnDragged.Add(MainWindow.RegenAll);
 
         MainWindow.BigScreen.Children.Add(this);
 
-        MainWindow.regenAll(0, 0, 0, 0);
+        MainWindow.RegenAll(0, 0, 0, 0);
         Provider.Regenerate();
     }
     public Circle GenerateCircumCircle()
     {
-        circumcircle = Tools.CircleFrom3Joints(joint1, joint2, joint3);
-        circumcircle.center.Roles.AddToRole(Role.TRIANGLE_CircumCircleCenter, this);
+        Circumcircle = Tools.CircleFrom3Joints(Vertex1, Vertex2, Vertex3);
+        Circumcircle.Center.Roles.AddToRole(Role.TRIANGLE_CircumCircleCenter, this);
         Provider.Regenerate();
-        return circumcircle;
+        return Circumcircle;
     }
 
     public Circle GenerateInCircle()
@@ -110,13 +110,13 @@ public partial class Triangle : DraggableGraphic
         var stats = GetCircleStats();
 
         var circle = new Circle(new Vertex(stats.x, stats.y), stats.r);
-        circle.center.Draggable = false;
+        circle.Center.Draggable = false;
         circle.Draggable = false;
-        incircle = circle;
+        Incircle = circle;
 
-        circle.center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
+        circle.Center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
 
-        foreach (var j in new[] { joint1, joint2, joint3 })
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
         {
             j.OnMoved.Add(__RecalculateInCircle);
         }
@@ -129,19 +129,19 @@ public partial class Triangle : DraggableGraphic
     Stats GetCircleStats()
     {
         // Calculate the lengths of the Triangle sides
-        double a = joint2.DistanceTo(joint3);
-        double b = joint1.DistanceTo(joint3);
-        double c = joint1.DistanceTo(joint2);
+        double a = Vertex2.DistanceTo(Vertex3);
+        double b = Vertex1.DistanceTo(Vertex3);
+        double c = Vertex1.DistanceTo(Vertex2);
 
         // Calculate the semiperimeter of the Triangle
         double s = (a + b + c) / 2;
 
-        // Calculate the radius of the inscribed circle
+        // Calculate the Radius of the inscribed circle
         double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
 
-        // Calculate the coordinates of the center of the inscribed circle
-        double centerX = (a * joint1.X + b * joint2.X + c * joint3.X) / (a + b + c);
-        double centerY = (a * joint1.Y + b * joint2.Y + c * joint3.Y) / (a + b + c);
+        // Calculate the coordinates of the Center of the inscribed circle
+        double centerX = (a * Vertex1.X + b * Vertex2.X + c * Vertex3.X) / (a + b + c);
+        double centerY = (a * Vertex1.Y + b * Vertex2.Y + c * Vertex3.Y) / (a + b + c);
 
         return new Stats
         {
@@ -161,23 +161,23 @@ public partial class Triangle : DraggableGraphic
     {
         var l = new List<(TriangleType type, string details, double confidence)>();
 
-        if (Type != TriangleType.EQUILATERAL && Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeEquilateralAngleOffset &&
-            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeEquilateralAngleOffset &&
-            Math.Abs(60 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 1 /* Chosen so it would often show at the top of the list */));
+        if (Type != TriangleType.EQUILATERAL && Math.Abs(60 - Tools.GetDegreesBetween3Points(Vertex1, Vertex2, Vertex3)) < Settings.MakeEquilateralAngleOffset &&
+            Math.Abs(60 - Tools.GetDegreesBetween3Points(Vertex2, Vertex1, Vertex3)) < Settings.MakeEquilateralAngleOffset &&
+            Math.Abs(60 - Tools.GetDegreesBetween3Points(Vertex1, Vertex3, Vertex2)) < Settings.MakeEquilateralAngleOffset) l.Add((TriangleType.EQUILATERAL, "", 1 /* Chosen so it would often show at the top of the list */));
         else if (Type != TriangleType.EQUILATERAL)  // Don't suggest both isosceles & equilateral. does'nt make sense more often than not.
         {
-            if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con13}", con12.Length.GetSimilarityPercentage(con13.Length)));
-            if (Type != TriangleType.ISOSCELES && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con12} = {con23}", con12.Length.GetSimilarityPercentage(con23.Length)));
-            if (Type != TriangleType.ISOSCELES && con23.Length.IsSimilarTo(con13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{con23} = {con13}", con23.Length.GetSimilarityPercentage(con13.Length)));
+            if (Type != TriangleType.ISOSCELES && Segment12.Length.IsSimilarTo(Segment13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{Segment12} = {Segment13}", Segment12.Length.GetSimilarityPercentage(Segment13.Length)));
+            if (Type != TriangleType.ISOSCELES && Segment12.Length.IsSimilarTo(Segment23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{Segment12} = {Segment23}", Segment12.Length.GetSimilarityPercentage(Segment23.Length)));
+            if (Type != TriangleType.ISOSCELES && Segment23.Length.IsSimilarTo(Segment13.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES, $"{Segment23} = {Segment13}", Segment23.Length.GetSimilarityPercentage(Segment13.Length)));
         }
 
-        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint2}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90));
-        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint2}{joint1}{joint3} = 90°", Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90));
-        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{joint1}{joint3}{joint2} = 90°", Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex1, Vertex2, Vertex3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{Vertex1}{Vertex2}{Vertex3} = 90°", Tools.GetDegreesBetween3Points(Vertex1, Vertex2, Vertex3) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex2, Vertex1, Vertex3)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{Vertex2}{Vertex1}{Vertex3} = 90°", Tools.GetDegreesBetween3Points(Vertex2, Vertex1, Vertex3) / 90));
+        if (Type != TriangleType.RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex1, Vertex3, Vertex2)) < Settings.MakeRightAngleOffset) l.Add((TriangleType.RIGHT, $"∠{Vertex1}{Vertex3}{Vertex2} = 90°", Tools.GetDegreesBetween3Points(Vertex1, Vertex3, Vertex2) / 90));
 
-        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint2, joint3)) < Settings.MakeRightAngleOffset && con12.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint2}{joint3} = 90°, {con12} = {con23}", (Tools.GetDegreesBetween3Points(joint1, joint2, joint3) / 90 + con12.Length.GetSimilarityPercentage(con23.Length)) / 2));
-        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint2, joint1, joint3)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint2}{joint1}{joint3} = 90°, {con13} = {con23}", (Tools.GetDegreesBetween3Points(joint2, joint1, joint3) / 90 + con13.Length.GetSimilarityPercentage(con23.Length)) / 2));
-        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(joint1, joint3, joint2)) < Settings.MakeRightAngleOffset && con13.Length.IsSimilarTo(con12.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{joint1}{joint3}{joint2} = 90°, {con13} = {con12}", (Tools.GetDegreesBetween3Points(joint1, joint3, joint2) / 90 + con13.Length.GetSimilarityPercentage(con12.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex1, Vertex2, Vertex3)) < Settings.MakeRightAngleOffset && Segment12.Length.IsSimilarTo(Segment23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{Vertex1}{Vertex2}{Vertex3} = 90°, {Segment12} = {Segment23}", (Tools.GetDegreesBetween3Points(Vertex1, Vertex2, Vertex3) / 90 + Segment12.Length.GetSimilarityPercentage(Segment23.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex2, Vertex1, Vertex3)) < Settings.MakeRightAngleOffset && Segment13.Length.IsSimilarTo(Segment23.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{Vertex2}{Vertex1}{Vertex3} = 90°, {Segment13} = {Segment23}", (Tools.GetDegreesBetween3Points(Vertex2, Vertex1, Vertex3) / 90 + Segment13.Length.GetSimilarityPercentage(Segment23.Length)) / 2));
+        if (Type != TriangleType.ISOSCELES_RIGHT && Math.Abs(90 - Tools.GetDegreesBetween3Points(Vertex1, Vertex3, Vertex2)) < Settings.MakeRightAngleOffset && Segment13.Length.IsSimilarTo(Segment12.Length, Settings.MakeIsocelesSideRatioDiff)) l.Add((TriangleType.ISOSCELES_RIGHT, $"∠{Vertex1}{Vertex3}{Vertex2} = 90°, {Segment13} = {Segment12}", (Tools.GetDegreesBetween3Points(Vertex1, Vertex3, Vertex2) / 90 + Segment13.Length.GetSimilarityPercentage(Segment12.Length)) / 2));
 
 
         return l;
@@ -193,13 +193,13 @@ public partial class Triangle : DraggableGraphic
         var geom = new PathGeometry();
         var figure = new PathFigure
         {
-            StartPoint = joint1,
+            StartPoint = Vertex1,
             IsClosed = true,
             IsFilled = true
         };
 
-        figure?.Segments?.Add(new LineSegment { Point = joint2 });
-        figure?.Segments?.Add(new LineSegment { Point = joint3 });
+        figure?.Segments?.Add(new LineSegment { Point = Vertex2 });
+        figure?.Segments?.Add(new LineSegment { Point = Vertex3 });
 
         geom.Figures.Add(figure);
 
@@ -216,11 +216,11 @@ public partial class Triangle : DraggableGraphic
     public bool IsDefinedBy(Vertex j1, Vertex j2, Vertex j3)
     {
         var arr = new Vertex[] { j1, j2, j3 };
-        return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3);
+        return arr.Contains(Vertex1) && arr.Contains(Vertex2) && arr.Contains(Vertex3);
     }
     public static bool Exists(Vertex j1, Vertex j2, Vertex j3)
     {
-        foreach (var triangle in all)
+        foreach (var triangle in All)
         {
             if (triangle.IsDefinedBy(j1, j2, j3)) return true;
         }

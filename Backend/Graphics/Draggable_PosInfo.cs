@@ -48,7 +48,7 @@ public partial class DraggableGraphic
     }
     public virtual bool Overlaps(Point point)
     {
-        return ((IVisual)this).HitTestCustom(point);
+        return this.HitTestCustom(point);
     }
 
     public virtual double Area()

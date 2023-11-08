@@ -21,41 +21,41 @@ namespace Dynamically.Shapes;
 
 public partial class Quadrilateral : DraggableGraphic
 {
-    public static readonly List<Quadrilateral> all = new();
+    public static readonly List<Quadrilateral> All = new();
 
-    public Vertex joint1;
-    public Vertex joint2;
-    public Vertex joint3;
-    public Vertex joint4;
+    public Vertex Vertex1;
+    public Vertex Vertex2;
+    public Vertex Vertex3;
+    public Vertex Vertex4;
 
     Func<double> _degrees1;
     Func<double> _degrees2;
     Func<double> _degrees3;
     Func<double> _degrees4;
-    public double degrees1 { get => _degrees1(); }
-    public double degrees2 { get => _degrees2(); }
-    public double degrees3 { get => _degrees3(); }
-    public double degrees4 { get => _degrees4(); }
+    public double Degrees1 { get => _degrees1(); }
+    public double Degrees2 { get => _degrees2(); }
+    public double Degrees3 { get => _degrees3(); }
+    public double Degrees4 { get => _degrees4(); }
 
-    public double radians1 { get => _degrees1().ToRadians(); }
-    public double radians2 { get => _degrees2().ToRadians(); }
-    public double radians3 { get => _degrees3().ToRadians(); }
-    public double radians4 { get => _degrees4().ToRadians(); }
+    public double Radians1 { get => _degrees1().ToRadians(); }
+    public double Radians2 { get => _degrees2().ToRadians(); }
+    public double Radians3 { get => _degrees3().ToRadians(); }
+    public double Radians4 { get => _degrees4().ToRadians(); }
 
-    public Vertex[] angle1Joints;
-    public Vertex[] angle2Joints;
-    public Vertex[] angle3Joints;
-    public Vertex[] angle4Joints;
+    public Vertex[] Angle1Joints;
+    public Vertex[] Angle2Joints;
+    public Vertex[] Angle3Joints;
+    public Vertex[] Angle4Joints;
 
 
-    public Segment con1;
-    public Segment con2;
-    public Segment con3;
-    public Segment con4;
+    public Segment Con1;
+    public Segment Con2;
+    public Segment Con3;
+    public Segment Con4;
 
-    public Tuple<Segment, Segment>[] opposites;
+    public Tuple<Segment, Segment>[] Opposites;
 
-    public Tuple<Segment, Segment>[] adjacents;
+    public Tuple<Segment, Segment>[] Adjacents;
 
     QuadrilateralType _type = QuadrilateralType.IRREGULAR;
     public QuadrilateralType Type
@@ -65,37 +65,37 @@ public partial class Quadrilateral : DraggableGraphic
     }
 
     
-    public Circle? circumcircle;
-    public Circle? incircle;
+    public Circle? Circumcircle;
+    public Circle? Incircle;
 
 #pragma warning disable CS8618
     public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4)
     {
-        joint1 = j1;
-        joint2 = j2;
-        joint3 = j3;
-        joint4 = j4;
+        Vertex1 = j1;
+        Vertex2 = j2;
+        Vertex3 = j3;
+        Vertex4 = j4;
 
         
         var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
         if (sides.Count == 0) return; // Don't do anything
         
-        foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3, Vertex4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
 
         for (int i = 0; i < 4; i++) {
             var side = sides[i];
             var x = side.Item1.Connect(side.Item2);
             x.Roles.AddToRole(Role.QUAD_Side, this);
-            if (i == 0) con1 = x;
-            else if (i == 1) con2 = x;
-            else if (i == 2) con3 = x;
-            else if (i == 3) con4 = x;
+            if (i == 0) Con1 = x;
+            else if (i == 1) Con2 = x;
+            else if (i == 2) Con3 = x;
+            else if (i == 3) Con4 = x;
         }
 
         Quadrilateral.AssignSegmentData(this);
         Quadrilateral.AssignAngles(this);
 
-        foreach (var j in new[] { joint1, joint2, joint3, joint4 }) j.reposition();
+        foreach (var j in new[] { Vertex1, Vertex2, Vertex3, Vertex4 }) j.Reposition();
 
         ContextMenu = new ContextMenu();
         Provider = new QuadrilateralContextMenuProvider(this, ContextMenu);
@@ -103,33 +103,33 @@ public partial class Quadrilateral : DraggableGraphic
 
         OnMoved.Add((x, y, px, py) =>
         {
-            if (joint1.Anchored || joint2.Anchored || joint3.Anchored || joint4.Anchored)
+            if (Vertex1.Anchored || Vertex2.Anchored || Vertex3.Anchored || Vertex4.Anchored)
             {
                 this.SetPosition(0, 0);
                 return;
             }
-            joint1.X += x - px;
-            joint2.X += x - px;
-            joint3.X += x - px;
-            joint4.X += x - px;
-            joint1.Y += y - py;
-            joint2.Y += y - py;
-            joint3.Y += y - py;
-            joint4.Y += y - py;
-            joint1.DispatchOnMovedEvents(joint1.X, joint1.Y, joint1.X, joint1.Y);
-            joint2.DispatchOnMovedEvents(joint2.X, joint2.Y, joint2.X, joint2.Y);
-            joint3.DispatchOnMovedEvents(joint3.X, joint3.Y, joint3.X, joint3.Y);
-            joint4.DispatchOnMovedEvents(joint4.X, joint4.Y, joint4.X, joint4.Y);
-            con1?.reposition();
-            con2?.reposition();
-            con3?.reposition();
-            con4?.reposition();
+            Vertex1.X += x - px;
+            Vertex2.X += x - px;
+            Vertex3.X += x - px;
+            Vertex4.X += x - px;
+            Vertex1.Y += y - py;
+            Vertex2.Y += y - py;
+            Vertex3.Y += y - py;
+            Vertex4.Y += y - py;
+            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, Vertex1.X, Vertex1.Y);
+            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, Vertex2.X, Vertex2.Y);
+            Vertex3.DispatchOnMovedEvents(Vertex3.X, Vertex3.Y, Vertex3.X, Vertex3.Y);
+            Vertex4.DispatchOnMovedEvents(Vertex4.X, Vertex4.Y, Vertex4.X, Vertex4.Y);
+            Con1?.Reposition();
+            Con2?.Reposition();
+            Con3?.Reposition();
+            Con4?.Reposition();
             this.SetPosition(0, 0);
         });
-        OnDragged.Add(MainWindow.regenAll);
+        OnDragged.Add(MainWindow.RegenAll);
 
-        all.Add(this);
-        MainWindow.regenAll(0,0,0,0);
+        All.Add(this);
+        MainWindow.RegenAll(0,0,0,0);
         MainWindow.BigScreen.Children.Add(this);
     }
 #pragma warning restore CS8618
@@ -137,7 +137,7 @@ public partial class Quadrilateral : DraggableGraphic
 
     public Point GetCentroid()
     {
-        return new((joint1.X + joint2.X + joint3.X + joint4.X) / 4, (joint1.Y + joint2.Y + joint3.Y + joint4.Y) / 4);
+        return new((Vertex1.X + Vertex2.X + Vertex3.X + Vertex4.X) / 4, (Vertex1.Y + Vertex2.Y + Vertex3.Y + Vertex4.Y) / 4);
     }
 
     public override void Render(DrawingContext context)
@@ -145,18 +145,18 @@ public partial class Quadrilateral : DraggableGraphic
         var geom = new PathGeometry();
         var figure = new PathFigure
         {
-            StartPoint = con1.joint1,
+            StartPoint = Con1.Vertex1,
             IsClosed = true,
             IsFilled = true
         };
 
-        figure?.Segments?.Add(new LineSegment { Point = con1.joint2 });
-        figure?.Segments?.Add(new LineSegment { Point = con2.joint1 });
-        figure?.Segments?.Add(new LineSegment { Point = con2.joint2 });
-        figure?.Segments?.Add(new LineSegment { Point = con3.joint1 });
-        figure?.Segments?.Add(new LineSegment { Point = con3.joint2 });
-        figure?.Segments?.Add(new LineSegment { Point = con4.joint1 });
-        figure?.Segments?.Add(new LineSegment { Point = con4.joint2 });
+        figure?.Segments?.Add(new LineSegment { Point = Con1.Vertex2 });
+        figure?.Segments?.Add(new LineSegment { Point = Con2.Vertex1 });
+        figure?.Segments?.Add(new LineSegment { Point = Con2.Vertex2 });
+        figure?.Segments?.Add(new LineSegment { Point = Con3.Vertex1 });
+        figure?.Segments?.Add(new LineSegment { Point = Con3.Vertex2 });
+        figure?.Segments?.Add(new LineSegment { Point = Con4.Vertex1 });
+        figure?.Segments?.Add(new LineSegment { Point = Con4.Vertex2 });
 
         geom.Figures.Add(figure);
 
@@ -173,7 +173,7 @@ public partial class Quadrilateral : DraggableGraphic
     public bool IsDefinedBy(Vertex j1, Vertex j2, Vertex j3, Vertex j4)
     {
         var arr = new Vertex[] { j1, j2, j3, j4 };
-        return arr.Contains(joint1) && arr.Contains(joint2) && arr.Contains(joint3) && arr.Contains(joint4);
+        return arr.Contains(Vertex1) && arr.Contains(Vertex2) && arr.Contains(Vertex3) && arr.Contains(Vertex4);
     }
     }
 

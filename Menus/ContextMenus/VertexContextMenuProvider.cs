@@ -180,12 +180,12 @@ public class VertexContextMenuProvider : ContextMenuProvider
         foreach (var c in Subject.Connections)
         {
             var item = new MenuItem();
-            if (c.joint1 == Subject) item.Header = c.joint2 + $" ({c})";
-            else item.Header = c.joint2 + $" ({c})";
+            if (c.Vertex1 == Subject) item.Header = c.Vertex2 + $" ({c})";
+            else item.Header = c.Vertex2 + $" ({c})";
 
             item.Click += (sender, e) =>
             {
-                c.joint1.Disconnect(c.joint2);
+                c.Vertex1.Disconnect(c.Vertex2);
             };
 
             options.Add(item);
@@ -252,17 +252,19 @@ public class VertexContextMenuProvider : ContextMenuProvider
     MenuItem Suggestions_MarkAngle()
     {
         var items = new List<string>();
-            foreach(Vertex j1 in Vertex.all)
+            foreach(Vertex j1 in Vertex.All)
             {
-                foreach (Vertex j2 in Vertex.all)
+                foreach (Vertex j2 in Vertex.All)
                 {
                     if (Subject == j1 || Subject == j2 || j1 == j2) continue;
                     if (Angle.Exists(Subject, j1, j2)) continue;
                     items.Add($"{j1}{Subject}{j2}");
                 }
             }
-        var l1 = new Label();
-        l1.Content = "Angle: ∠";
+        var l1 = new Label
+        {
+            Content = "Angle: ∠"
+        };
 
         var ac = new AutoCompleteBox
         {
@@ -354,7 +356,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
-            var j1 = new Vertex(j.X - (j.X - circle.center.X) * 2, j.Y - (j.Y - circle.center.Y) * 2);
+            var j1 = new Vertex(j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);
             j1.Connect(Subject);
 
@@ -383,7 +385,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
     MenuItem? Recom_MergeJoints()
     {
         List<Vertex> veryCloseTo = new();
-        foreach (var j in Vertex.all)
+        foreach (var j in Vertex.All)
         {
             if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
         }
@@ -462,7 +464,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
     MenuItem? Recom_MountJoints()
     {
         List<dynamic> veryCloseTo = new();
-        foreach (var container in new List<dynamic>().Concat(Circle.all).Concat(Segment.all)) // container is IHasFormula<Formula>
+        foreach (var container in new List<dynamic>().Concat(Circle.All).Concat(Segment.all)) // container is IHasFormula<Formula>
         {
             if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container))
             {
@@ -538,7 +540,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         string Keys()
         {
             var s = "";
-            foreach (var role in Subject.Roles.underlying.Keys)
+            foreach (var role in Subject.Roles.Underlying.Keys)
             {
                 if (Subject.Roles.CountOf(role) == 0) continue;
                 s += role.ToString();
