@@ -37,6 +37,11 @@ public class BigScreen : DraggableGraphic
     }
 
     private DraggableGraphic _focused;
+
+    /// <summary>
+    /// A list of all vertices that are currently in an illegal state.
+    /// </summary>
+    public HashSet<DraggableGraphic> Immovables = new();
     public DraggableGraphic FocusedObject
     {
         get => _focused;
@@ -73,6 +78,8 @@ public class BigScreen : DraggableGraphic
         MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
         MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
+
+        MainWindow.Instance.AddHandler(PointerReleasedEvent, (s, e) => Vertex.DeFactoAnchored = false, RoutingStrategies.Tunnel);
     }
 
     public void Refresh()
@@ -91,6 +98,7 @@ public class BigScreen : DraggableGraphic
                 draggable.InvalidateVisual();
             }
         }
+
     }
 
     public void HandleCreateConnection(Vertex from, Vertex potential, Dictionary<Role, List<object>>? requiresRoles = null)
@@ -263,6 +271,8 @@ public class BigScreen : DraggableGraphic
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
         else if (HoveredObject is EllipseBase Ellipse) Log.Write($"Ellipse {Ellipse.Focal1.Id}{Ellipse.Focal2.Id} Is Hovered");
         */
+        Log.WriteVar(Immovables);
+
     }
 
     public override double Area()

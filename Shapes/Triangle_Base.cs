@@ -82,9 +82,9 @@ public partial class Triangle : DraggableGraphic
             Vertex2.Y += y - py;
             Vertex3.Y += y - py;
             EQ_temp_incircle_center = new Point(EQ_temp_incircle_center.X + x - px, EQ_temp_incircle_center.Y + y - py);
-            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, Vertex1.X, Vertex1.Y);
-            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, Vertex2.X, Vertex2.Y);
-            Vertex3.DispatchOnMovedEvents(Vertex3.X, Vertex3.Y, Vertex3.X, Vertex3.Y);
+            Vertex1.DispatchOnMovedEvents();
+            Vertex2.DispatchOnMovedEvents();
+            Vertex3.DispatchOnMovedEvents();
             Segment12.Reposition();
             Segment13.Reposition();
             Segment23.Reposition();

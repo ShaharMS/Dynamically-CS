@@ -46,9 +46,9 @@ public abstract class Formula
                 // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
                 if (MainWindow.BigScreen.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;
-                joint.X = joint.X - preX + curX;
-                joint.Y = joint.Y - preY + curY;
-                joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X + preX - curX, joint.Y + preY - curY);
+                joint.X = joint.UntouchedX - preX + curX;
+                joint.Y = joint.UntouchedY - preY + curY;
+                joint.DispatchOnMovedEvents(joint.UntouchedX + preX - curX, joint.UntouchedY + preY - curY);
             }
         });
         OnChange.Add(UpdateFollowers);
@@ -58,7 +58,7 @@ public abstract class Formula
     {
         Followers.Add(joint);
         joint.PositioningByFormula.Add(UpdateJointPosition);
-        joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
+        joint.DispatchOnMovedEvents();
     }
 
     public virtual void RemoveFollower(Vertex joint)
@@ -88,7 +88,7 @@ public abstract class Formula
     {
         foreach(var joint in Followers)
         {
-            joint.DispatchOnMovedEvents(joint.X, joint.Y, joint.X, joint.Y);
+            joint.DispatchOnMovedEvents();
         }
     }
 

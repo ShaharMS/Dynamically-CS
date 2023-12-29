@@ -117,7 +117,12 @@ namespace Dynamically
                     s.Add("null"); 
                     continue; 
                 }
-                if (item!.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
+                if (item!.GetType().IsArray || 
+                    (
+                        item.GetType().IsGenericType &&
+                        new[] { typeof(List<>), typeof(HashSet<>)}.Contains(item.GetType().GetGenericTypeDefinition())
+                    )
+                   ) itemS = StringifyCollection((IEnumerable)item);
                 else if (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)) itemS = StringifyCollection((IEnumerable)item);
                 s.Add(itemS ?? "Value");
             }

@@ -31,7 +31,7 @@ public partial class Triangle
             angle += 2 * Math.PI / 3;
             o.X = center.X + len * Math.Cos(angle);
             o.Y = center.Y + len * Math.Sin(angle);
-            o.DispatchOnMovedEvents(o.X, o.Y, o.X, o.Y);
+            o.DispatchOnMovedEvents();
         }
     }
 

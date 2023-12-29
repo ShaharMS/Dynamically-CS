@@ -357,8 +357,8 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                 Subject.Vertex2.X = j2pos.Value.X;
                 Subject.Vertex2.Y = j2pos.Value.Y;
             }
-            Subject.Vertex1.DispatchOnMovedEvents(Subject.Vertex1.X, Subject.Vertex1.Y, Subject.Vertex1.X, Subject.Vertex1.Y);
-            Subject.Vertex2.DispatchOnMovedEvents(Subject.Vertex2.X, Subject.Vertex2.Y, Subject.Vertex2.X, Subject.Vertex2.Y);
+            Subject.Vertex1.DispatchOnMovedEvents();
+            Subject.Vertex2.DispatchOnMovedEvents();
             Regenerate();
         };
         return item;
