@@ -28,14 +28,16 @@ public partial class DraggableGraphic : Canvas
     /// <summary>
     /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
     /// <param name="px"></param>
     /// <param name="py"></param>
-    public virtual void DispatchOnMovedEvents(double? px = null, double? py = null)
+    public virtual void DispatchOnMovedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
         var c = OnMoved.ToArray();
         foreach (var listener in c)
         {
-            listener(X, Y, px ?? X, py ?? Y);
+            listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
         }
     }
 
@@ -55,12 +57,12 @@ public partial class DraggableGraphic : Canvas
     /// <param name="y"></param>
     /// <param name="px"></param>
     /// <param name="py"></param>
-    public virtual void DispatchOnDraggedEvents(double? px = null, double? py = null)
+    public virtual void DispatchOnDraggedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
     {
         var c = OnDragged.ToArray();
         foreach (var listener in c)
         {
-            listener(X, Y, px ?? X, py ?? Y);
+            listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
         }
     }
 
@@ -112,7 +114,7 @@ public partial class DraggableGraphic : Canvas
             CurrentlyDragging = false;
             e.Pointer?.Capture(null);
 
-            DispatchOnDraggedEvents(_startPosition.X, _startPosition.Y);
+            DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
 
         }
     }
@@ -129,7 +131,7 @@ public partial class DraggableGraphic : Canvas
             X = _startPosition.X + offset.X;
             Y = _startPosition.Y + offset.Y;
 
-            DispatchOnMovedEvents(before.X, before.Y);
+            DispatchOnMovedEvents(X, Y, before.X, before.Y);
         }
     }
 

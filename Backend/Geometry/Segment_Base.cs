@@ -157,15 +157,15 @@ public partial class Segment : DraggableGraphic
                 this.SetPosition(0, 0);
                 return;
             }
-            var pj1X = Vertex1.UntouchedX; var pj2X = Vertex2.UntouchedX;
-            var pj1Y = Vertex1.UntouchedY; var pj2Y = Vertex2.UntouchedY;
+            var pj1X = Vertex1.X; var pj2X = Vertex2.X;
+            var pj1Y = Vertex1.Y; var pj2Y = Vertex2.Y;
             Vertex1.X = org1X + X;
             Vertex2.X = org2X + X;
             Vertex1.Y = org1Y + Y;
             Vertex2.Y = org2Y + Y;
             X = 0; Y = 0;
-            Vertex1.DispatchOnMovedEvents(pj1X, pj1Y);
-            Vertex2.DispatchOnMovedEvents(pj2X, pj2Y);
+            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, pj1X, pj1Y);
+            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, pj2X, pj2Y);
             Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
             Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
             InvalidateVisual();

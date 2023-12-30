@@ -60,10 +60,10 @@ public partial class Circle : EllipseBase
 
         OnMoved.Add((x, y, px, py) =>
         {
-            double pcx = this.Center.UntouchedX, pcy = this.Center.UntouchedY;
+            double pcx = this.Center.X, pcy = this.Center.Y;
             this.Center.X += x - px;
             this.Center.Y += y - py;
-            this.Center.DispatchOnMovedEvents(pcx, pcy);
+            this.Center.DispatchOnMovedEvents(this.Center.X, this.Center.Y, pcx, pcy);
             this.SetPosition(0, 0);
         });
         OnMoved.Add(__circle_OnChange);

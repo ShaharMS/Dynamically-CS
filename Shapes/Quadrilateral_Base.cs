@@ -116,10 +116,10 @@ public partial class Quadrilateral : DraggableGraphic
             Vertex2.Y += y - py;
             Vertex3.Y += y - py;
             Vertex4.Y += y - py;
-            Vertex1.DispatchOnMovedEvents();
-            Vertex2.DispatchOnMovedEvents();
-            Vertex3.DispatchOnMovedEvents();
-            Vertex4.DispatchOnMovedEvents();
+            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, Vertex1.X, Vertex1.Y);
+            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, Vertex2.X, Vertex2.Y);
+            Vertex3.DispatchOnMovedEvents(Vertex3.X, Vertex3.Y, Vertex3.X, Vertex3.Y);
+            Vertex4.DispatchOnMovedEvents(Vertex4.X, Vertex4.Y, Vertex4.X, Vertex4.Y);
             Con1?.Reposition();
             Con2?.Reposition();
             Con3?.Reposition();

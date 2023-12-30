@@ -84,8 +84,8 @@ public partial class Vertex : DraggableGraphic
 
         MainWindow.BigScreen.Children.Add(IdDisplay);
 
-        X = UntouchedX = x;
-        Y = UntouchedY = y;
+        X = x;
+        Y = y;
 
         ContextMenu = new ContextMenu();
         Provider = new VertexContextMenuProvider(this, ContextMenu);
