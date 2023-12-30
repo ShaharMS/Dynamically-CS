@@ -113,7 +113,7 @@ public class MathTextBox : Canvas
 
         MainWindow.Instance.AddHandler(PointerPressedEvent, (_, e) =>
         {
-            Log.WriteVar(e.Source);
+            //Log.WriteVar(e.Source);
             if (e.Source == TextBox || e.Source == MathView)
             {
                 if (!TextBox.IsFocused) TextBox.Focus();

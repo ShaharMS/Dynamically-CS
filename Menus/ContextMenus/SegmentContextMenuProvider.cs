@@ -346,19 +346,23 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             var slope = Subject.Formula.Slope;
             var ray = new RayFormula(circle.Center, slope);
             var j1pos = ray.GetClosestOnFormula(Subject.Vertex1);
-            if (j1pos != null)
+            if (j1pos != null && Subject.Vertex1.IsMovementLegal(j1pos.Value.X, j1pos.Value.Y))
             {
+                double px = Subject.Vertex1.X, py = Subject.Vertex1.Y;
                 Subject.Vertex1.X = j1pos.Value.X;
                 Subject.Vertex1.Y = j1pos.Value.Y;
+                Subject.Vertex1.DispatchOnMovedEvents(px, py);
             }
             var j2pos = ray.GetClosestOnFormula(Subject.Vertex2);
-            if (j2pos != null)
+            if (j2pos != null && Subject.Vertex2.IsMovementLegal(j2pos.Value.X, j2pos.Value.Y))
             {
+                double px = Subject.Vertex2.X, py = Subject.Vertex2.Y;
                 Subject.Vertex2.X = j2pos.Value.X;
                 Subject.Vertex2.Y = j2pos.Value.Y;
+                Subject.Vertex2.DispatchOnMovedEvents(px, py);
+
             }
-            Subject.Vertex1.DispatchOnMovedEvents(Subject.Vertex1.X, Subject.Vertex1.Y, Subject.Vertex1.X, Subject.Vertex1.Y);
-            Subject.Vertex2.DispatchOnMovedEvents(Subject.Vertex2.X, Subject.Vertex2.Y, Subject.Vertex2.X, Subject.Vertex2.Y);
+            
             Regenerate();
         };
         return item;
@@ -397,7 +401,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                         {
                             if (existing.ContainsRoughly(p)) continue;
                             var j = new Vertex(p);
-                            j.X = p.X; j.Y = p.Y;
+                            j.X = p.X; j.Y = p.Y; // no need to verify movement here, new vertex without data.
                             j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
                         }

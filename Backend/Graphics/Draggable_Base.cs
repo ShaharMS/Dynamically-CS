@@ -32,12 +32,12 @@ public partial class DraggableGraphic : Canvas
     /// <param name="y"></param>
     /// <param name="px"></param>
     /// <param name="py"></param>
-    public virtual void DispatchOnMovedEvents(double? x = null, double? y = null, double? px = null, double? py = null)
+    public virtual void DispatchOnMovedEvents(double? px = null, double? py = null)
     {
         var c = OnMoved.ToArray();
         foreach (var listener in c)
         {
-            listener(x ?? X, y ?? Y, px ?? X, py ?? Y);
+            listener(X, Y, px ?? X, py ?? Y);
         }
     }
 
@@ -131,7 +131,7 @@ public partial class DraggableGraphic : Canvas
             X = _startPosition.X + offset.X;
             Y = _startPosition.Y + offset.Y;
 
-            DispatchOnMovedEvents(X, Y, before.X, before.Y);
+            DispatchOnMovedEvents(before.X, before.Y);
         }
     }
 

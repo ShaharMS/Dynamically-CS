@@ -25,6 +25,12 @@ public class PointFormula : Formula
         set => Move(_x, _y);
     }
 
+    public void QuietSet(double x, double y)
+    {
+        _x = x;
+        _y = y;
+    }
+
     public PointFormula(double x, double y)
     {
         Move(x, y);

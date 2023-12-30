@@ -37,6 +37,12 @@ public class RayFormula : Formula
         }
     }
 
+    public void QuietSet(double yIntercept, double slope)
+    {
+        _yIntercept = yIntercept;
+        _slope = slope;
+    }
+
     /// <summary>
     /// Useful when dealing with vertical rays, which cannot be represented accurately using Slope & yItntercept.
     /// Only set when defining the ray using a point.

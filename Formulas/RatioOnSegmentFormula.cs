@@ -17,6 +17,12 @@ public class RatioOnSegmentFormula : Formula
         get => new(Ratio * (SegmentFormula.X2 + SegmentFormula.X1), Ratio * (SegmentFormula.Y2 + SegmentFormula.Y1));
     }
 
+    public void QuietSet(SegmentFormula Formula, double ratio)
+    {
+        SegmentFormula = Formula;
+        this.Ratio = ratio;
+    }
+
     public RatioOnSegmentFormula(SegmentFormula Formula, double ratio) : base()
     {
         SegmentFormula = Formula;

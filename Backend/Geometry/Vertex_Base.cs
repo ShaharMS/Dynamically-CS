@@ -17,6 +17,7 @@ using Dynamically.Screens;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
+using System.Collections.ObjectModel;
 
 namespace Dynamically.Backend.Geometry;
 
@@ -39,7 +40,11 @@ public partial class Vertex : DraggableGraphic
 
     public List<Action<double, double>> OnRemoved = new();
 
-    
+    /// <summary>
+    /// When this vertex is manipulated, the formulas contained here are supposed to change.
+    /// </summary>
+    public ObservableCollection<Formula> FormulasEffected { get; set; } = new();
+
 
     public Label IdDisplay;
 
@@ -65,6 +70,8 @@ public partial class Vertex : DraggableGraphic
     public Vertex(Point p) : this(p.X, p.Y) { }
     public Vertex(double x, double y, char id = '_')
     {
+
+        FormulasEffected.CollectionChanged += (s, e) => Log.Write(this, FormulasEffected);
 
         IdDisplay = new Label()
         {

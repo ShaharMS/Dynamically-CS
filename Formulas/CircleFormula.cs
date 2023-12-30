@@ -45,6 +45,13 @@ public class CircleFormula : Formula
             foreach (var l in OnMoved) l(_centerX, value, _centerX, prev);
         }
     }
+
+    public void QuietSet(double radius, double centerX, double centerY)
+    {
+        _radius = radius;
+        _centerX = centerX;
+        _centerY = centerY;
+    }
     public CircleFormula(double radius, double centerX, double centerY) : base()
     {
         Radius = radius;

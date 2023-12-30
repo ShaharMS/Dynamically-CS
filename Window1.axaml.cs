@@ -5,6 +5,7 @@ using Avalonia.Media;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -117,7 +118,7 @@ namespace Dynamically
                     s.Add("null"); 
                     continue; 
                 }
-                if (item!.GetType().IsArray || (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(List<>))) itemS = StringifyCollection((IEnumerable)item);
+                if (item!.GetType().IsArray || (item.GetType().IsGenericType && new[] { typeof(List<>), typeof(HashSet<>), typeof(ObservableCollection<>)}.Contains(item.GetType().GetGenericTypeDefinition()))) itemS = StringifyCollection((IEnumerable)item);
                 else if (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)) itemS = StringifyCollection((IEnumerable)item);
                 s.Add(itemS ?? "Value");
             }

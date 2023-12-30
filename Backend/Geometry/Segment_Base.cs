@@ -159,13 +159,22 @@ public partial class Segment : DraggableGraphic
             }
             var pj1X = Vertex1.X; var pj2X = Vertex2.X;
             var pj1Y = Vertex1.Y; var pj2Y = Vertex2.Y;
-            Vertex1.X = org1X + X;
-            Vertex2.X = org2X + X;
-            Vertex1.Y = org1Y + Y;
-            Vertex2.Y = org2Y + Y;
+
+            if (Vertex1.IsMovementLegal(org1X, org1Y))
+            {
+                Vertex1.X = org1X + X;
+                Vertex1.Y = org1Y + Y;
+                Vertex1.DispatchOnMovedEvents(pj1X, pj1Y);
+            }
+            if (Vertex2.IsMovementLegal(org2X, org2Y))
+            {
+                Vertex2.X = org2X + X;
+                Vertex2.Y = org2Y + Y;
+                Vertex2.DispatchOnMovedEvents(pj2X, pj2Y);
+            }
+
             X = 0; Y = 0;
-            Vertex1.DispatchOnMovedEvents(Vertex1.X, Vertex1.Y, pj1X, pj1Y);
-            Vertex2.DispatchOnMovedEvents(Vertex2.X, Vertex2.Y, pj2X, pj2Y);
+
             Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
             Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
             InvalidateVisual();
@@ -196,9 +205,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex1.Connections.Remove(this);
             Vertex1.Relations.Remove(Vertex2);
+            Vertex1.FormulasEffected.Remove(Formula);
             Vertex1 = by;
             Vertex1.Connections.Add(this);
             Vertex1.Relations.Add(Vertex2);
+            Vertex1.FormulasEffected.Add(Formula);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }
@@ -206,9 +217,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex2.Connections.Remove(this);
             Vertex2.Relations.Remove(Vertex1);
+            Vertex2.FormulasEffected.Remove(Formula);
             Vertex2 = by;
             Vertex2.Connections.Add(this);
             Vertex2.Relations.Add(Vertex1);
+            Vertex2.FormulasEffected.Add(Formula);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }

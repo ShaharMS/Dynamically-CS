@@ -1,4 +1,5 @@
 ﻿using Dynamically.Formulas;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +30,13 @@ public partial class Segment
         {
             var rads = Vertex1.RadiansTo(Vertex2);
 
-            Vertex2.X = Vertex1.X + value * Math.Cos(rads);
-            Vertex2.Y = Vertex1.Y + value * Math.Sin(rads);
+            if (Vertex2.IsMovementLegal(Vertex2.X - value * Math.Cos(rads), Vertex2.Y - value * Math.Sin(rads))) {
+                double px = Vertex2.X, py = Vertex2.Y;
+                Vertex2.X = Vertex2.X + value * Math.Cos(rads);
+                Vertex2.Y = Vertex2.Y + value * Math.Sin(rads);
+
+                Vertex2.DispatchOnMovedEvents(px, py);
+            }
         }
     }
     public void SetLength(double len, bool isFirstStuck = true)
@@ -39,10 +45,17 @@ public partial class Segment
         {
             Length = len; // First is stuck by default
             return;
-        }
-        var rads = Vertex2.RadiansTo(Vertex1);
+        } else
+        {
+            var rads = Vertex2.RadiansTo(Vertex1);
 
-        Vertex1.X = Vertex2.X + len * Math.Cos(rads);
-        Vertex1.Y = Vertex2.Y + len * Math.Sin(rads);
+            if (Vertex1.IsMovementLegal(Vertex1.X + len * Math.Cos(rads), Vertex1.Y + len * Math.Sin(rads))) {
+                double px = Vertex1.X, py = Vertex1.Y;
+                Vertex1.X = Vertex1.X + len * Math.Cos(rads);
+                Vertex1.Y = Vertex1.Y + len * Math.Sin(rads);
+
+                Vertex1.DispatchOnMovedEvents(px, py);
+            }
+        }
     }
 }

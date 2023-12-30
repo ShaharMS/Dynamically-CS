@@ -51,7 +51,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     {
         var stats = GetCircleStats();
         if (Incircle == null) return;
-        Incircle.Center.X = stats.x;
+        Incircle.Center.X = stats.x; // No need to validate movement, this value "doesn't matter"
         Incircle.Center.Y = stats.y;
         Incircle.Radius = stats.r;
         Incircle.UpdateFormula();
