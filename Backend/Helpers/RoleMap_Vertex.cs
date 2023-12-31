@@ -14,7 +14,7 @@ namespace Dynamically.Backend.Helpers;
 #pragma warning disable CA1822
 public partial class RoleMap
 {
-    private void Joint__AddToRole<T>(Role role, T item, Vertex Subject)
+    private void Vertex__AddToRole<T>(Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -29,8 +29,8 @@ public partial class RoleMap
                 Subject.OnMoved.Add(s1.__repositionLabel);
                 s1.Vertex1.Relations.Remove(s1.Vertex2);
                 s1.Vertex2.Relations.Remove(s1.Vertex1);
-                s1.Vertex1.FormulasEffected.Add(s1.Formula);
-                s1.Vertex2.FormulasEffected.Add(s1.Formula);
+                s1.Vertex1.EffectedFormulas.Add(s1.Formula);
+                s1.Vertex2.EffectedFormulas.Add(s1.Formula);
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.AddFollower(Subject);
@@ -52,7 +52,7 @@ public partial class RoleMap
                 Subject.OnDragStart.Add((item as Circle).__circle_Moving);
                 Subject.OnDragged.Add((item as Circle).__circle_StopMoving);
                 Subject.OnRemoved.Add((item as Circle).__circle_Remove);
-                Subject.FormulasEffected.Add((item as Circle).Formula);
+                Subject.EffectedFormulas.Add((item as Circle).Formula);
                 foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         Subject.CreateBoardRelationsWith(joint, Subject.GetConnectionTo(joint));
@@ -79,7 +79,7 @@ public partial class RoleMap
         }
     }
 
-    private void Joint__RemoveFromRole<T>(Role role, T item, Vertex Subject)
+    private void Vertex__RemoveFromRole<T>(Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -93,8 +93,8 @@ public partial class RoleMap
                 Subject.OnDragged.Remove(s1.__reposition);
                 s1.Vertex1.Relations.Remove(s1.Vertex2);
                 s1.Vertex2.Relations.Remove(s1.Vertex1);
-                s1.Vertex1.FormulasEffected.Remove(s1.Formula);
-                s1.Vertex2.FormulasEffected.Remove(s1.Formula);
+                s1.Vertex1.EffectedFormulas.Remove(s1.Formula);
+                s1.Vertex2.EffectedFormulas.Remove(s1.Formula);
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.RemoveFollower(Subject);
@@ -119,7 +119,7 @@ public partial class RoleMap
                 (item as Circle).Center.OnDragStart.Remove((item as Circle).__circle_Moving);
                 (item as Circle).Center.OnDragged.Remove((item as Circle).__circle_StopMoving);
                 (item as Circle).Center.OnRemoved.Remove((item as Circle).__circle_Remove);
-                (item as Circle).Center.FormulasEffected.Remove((item as Circle).Formula);
+                (item as Circle).Center.EffectedFormulas.Remove((item as Circle).Formula);
                 foreach (Vertex joint in Subject.Relations) {
                     if (joint.Roles.Has(Role.CIRCLE_On, item)) {
                         joint.Roles.RemoveFromRole(Role.CIRCLE_On, item);
@@ -148,7 +148,7 @@ public partial class RoleMap
         }
     }
 
-    private void Joint__TransferRole<T>(Vertex From, Role role, T item, Vertex Subject)
+    private void Vertex__TransferRole<T>(Vertex From, Role role, T item, Vertex Subject)
     {
         switch (role)
         {
@@ -192,8 +192,8 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                From.FormulasEffected.Remove((item as Circle).Formula);
-                Subject.FormulasEffected.Remove((item as Circle).Formula);
+                From.EffectedFormulas.Remove((item as Circle).Formula);
+                Subject.EffectedFormulas.Remove((item as Circle).Formula);
                 (item as Circle).Set(Subject, (item as Circle).Radius);
                 foreach (Vertex joint in Subject.Relations)
                 {

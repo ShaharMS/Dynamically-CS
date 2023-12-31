@@ -345,24 +345,20 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             // Place the diameter at a position that makes sense - same Slope and a bit longer
             var slope = Subject.Formula.Slope;
             var ray = new RayFormula(circle.Center, slope);
-            var j1pos = ray.GetClosestOnFormula(Subject.Vertex1);
-            if (j1pos != null && Subject.Vertex1.IsMovementLegal(j1pos.Value.X, j1pos.Value.Y))
-            {
-                double px = Subject.Vertex1.X, py = Subject.Vertex1.Y;
-                Subject.Vertex1.X = j1pos.Value.X;
-                Subject.Vertex1.Y = j1pos.Value.Y;
-                Subject.Vertex1.DispatchOnMovedEvents(px, py);
-            }
-            var j2pos = ray.GetClosestOnFormula(Subject.Vertex2);
-            if (j2pos != null && Subject.Vertex2.IsMovementLegal(j2pos.Value.X, j2pos.Value.Y))
-            {
-                double px = Subject.Vertex2.X, py = Subject.Vertex2.Y;
-                Subject.Vertex2.X = j2pos.Value.X;
-                Subject.Vertex2.Y = j2pos.Value.Y;
-                Subject.Vertex2.DispatchOnMovedEvents(px, py);
 
-            }
-            
+            var j1pos = ray.GetClosestOnFormula(Subject.Vertex1);
+            double px = Subject.Vertex1.X, py = Subject.Vertex1.Y;
+            Subject.Vertex1.X = j1pos.Value.X;
+            Subject.Vertex1.Y = j1pos.Value.Y;
+            Subject.Vertex1.DispatchOnMovedEvents(px, py);
+
+            var j2pos = ray.GetClosestOnFormula(Subject.Vertex2);
+            px = Subject.Vertex2.X;  py = Subject.Vertex2.Y;
+            Subject.Vertex2.X = j2pos.Value.X;
+            Subject.Vertex2.Y = j2pos.Value.Y;
+            Subject.Vertex2.DispatchOnMovedEvents(px, py);
+
+
             Regenerate();
         };
         return item;

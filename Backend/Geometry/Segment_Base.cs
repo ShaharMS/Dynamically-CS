@@ -110,8 +110,6 @@ public partial class Segment : DraggableGraphic
     {
         Vertex1 = f;
         Vertex2 = t;
-        Vertex1.Roles.AddToRole(Role.SEGMENT_Corner, this);
-        Vertex2.Roles.AddToRole(Role.SEGMENT_Corner, this);
         org1X = f.X;
         org1Y = f.Y;
         org2X = t.X;
@@ -160,18 +158,12 @@ public partial class Segment : DraggableGraphic
             var pj1X = Vertex1.X; var pj2X = Vertex2.X;
             var pj1Y = Vertex1.Y; var pj2Y = Vertex2.Y;
 
-            if (Vertex1.IsMovementLegal(org1X, org1Y))
-            {
                 Vertex1.X = org1X + X;
                 Vertex1.Y = org1Y + Y;
                 Vertex1.DispatchOnMovedEvents(pj1X, pj1Y);
-            }
-            if (Vertex2.IsMovementLegal(org2X, org2Y))
-            {
                 Vertex2.X = org2X + X;
                 Vertex2.Y = org2Y + Y;
                 Vertex2.DispatchOnMovedEvents(pj2X, pj2Y);
-            }
 
             X = 0; Y = 0;
 
@@ -196,6 +188,9 @@ public partial class Segment : DraggableGraphic
 
         MainWindow.BigScreen.Children.Insert(0, this);
 
+
+        Vertex1.Roles.AddToRole(Role.SEGMENT_Corner, this);
+        Vertex2.Roles.AddToRole(Role.SEGMENT_Corner, this);
         InvalidateVisual();
     }
 
@@ -205,11 +200,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex1.Connections.Remove(this);
             Vertex1.Relations.Remove(Vertex2);
-            Vertex1.FormulasEffected.Remove(Formula);
+            Vertex1.EffectedFormulas.Remove(Formula);
             Vertex1 = by;
             Vertex1.Connections.Add(this);
             Vertex1.Relations.Add(Vertex2);
-            Vertex1.FormulasEffected.Add(Formula);
+            Vertex1.EffectedFormulas.Add(Formula);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }
@@ -217,11 +212,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex2.Connections.Remove(this);
             Vertex2.Relations.Remove(Vertex1);
-            Vertex2.FormulasEffected.Remove(Formula);
+            Vertex2.EffectedFormulas.Remove(Formula);
             Vertex2 = by;
             Vertex2.Connections.Add(this);
             Vertex2.Relations.Add(Vertex1);
-            Vertex2.FormulasEffected.Add(Formula);
+            Vertex2.EffectedFormulas.Add(Formula);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }

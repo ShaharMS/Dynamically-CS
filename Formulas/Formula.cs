@@ -46,7 +46,6 @@ public abstract class Formula
                 // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
                 if (MainWindow.BigScreen.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;
-                if (!joint.IsMovementLegal(joint.X - preX + curX, joint.Y - preX + curX)) continue;
                 joint.X = joint.X - preX + curX;
                 joint.Y = joint.Y - preY + curY;
                 joint.DispatchOnMovedEvents(joint.X + preX - curX, joint.Y + preY - curY);

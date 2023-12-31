@@ -57,7 +57,8 @@ public class MathTextBox : Canvas
         MathView = new MathView
         {
             FontSize = (float)TextBox.FontSize,
-            DisplacementX = (float)TextBox.FontSize / 4,
+            DisplacementX = (float)TextBox.FontSize - 2,
+            DisplacementY = (float)TextBox.FontSize / 4 - (float)TextBox.FontSize / 6,
             TextAlignment = CSharpMath.Rendering.FrontEnd.TextAlignment.Left,
             HighlightColor = Colors.Red,
         };
@@ -66,14 +67,14 @@ public class MathTextBox : Canvas
         {
             if (e.Property.Name != nameof(TextBox.Text) || MathView == null) return;
             MathView.LaTeX = Latex.Latex.Latexify(TextBox.Text ?? "");
-            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox));
             //PrintDebugPosition();
         };
         TextBox.LayoutUpdated += (s, e) =>
         {
             //Log.WriteVar(MathView.Bounds.Height);
             // Second pass, incase the first didnt catch the bounds update
-            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox) - MathView.Bounds.Height / 2 + TextBox.Bounds.Height / 2);
+            MathView.SetPosition(Canvas.GetLeft(TextBox), Canvas.GetTop(TextBox));
         };
         TextBox.PropertyChanged += (s, e) =>
         {

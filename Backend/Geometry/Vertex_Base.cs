@@ -43,7 +43,7 @@ public partial class Vertex : DraggableGraphic
     /// <summary>
     /// When this vertex is manipulated, the formulas contained here are supposed to change.
     /// </summary>
-    public ObservableCollection<Formula> FormulasEffected { get; set; } = new();
+    public List<Formula> EffectedFormulas { get; set; } = new();
 
 
     public Label IdDisplay;
@@ -71,7 +71,6 @@ public partial class Vertex : DraggableGraphic
     public Vertex(double x, double y, char id = '_')
     {
 
-        FormulasEffected.CollectionChanged += (s, e) => Log.Write(this, FormulasEffected);
 
         IdDisplay = new Label()
         {

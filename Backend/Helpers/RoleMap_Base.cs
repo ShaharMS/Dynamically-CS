@@ -148,7 +148,7 @@ public partial class RoleMap
         else Underlying[role] = new List<object> { item };
         if (Underlying[role].Count == 1) Count++;
 
-        if (Subject.Is<Vertex>())  Joint__AddToRole(role, item, Subject.L());
+        if (Subject.Is<Vertex>())  Vertex__AddToRole(role, item, Subject.L());
         else Segment__AddToRole(role, item, Subject.R());
 
         return item;
@@ -160,7 +160,7 @@ public partial class RoleMap
         if (list.Count == 1) Count--;
         Underlying[role].Remove(item);
 
-        if (Subject.Is<Vertex>()) Joint__RemoveFromRole(role, item, Subject.L());
+        if (Subject.Is<Vertex>()) Vertex__RemoveFromRole(role, item, Subject.L());
         else Segment__RemoveFromRole(role, item, Subject.R());
         
 
@@ -189,7 +189,7 @@ public partial class RoleMap
                 else Underlying[role] = new List<object> { item };
                 if (Underlying[role].Count == 1) Count++;
 
-                if (Subject.Is<Vertex>()) Joint__TransferRole(Roles.Subject.L(), role, item, Subject.L());
+                if (Subject.Is<Vertex>()) Vertex__TransferRole(Roles.Subject.L(), role, item, Subject.L());
                 else Segment__TransferRole(Roles.Subject.R(), role, item, Subject.R());
             }
         }

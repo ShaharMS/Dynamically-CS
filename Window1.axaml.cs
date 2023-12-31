@@ -83,21 +83,21 @@ namespace Dynamically
             [CallerArgumentExpression("self8")] string paramName8 = "",
             [CallerArgumentExpression("self9")] string paramName9 = "") 
         {
-            if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
-            if (self1 != null) Write($"{paramName1}: {Stringify(self1)}");
-            if (self2 != null) Write($"{paramName2}: {Stringify(self2)}");
-            if (self3 != null) Write($"{paramName3}: {Stringify(self3)}"); 
-            if (self4 != null) Write($"{paramName4}: {Stringify(self4)}");
-            if (self5 != null) Write($"{paramName5}: {Stringify(self5)}");
-            if (self6 != null) Write($"{paramName6}: {Stringify(self6)}");
-            if (self7 != null) Write($"{paramName7}: {Stringify(self7)}");
-            if (self8 != null) Write($"{paramName8}: {Stringify(self8)}");
-            if (self9 != null) Write($"{paramName9}: {Stringify(self9)}");
+            if (paramName  == "") Write(""); else Write($"{paramName}: {Stringify(self)}");
+            if (paramName1 != "") Write($"{paramName1}: {Stringify(self1)}");
+            if (paramName2 != "") Write($"{paramName2}: {Stringify(self2)}");
+            if (paramName3 != "") Write($"{paramName3}: {Stringify(self3)}"); 
+            if (paramName4 != "") Write($"{paramName4}: {Stringify(self4)}");
+            if (paramName5 != "") Write($"{paramName5}: {Stringify(self5)}");
+            if (paramName6 != "") Write($"{paramName6}: {Stringify(self6)}");
+            if (paramName7 != "") Write($"{paramName7}: {Stringify(self7)}");
+            if (paramName8 != "") Write($"{paramName8}: {Stringify(self8)}");
+            if (paramName9 != "") Write($"{paramName9}: {Stringify(self9)}");
         }
 
         public static void WriteAsTree(object? self, [CallerArgumentExpression("self")] string paramName = "")
         {
-            if (self == null) Write("null: null"); else Write($"{paramName}: {Stringify(self)}");
+            if (paramName == null) Write(""); else Write($"{paramName}: {Stringify(self)}");
             Indent++;
             foreach (PropertyInfo prop in self!.GetType().GetProperties().Where(p => !p.GetIndexParameters().Any()))
             {

@@ -99,10 +99,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
             {
                 var currentRotation = rotationCenter.RadiansTo(args.GetPosition(null)) - initialRotationRad;
 
-                if (Subject.Vertex1.IsMovementLegal(rotationCenter.X + dist1 * Math.Cos(rad1 + currentRotation), rotationCenter.Y + dist1 * Math.Sin(rad1 + currentRotation)) &&
-                   Subject.Vertex2.IsMovementLegal(rotationCenter.X + dist2 * Math.Cos(rad2 + currentRotation), rotationCenter.Y + dist2 * Math.Sin(rad2 + currentRotation)) &&
-                   Subject.Vertex2.IsMovementLegal(rotationCenter.X + dist3 * Math.Cos(rad3 + currentRotation), rotationCenter.Y + dist3 * Math.Sin(rad3 + currentRotation))) return;
-
                 Subject.Vertex1.X = rotationCenter.X + dist1 * Math.Cos(rad1 + currentRotation); Subject.Vertex1.Y = rotationCenter.Y + dist1 * Math.Sin(rad1 + currentRotation);
                 Subject.Vertex2.X = rotationCenter.X + dist2 * Math.Cos(rad2 + currentRotation); Subject.Vertex2.Y = rotationCenter.Y + dist2 * Math.Sin(rad2 + currentRotation);
                 Subject.Vertex3.X = rotationCenter.X + dist3 * Math.Cos(rad3 + currentRotation); Subject.Vertex3.Y = rotationCenter.Y + dist3 * Math.Sin(rad3 + currentRotation);
