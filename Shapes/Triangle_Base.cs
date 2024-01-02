@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Avalonia.Media;
 using Dynamically.Design;
 using System.Linq;
@@ -92,7 +92,7 @@ public partial class Triangle : DraggableGraphic
         });
         OnDragged.Add(MainWindow.RegenAll);
 
-        MainWindow.BigScreen.Children.Add(this);
+        MainWindow.Instance.MainBoard.Children.Add(this);
 
         MainWindow.RegenAll(0, 0, 0, 0);
         Provider.Regenerate();
@@ -203,7 +203,7 @@ public partial class Triangle : DraggableGraphic
 
         geom.Figures.Add(figure);
 
-        if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
+        if (MainWindow.Instance.MainBoard.HoveredObject == this && (MainWindow.Instance.MainBoard.FocusedObject == this || MainWindow.Instance.MainBoard.FocusedObject is not IShape))
         {
             context.DrawGeometry(UIColors.ShapeHoverFill, null, geom);
         }

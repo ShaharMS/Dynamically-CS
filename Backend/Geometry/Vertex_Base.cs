@@ -13,7 +13,7 @@ using Avalonia.Controls;
 using Dynamically.Shapes;
 using System.Runtime.CompilerServices;
 using Avalonia.Styling;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
@@ -50,7 +50,7 @@ public partial class Vertex : DraggableGraphic
 
     public bool GotRemoved
     {
-        get => !MainWindow.BigScreen.Children.Contains(this);
+        get => !MainWindow.Instance.MainBoard.Children.Contains(this);
     }
 
     public new double Opacity {
@@ -88,7 +88,7 @@ public partial class Vertex : DraggableGraphic
 
 
 
-        MainWindow.BigScreen.Children.Add(IdDisplay);
+        MainWindow.Instance.MainBoard.Children.Add(IdDisplay);
 
         X = x;
         Y = y;
@@ -105,7 +105,7 @@ public partial class Vertex : DraggableGraphic
 
         All.Add(this);
 
-        MainWindow.BigScreen.Children.Add(this);
+        MainWindow.Instance.MainBoard.Children.Add(this);
 
         Width = Height = UIDesign.JointGraphicCircleRadius * 2;
     }
@@ -170,8 +170,8 @@ public partial class Vertex : DraggableGraphic
 
         IDGenerator.Remove(this);
 
-        MainWindow.BigScreen.Children.Remove(this);
-        MainWindow.BigScreen.Children.Remove(IdDisplay);
+        MainWindow.Instance.MainBoard.Children.Remove(this);
+        MainWindow.Instance.MainBoard.Children.Remove(IdDisplay);
 
         Roles.Clear();
         OnMoved.Clear();

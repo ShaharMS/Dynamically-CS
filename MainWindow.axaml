@@ -7,13 +7,19 @@
         Title="Dynamically">
 
 	<DockPanel Name="Display">
-		<Menu DockPanel.Dock="Top" Name="TopMenu">
-			<MenuItem Header="_File">
-				<MenuItem Header="_New"/>
-				<MenuItem IsEnabled="False" Header="_Open..."/>
+		<Menu DockPanel.Dock="Top" Name="Menu">
+			<MenuItem Header="File">
+				<MenuItem Header="New"/>
+				<MenuItem IsEnabled="False" Header="Open..."/>
 				<Separator/>
 				<MenuItem Header="Exit"/>
 			</MenuItem>
+      <MenuItem Header="Board">
+        <MenuItem Header="Add New Board"></MenuItem>
+        <Separator/>
+        <MenuItem Header="Select All"></MenuItem>
+        <MenuItem Header="Generate Exercise"></MenuItem>
+      </MenuItem>
 			<MenuItem Header="Edit">
 				<MenuItem Header="Copy"/>
 				<MenuItem Header="Paste"/>
@@ -96,8 +102,12 @@
 				</MenuItem>
 			</MenuItem>
 		</Menu>
-		<Canvas Name="Main">
-			
-		</Canvas>
+    <TabControl Margin="5" Name="Tabs">
+      <TabItem Header="Main Board" Name="__MainBoard">
+        <Canvas Name="Main">
+
+        </Canvas>
+      </TabItem>
+    </TabControl>
 	</DockPanel>
 </Window>

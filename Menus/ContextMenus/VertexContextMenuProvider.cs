@@ -11,7 +11,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Shapes;
 using Avalonia;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend;
 using System.Collections;
@@ -168,7 +168,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         connect.Click += (s, args) =>
         {
             var potential = new Vertex(MainWindow.Mouse.GetPosition(null));
-            MainWindow.BigScreen.HandleCreateConnection(Subject, potential);
+            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, potential);
         };
 
         return connect;
@@ -333,9 +333,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
 
         return item;
@@ -352,9 +352,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            MainWindow.BigScreen.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
             var j1 = new Vertex(j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);

@@ -31,8 +31,8 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
         foreach (var l in OnRemoved) l();
 
-        MainWindow.BigScreen.Children.Remove(Ring);
-        MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.Instance.MainBoard.Children.Remove(Ring);
+        MainWindow.Instance.MainBoard.Children.Remove(this);
     }
     public void __circle_OnChange(double z, double x, double c, double v)
     {

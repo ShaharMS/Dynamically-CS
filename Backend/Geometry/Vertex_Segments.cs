@@ -111,7 +111,7 @@ public partial class Vertex
                 c.Formula.RemoveAllFollowers();
                 c.MiddleFormula.RemoveAllFollowers();
                 Segment.all.Remove(c);
-                MainWindow.BigScreen.Children.Remove(c);
+                MainWindow.Instance.MainBoard.Children.Remove(c);
                 foreach (var l in c.OnRemoved) l(this, joint);
             }
         }
@@ -143,7 +143,7 @@ public partial class Vertex
                     c.Formula.RemoveAllFollowers();
                     c.MiddleFormula.RemoveAllFollowers();
                     Segment.all.Remove(c);
-                    MainWindow.BigScreen.Children.Remove(c);
+                    MainWindow.Instance.MainBoard.Children.Remove(c);
                     foreach (var l in c.OnRemoved) l(this, joint);
 
                 }
@@ -157,7 +157,7 @@ public partial class Vertex
 
         foreach (Segment c in Connections)
         {
-            MainWindow.BigScreen.Children.Remove(c);
+            MainWindow.Instance.MainBoard.Children.Remove(c);
             if (c.Vertex1 != this) c.Vertex1.Connections.Remove(c);
             else c.Vertex2.Connections.Remove(c);
             if (c.Vertex1 != this) c.Vertex1.Relations.Remove(c.Vertex2);

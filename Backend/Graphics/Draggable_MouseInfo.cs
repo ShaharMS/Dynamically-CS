@@ -16,8 +16,8 @@ public partial class DraggableGraphic
     public bool IsPressed { get; set; }
     public new bool IsFocused
     {
-        get => MainWindow.BigScreen.FocusedObject == this;
-        set => MainWindow.BigScreen.FocusedObject = this;
+        get => MainWindow.Instance.MainBoard.FocusedObject == this;
+        set => MainWindow.Instance.MainBoard.FocusedObject = this;
     }
 
     public DraggableGraphic()
@@ -27,7 +27,7 @@ public partial class DraggableGraphic
         PointerLeave += MouseInfo_PointerOut;
         PointerPressed += MouseInfo_PointerPressed;
         PointerReleased += MouseInfo_PointerReleased;
-        // IsFocused handled in BigScreen
+        // IsFocused handled in MainBoard
     }
 
     private void MouseInfo_PointerHover(object? sender, PointerEventArgs e)

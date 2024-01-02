@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Avalonia;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 
@@ -78,8 +78,8 @@ public class EllipseBase : DraggableGraphic, IDrawable
         Focal1.OnRemoved.Add(__remove);
         Focal1.OnRemoved.Add(__remove);
 
-        MainWindow.BigScreen.Children.Insert(0, this);
-        MainWindow.BigScreen.Children.Insert(0, Ring);
+        MainWindow.Instance.MainBoard.Children.Insert(0, this);
+        MainWindow.Instance.MainBoard.Children.Insert(0, Ring);
         InvalidateVisual();
     }
 
@@ -106,8 +106,8 @@ public class EllipseBase : DraggableGraphic, IDrawable
     private void __remove(double z, double x)
     {
         _ = z; _ = x;
-        MainWindow.BigScreen.Children.Remove(this);
-        MainWindow.BigScreen.Children.Remove(Ring);
+        MainWindow.Instance.MainBoard.Children.Remove(this);
+        MainWindow.Instance.MainBoard.Children.Remove(Ring);
     }
 }
     internal class Ring : DraggableGraphic
@@ -122,10 +122,9 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
             OnMoved.Add((double _, double _, double _, double _) =>
             {
-                double mx = BigScreen.MouseX, my = BigScreen.MouseY;
-                var parentOffset = this.GetPosition();
-                mx -= parentOffset.X;
-                my -= parentOffset.Y;
+                double mx = Board.MouseX, my = Board.MouseY;
+                mx -= ((Board)Parent!).X;
+                my -= ((Board)Parent!).Y;
                 this.SetPosition(0, 0);
                 Ellipse.DistanceSum = new Point(Ellipse.Focal1.X, Ellipse.Focal1.Y).DistanceTo(new Point(mx, my)) + new Point(Ellipse.Focal2.X, Ellipse.Focal2.Y).DistanceTo(new Point(mx, my));
                 InvalidateVisual();

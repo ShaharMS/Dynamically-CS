@@ -6,7 +6,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -228,7 +228,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         c.Click += (o, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
 
             j.ForceStartDrag(MainWindow.Mouse);
@@ -245,7 +245,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         m.Click += (o, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
         };
 

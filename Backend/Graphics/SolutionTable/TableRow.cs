@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Dynamically.Screens;
+using Dynamically.Containers;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 
@@ -66,14 +66,14 @@ public class TableRow : Canvas
             Log.Write(this.GetPosition().ToString(), Height, Handle.Height);
             if (double.IsNaN(this.GetPosition().Y)) return;
             Handle.X = this.GetPosition().X - 50;
-            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.GetPosition().Y + Height / 2 - Handle.Height / 2;
+            Handle.Y = this.GetPosition().Y - MainWindow.Instance.MainBoard.GetPosition().Y + Height / 2 - Handle.Height / 2;
             LayoutUpdated -= placeHandle;
         };
         LayoutUpdated += placeHandle;
         
         border.SetPosition(0, 0);
         Children.Add(border);
-        MainWindow.BigScreen.Children.Add(Handle);
+        MainWindow.Instance.MainBoard.Children.Add(Handle);
     }
 
     public void AttemptMovement()
@@ -91,7 +91,7 @@ public class TableRow : Canvas
     public void RepositionHandle() {
         if (!Handle.CurrentlyDragging) {
             Handle.X = this.GetPosition().X - 50;
-            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.GetPosition().Y + Height / 2 - Handle.Height / 2;
+            Handle.Y = this.GetPosition().Y - MainWindow.Instance.MainBoard.GetPosition().Y + Height / 2 - Handle.Height / 2;
         }
     }
 }

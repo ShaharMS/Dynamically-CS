@@ -130,7 +130,7 @@ public partial class Quadrilateral : DraggableGraphic
 
         All.Add(this);
         MainWindow.RegenAll(0,0,0,0);
-        MainWindow.BigScreen.Children.Add(this);
+        MainWindow.Instance.MainBoard.Children.Add(this);
     }
 #pragma warning restore CS8618
     
@@ -160,7 +160,7 @@ public partial class Quadrilateral : DraggableGraphic
 
         geom.Figures.Add(figure);
 
-        if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
+        if (MainWindow.Instance.MainBoard.HoveredObject == this && (MainWindow.Instance.MainBoard.FocusedObject == this || MainWindow.Instance.MainBoard.FocusedObject is not IShape))
         {
             context.DrawGeometry(UIColors.ShapeHoverFill, null, geom);
         }

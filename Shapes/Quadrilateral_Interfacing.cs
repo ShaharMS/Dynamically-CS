@@ -28,7 +28,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
         All.Remove(this);
         MainWindow.RegenAll(0, 0, 0, 0);
-        MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.Instance.MainBoard.Children.Remove(this);
     }
 
     public void __Disment(Vertex z, Vertex x)

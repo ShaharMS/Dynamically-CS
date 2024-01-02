@@ -92,8 +92,8 @@ public class SolutionTable : Canvas
                 _stWidth = VisualList.Width * 2 / 5;
                 _fsWidth = VisualList.Width * 1 / 5;
             }
-            Handle.X = this.GetPosition().X - MainWindow.BigScreen.X + Width / 2 - Handle.Width / 2;
-            Handle.Y = this.GetPosition().Y - MainWindow.BigScreen.Y - 50;
+            Handle.X = this.GetPosition().X - MainWindow.Instance.MainBoard.X + Width / 2 - Handle.Width / 2;
+            Handle.Y = this.GetPosition().Y - MainWindow.Instance.MainBoard.Y - 50;
             Refresh();
         });
 
@@ -113,7 +113,7 @@ public class SolutionTable : Canvas
 
 
         Children.Add(border);
-        MainWindow.BigScreen.Children.Add(Handle);
+        MainWindow.Instance.MainBoard.Children.Add(Handle);
 
         for (int i = 0; i < 4; i++) AddRow(
             new TableRow(this)

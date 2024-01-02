@@ -17,18 +17,18 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Dynamically.Screens;
+namespace Dynamically.Containers;
 
-public class BigScreen : DraggableGraphic
+public class Board : DraggableGraphic
 {
 
     public static double MouseX
     {
-        get => Mouse?.GetPosition(MainWindow.BigScreen).X ?? -1;
+        get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).X ?? -1;
     }
     public static double MouseY
     {
-        get => Mouse?.GetPosition(MainWindow.BigScreen).Y ?? -1;
+        get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).Y ?? -1;
     }
 
     public static PointerEventArgs Mouse
@@ -63,7 +63,7 @@ public class BigScreen : DraggableGraphic
     }
 
 
-    public BigScreen() : base()
+    public Board() : base()
     {
         _focused = this;
         _hovered = this;
@@ -188,7 +188,7 @@ public class BigScreen : DraggableGraphic
             }
         }
 
-        if (FocusedObject is BigScreen) Log.Write("No object is focused");
+        if (FocusedObject is Board) Log.Write("No object is focused");
         else if (FocusedObject is Vertex joint) Log.Write($"{joint.Id} Is Focused");
         else if (FocusedObject is Segment connection) Log.Write($"{connection} Is Focused");
         else if (FocusedObject is Angle angle) Log.Write($"{angle} Is Focused");
@@ -204,7 +204,8 @@ public class BigScreen : DraggableGraphic
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
-        if (e.Source is not Panel || FocusedObject is not BigScreen) return;
+        Log.WriteVar(e.Source, FocusedObject);
+        if (e.Source is not Border || FocusedObject is not Board) return;
 
         if (FocusedObject is Selection selection)
         {
@@ -228,7 +229,7 @@ public class BigScreen : DraggableGraphic
                 Selection?.Cancel();
                 return;
             }
-            Selection = new Selection(pos);
+            Selection = new Selection(pos, this);
             MainWindow.Instance.PointerMoved -= a;
         };
         MainWindow.Instance.PointerMoved += a;
@@ -257,7 +258,7 @@ public class BigScreen : DraggableGraphic
             }
         }
         /*
-        if (HoveredObject is BigScreen) Log.Write("No object is hovered");
+        if (HoveredObject is MainBoard) Log.Write("No object is hovered");
         else if (HoveredObject is Vertex joint) Log.Write($"{joint.Id} Is Hovered");
         else if (HoveredObject is Segment connection) Log.Write($"{connection.Vertex1.Id}{connection.Vertex2.Id} Is Hovered");
         else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");

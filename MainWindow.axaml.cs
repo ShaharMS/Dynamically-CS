@@ -1,21 +1,15 @@
 ﻿using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
 using Dynamically.Backend.Geometry;
 using Dynamically.Shapes;
-using System.Collections.Generic;
-using Dynamically.Formulas;
-using Dynamically.Menus;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using System;
 using Dynamically.Backend;
-using Dynamically.Backend.Interfaces;
 using System.Linq;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Graphics.SolutionTable;
 using Dynamically.Backend.Latex;
-using Dynamically.Solver.ExerciseInfoExtraction;
+using Dynamically.Menus;
 
 namespace Dynamically;
 
@@ -24,16 +18,19 @@ public partial class MainWindow : Window
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public static MainWindow Instance { get; private set; }
-
-    public static Canvas MainDisplay { get; private set; }
-
-    public static DockPanel MainPanel { get; private set; }
-
-    public static BigScreen BigScreen { get; private set; }
+    public static PointerEventArgs Mouse { get; set; }
 
     public static bool Debug { get; set; } = true;
 
-public static PointerEventArgs Mouse { get; set; }
+    public static Canvas MainDisplay { get; private set; }
+    private static DockPanel MainPanel;
+
+    public Board MainBoard { get; private set; }
+    public Tabs WindowTabs { get; private set; }
+
+    public TopMenu TopMenu { get; private set; }
+
+
 
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public MainWindow()
@@ -43,12 +40,14 @@ public static PointerEventArgs Mouse { get; set; }
         Instance = this;
         MainDisplay = Instance.Find<Canvas>("Main");
         MainPanel = Instance.Find<DockPanel>("Display");
-        var ca = new BigScreen
+        WindowTabs = new Tabs(Instance.Find<TabControl>("Tabs"));
+        TopMenu = new TopMenu(Instance.Find<Menu>("Menu"), this);
+        var ca = new Board
         {
-            Name = "BigScreen"
+            Name = "MainBoard"
         };
-        BigScreen = ca;
-        BigScreen.SetPosition(0, 0);
+        MainBoard = ca;
+        MainBoard.SetPosition(0, 0);
         
         Menus.TopMenu.applyDefaultStyling();
 
@@ -72,20 +71,20 @@ public static PointerEventArgs Mouse { get; set; }
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
-        MainDisplay.Children.Add(BigScreen);
-        BigScreen.SetPosition(0, 0);
+        MainDisplay.Children.Add(MainBoard);
+        MainBoard.SetPosition(0, 0);
 
 
 
         foreach (DraggableGraphic obj in Vertex.All.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.All)) obj.OnDragged.Add(RegenAll);
 
-        BigScreen.Refresh();
+        MainBoard.Refresh();
          
         RegenAll(0, 0, 0, 0);
 
         _ = new BottomNote("Application Started!");
-        BigScreen.Children.Add(new SolutionTable(true));
-        BigScreen.Children.Add(new MathTextBox());
+        MainBoard.Children.Add(new SolutionTable(true));
+        MainBoard.Children.Add(new MathTextBox());
 
         Log.WriteVar(Latex.Latexify("123 + AB / 3 = 66 * 5"));
 

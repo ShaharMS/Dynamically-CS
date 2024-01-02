@@ -6,7 +6,7 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Helpers.Containers;
 using Dynamically.Backend.Interfaces;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -121,9 +121,9 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.BigScreen.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
 
         return item;
@@ -138,9 +138,9 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(BigScreen.Mouse.GetPosition(null));
+            var j = new Vertex(Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.BigScreen.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
             var j1 = new Vertex(j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);

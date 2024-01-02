@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Backend;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Menus;
 using Dynamically.Design;
 using Dynamically.Menus.ContextMenus;
@@ -150,7 +150,7 @@ public partial class Circle : EllipseBase
     }
     public override void Render(DrawingContext context)
     {
-        if (MainWindow.BigScreen.HoveredObject == this && (MainWindow.BigScreen.FocusedObject == this || MainWindow.BigScreen.FocusedObject is not IShape))
+        if (MainWindow.Instance.MainBoard.HoveredObject == this && (MainWindow.Instance.MainBoard.FocusedObject == this || MainWindow.Instance.MainBoard.FocusedObject is not IShape))
         {
             context.DrawEllipse(UIColors.ShapeHoverFill, null, Center, Radius, Radius);
         }

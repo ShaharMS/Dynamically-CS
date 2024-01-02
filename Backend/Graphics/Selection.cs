@@ -6,7 +6,7 @@ using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -27,12 +27,15 @@ public class Selection : DraggableGraphic, IStringifyable
 
     public HashSet<DraggableGraphic> EncapsulatedElements = new();
 
+    private new Board Parent;
+
     public SelectionContextMenuProvider Provider { get; }
-    public Selection(Point start)
+    public Selection(Point start, Board parent)
     {
+        Parent = parent;
         sx = ex = start.X; sy = ey = start.Y;
 
-        MainWindow.BigScreen.Children.Add(this);
+        Parent.Children.Add(this);
 
         OnMoved.Add((x, y, px, py) => {
             double offsetX = x - px, offsetY = y - py;
@@ -69,7 +72,7 @@ public class Selection : DraggableGraphic, IStringifyable
         foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
             item.Opacity = 1;
 
-        MainWindow.BigScreen.FocusedObject = this;
+        Parent.FocusedObject = this;
 
         MainWindow.Instance.PointerMoved -= EvalSelection;
         MainWindow.Instance.PointerReleased -= FinishSelection;
@@ -77,7 +80,7 @@ public class Selection : DraggableGraphic, IStringifyable
 
     private void EvalSelection(object? sender, PointerEventArgs e)
     {
-        var pos = e.GetPosition(MainWindow.BigScreen);
+        var pos = e.GetPosition(Parent);
         ex = pos.X; ey = pos.Y;
         var rect = Rect; // Use getter once.
         foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
@@ -111,8 +114,8 @@ public class Selection : DraggableGraphic, IStringifyable
     {
         MainWindow.Instance.PointerMoved -= EvalSelection;
         MainWindow.Instance.PointerReleased -= FinishSelection;
-        MainWindow.BigScreen.Children.Remove(this);
-        MainWindow.BigScreen.Selection = null;
+        Parent.Children.Remove(this);
+        Parent.Selection = null;
         EncapsulatedElements.Clear();
         foreach (var element in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {

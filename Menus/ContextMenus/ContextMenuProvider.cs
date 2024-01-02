@@ -113,7 +113,7 @@ public class ContextMenuProvider
         AdjacentElements.Clear();
         var list = new List<ISupportsAdjacency>();
         if (MainWindow.Mouse == null) return;
-        var mouse = MainWindow.Mouse.GetPosition(MainWindow.BigScreen);
+        var mouse = MainWindow.Mouse.GetPosition(MainWindow.Instance.MainBoard);
         list = list.Concat(Vertex.All.ToList()).Concat(Segment.all).Concat(Circle.All).Concat(Triangle.All).Concat(Quadrilateral.All).ToList();
         foreach (var item in list) {
             if (!item.Equals(_sub) && item.Overlaps(mouse)) {

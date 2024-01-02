@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Containers;
 
 namespace Dynamically.Backend.Graphics;
 
@@ -69,7 +70,7 @@ public partial class DraggableGraphic : Canvas
     public void ForceStartDrag(dynamic args)
     {
         CurrentlyDragging = true;
-        _startPosition = new Point(args.GetPosition(null).X, args.GetPosition(null).Y - MainWindow.BigScreen.GetPosition().Y);
+        _startPosition = new Point(args.GetPosition(null).X, args.GetPosition(null).Y - MainWindow.Instance.MainBoard.GetPosition().Y);
         _startMousePosition = args.GetPosition(null);
         args.Pointer.Capture(this);
 

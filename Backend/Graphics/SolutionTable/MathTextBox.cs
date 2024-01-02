@@ -120,7 +120,7 @@ public class MathTextBox : Canvas
                 if (!TextBox.IsFocused) TextBox.Focus();
                 else return;
             }
-            else MainWindow.BigScreen.Focus();
+            else MainWindow.Instance.MainBoard.Focus();
         }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         TextBox.SetPosition(0, 0);
 

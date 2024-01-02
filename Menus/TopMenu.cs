@@ -1,8 +1,11 @@
 
 
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Dynamically;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Dynamically.Menus;
 
@@ -51,4 +54,40 @@ public class TopMenu
         set => Instance.Foreground = value ?? Brushes.Black;
     }
 
+
+    public Menu Menu { get; set; }
+    public MainWindow Parent { get; set; }
+
+    public TopMenu(Menu menu, MainWindow window)
+    {
+        Menu = menu;
+        Parent = window;
+
+        // Event Listeners
+
+        foreach (var item in Flatten(Menu.Items.OfType<MenuItem>()))
+        {
+            Log.Write(item.Header);
+            switch (item.Header)
+            {
+                case "Add New Board": item.Click += AddNewBoard; break;
+            }
+        }
+    }
+
+    private MenuItem[] Flatten(IEnumerable<MenuItem> items)
+    {
+        var list = new List<MenuItem>();
+        foreach (var item in items)
+        {
+            list.Add(item);
+            list.AddRange(Flatten(item.Items.OfType<MenuItem>()));
+        }
+        return list.ToArray();
+    }
+
+    public void AddNewBoard(object? sender, RoutedEventArgs e)
+    {
+        Parent.WindowTabs.CreateNewTab($"Board {Parent.WindowTabs.OpenTabs.Length}");
+    }
 }

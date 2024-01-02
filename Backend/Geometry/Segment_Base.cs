@@ -145,7 +145,7 @@ public partial class Segment : DraggableGraphic
         };
 
 
-        MainWindow.BigScreen.Children.Add(Label);
+        MainWindow.Instance.MainBoard.Children.Add(Label);
 
         OnMoved.Add((_, _, _, _) =>
         {
@@ -186,7 +186,7 @@ public partial class Segment : DraggableGraphic
 
         all.Add(this);
 
-        MainWindow.BigScreen.Children.Insert(0, this);
+        MainWindow.Instance.MainBoard.Children.Insert(0, this);
 
 
         Vertex1.Roles.AddToRole(Role.SEGMENT_Corner, this);

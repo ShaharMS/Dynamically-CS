@@ -43,7 +43,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         }
 
         Triangle.All.Remove(this);
-        MainWindow.BigScreen.Children.Remove(this);
+        MainWindow.Instance.MainBoard.Children.Remove(this);
     }
 
 

@@ -3,7 +3,7 @@ using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Formulas;
-using Dynamically.Screens;
+using Dynamically.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ public partial class Triangle
             else if (other1.Anchored)
             {
                 var ray = new RayFormula(pos, other1);
-                var p = ray.GetClosestOnFormula(new Point(BigScreen.MouseX, BigScreen.MouseY));
+                var p = ray.GetClosestOnFormula(new Point(Board.MouseX, Board.MouseY));
                 if (p != null)
                 {
                     moved.X = p.Value.X; moved.Y = p.Value.Y;
@@ -62,7 +62,7 @@ public partial class Triangle
             else if (other2.Anchored)
             {
                 var ray = new RayFormula(pos, other2);
-                var p = ray.GetClosestOnFormula(new Point(BigScreen.MouseX, BigScreen.MouseY));
+                var p = ray.GetClosestOnFormula(new Point(Board.MouseX, Board.MouseY));
                 if (p != null)
                 {
                     moved.X = p.Value.X; moved.Y = p.Value.Y;
