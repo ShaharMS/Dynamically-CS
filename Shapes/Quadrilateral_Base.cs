@@ -69,7 +69,7 @@ public partial class Quadrilateral : DraggableGraphic
     public Circle? Incircle;
 
 #pragma warning disable CS8618
-    public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4)
+    public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4) : base(j1.ParentBoard)
     {
         Vertex1 = j1;
         Vertex2 = j2;

@@ -22,7 +22,7 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Segment : DraggableGraphic
 {
-    public static readonly List<Segment> all = new();
+    public static readonly List<Segment> All = new();
 
     public bool Anchored
     {
@@ -106,7 +106,7 @@ public partial class Segment : DraggableGraphic
     }
 
     Action labelUpdater = () => { };
-    public Segment(Vertex f, Vertex t)
+    public Segment(Vertex f, Vertex t) : base(f.ParentBoard)
     {
         Vertex1 = f;
         Vertex2 = t;
@@ -184,7 +184,7 @@ public partial class Segment : DraggableGraphic
         OnDragged.Add(MainWindow.RegenAll);
 
 
-        all.Add(this);
+        All.Add(this);
 
         MainWindow.Instance.MainBoard.Children.Insert(0, this);
 

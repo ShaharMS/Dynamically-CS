@@ -104,9 +104,6 @@
 		</Menu>
     <TabControl Margin="5" Name="Tabs">
       <TabItem Header="Main Board" Name="__MainBoard">
-        <Canvas Name="Main">
-
-        </Canvas>
       </TabItem>
     </TabControl>
 	</DockPanel>

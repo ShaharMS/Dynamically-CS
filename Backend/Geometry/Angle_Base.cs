@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Containers;
 using Dynamically.Design;
 using Dynamically.Formulas;
 using Dynamically.Menus.ContextMenus;
@@ -97,7 +98,7 @@ public partial class Angle : DraggableGraphic
         }
     }
 
-    public Angle(Vertex v1, Vertex c, Vertex v2, bool large = false)
+    public Angle(Vertex v1, Vertex c, Vertex v2, bool large = false) : base(c.ParentBoard)
     {
         _c = c;
         _v1 = v1;
@@ -227,7 +228,7 @@ public partial class Angle : DraggableGraphic
         var x = Center.X + len * Math.Cos(middleAngle);
         var y = Center.Y + len * Math.Sin(middleAngle);
         
-        var nj = new Vertex(x, y);
+        var nj = new Vertex(ParentBoard, x, y);
         nj.Roles.AddToRole(Role.RAY_On, BisectorRay);
         var segment = Center.Connect(nj);
         segment.Roles.AddToRole(Role.ANGLE_Bisector, this);

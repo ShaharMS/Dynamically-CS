@@ -167,7 +167,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
 
         connect.Click += (s, args) =>
         {
-            var potential = new Vertex(MainWindow.Mouse.GetPosition(null));
+            var potential = new Vertex(Subject.ParentBoard, MainWindow.Mouse.GetPosition(null));
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, potential);
         };
 
@@ -333,7 +333,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
@@ -352,11 +352,11 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
-            var j1 = new Vertex(j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
+            var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);
             j1.Connect(Subject);
 
@@ -464,7 +464,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
     MenuItem? Recom_MountJoints()
     {
         List<dynamic> veryCloseTo = new();
-        foreach (var container in new List<dynamic>().Concat(Circle.All).Concat(Segment.all)) // container is IHasFormula<Formula>
+        foreach (var container in new List<dynamic>().Concat(Circle.All).Concat(Segment.All)) // container is IHasFormula<Formula>
         {
             if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container))
             {

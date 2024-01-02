@@ -27,15 +27,13 @@ public class Selection : DraggableGraphic, IStringifyable
 
     public HashSet<DraggableGraphic> EncapsulatedElements = new();
 
-    private new Board Parent;
 
     public SelectionContextMenuProvider Provider { get; }
-    public Selection(Point start, Board parent)
+    public Selection(Point start, Board ParentBoard) : base(ParentBoard)
     {
-        Parent = parent;
         sx = ex = start.X; sy = ey = start.Y;
 
-        Parent.Children.Add(this);
+        ParentBoard.Children.Add(this);
 
         OnMoved.Add((x, y, px, py) => {
             double offsetX = x - px, offsetY = y - py;
@@ -62,6 +60,38 @@ public class Selection : DraggableGraphic, IStringifyable
         MainWindow.Instance.PointerReleased += FinishSelection;
     }
 
+    public Selection(Point start, Point end, Board parent) : base(parent)
+    {
+        sx = start.X; sy = start.Y;
+        ex = end.X; ey = end.Y;
+
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.All).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All)) EncapsulatedElements.Add(item);
+
+        ParentBoard.Children.Add(this);
+
+        OnMoved.Add((x, y, px, py) => {
+            double offsetX = x - px, offsetY = y - py;
+            foreach (var item in EncapsulatedElements)
+            {
+                if (item is not Vertex) continue;
+                item.X += offsetX;
+                item.Y += offsetY;
+            }
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnMovedEvents();
+        });
+        OnDragStart.Add(() => {
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDragStartEvents();
+        });
+        OnDragged.Add((_, _, _, _) => {
+            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDraggedEvents();
+        });
+
+        ContextMenu = new ContextMenu();
+        Provider = new SelectionContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
+
+        ParentBoard.FocusedObject = this;
+    }
     private void FinishSelection(object? sender, PointerReleasedEventArgs e)
     {
         if (ex.RoughlyEquals(sx) && ey.RoughlyEquals(sy)) {
@@ -69,10 +99,10 @@ public class Selection : DraggableGraphic, IStringifyable
             return;
         }
 
-        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.All).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
             item.Opacity = 1;
 
-        Parent.FocusedObject = this;
+        ParentBoard.FocusedObject = this;
 
         MainWindow.Instance.PointerMoved -= EvalSelection;
         MainWindow.Instance.PointerReleased -= FinishSelection;
@@ -80,10 +110,10 @@ public class Selection : DraggableGraphic, IStringifyable
 
     private void EvalSelection(object? sender, PointerEventArgs e)
     {
-        var pos = e.GetPosition(Parent);
+        var pos = e.GetPosition(ParentBoard);
         ex = pos.X; ey = pos.Y;
         var rect = Rect; // Use getter once.
-        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.All).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             if (item.EncapsulatedWithin(rect))
             {
@@ -114,10 +144,10 @@ public class Selection : DraggableGraphic, IStringifyable
     {
         MainWindow.Instance.PointerMoved -= EvalSelection;
         MainWindow.Instance.PointerReleased -= FinishSelection;
-        Parent.Children.Remove(this);
-        Parent.Selection = null;
+        ParentBoard.Children.Remove(this);
+        ParentBoard.Selection = null;
         EncapsulatedElements.Clear();
-        foreach (var element in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
+        foreach (var element in Vertex.All.Concat<dynamic>(Segment.All).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             element.Opacity = 1;
         }

@@ -8,6 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Media;
 using CSharpMath.Avalonia;
 using Dynamically.Backend.Helpers.Containers;
+using Dynamically.Containers;
 using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
@@ -43,14 +44,16 @@ public class SolutionTable : Canvas
     readonly ResizableBorder border;
 
     public TableHandle Handle;
+    public Board ParentBoard { get; private set; }
 
     public new double Width
     {
         get => VisualList.Width + 6; // Border gutter
         set => VisualList.Width = value - 6; // Border gutter
     }
-    public SolutionTable(bool hasFroms = false, double x = 200, double y = 200) : base()
+    public SolutionTable(Board board, bool hasFroms = false, double x = 200, double y = 200) : base()
     {
+        ParentBoard = board;
         HasFroms = hasFroms;
         VisualList = new Canvas
         {

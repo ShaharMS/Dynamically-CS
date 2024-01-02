@@ -2,6 +2,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Dynamically.Backend.Geometry;
+using Dynamically.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,9 @@ public partial class DraggableGraphic
         set => MainWindow.Instance.MainBoard.FocusedObject = this;
     }
 
-    public DraggableGraphic()
+    public DraggableGraphic(Board board)
     {
+        ParentBoard = board;
         Draggable = true;
         PointerEnter += MouseInfo_PointerHover;
         PointerLeave += MouseInfo_PointerOut;

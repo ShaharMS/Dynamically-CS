@@ -36,7 +36,7 @@ public class TableRowHandle : DraggableGraphic
         get => border.Bounds.Height;
         set => border.Height = value;
     }
-    public TableRowHandle(TableRow row) {
+    public TableRowHandle(TableRow row) : base(row.Table.ParentBoard) {
         Row = row;
         label = new Label
         {

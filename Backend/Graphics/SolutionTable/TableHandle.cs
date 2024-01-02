@@ -24,7 +24,7 @@ public class TableHandle : DraggableGraphic
         get => border.Bounds.Height;
         set => border.Height = value;
     }
-    public TableHandle(SolutionTable table) {
+    public TableHandle(SolutionTable table) : base(table.ParentBoard) {
         Table = table;
         label = new Label
         {

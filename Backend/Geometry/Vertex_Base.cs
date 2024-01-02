@@ -50,7 +50,7 @@ public partial class Vertex : DraggableGraphic
 
     public bool GotRemoved
     {
-        get => !MainWindow.Instance.MainBoard.Children.Contains(this);
+        get => !ParentBoard.Children.Contains(this);
     }
 
     public new double Opacity {
@@ -67,8 +67,8 @@ public partial class Vertex : DraggableGraphic
         }
     }
 
-    public Vertex(Point p) : this(p.X, p.Y) { }
-    public Vertex(double x, double y, char id = '_')
+    public Vertex(Board board, Point p) : this(board, p.X, p.Y) { }
+    public Vertex(Board board, double x, double y, char id = '_') : base(board)
     {
 
 
@@ -190,7 +190,7 @@ public partial class Vertex : DraggableGraphic
     }
 
     public static implicit operator Point(Vertex joint) { return new Point(joint.X, joint.Y); }
-    public static implicit operator Vertex(Point point) { return new Vertex(point.X, point.Y); }
+    public static implicit operator Vertex(Point point) { return new Vertex(MainWindow.Instance.WindowTabs.CurrentBoard, point.X, point.Y); }
 
 
     public static Vertex? GetJointById(char id)

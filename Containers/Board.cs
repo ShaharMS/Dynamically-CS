@@ -63,7 +63,7 @@ public class Board : DraggableGraphic
     }
 
 
-    public Board() : base()
+    public Board() : base(null!)
     {
         _focused = this;
         _hovered = this;
@@ -173,6 +173,7 @@ public class Board : DraggableGraphic
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
     {
+        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         if (e.Source is not DraggableGraphic)
         {
@@ -204,7 +205,9 @@ public class Board : DraggableGraphic
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
-        Log.WriteVar(e.Source, FocusedObject);
+        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
+        Log.WriteVar(e.Source);
+
         if (e.Source is not Border || FocusedObject is not Board) return;
 
         if (FocusedObject is Selection selection)
@@ -237,6 +240,8 @@ public class Board : DraggableGraphic
 
     private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from MainWindow
     {
+        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
+
         HoveredObject = this;
         foreach (var child in Children)
         {

@@ -22,7 +22,6 @@ public partial class MainWindow : Window
 
     public static bool Debug { get; set; } = true;
 
-    public static Canvas MainDisplay { get; private set; }
     private static DockPanel MainPanel;
 
     public Board MainBoard { get; private set; }
@@ -38,7 +37,6 @@ public partial class MainWindow : Window
         InitializeComponent();
         Debug = true;
         Instance = this;
-        MainDisplay = Instance.Find<Canvas>("Main");
         MainPanel = Instance.Find<DockPanel>("Display");
         WindowTabs = new Tabs(Instance.Find<TabControl>("Tabs"));
         TopMenu = new TopMenu(Instance.Find<Menu>("Menu"), this);
@@ -48,42 +46,40 @@ public partial class MainWindow : Window
         };
         MainBoard = ca;
         MainBoard.SetPosition(0, 0);
-        
+        Instance.Find<TabItem>("__MainBoard").Content = MainBoard;
+
         Menus.TopMenu.applyDefaultStyling();
 
-        var j0 = new Vertex(130, 30);
-        var j = new Vertex(30, 30);
+        var j0 = new Vertex(MainBoard, 130, 30);
+        var j = new Vertex(MainBoard, 30, 30);
         j.Connect(j0);
-        var j11 = new Vertex(120, 90);
+        var j11 = new Vertex(MainBoard, 120, 90);
         j11.Connect(j);
-        var t = new Triangle(new Vertex(570, 20), new Vertex(750, 10), new Vertex(860, 220));
+        var t = new Triangle(new Vertex(MainBoard, 570, 20), new Vertex(MainBoard, 750, 10), new Vertex(MainBoard, 860, 220));
         var circ = t.GenerateCircumCircle();
         var circ2 = t.GenerateInCircle();
 
-        var t4 = new Triangle(new Vertex(70, 500), new Vertex(250, 570), new Vertex(160, 370));
+        var t4 = new Triangle(new Vertex(MainBoard, 70, 500), new Vertex(MainBoard, 250, 570), new Vertex(MainBoard, 160, 370));
         t4.Type = TriangleType.EQUILATERAL;
-        var t6 = new Triangle(new Vertex(70, 500), new Vertex(250, 570), new Vertex(160, 370));
+        var t6 = new Triangle(new Vertex(MainBoard, 70, 500), new Vertex(MainBoard, 250, 570), new Vertex(MainBoard, 160, 370));
 
-        var q1 = new Quadrilateral(new Vertex(600, 350), new Vertex(900, 300), new Vertex(600, 450), new Vertex(900, 600));
+        var q1 = new Quadrilateral(new Vertex(MainBoard, 600, 350), new Vertex(MainBoard, 900, 300), new Vertex(MainBoard, 600, 450), new Vertex(MainBoard, 900, 600));
 
 
         _ = new Angle(j0, j, j11);
 
         AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
 
-        MainDisplay.Children.Add(MainBoard);
-        MainBoard.SetPosition(0, 0);
 
 
-
-        foreach (DraggableGraphic obj in Vertex.All.ToList<DraggableGraphic>().Concat(Segment.all).Concat(Ring.All)) obj.OnDragged.Add(RegenAll);
+        foreach (DraggableGraphic obj in Vertex.All.ToList<DraggableGraphic>().Concat(Segment.All).Concat(Ring.All)) obj.OnDragged.Add(RegenAll);
 
         MainBoard.Refresh();
          
         RegenAll(0, 0, 0, 0);
 
         _ = new BottomNote("Application Started!");
-        MainBoard.Children.Add(new SolutionTable(true));
+        MainBoard.Children.Add(new SolutionTable(MainBoard, true));
         MainBoard.Children.Add(new MathTextBox());
 
         Log.WriteVar(Latex.Latexify("123 + AB / 3 = 66 * 5"));
@@ -92,7 +88,7 @@ public partial class MainWindow : Window
 
     public static void RegenAll(double z, double x, double c, double v) {
         _ = z; _ = x; _ = c; _ = v;
-        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.all).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
+        foreach (dynamic item in Vertex.All.Concat<dynamic>(Segment.All).Concat(Triangle.All).Concat(Quadrilateral.All).Concat(Circle.All).Concat(Angle.All))
         {
             item.Provider.Regenerate();
         }

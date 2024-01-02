@@ -59,7 +59,7 @@ class Tools
         double dx = center.X - joint1.X;
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
-        var c = new Vertex(center.X, center.Y);
+        var c = new Vertex(joint1.ParentBoard, center.X, center.Y);
         Circle circle = new(c, radius);
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
         foreach (var joint in new[] { joint1, joint2, joint3 })
@@ -94,7 +94,7 @@ class Tools
         double dy = center.Y - joint1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
 
-        var c = new Vertex(center.X, center.Y);
+        var c = new Vertex(MainWindow.Instance.WindowTabs.CurrentBoard, center.X, center.Y);
         Circle circle = new(c, radius);
 
         return circle;

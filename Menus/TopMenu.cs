@@ -4,6 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Dynamically;
+using Dynamically.Backend;
+using Dynamically.Backend.Graphics;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -71,6 +73,7 @@ public class TopMenu
             switch (item.Header)
             {
                 case "Add New Board": item.Click += AddNewBoard; break;
+                case "Select All": item.Click += SelectAll; break;
             }
         }
     }
@@ -89,5 +92,12 @@ public class TopMenu
     public void AddNewBoard(object? sender, RoutedEventArgs e)
     {
         Parent.WindowTabs.CreateNewTab($"Board {Parent.WindowTabs.OpenTabs.Length}");
+    }
+
+    public void SelectAll(object? sender, RoutedEventArgs e)
+    {
+        var pos = Parent.WindowTabs.CurrentBoard.GetPosition();
+        Parent.WindowTabs.CurrentBoard.Selection?.Cancel();
+        Parent.WindowTabs.CurrentBoard.Selection = new Selection(new Avalonia.Point(0, 0), new Avalonia.Point(Parent.Width - pos.X, Parent.Height - pos.Y), Parent.WindowTabs.CurrentBoard);
     }
 }

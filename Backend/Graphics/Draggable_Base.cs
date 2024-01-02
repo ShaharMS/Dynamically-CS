@@ -26,6 +26,8 @@ public partial class DraggableGraphic : Canvas
     private Point _startPosition;
     private Point _startMousePosition;
 
+    public Board ParentBoard { get; protected set; }
+
     /// <summary>
     /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>

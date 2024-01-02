@@ -121,7 +121,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
@@ -138,11 +138,11 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
-            var j1 = new Vertex(j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
+            var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);
             j1.Connect(Subject.Center);
 
@@ -155,7 +155,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MarkIntersection()
     {
-        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.All).ToList();
+        List<dynamic> scanList = Segment.All.ToList<dynamic>().Concat(Circle.All).ToList();
 
         scanList.Remove(Subject);
 
@@ -177,7 +177,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
                     foreach (var p in intersections)
                     {
                         if (existing.ContainsRoughly(p)) continue;
-                        var j = new Vertex(p)
+                        var j = new Vertex(Subject.ParentBoard, p)
                         {
                             X = p.X,
                             Y = p.Y

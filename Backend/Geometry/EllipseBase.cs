@@ -59,7 +59,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
     public double DistanceSum { get; set; }
 
     internal Ring Ring;
-    public EllipseBase(Vertex f1, Vertex f2, double dSum)
+    public EllipseBase(Vertex f1, Vertex f2, double dSum) : base(f1.ParentBoard)
     {
         _f1 = f1;
         _f2 = f2;
@@ -110,17 +110,18 @@ public class EllipseBase : DraggableGraphic, IDrawable
         MainWindow.Instance.MainBoard.Children.Remove(Ring);
     }
 }
-    internal class Ring : DraggableGraphic
+internal class Ring : DraggableGraphic
+{
+    public static readonly List<Ring> All = new();
+    public EllipseBase Ellipse;
+
+    public Ring(EllipseBase el) : base(el.ParentBoard)
     {
-        public static readonly List<Ring> All = new();
-        public EllipseBase Ellipse;
 
-        public Ring(EllipseBase el)
-        {
-            All.Add(this);
-            Ellipse = el;
+        All.Add(this);
+        Ellipse = el;
 
-            OnMoved.Add((double _, double _, double _, double _) =>
+        OnMoved.Add((double _, double _, double _, double _) =>
             {
                 double mx = Board.MouseX, my = Board.MouseY;
                 mx -= ((Board)Parent!).X;
@@ -131,49 +132,49 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
                 foreach (var l in Ellipse.OnMoved) l(X, Y, X, Y);
             });
-            OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(MainWindow.RegenAll);
 
-        }
-
-        public override void Render(DrawingContext context)
-        {
-            // Graphic is cleared
-            var info = ConvertFociToEllipse(Ellipse.Focal1.X, Ellipse.Focal1.Y, Ellipse.Focal2.X, Ellipse.Focal2.Y);
-
-            var pen = new Pen(UIColors.ConnectionColor, 4);
-            context.DrawEllipse(null, pen, new Point(info.X + info.Width / 2, info.Y + info.Height / 2), info.Width / 2, info.Height / 2);
-        }
-
-        EllipseData ConvertFociToEllipse(double focus1X, double focus1Y, double focus2X, double focus2Y)
-        {
-            var distance = Math.Sqrt(Math.Pow(focus2X - focus1X, 2) + Math.Pow(focus2Y - focus1Y, 2));
-            var semiMajorAxis = Ellipse.DistanceSum / 2;
-            var semiMinorAxis = Math.Sqrt(Math.Pow(semiMajorAxis, 2) - Math.Pow(distance / 2, 2));
-
-            var width = 2 * semiMajorAxis;
-            var height = 2 * semiMinorAxis;
-            var x = (focus1X + focus2X) / 2 - width / 2;
-            var y = (focus1Y + focus2Y) / 2 - height / 2;
-            return new EllipseData
-            {
-                Width = width,
-                Height = height,
-                X = x,
-                Y = y
-            };
-        }
-
-        public override double Area()
-        {
-            return 1;
-        }
     }
 
-    struct EllipseData
+    public override void Render(DrawingContext context)
     {
-        public double Width { get; set; }
-        public double Height { get; set; }
-        public double X { get; set; }
-        public double Y { get; set; }
+        // Graphic is cleared
+        var info = ConvertFociToEllipse(Ellipse.Focal1.X, Ellipse.Focal1.Y, Ellipse.Focal2.X, Ellipse.Focal2.Y);
+
+        var pen = new Pen(UIColors.ConnectionColor, 4);
+        context.DrawEllipse(null, pen, new Point(info.X + info.Width / 2, info.Y + info.Height / 2), info.Width / 2, info.Height / 2);
     }
+
+    EllipseData ConvertFociToEllipse(double focus1X, double focus1Y, double focus2X, double focus2Y)
+    {
+        var distance = Math.Sqrt(Math.Pow(focus2X - focus1X, 2) + Math.Pow(focus2Y - focus1Y, 2));
+        var semiMajorAxis = Ellipse.DistanceSum / 2;
+        var semiMinorAxis = Math.Sqrt(Math.Pow(semiMajorAxis, 2) - Math.Pow(distance / 2, 2));
+
+        var width = 2 * semiMajorAxis;
+        var height = 2 * semiMinorAxis;
+        var x = (focus1X + focus2X) / 2 - width / 2;
+        var y = (focus1Y + focus2Y) / 2 - height / 2;
+        return new EllipseData
+        {
+            Width = width,
+            Height = height,
+            X = x,
+            Y = y
+        };
+    }
+
+    public override double Area()
+    {
+        return 1;
+    }
+}
+
+struct EllipseData
+{
+    public double Width { get; set; }
+    public double Height { get; set; }
+    public double X { get; set; }
+    public double Y { get; set; }
+}
 

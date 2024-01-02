@@ -36,10 +36,10 @@ public class BottomNote : Canvas
 
         MainWindow.Instance.LayoutUpdated += pos;
 
-        MainWindow.MainDisplay.Children.Add(this);
+        MainWindow.Instance.WindowTabs.CurrentBoard.Children.Add(this);
         DispatcherTimer.Run(() =>
         {
-            MainWindow.MainDisplay.Children.Remove(this);
+            MainWindow.Instance.WindowTabs.CurrentBoard.Children.Remove(this);
             return false;
         }, new TimeSpan(0, 0, 10));
     }

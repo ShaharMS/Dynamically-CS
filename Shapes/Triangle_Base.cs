@@ -43,7 +43,7 @@ public partial class Triangle : DraggableGraphic
     public Circle? Circumcircle;
     public Circle? Incircle;
 
-    public Triangle(Vertex j1, Vertex j2, Vertex j3)
+    public Triangle(Vertex j1, Vertex j2, Vertex j3) : base(j1.ParentBoard)
     {
         if (Exists(j1, j2, j3)) return;
 
@@ -109,7 +109,7 @@ public partial class Triangle : DraggableGraphic
     {
         var stats = GetCircleStats();
 
-        var circle = new Circle(new Vertex(stats.x, stats.y), stats.r);
+        var circle = new Circle(new Vertex(ParentBoard, stats.x, stats.y), stats.r);
         circle.Center.Draggable = false;
         circle.Draggable = false;
         Incircle = circle;

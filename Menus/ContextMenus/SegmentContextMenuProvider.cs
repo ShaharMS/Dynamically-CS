@@ -228,7 +228,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         c.Click += (o, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
 
             j.ForceStartDrag(MainWindow.Mouse);
@@ -245,7 +245,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         m.Click += (o, e) =>
         {
-            var j = new Vertex(Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
         };
 
@@ -366,7 +366,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
 
     MenuItem? Recom_MarkIntersection()
     {
-        List<dynamic> scanList = Segment.all.ToList<dynamic>().Concat(Circle.All).ToList();
+        List<dynamic> scanList = Segment.All.ToList<dynamic>().Concat(Circle.All).ToList();
 
         scanList.Remove(Subject);
 
@@ -385,7 +385,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                 {
                     if (element is Segment)
                     {
-                        var j = new Vertex(0, 0);
+                        var j = new Vertex(Subject.ParentBoard, 0, 0);
                         j.Roles.AddToRole<Segment>(Role.SEGMENT_On, element);
                         j.Roles.AddToRole(Role.SEGMENT_On, Subject);
                     }
@@ -396,7 +396,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                         foreach (var p in intersections)
                         {
                             if (existing.ContainsRoughly(p)) continue;
-                            var j = new Vertex(p);
+                            var j = new Vertex(Subject.ParentBoard, p);
                             j.X = p.X; j.Y = p.Y; // no need to verify movement here, new vertex without data.
                             j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                             j.Roles.AddToRole(Role.SEGMENT_On, Subject);

@@ -22,6 +22,17 @@ public class Tabs
         get => TabContainer.Items.OfType<TabItem>().ToArray();
     }
 
+    public Board CurrentBoard
+    {
+        get => GetBoardOfTab((TabContainer.SelectedItem as TabItem)!);
+    }
+
+    public TabItem CurrentTab
+    {
+        get => (TabContainer.SelectedItem as TabItem)!;
+        set => TabContainer.SelectedItem = value;
+    }
+
     public Tabs(TabControl container)
     {
         TabContainer = container;
