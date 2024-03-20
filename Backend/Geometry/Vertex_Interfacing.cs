@@ -2,6 +2,7 @@
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Menus.ContextMenus;
+using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable
+public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable, IMovementFreezable
 {
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
@@ -58,5 +59,30 @@ public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenu
     public bool EncapsulatedWithin(Rect rect)
     {
         return rect.Contains(this);
+    }
+
+    public bool IsMovable()
+    {
+        if (Roles.Has(Role.CIRCLE_Center))
+        {
+            var circs = Roles.Access<Circle>(Role.CIRCLE_Center);
+            foreach (var c in circs)
+            {
+                foreach (var t in Triangle.All)
+                {
+                    if (t.Circumcircle == c && t.Incircle != null && t.Incircle.Center.Anchored) return false; // Case 1.
+                }
+            }
+        }
+        if (Roles.Has(Role.TRIANGLE_Corner))
+        {
+            var tris = Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+            foreach (var t in tris)
+            {
+                if (t.Incircle != null && t.Incircle.Center.Anchored) return false; // Case 2.
+            }
+        }
+
+        return true;
     }
 }

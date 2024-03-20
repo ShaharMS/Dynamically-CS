@@ -147,6 +147,7 @@ public partial class Segment : DraggableGraphic
 
         MainWindow.Instance.MainBoard.Children.Add(Label);
 
+        OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((_, _, _, _) =>
         {
             Vertex1.CurrentlyDragging = Vertex2.CurrentlyDragging = true;

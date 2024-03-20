@@ -9,10 +9,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ISelectable = Dynamically.Backend.Interfaces.ISelectable;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>, IContextMenuSupporter<SegmentContextMenuProvider>, Interfaces.ISelectable
+public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>, IContextMenuSupporter<SegmentContextMenuProvider>, ISelectable, IMovementFreezable
 {
     public SegmentFormula Formula { get; set; }
     public RatioOnSegmentFormula MiddleFormula { get; }
@@ -99,5 +100,10 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
     public bool EncapsulatedWithin(Rect rect)
     {
         return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect);
+    }
+
+    public bool IsMovable()
+    {
+        return Vertex1.IsMovable() && Vertex2.IsMovable();
     }
 }

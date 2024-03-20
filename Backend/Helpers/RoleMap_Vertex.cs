@@ -211,8 +211,8 @@ public partial class RoleMap
                 char? id = null;
                 if (t1.Incircle != null)
                 {
-                    t1.Incircle.Dismantle();
                     id = t1.Incircle.Center.Id;
+                    t1.Incircle.Dismantle();
                     t1.Incircle.Center.RemoveFromBoard();
                 }
 

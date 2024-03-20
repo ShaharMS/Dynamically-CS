@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using CSharpMath.Atom.Atoms;
 using Dynamically.Design;
 
@@ -27,14 +28,14 @@ public class TableRowHandle : DraggableGraphic
     }
 
     private readonly Label label;
-    private readonly Border border;
+    private readonly Image image;
     public new double Width {
-        get => border.Bounds.Width;
-        set => border.Width = value;
+        get => image.Bounds.Width;
+        set => image.Width = value;
     }
     public new double Height {
-        get => border.Bounds.Height;
-        set => border.Height = value;
+        get => image.Bounds.Height;
+        set => image.Height = value;
     }
     public TableRowHandle(TableRow row) : base(row.Table.ParentBoard) {
         Row = row;
@@ -47,17 +48,11 @@ public class TableRowHandle : DraggableGraphic
             VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
             Height = 20
         };
-        border = new Border {
-            Child = label,
-            BorderBrush = UIColors.SolutionTableBorder,
-            BorderThickness = new Thickness(2),
-            Background = UIColors.SolutionTableFill,
-            CornerRadius = new CornerRadius(50),
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
+        image = new Image {
+            Source = new Bitmap("Assets/Light/Geometry/SolutionTable/empty_handle.png"),
         };
-        border.SetPosition(0, 0);
-        Children.Add(border);
+        image.SetPosition(0, 0);
+        Children.Add(image);
 
         OnMoved.Add((_, _ , _, _) => {
             Row.AttemptMovement();

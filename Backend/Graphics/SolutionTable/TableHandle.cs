@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
@@ -16,40 +17,27 @@ public class TableHandle : DraggableGraphic
     readonly Label label;
     readonly Border border;
 
+    readonly Image image;
+
     public new double Width {
-        get => border.Bounds.Width;
-        set => border.Width = value;
+        get => image.Bounds.Width;
+        set => image.Width = value;
     }
     public new double Height {
-        get => border.Bounds.Height;
-        set => border.Height = value;
+        get => image.Bounds.Height;
+        set => image.Height = value;
     }
     public TableHandle(SolutionTable table) : base(table.ParentBoard) {
         Table = table;
-        label = new Label
+        image = new Image
         {
-            FontSize = 12,
-            Foreground = UIColors.SolutionTableBorder,
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-            Width = 20,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center,
-            Height = 20,
-            Content = "⭤"
+            Source = new Bitmap("Assets/Light/Geometry/SolutionTable/handle.png"),
         };
-        border = new Border {
-            Child = label,
-            BorderBrush = UIColors.SolutionTableBorder,
-            BorderThickness = new Thickness(2),
-            Background = UIColors.SolutionTableFill,
-            CornerRadius = new CornerRadius(50),
-            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center,
-            VerticalAlignment = Avalonia.Layout.VerticalAlignment.Center
-        };
-        Children.Add(border);
+        Children.Add(image);
 
         OnMoved.Add((x, y, _, _) =>
         {
-            Table.SetPosition(x + border.Bounds.Width / 2 - Table.Width / 2, y + 50);
+            Table.SetPosition(x + image.Bounds.Width / 2 - Table.Width / 2, y + 50);
             foreach(var row in Table.Rows) row.RepositionHandle();
         });
     }

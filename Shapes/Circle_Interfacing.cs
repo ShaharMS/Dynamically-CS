@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>, IContextMenuSupporter<CircleContextMenuProvider>, ISelectable
+public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IHasFormula<CircleFormula>, IContextMenuSupporter<CircleContextMenuProvider>, ISelectable, IMovementFreezable
 {
     public CircleFormula Formula { get; set; }
 
@@ -45,7 +45,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
     }
     public void __circle_Moving()
     {
-        Formula.Moving = true;
+        if (CurrentlyDragging) Formula.Moving = true;
     }
     public void __circle_StopMoving(double z, double x, double c, double v)
     {
@@ -103,5 +103,10 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         foreach (var border in new[] {rect.Top, rect.Bottom}) if (Center.DistanceTo(new Point(Center.X, border)) < Radius) return false;
         foreach (var border in new[] {rect.Left, rect.Right}) if (Center.DistanceTo(new Point(border, Center.Y)) < Radius) return false;
         return rect.Contains(Center);
+    }
+
+    public bool IsMovable()
+    {
+        return Center.IsMovable();
     }
 }

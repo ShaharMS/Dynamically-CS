@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>, ISelectable
+public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>, ISelectable, IMovementFreezable
 {
     public TriangleContextMenuProvider Provider { get; }
 
@@ -142,5 +142,9 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
     public bool EncapsulatedWithin(Rect rect)
     {
         return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect) && Vertex3.EncapsulatedWithin(rect);
+    }
+    public bool IsMovable()
+    {
+        return Vertex1.IsMovable() && Vertex2.IsMovable() && Vertex3.IsMovable();
     }
 }

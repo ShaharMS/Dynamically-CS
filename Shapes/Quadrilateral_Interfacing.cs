@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>, ISelectable
+public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<QuadrilateralContextMenuProvider>, ISelectable, IMovementFreezable
 {
 
     public QuadrilateralContextMenuProvider Provider { get; }
@@ -122,5 +122,10 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
     public bool EncapsulatedWithin(Rect rect)
     {
         return Vertex1.EncapsulatedWithin(rect) && Vertex2.EncapsulatedWithin(rect) && Vertex3.EncapsulatedWithin(rect) && Vertex4.EncapsulatedWithin(rect);
+    }
+
+    public bool IsMovable()
+    {
+        return Vertex1.IsMovable() && Vertex2.IsMovable() && Vertex3.IsMovable() && Vertex4.IsMovable();
     }
 }

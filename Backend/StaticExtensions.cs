@@ -221,15 +221,15 @@ public static class StaticExtensions
     public static bool ContainsRoughly(this IEnumerable<int> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<int> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
     public static bool ContainsRoughly(this IEnumerable<double> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Vertex> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Point> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Point> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<Point> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.0001 && Math.Abs(v.Y - value.Y) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<Vertex> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<Point> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
+    public static bool ContainsRoughly(this IEnumerable<(double X, double Y)> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
 
 
     public static bool IsDifferent(this object? obj, EQUALITY_OP_TYPE type = EQUALITY_OP_TYPE.ROUGH, params dynamic[] others) 

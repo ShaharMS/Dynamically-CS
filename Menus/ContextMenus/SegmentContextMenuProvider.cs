@@ -400,6 +400,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                             j.X = p.X; j.Y = p.Y; // no need to verify movement here, new vertex without data.
                             j.Roles.AddToRole<Circle>(Role.CIRCLE_On, element);
                             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
+                            existing.Add(j);
                         }
                     }
                     element.Provider.Regenerate();

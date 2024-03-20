@@ -82,8 +82,6 @@ public partial class MainWindow : Window
         MainBoard.Children.Add(new SolutionTable(MainBoard, true));
         MainBoard.Children.Add(new MathTextBox());
 
-        Log.WriteVar(Latex.Latexify("123 + AB / 3 = 66 * 5"));
-
     }
 
     public static void RegenAll(double z, double x, double c, double v) {

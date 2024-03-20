@@ -68,6 +68,7 @@ public partial class Triangle : DraggableGraphic
         Provider = new TriangleContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
+        OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((x, y, px, py) =>
         {
             if (Vertex1.Anchored || Vertex2.Anchored || Vertex3.Anchored)

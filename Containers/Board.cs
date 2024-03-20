@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
@@ -208,7 +209,7 @@ public class Board : DraggableGraphic
         if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
         Log.WriteVar(e.Source);
 
-        if (e.Source is not Border || FocusedObject is not Board) return;
+        if (e.Source is not Border || FocusedObject is not Board || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
 
         if (FocusedObject is Selection selection)
         {

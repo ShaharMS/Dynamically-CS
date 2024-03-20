@@ -35,14 +35,14 @@ class Program
                     var windowHeight = screen.WorkingArea.Height;
 
                     // Set the size and position of the MainWindow
-                    logWindow.Width = windowWidth / 4;
+                    logWindow.Width = windowWidth / 3;
                     logWindow.Height = windowHeight;
                     logWindow.Position = new PixelPoint(screen.WorkingArea.TopLeft.X, screen.WorkingArea.TopLeft.Y);
 
                     // Set the size and position of the LogWindow
-                    mainWindow.Width = windowWidth / 4 * 3;
+                    mainWindow.Width = windowWidth / 3 * 2;
                     mainWindow.Height = windowHeight;
-                    mainWindow.Position = new PixelPoint(screen.WorkingArea.TopLeft.X + windowWidth / 4, screen.WorkingArea.TopLeft.Y);
+                    mainWindow.Position = new PixelPoint(screen.WorkingArea.TopLeft.X + windowWidth / 3, screen.WorkingArea.TopLeft.Y);
 
                     logWindow.Show();
                 }).LogToTrace();

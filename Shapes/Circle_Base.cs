@@ -58,6 +58,8 @@ public partial class Circle : EllipseBase
 
         All.Add(this);
 
+        OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
+        OnDragStart.Add(__circle_Moving);
         OnMoved.Add((x, y, px, py) =>
         {
             double pcx = this.Center.X, pcy = this.Center.Y;
@@ -67,7 +69,6 @@ public partial class Circle : EllipseBase
             this.SetPosition(0, 0);
         });
         OnMoved.Add(__circle_OnChange);
-        OnDragStart.Add(__circle_Moving);
         OnDragged.Add(__circle_StopMoving);
         OnDragged.Add(MainWindow.RegenAll);
 

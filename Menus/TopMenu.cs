@@ -69,7 +69,6 @@ public class TopMenu
 
         foreach (var item in Flatten(Menu.Items.OfType<MenuItem>()))
         {
-            Log.Write(item.Header);
             switch (item.Header)
             {
                 case "Add New Board": item.Click += AddNewBoard; break;

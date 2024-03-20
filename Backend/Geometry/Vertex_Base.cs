@@ -97,6 +97,7 @@ public partial class Vertex : DraggableGraphic
         Provider = new VertexContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
+        OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((double _, double _, double _, double _) => Reposition());
         OnDragged.Add(MainWindow.RegenAll);
 
