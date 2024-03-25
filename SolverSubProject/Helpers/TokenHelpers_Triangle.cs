@@ -63,7 +63,7 @@ public static partial class TokenHelpers
 
     public static TAngle GetIsoscelesHeadAngle(this TTriangle triangle)
     {
-        if (!triangle.ParentPool.AvailableDetails.Has(triangle, Details.Relation.TRIANGLE_ISOSCELES)) 
+        if (!triangle.ParentPool.AvailableDetails.Has(triangle, Details.Relation.TRIANGLE_ISOSCELES))
             throw new ArgumentException("Provided triangle must be an isosceles triangle", nameof(triangle));
 
         var detail = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Details.Relation.TRIANGLE_ISOSCELES);
@@ -77,15 +77,17 @@ public static partial class TokenHelpers
             throw new ArgumentException("Provided triangle must be an isosceles triangle", nameof(triangle));
 
         var detail = triangle.ParentPool.AvailableDetails.EnsuredGet(triangle, Details.Relation.TRIANGLE_ISOSCELES);
-        
-        return new[] { triangle.V1V2, triangle.V2V3, triangle.V1V3}.Except(detail.SideProducts.Cast<TSegment>()).First();
+
+        return new[] { triangle.V1V2, triangle.V2V3, triangle.V1V3 }.Except(detail.SideProducts.Cast<TSegment>()).First();
     }
 
-    public static TSegment[] GetMidSegments(this TTriangle triangle) {
+    public static TSegment[] GetMidSegments(this TTriangle triangle)
+    {
         return triangle.ParentPool.AvailableDetails.GetMany(Relation.MIDSEGMENT, triangle).Select(x => x.Left).Cast<TSegment>().ToArray();
     }
 
-    public static (TSegment midSegment, TSegment opposite)[] GetMidSegmentsWithOpposites(this TTriangle triangle) {
+    public static (TSegment midSegment, TSegment opposite)[] GetMidSegmentsWithOpposites(this TTriangle triangle)
+    {
         return triangle.ParentPool.AvailableDetails.GetMany(Relation.MIDSEGMENT, triangle).Select(x => (x.Left, x.SideProducts[0])).Cast<(TSegment midSegment, TSegment opposite)>().ToArray();
     }
 
@@ -102,3 +104,4 @@ public static partial class TokenHelpers
             throw new ArgumentException("Provided triangle must have a circumcircle", nameof(triangle));
         return (TCircle)triangle.ParentPool.AvailableDetails.EnsuredGet(Relation.CIRCUMCIRCLE, triangle).Left;
     }
+}

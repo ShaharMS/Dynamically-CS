@@ -461,7 +461,7 @@ public class Extractor
                     .Select(x => x.GetOrCreateSegment(mount))
                     .Select(x => { detail1.Add(x.Item2); return x.Item1; })
                     .ToList();
-                    
+
                 List<TValue> segment1MountsLength = segment1MountsSegment.Select(x => { return x.GetValue(); }).ToList();
 
                 List<TSegment> segment2MountsSegment = segment2.AllMounts.Where(x => x is TVertex)
@@ -469,7 +469,7 @@ public class Extractor
                     .Select(x => x.GetOrCreateSegment(mount))
                     .Select(x => { detail2.Add(x.Item2); return x.Item1; })
                     .ToList();
-                    
+
                 List<TValue> segment2MountsLength = segment2MountsSegment.Select(x => { return x.GetValue(); }).ToList();
 
                 var intersection = segment1MountsLength.Intersect(segment2MountsLength);
@@ -489,41 +489,88 @@ public class Extractor
             }
         }
     }
-    /*                                                                                                                             
 
-        █████████                                                             ███      █████          
-        █:::::::█                                                          █::::█      █:::█          
-          █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
-          █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
-          █:::█         █:::::█   █::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
-          █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
-        ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
-        █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
-        ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
-                                                         █████    █:::█                               
-                                                          █:::::█:::::█                               
-                                                            ███::::███                                
-    */
+    [Reason(Reason.POINT_ON_PERPENDICULARBISECTOR_EQUAL_DISTANCE_TO_SIDE_VERTICES)]
+    public static IEnumerable<Detail?> PerpendicularBisectorProperties_A(TSegment segment)
+    {
+        var perpendiculars = segment.GetPerpendicularsWithDetails();
+        var bisectors = segment.GetBisectorsWithDetails();
+        var potentialSegments = perpendiculars.Select(x => x.segment).Intersect(bisectors.Select(x => x.segment));
+        var potentials = potentialSegments.Select(x => (x, perpendiculars.First(s => s.segment == x).detail, bisectors.First(s => s.segment == x).detail));
 
-    /*                                                                                                                                       
+        foreach (var (s, perpendicularDetail, bisectionDetail) in potentials)
+        {
+            var vertices = s.AllMounts.OfType<TVertex>();
 
-        ██████████████                ███                                             ████             
-        █::██::::██::█                                                                █::█             
-        ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
-             █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
-             █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
-             █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
-             █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
-           █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
-           ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
-                                                                        ████:     █::█                  
-                                                                         █::::██::::█                  
-                                                                          ███:::::█                    
-                                                                             █████:                     
-    */
+            foreach (var vertex in vertices)
+            {
+                var aux1 = vertex.GetOrCreateSegment(segment.V1);
+                var aux2 = vertex.GetOrCreateSegment(segment.V2);
+
+                yield return aux1.Item1.EqualsVal(aux2.Item1).AddReferences(perpendicularDetail, bisectionDetail, aux1.Item2, aux2.Item2);
+            }
+        }
+
+    }
+
+    [Reason(Reason.POINT_AT_EQUAL_DISTANCE_FROM_SIDE_VERTICES_IS_ON_PERPENDICULARBISECTOR)]
+    public static IEnumerable<Detail?> IsSegmentPerpendicularBisector_A(TSegment bisector, TSegment bisected)
+    {
+        TokenHelpers.Validate(bisector, bisected);
+        if (!bisected.IsIntersecting(bisector)) return E();
+
+        var mounts = bisector.GetMountedWithDetails();
+        foreach (var (mount, detail) in mounts.Where(x => x.token is TVertex).Cast<(TVertex, Detail)>())
+        {
+            var segment1 = mount.GetOrCreateSegment(bisected.V1);
+            var segment2 = mount.GetOrCreateSegment(bisected.V2);
+            if (segment1.Item1.GetValue() == segment2.Item1.GetValue())
+            {
+                return new[] {
+                    bisector.Bisects(bisected).AddReferences(detail, segment1.Item2, segment2.Item2, segment1.Item1.GetEqualityDetail(segment2.Item1)),
+                    bisector.Perpendicular(bisected).AddReferences(detail, segment1.Item2, segment2.Item2, segment1.Item1.GetEqualityDetail(segment2.Item1))
+                };
+            }
+        }
+
+        return E();
+    }
+
+        /*                                                                                                                             
+
+            █████████                                                             ███      █████          
+            █:::::::█                                                          █::::█      █:::█          
+              █:::█             ██████████    ████ ███████      ██████   ███████::::████    █::█ ████     
+              █:::█          █::::█████:::::███:::::::::::██  █::::::::::::██:::::::::::    █:::::::::██  
+              █:::█         █:::::█   █::::::█  █::::███::::██::::█   █:::█    █::::█       █::::█  █::::█
+              █:::█         █::::███████████    █:::█   █:::██::::█   █:::█    █::::█       █:::█    █:::█
+            ██:::::█████:::██::::::█            █:::█   █:::██::::::███:::█    █:::::██:::█ █:::█    █:::█
+            █::::::::::::::█  ██:::::::::::█    █:::█   █:::█  █::::::::::█      ██::::::██ █:::█    █:::█
+            ████████████████    ████████████    █████   █████   ██████::::█        ██████   █████    █████
+                                                             █████    █:::█                               
+                                                              █:::::█:::::█                               
+                                                                ███::::███                                
+        */
+
+        /*                                                                                                                                       
+
+            ██████████████                ███                                             ████             
+            █::██::::██::█                                                                █::█             
+            ███  █::█  ██████   █████   ██████   █████████   ████ ███████     ███████  ███ ██   ████████  
+                 █::█     █:::::::::::█  █:::█   ███████:::█ █:::::::::::██  █:::::::::::█ █:█  █::████::██
+                 █::█      █:::█   █:::█ █:::█     █████:::█   █::::███::::██:::█    █::█  █:█ █:::████:::█
+                 █::█      █:::█   █████ █:::█   ██::::::::█   █:::█   █:::██:::█    █::█  █:█ █:::::::::█ 
+                 █::█      █:::█         █:::█ █::::   █:::█   █:::█   █:::██::::█   █::█  █:█ █:::█       
+               █::::::█    █:::█        █:::::██::::███::::█   █:::█   █:::█ █::::::::::█ █:::█ █::::█████  
+               ████████    █████        ███████  ███████  ███  █████   █████  ███████:::█ █████  █████████  
+                                                                            ████:     █::█                  
+                                                                             █::::██::::█                  
+                                                                              ███:::::█                    
+                                                                                 █████:                     
+        */
 
 
-    [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
+        [Reason(Reason.TRIANGLE_EQUAL_SIDES_EQUAL_ANGLES)]
     public static IEnumerable<Detail?> TriangleProperties_A(TTriangle triangle)
     {
         var details = new List<Detail>();
@@ -1423,7 +1470,8 @@ public class Extractor
                 IsAuxiliary = true
             };
             yield return incircle.Incircle(triangle).AddReferences(angleBisectorIntersectionDetail, new Detail(incircle, Relation.NEW));
-        } else
+        }
+        else
         {
             var incircleDetail = all.EnsuredGet(Relation.INCIRCLE, triangle);
             var incircle = (incircleDetail.Left as TCircle)!;
@@ -1435,9 +1483,20 @@ public class Extractor
     public static IEnumerable<Detail?> TriangleProperties_C(TTriangle triangle)
     {
         if (triangle.ParentPool.AvailableDetails.Has(Relation.INCIRCLE, triangle)) yield break;
-        var circle = new TCircle(Array.Empty<TVertex>()) {
+        var circle = new TCircle(Array.Empty<TVertex>())
+        {
             IsAuxiliary = true
         };
         yield return circle.Incircle(triangle).AddReferences(new Detail(circle, Relation.NEW));
     }
-}
+
+    [Reason(Reason.EVERY_TRIANGLE_HAS_CIRCUMCIRCLE)]
+    public static IEnumerable<Detail?> TriangleProperties_D(TTriangle triangle)
+    {
+        if (triangle.ParentPool.AvailableDetails.Has(Relation.CIRCUMCIRCLE, triangle)) yield break;
+        var circle = new TCircle(Array.Empty<TVertex>())
+        {
+            IsAuxiliary = true
+        };
+        yield return circle.Circumcircle(triangle).AddReferences(new Detail(circle, Relation.NEW));
+    }

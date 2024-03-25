@@ -33,8 +33,8 @@ public static class DetailQuickCreator
 
     public static Detail Incircle(this TCircle c, TTriangle t) => new(c, Relation.INCIRCLE, t);
     public static Detail Incircle(this TCircle c, TQuad q) => new(c, Relation.INCIRCLE, q);
-    public static Detail CircumCircle(this TCircle c, TTriangle t) => new(c, Relation.CIRCUMCIRCLE, t);
-    public static Detail CircumCircle(this TCircle c, TQuad q) => new(c, Relation.CIRCUMCIRCLE, q);
+    public static Detail Circumcircle(this TCircle c, TTriangle t) => new(c, Relation.CIRCUMCIRCLE, t);
+    public static Detail Circumcircle(this TCircle c, TQuad q) => new(c, Relation.CIRCUMCIRCLE, q);
 
     public static Detail CircleCenter(this TVertex v, TCircle c) => new(v, Relation.CIRCLE_CENTER, c);
 

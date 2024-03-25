@@ -131,6 +131,7 @@ public static partial class TokenHelpers
                 default:
                     throw new ArgumentException("given relation type is not of type LARGER, SMALLER, EQLARGER or EQSMALLER", nameof(type));
             }
+            throw new ArgumentException("given relation type is not of type LARGER, SMALLER, EQLARGER or EQSMALLER", nameof(type));
         }
     }
     public static bool IsNull(this ExerciseToken token) => token == ExerciseToken.Null;
