@@ -1,4 +1,5 @@
-﻿using Dynamically.Formulas;
+﻿using Avalonia;
+using Dynamically.Formulas;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -41,10 +42,16 @@ public partial class Segment
     }
     public void SetLength(double len, bool isFirstStuck = true)
     {
+        Log.Write("Pre:", (Point)Vertex1, (Point)Vertex2);
         if (isFirstStuck)
         {
-            Length = len; // First is stuck by default
-            return;
+            var rads = Vertex1.RadiansTo(Vertex2);
+
+            double px = Vertex2.X, py = Vertex2.Y;
+            Vertex2.X = Vertex2.X + len * Math.Cos(rads);
+            Vertex2.Y = Vertex2.Y + len * Math.Sin(rads);
+
+            Vertex2.DispatchOnMovedEvents(px, py);
         }
         else
         {
@@ -56,5 +63,7 @@ public partial class Segment
 
             Vertex1.DispatchOnMovedEvents(px, py);
         }
+        Log.Write("Post:", (Point)Vertex1, (Point)Vertex2);
+
     }
 }

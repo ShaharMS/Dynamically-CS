@@ -81,10 +81,12 @@ public partial class Vertex
 
     public Segment? GetConnectionTo(Vertex to)
     {
+        Log.Write("Getting connection from " + this + " to " + to);
         foreach (Segment c in Connections.Concat(to.Connections))
         {
             if ((c.Vertex1 == this && c.Vertex2 == to) || (c.Vertex2 == this && c.Vertex1 == to)) return c;
         }
+        Log.Write("Couldn't find connection from " + this + " to " + to);
         return null;
     }
 

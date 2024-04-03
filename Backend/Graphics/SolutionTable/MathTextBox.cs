@@ -39,7 +39,7 @@ public class MathTextBox : Canvas
 
     public new double Height
     {
-        get => TextBox.Height.Max(MathView.Height);
+        get => TextBox.Bounds.Height.Max(MathView.Bounds.Height);
         set
         {
             base.Height = value;
@@ -62,7 +62,6 @@ public class MathTextBox : Canvas
             TextAlignment = CSharpMath.Rendering.FrontEnd.TextAlignment.Left,
             HighlightColor = Colors.Red,
         };
-
         TextBox.PropertyChanged += (s, e) =>
         {
             if (e.Property.Name != nameof(TextBox.Text) || MathView == null) return;
@@ -114,7 +113,6 @@ public class MathTextBox : Canvas
 
         MainWindow.Instance.AddHandler(PointerPressedEvent, (_, e) =>
         {
-            //Log.WriteVar(e.Source);
             if (e.Source == TextBox || e.Source == MathView)
             {
                 if (!TextBox.IsFocused) TextBox.Focus();
@@ -125,10 +123,12 @@ public class MathTextBox : Canvas
         TextBox.SetPosition(0, 0);
 
 
-        Children.Add(MathView); Children.Add(TextBox);
+         Children.Add(MathView); Children.Add(TextBox);
         AttachedToVisualTree += (_, _) =>
         {
             TextBox.Text = TextBox.Text;
+            MathView.MinHeight = 32;
+            MathView.MinWidth = 240;
         };
     }
 

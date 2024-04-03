@@ -17,7 +17,7 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = MainWindow.Instance;
-            if (MainWindow.Debug) Log.Instance.Show();
+            if (MainWindow.Debug && !Program.HasConsole) Log.Instance.Show();
         }
 
         base.OnFrameworkInitializationCompleted();

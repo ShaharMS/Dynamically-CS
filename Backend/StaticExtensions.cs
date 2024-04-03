@@ -128,6 +128,8 @@ public static class StaticExtensions
     public static double Min(this double val, double val2) => Math.Min(val, val2);
     public static double Max(this double val, double val2) => Math.Max(val, val2);
 
+    public static double Average(this double val, double val2) => (val + val2) / 2;
+
     public static List<T> InsertR<T>(this List<T> en, int index, T value)
     {
         en.Insert(index, value);
@@ -187,25 +189,30 @@ public static class StaticExtensions
 
     }
 
-    public static bool RoughlyEquals(this Point p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Vertex p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this (double X, double Y) p, Point o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Point p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Vertex p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this (double X, double Y) p, Vertex o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool IsBoundedBy(this double value, double b1, double b2)
+    {
+        return value >= Math.Min(b1, b2) && value <= Math.Max(b1, b2);
+    }
 
-    public static bool RoughlyEquals(this Point p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this Vertex p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
-    public static bool RoughlyEquals(this (double X, double Y) p, (double X, double Y) o) => Math.Abs(p.X - o.X) < 0.0001 && Math.Abs(p.Y - o.Y) < 0.0001;
+    public static bool RoughlyEquals(this Point p, Point o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this Vertex p, Point o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this (double X, double Y) p, Point o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this Point p, Vertex o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this Vertex p, Vertex o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this (double X, double Y) p, Vertex o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
 
-    public static bool RoughlyEquals(this Point p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
-    public static bool RoughlyEquals(this Vertex p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
-    public static bool RoughlyEquals(this (double X, double Y) p, double X, double Y) => Math.Abs(p.X - X) < 0.0001 && Math.Abs(p.Y - Y) < 0.0001;
+    public static bool RoughlyEquals(this Point p, (double X, double Y) o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this Vertex p, (double X, double Y) o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
+    public static bool RoughlyEquals(this (double X, double Y) p, (double X, double Y) o) => (Math.Abs(p.X - o.X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(o.X))) && (Math.Abs(p.Y - o.Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(o.Y)));
 
-    public static bool RoughlyEquals(this double a, double b) => Math.Abs(a - b) < 0.0001;
-    public static bool RoughlyEquals(this double a, int b) => Math.Abs(a - b) < 0.0001;
-    public static bool RoughlyEquals(this int a, double b) => Math.Abs(a - b) < 0.0001;
-    public static bool RoughlyEquals(this int a, int b) => Math.Abs(a - b) < 0.0001;
+    public static bool RoughlyEquals(this Point p, double X, double Y) => (Math.Abs(p.X - X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(X))) && (Math.Abs(p.Y - Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(Y)));
+    public static bool RoughlyEquals(this Vertex p, double X, double Y) => (Math.Abs(p.X - X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(X))) && (Math.Abs(p.Y - Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(Y)));
+    public static bool RoughlyEquals(this (double X, double Y) p, double X, double Y) => (Math.Abs(p.X - X) < 0.0001 || (double.IsNaN(p.X) && double.IsNaN(X))) && (Math.Abs(p.Y - Y) < 0.0001 || (double.IsNaN(p.Y) && double.IsNaN(Y)));
+
+    public static bool RoughlyEquals(this double a, double b) => Math.Abs(a - b) < 0.0001 || (double.IsNaN(a) && double.IsNaN(b));
+    public static bool RoughlyEquals(this double a, int b) => Math.Abs(a - b) < 0.0001 || (double.IsNaN(a) && double.IsNaN(b));
+    public static bool RoughlyEquals(this int a, double b) => Math.Abs(a - b) < 0.0001 || (double.IsNaN(a) && double.IsNaN(b));
+    public static bool RoughlyEquals(this int a, int b) => Math.Abs(a - b) < 0.0001 || (double.IsNaN(a) && double.IsNaN(b));
 
     public static bool RoughlyLarger(this double a, double b) => Math.Abs(a - b) > 0.0001;
     public static bool RoughlyLarger(this double a, int b) => Math.Abs(a - b) > 0.0001;
@@ -217,10 +224,10 @@ public static class StaticExtensions
     public static bool RoughlySmaller(this int a, double b) => Math.Abs(a - b) < 0.0001;
     public static bool RoughlySmaller(this int a, int b) => Math.Abs(a - b) < 0.0001;
 
-    public static bool ContainsRoughly(this IEnumerable<double> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<int> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<int> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
-    public static bool ContainsRoughly(this IEnumerable<double> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001);
+    public static bool ContainsRoughly(this IEnumerable<double> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001 || (double.IsNaN(v) && double.IsNaN(value)));
+    public static bool ContainsRoughly(this IEnumerable<int> en, double value) => en.Any(v => Math.Abs(v - value) < 0.0001 || (double.IsNaN(v) && double.IsNaN(value)));
+    public static bool ContainsRoughly(this IEnumerable<int> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001 || (double.IsNaN(v) && double.IsNaN(value)));
+    public static bool ContainsRoughly(this IEnumerable<double> en, int value) => en.Any(v => Math.Abs(v - value) < 0.0001 || (double.IsNaN(v) && double.IsNaN(value)));
     public static bool ContainsRoughly(this IEnumerable<Vertex> en, Vertex value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
     public static bool ContainsRoughly(this IEnumerable<Vertex> en, Point value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);
     public static bool ContainsRoughly(this IEnumerable<Vertex> en, (double X, double Y) value) => en.Any(v => Math.Abs(v.X - value.X) < 0.1 && Math.Abs(v.Y - value.Y) < 0.1);

@@ -410,8 +410,6 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             }
         }
 
-        if (Subject.ToString() == "JK") Log.Write(intersections.Select(x => x.Header).ToList());
-
         if (intersections.Count == 0) return null;
         else if (intersections.Count == 1) return intersections[0];
         else return new MenuItem

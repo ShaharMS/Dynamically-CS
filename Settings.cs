@@ -15,7 +15,7 @@ public class Settings
     public static int ConnectionStraighteningAngleOffset = 10;
     public static double MakeDiameterLengthRatio = 0.9;
 
-    public static int MakeEquilateralAngleOffset = 5;
+    public static int MakeEquilateralAngleOffset = 8;
     public static double MakeIsocelesSideRatioDiff = 0.9;
     public static int MakeRightAngleOffset = 10;
 

@@ -76,6 +76,7 @@ public partial class Circle : EllipseBase
         ContextMenu = new ContextMenu();
         Provider = new CircleContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
+        Ring.ContextMenu = ContextMenu;
 
         center.Roles.AddToRole(Role.CIRCLE_Center, this);
         center.Reposition();

@@ -10,6 +10,7 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Graphics.SolutionTable;
 using Dynamically.Backend.Latex;
 using Dynamically.Menus;
+using System;
 
 namespace Dynamically;
 
@@ -35,6 +36,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Console.WriteLine("Hey There!");
         Debug = true;
         Instance = this;
         MainPanel = Instance.Find<DockPanel>("Display");
@@ -91,4 +93,5 @@ public partial class MainWindow : Window
             item.Provider.Regenerate();
         }
     }
+
 }

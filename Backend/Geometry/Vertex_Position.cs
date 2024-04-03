@@ -38,8 +38,6 @@ public partial class Vertex
     /// Dispatches OnMoved events & updates position according to existing formulas. 
     /// when a parameter provided is null, or isnt provided, its reset to Instance X & Y coords.
     /// </summary>
-    /// <param name="x"></param>
-    /// <param name="y"></param>
     /// <param name="px"></param>
     /// <param name="py"></param>
     public override void DispatchOnMovedEvents(double? px = null, double? py = null)

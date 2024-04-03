@@ -37,6 +37,12 @@ public class RayFormula : Formula
         }
     }
 
+    public double Radians
+    {
+        get => Math.Atan(Slope);
+        set => Slope = Math.Tan(value);
+    }
+
     public void QuietSet(double yIntercept, double slope)
     {
         _yIntercept = yIntercept;
@@ -47,12 +53,13 @@ public class RayFormula : Formula
     /// Useful when dealing with vertical rays, which cannot be represented accurately using Slope & yItntercept.
     /// Only set when defining the ray using a point.
     /// </summary>
-    public Point? ReferencePoint { get; private set; }
+    public Point ReferencePoint { get; private set; }
 
     public RayFormula(double yIntercept, double slope) : base()
     {
         YIntercept = yIntercept;
         Slope = slope;
+        ReferencePoint = new Point(0, YIntercept);
     }
 
     public RayFormula(Point pointOnRay, double slope) : base()
@@ -129,9 +136,9 @@ public class RayFormula : Formula
 
     public void Set(double yIntercept, double slope)
     {
-        this.YIntercept = yIntercept;
-        this.Slope = slope;
-        ReferencePoint = null;
+        YIntercept = yIntercept;
+        Slope = slope;
+        ReferencePoint = new Point(0, yIntercept);
     }
 
     public void Set(Point pointOnRay, double slope)
@@ -144,14 +151,24 @@ public class RayFormula : Formula
         {
             YIntercept = pointOnRay.Y + (slope * pointOnRay.X);
         }
-        this.Slope = slope;
+        Slope = slope;
         ReferencePoint = pointOnRay;
     }
 
     public Point? Intersect(RayFormula formula)
     {
         if (formula == null) return null;
-        if (formula.Slope.RoughlyEquals(Slope)) return null;
+        if (formula.Radians.RoughlyEquals(Radians)) return null;
+        if (double.IsInfinity(Slope) || double.IsNaN(Slope))
+        {
+            if (double.IsInfinity(formula.Slope) || double.IsNaN(formula.Slope)) return null;
+            return new Point(ReferencePoint.X, formula.SolveForY(ReferencePoint.X)[0]);
+        }
+        if (double.IsInfinity(formula.Slope) || double.IsNaN(formula.Slope))
+        {
+            if (double.IsInfinity(Slope) || double.IsNaN(Slope)) return null;
+            return new Point(formula.ReferencePoint.X, SolveForY(formula.ReferencePoint.X)[0]);
+        }
 
         var X = (YIntercept - formula._yIntercept) / (formula.Slope - Slope);
         var Y = SolveForY(X);
@@ -164,6 +181,16 @@ public class RayFormula : Formula
 
     public Point[] Intersect(CircleFormula formula)
     {
+        if (double.IsInfinity(Slope) || double.IsNaN(Slope))
+        {
+            var center = formula.CenterX;
+            var origin = ReferencePoint.X;
+            if (Math.Abs(center - origin) <= formula.Radius)
+            {
+                var ps = formula.SolveForY(origin);
+                return (from p in ps select new Point(origin, p)).ToArray();
+            } else return Array.Empty<Point>();
+        }
         var m = Slope;
         var c = YIntercept;
         var a = formula.CenterX;
@@ -206,6 +233,7 @@ public class RayFormula : Formula
 
     public override double[] SolveForX(double y)
     {
+        if (double.IsInfinity(Slope) || double.IsNaN(Slope)) return new double[] { ReferencePoint.X };
         if (double.IsNaN((y - YIntercept) / Slope)) return Array.Empty<double>();
         return new double[] {(y - YIntercept) / Slope};
     }

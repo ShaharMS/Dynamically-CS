@@ -236,6 +236,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
     List<Control> Recom_ChangeType()
     {
         var suggestions = Subject.SuggestTypes();
+        suggestions.Sort((a, b) => b.confidence.CompareTo(a.confidence));
         var list = new List<Control>();
 
         foreach ((TriangleType type, string details, double confidence) in suggestions)
@@ -245,7 +246,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.EQUILATERAL:
                     var eq = new MenuItem
                     {
-                        Header = "★ Make Equilateral",
+                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Equilateral",
                         Tag = confidence
                     };
                     eq.Click += (sender, e) =>
@@ -258,7 +259,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES_RIGHT:
                     var ir = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Isosceles-Right {details}",
+                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles-Right {details}",
                         Tag = confidence
                     };
                     ir.Click += (sender, e) =>
@@ -276,7 +277,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES:
                     var iso = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Isosceles {details}",
+                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles {details}",
                         Tag = confidence
                     };
                     iso.Click += (sender, e) =>
@@ -305,7 +306,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.RIGHT:
                     var r = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + confidence + ") " : "")}{(confidence > 0.7 ? "★ " : "")}Make Right {details}",
+                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Right {details}",
                         Tag = confidence
                     };
                     r.Click += (sender, e) =>
@@ -323,8 +324,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.SCALENE: break;
             }
         }
-
-        list = list.OrderBy(m => (double?)m.Tag ?? 0.0).ToList();
 
         return list;
     }

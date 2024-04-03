@@ -100,7 +100,7 @@ public class SolutionTable : Canvas
             Refresh();
         });
 
-        if (!hasFroms )
+        if (!hasFroms)
         {
             FromsWidth = 0;
             StatementsWidth = VisualList.Width / 2;

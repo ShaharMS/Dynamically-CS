@@ -151,8 +151,7 @@ public class SegmentFormula : Formula
 
         if (!double.IsFinite(formula.Slope))
         {
-            if (formula.ReferencePoint == null) return null;
-            X = formula.ReferencePoint.Value.X;
+            X = formula.ReferencePoint.X;
         }
         double[] Y = SolveForY(X);
         if (Y.Length == 0) return null;
@@ -161,6 +160,15 @@ public class SegmentFormula : Formula
 
     public Point[] Intersect(CircleFormula formula)
     {
+
+        if (double.IsInfinity(Slope) || double.IsNaN(Slope))
+        {
+            var coords = formula.SolveForY(X1);
+            if (!coords.Any()) return Array.Empty<Point>();
+            var points = from y in coords where y.IsBoundedBy(Y1, Y2) select new Point(X1, y);
+            return points.ToArray();
+        }
+
         var m = Slope;
         var c = PotentialYIntercept;
         var a = formula.CenterX;
@@ -222,12 +230,14 @@ public class SegmentFormula : Formula
 
     public override double[] SolveForX(double y)
     {
+        if ((double.IsNaN(Slope) || double.IsInfinity(Slope)) && y.IsBoundedBy(Y1, Y2)) return new double[] { X1 };
         if ((Y1 > Y2 && (y > Y1 || y < Y2)) || (Y1 < Y2 && (y < Y1 || y > Y2)) || double.IsNaN((y - PotentialYIntercept) / Slope)) return Array.Empty<double>();
         return new double[] { (y - PotentialYIntercept) / Slope };
     }
 
     public override double[] SolveForY(double x)
     {
+        if (double.IsNaN(Slope) || double.IsInfinity(Slope)) return Array.Empty<double>();
         if ((X1 > X2 && (x > X1 || x < X2)) || (X1 < X2 && (x < X1 || x > X2)) || double.IsNaN(Slope * x + PotentialYIntercept)) return Array.Empty<double>();
         return new double[] { Slope * x + PotentialYIntercept };
     }

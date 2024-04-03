@@ -132,6 +132,7 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
             };
             item.Click += (s, e) =>
             {
+                Log.Write($"{Subject} changed type to {type}");
                 Subject.Type = type;
             };
             items[i] = item;

@@ -71,9 +71,9 @@ public class Board : DraggableGraphic
         Draggable = false;
         MouseOverCursor = Cursor.Default;
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Tunnel);
-        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Tunnel);
-        MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Tunnel);
+        MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
+        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
+        MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
     }
 
     public void Refresh()
@@ -207,9 +207,14 @@ public class Board : DraggableGraphic
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
         if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
-        Log.WriteVar(e.Source);
+        Log.WriteVar(e.Source, FocusedObject);
 
-        if (e.Source is not Border || FocusedObject is not Board || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
+        if (e.Source is Border && Selection != null)
+        {
+            Selection.Cancel();
+            FocusedObject = this;
+        }
+        if (e.Source is not Border || FocusedObject is not DraggableGraphic || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
 
         if (FocusedObject is Selection selection)
         {

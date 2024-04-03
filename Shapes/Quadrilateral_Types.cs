@@ -42,14 +42,17 @@ public partial class Quadrilateral
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
 
         var length = new[] { Con1.Length, Con2.Length, Con3.Length, Con4.Length }.Average();
-        Segment? AB = A.GetConnectionTo(B), BC = B.GetConnectionTo(C);
+        Log.Write($"Attempt {A}{B}, {B}{C}");
+        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
+        var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
+        
+        A.X = B.X + length * Math.Cos(radBA);
+        A.Y = B.Y + length * Math.Sin(radBA);
+        C.X = B.X + length * Math.Cos(radBC);
+        C.Y = B.Y + length * Math.Sin(radBC);
 
-        AB?.SetLength(length, AB.Vertex1 == B);
-        BC?.SetLength(length, BC.Vertex1 == B);
-
-        Segment? AD = A.GetConnectionTo(D), CD = C.GetConnectionTo(D);
-        AD?.SetLength(length, AD.Vertex1 == A);
-        CD?.SetLength(length, CD.Vertex1 == C);
+        D.X = C.X + length * Math.Cos(radBA);
+        D.Y = C.Y + length * Math.Sin(radBA);
     }
 
     public void MakeRectangleRelativeToABC(Vertex A, Vertex B, Vertex C)
@@ -107,14 +110,15 @@ public partial class Quadrilateral
     public void MakeTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
+        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
 
+        Log.Write(radBA,D.DistanceTo(C), Math.Cos(radBA), Math.Sin(radBA));
         D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
         D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
     }
 
     /// <summary>
-    /// AB represents the Slope of the parallel pair.
+    /// AB represents the Slope of the parallel pair. C is locked
     /// </summary>
     /// <param name="A"></param>
     /// <param name="B"></param>
@@ -122,10 +126,9 @@ public partial class Quadrilateral
     public void MakeIsoscelesTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
+        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
 
-        D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
-        D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
+        var len = B.DistanceTo(C).Average(A.DistanceTo(D));
     }
 
     /// <summary>
@@ -137,7 +140,7 @@ public partial class Quadrilateral
     public void MakeRightTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
+        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
 
         if (C.IsConnectedTo(A))
         {
@@ -153,12 +156,12 @@ public partial class Quadrilateral
     }
     public void ForceType(QuadrilateralType type, Vertex A, Vertex B, Vertex C)
     {
+        Log.Write("ForceType", type, A, B, C);
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         Point a, b, c, d;
         _type = type;
         do
         {
-            a = A; b = B; c = C; d = D;
             switch (type)
             {
                 case QuadrilateralType.SQUARE: MakeSquareRelativeToABC(A, B, C); break;
@@ -171,12 +174,17 @@ public partial class Quadrilateral
                 case QuadrilateralType.RIGHT_TRAPEZOID: MakeRightTrapezoidRelativeToABC(A, B, C); break;
                 default: break;
             }
+            a = A; b = B; c = C; d = D;
+
             A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents(); D.DispatchOnMovedEvents();
+            Log.Write($"Attempt: {(Point)A}-{a}, {(Point)B}-{b}, {(Point)C}-{c}, {(Point)D}-{d}");
+
         } while (!a.RoughlyEquals(A) || !b.RoughlyEquals(B) || !c.RoughlyEquals(C) || !d.RoughlyEquals(D));
     }
 
     QuadrilateralType ChangeType(QuadrilateralType type)
     {
+        Log.Write($"Changing type of {this} to {type}");
         // Actual shape modification
         switch (type)
         {
@@ -203,6 +211,7 @@ public partial class Quadrilateral
                 else if (_closest == _angle4ClosenessTo90Deg) ForceType(QuadrilateralType.RECTANGLE, Angle4Joints[0], Angle4Joints[1], Angle4Joints[2]);
                 break;
             case QuadrilateralType.RHOMBUS:
+                Log.Write("Forcing Rhombus");
                 ForceType(QuadrilateralType.RHOMBUS, Angle1Joints[0], Angle1Joints[1], Angle1Joints[2]);
                 break;
             case QuadrilateralType.PARALLELOGRAM:

@@ -72,6 +72,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         {
             Items = Items
         };
+        Subject.Ring.ContextMenu = Subject.ContextMenu;
     }
 
 

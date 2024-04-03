@@ -21,10 +21,13 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
 
     public void Dismantle()
     {
-        Con1.Dismantle();
-        Con2.Dismantle();
-        Con3.Dismantle();
-        Con4.Dismantle();
+        if (!Vertex1.GotRemoved && !Vertex2.GotRemoved && !Vertex3.GotRemoved && !Vertex4.GotRemoved)
+        { // Dismantle was forceful, it is expected to completely disconnect the quadrilateral from its vertices
+            Con1.Dismantle();
+            Con2.Dismantle();
+            Con3.Dismantle();
+            Con4.Dismantle();
+        }
 
         All.Remove(this);
         MainWindow.RegenAll(0, 0, 0, 0);

@@ -16,7 +16,7 @@ namespace Dynamically;
 
 public partial class Log : Window
 {
-    public static readonly Log Instance = new();
+    public static readonly Log Instance = Program.HasConsole ? null! : new();
     private readonly TextBlock consoleTextBlock;
     private readonly ScrollViewer scrollViewer;
     public Log()
@@ -34,7 +34,14 @@ public partial class Log : Window
         {
             Content = consoleTextBlock,
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto
+            HorizontalScrollBarVisibility = ScrollBarVisibility.Auto,
+        };
+        consoleTextBlock.PropertyChanged += (sender, args) =>
+        {
+            if (args.Property.Name == nameof(consoleTextBlock.Text))
+            {
+                scrollViewer.ScrollToEnd();
+            }
         };
 
         Content = scrollViewer;
@@ -56,15 +63,23 @@ public partial class Log : Window
 
     static void __Write(params object?[] text)
     {
-        Instance.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
-        if (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+        if (Program.HasConsole)
         {
-            while (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+            Console.Write(new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n");
+        }
+        else
+        {
+            Instance.consoleTextBlock.Text += new string(' ', (int)Indent * 4) + StringifyCollection(text) + "\n";
+            if (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
             {
-                Instance.consoleTextBlock.Text = Instance.consoleTextBlock.Text.Remove(0, 1);
+                while (Instance.consoleTextBlock.Text.Count(c => c.Equals('\n')) + 1 > 1000)
+                {
+                    Instance.consoleTextBlock.Text = Instance.consoleTextBlock.Text.Remove(0, 1);
+                    Instance.scrollViewer.ScrollToEnd();
+                }
             }
         }
-        Instance.scrollViewer.ScrollToEnd();
+
     }
 
     public static void Write(
@@ -78,7 +93,7 @@ public partial class Log : Window
         var str = string.Join(", ", p);
         __Write(filePath + ":" + lineNumber + ": " + str);
     }
-    
+
     /// <summary>
     /// Pretty-prints up to 10 var-value pairs
     /// </summary>
@@ -95,14 +110,14 @@ public partial class Log : Window
         [CallerArgumentExpression("self8")] string paramName8 = "",
         [CallerArgumentExpression("self9")] string paramName9 = "",
         [CallerFilePath] string filePath = "",
-        [CallerLineNumber] int lineNumber = 0) 
+        [CallerLineNumber] int lineNumber = 0)
     {
         filePath = filePath.Split("Dynamically-CS").Last().Substring(1);
 
         if (paramName == "") throw new ArgumentException("WriteVar requires at least 1 argument"); else __Write($"{filePath}:{lineNumber}: {paramName}: {Stringify(self)}");
         if (paramName1 != "") __Write($"{filePath}:{lineNumber}: {paramName1}: {Stringify(self1)}");
         if (paramName2 != "") __Write($"{filePath}:{lineNumber}: {paramName2}: {Stringify(self2)}");
-        if (paramName3 != "") __Write($"{filePath}:{lineNumber}: {paramName3}: {Stringify(self3)}"); 
+        if (paramName3 != "") __Write($"{filePath}:{lineNumber}: {paramName3}: {Stringify(self3)}");
         if (paramName4 != "") __Write($"{filePath}:{lineNumber}: {paramName4}: {Stringify(self4)}");
         if (paramName5 != "") __Write($"{filePath}:{lineNumber}: {paramName5}: {Stringify(self5)}");
         if (paramName6 != "") __Write($"{filePath}:{lineNumber}: {paramName6}: {Stringify(self6)}");
@@ -132,11 +147,12 @@ public partial class Log : Window
         foreach (var item in collection)
         {
             var itemS = item is Catalyst.TokenData t ? JsonSerializer.Serialize(t) : item?.ToString();
-            if (itemS == null) {
-                s.Add("null"); 
-                continue; 
+            if (itemS == null)
+            {
+                s.Add("null");
+                continue;
             }
-            if (item!.GetType().IsArray || (item.GetType().IsGenericType && new[] { typeof(List<>), typeof(HashSet<>), typeof(ObservableCollection<>)}.Contains(item.GetType().GetGenericTypeDefinition()))) itemS = StringifyCollection((IEnumerable)item);
+            if (item!.GetType().IsArray || (item.GetType().IsGenericType && new[] { typeof(List<>), typeof(HashSet<>), typeof(ObservableCollection<>) }.Contains(item.GetType().GetGenericTypeDefinition()))) itemS = StringifyCollection((IEnumerable)item);
             else if (item.GetType().IsGenericType && item.GetType().GetGenericTypeDefinition() == typeof(Dictionary<,>)) itemS = StringifyCollection((IEnumerable)item);
             s.Add(itemS ?? "Value");
         }
