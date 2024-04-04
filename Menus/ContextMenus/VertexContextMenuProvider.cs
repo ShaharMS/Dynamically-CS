@@ -20,13 +20,14 @@ using Dynamically.Formulas;
 using System.Reactive.Subjects;
 using Avalonia.Media;
 using System.Threading;
+using Avalonia.Interactivity;
 
 namespace Dynamically.Menus.ContextMenus;
 
 public class VertexContextMenuProvider : ContextMenuProvider
 {
 
-    public Vertex Subject {get => _sub; set => _sub = value; }
+    public Vertex Subject { get => _sub; set => _sub = value; }
     public VertexContextMenuProvider(Vertex joint, ContextMenu menu)
     {
         Subject = joint;
@@ -204,7 +205,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
     {
         var options = new List<MenuItem>();
 
-        foreach (var r in new[] { Role.CIRCLE_On, Role.SEGMENT_On, Role.SEGMENT_Center})
+        foreach (var r in new[] { Role.CIRCLE_On, Role.SEGMENT_On, Role.SEGMENT_Center })
         {
             foreach (var obj in Subject.Roles.Access<dynamic>(r))
             {
@@ -251,31 +252,33 @@ public class VertexContextMenuProvider : ContextMenuProvider
 
     MenuItem Suggestions_MarkAngle()
     {
-        var items = new List<string>();
-            foreach(Vertex j1 in Vertex.All)
+        var items = new List<(string, double)>();
+        foreach (Vertex j1 in Vertex.All)
+        {
+            foreach (Vertex j2 in Vertex.All)
             {
-                foreach (Vertex j2 in Vertex.All)
-                {
-                    if (Subject == j1 || Subject == j2 || j1 == j2) continue;
-                    if (Angle.Exists(Subject, j1, j2)) continue;
-                    items.Add($"{j1}{Subject}{j2}");
-                }
+                if (Subject == j1 || Subject == j2 || j1 == j2) continue;
+                if (Angle.Exists(Subject, j1, j2)) continue;
+                items.Add(($"{j1}{Subject}{j2}", (Subject.IsConnectedTo(j1) ? 0.5 : 0) + (Subject.IsConnectedTo(j2) ? 0.5 : 0)));
             }
+        }
+        items.Sort((a, b) => b.Item2.CompareTo(a.Item2));
+
         var l1 = new Label
         {
             Content = "Angle: ∠"
         };
-
         var ac = new AutoCompleteBox
         {
-            Items = items
+            Items = items.Select(x => x.Item1),
+
         };
 
         var d1 = new DockPanel();
         d1.Children.Add(l1);
         d1.Children.Add(ac);
 
-        
+
 
         var button = new Button
         {
@@ -311,14 +314,36 @@ public class VertexContextMenuProvider : ContextMenuProvider
             }, new TimeSpan(0, 0, 2));
         };
 
+        var specialSuggestions = items.Where(x => x.Item2 == 1).Select(x => x.Item1).DistinctBy(x =>
+        {
+            var rel = x.SkipLast(3);
+            var res = x[1];
+            var oth = new List<char> { x[0], x[2] };
+            oth.Sort((a, b) => b.CompareTo(a));
+            return res + oth[0] + oth[1];
+        }).Select(x =>
+        {
+            var m = new MenuItem
+            {
+                Header = "★ Angle: ∠" + x
+            };
+            m.Click += (sender, args) =>
+            {
+                ac.Text = x;
+                button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            };
+            return m;
+        }).ToList();
+        
+
         return new MenuItem
         {
             Header = "Mark Angle",
-            Items = new List<Control>
+            Items = specialSuggestions.Concat(new List<Control>
             {
                 d1,
                 button
-            }
+            })
         };
     }
 

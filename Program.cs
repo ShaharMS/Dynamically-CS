@@ -58,7 +58,7 @@ class Program
                     if (HasConsole)
                     {
                         //Console.SetWindowSize(windowWidth / 3 / 9, windowHeight / 22);
-                        MoveWindow(GetConsoleWindow(), screen.WorkingArea.TopLeft.X, screen.WorkingArea.TopLeft.Y, windowWidth / 3, windowHeight, true);
+                        MoveWindow(GetConsoleWindow(), screen.WorkingArea.TopLeft.X, screen.WorkingArea.TopLeft.Y, windowWidth / 3 + 30, windowHeight + 10, true);
                         Log.Write(HasConsole);
                     } 
                     else

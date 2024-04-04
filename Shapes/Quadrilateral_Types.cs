@@ -22,7 +22,7 @@ public partial class Quadrilateral
 
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
         var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
-        var remainingGap = Math.PI / 2 - Math.Abs(radBC.RadiansBetween(radBA, true));
+        var remainingGap = Math.Abs(Math.PI / 2 - Math.Abs(radBC.RadiansBetween(radBA, true)));
         var dist = (A.DistanceTo(B) + B.DistanceTo(C)) / 2;
 
         int oppose = Math.Abs((radBA + remainingGap / 2).RadiansBetween(radBC - remainingGap / 2, true)) < Math.PI / 2 ? -1 : 1;
@@ -61,7 +61,7 @@ public partial class Quadrilateral
 
         var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
         var radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
-        var remainingGap = Math.PI / 2 - Math.Abs(radBC.RadiansBetween(radBA, true));
+        var remainingGap = Math.Abs(Math.PI / 2 - Math.Abs(radBC.RadiansBetween(radBA, true)));
         double length1 = (A.DistanceTo(B) + C.DistanceTo(D)) / 2, length2 = (A.DistanceTo(D) + B.DistanceTo(C)) / 2;
 
         int oppose = Math.Abs((radBA + remainingGap / 2).RadiansBetween(radBC - remainingGap / 2, true)) < Math.PI / 2 ? -1 : 1;
@@ -114,11 +114,11 @@ public partial class Quadrilateral
     public void MakeTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
+        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
 
         Log.Write(radBA,D.DistanceTo(C), Math.Cos(radBA), Math.Sin(radBA));
-        D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
-        D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
+        D.X = C.X + D.DistanceTo(C) * -Math.Cos(radBA);
+        D.Y = C.Y + D.DistanceTo(C) * -Math.Sin(radBA);
     }
 
     /// <summary>
@@ -130,7 +130,7 @@ public partial class Quadrilateral
     public void MakeIsoscelesTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
+        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
 
         var otherSegments = new[] { Con1, Con2, Con3, Con4 }.Where(c => c != A.GetConnectionTo(B)! && c != C.GetConnectionTo(D));
         var len = otherSegments.Average(c => c.Length);
@@ -163,26 +163,23 @@ public partial class Quadrilateral
     public void MakeRightTrapezoidRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
+        var radBA = Math.Atan2(A.Y - B.Y, A.X - B.X);
         var sideLen = A.DistanceTo(C).Min(A.DistanceTo(D));
+        var bottomLen = C.DistanceTo(D);
 
-        if (HasAsSide(A, C))
+        if (HasAsSide(A, D))
         {
             C.X = B.X + sideLen * Math.Cos(radBA + Math.PI / 2);
             C.Y = B.Y + sideLen * Math.Sin(radBA + Math.PI / 2);
-            var ray = new RayFormula(C, Math.Tan(radBA));
-            var point = ray.GetClosestOnFormula(D) ?? new Point();
-            D.X = point.X;
-            D.Y = point.Y;
+            D.X = C.X + bottomLen * Math.Cos(radBA);
+            D.Y = C.Y + bottomLen * Math.Sin(radBA);
         }
         else
         {
             D.X = B.X + sideLen * Math.Cos(radBA + Math.PI / 2);
             D.Y = B.Y + sideLen * Math.Sin(radBA + Math.PI / 2);
-            var ray = new RayFormula(D, Math.Tan(radBA));
-            var point = ray.GetClosestOnFormula(C) ?? new Point();
-            C.X = point.X;
-            C.Y = point.Y;
+            C.X = D.X + bottomLen * Math.Cos(radBA);
+            C.Y = D.Y + bottomLen * Math.Sin(radBA);  
         }
 
     }

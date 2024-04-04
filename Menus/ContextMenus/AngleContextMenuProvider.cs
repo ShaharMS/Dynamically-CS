@@ -201,9 +201,9 @@ public class AngleContextMenuProvider : ContextMenuProvider
 
         var none = new MenuItem
         {
-            Header = "Nothing " + (Subject.TextDisplayMode == AngleTextDisplay.DEGREES_EXACT ? "✓" : "")
+            Header = "Nothing " + (Subject.TextDisplayMode == AngleTextDisplay.NONE ? "✓" : "")
         };
-        none.Click += (s, e) => { Subject.TextDisplayMode = AngleTextDisplay.DEGREES_EXACT; };
+        none.Click += (s, e) => { Subject.TextDisplayMode = AngleTextDisplay.NONE; };
 
         var paramField = new TextBox
         {
