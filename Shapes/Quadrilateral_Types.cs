@@ -89,16 +89,20 @@ public partial class Quadrilateral
     public void MakeKiteRelativeToABC(Vertex A, Vertex B, Vertex C)
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
-        double length1 = (A.DistanceTo(B) + C.DistanceTo(B)) / 2, length2 = (A.DistanceTo(D) + C.DistanceTo(D)) / 2;
 
-        Segment? AB = A.GetConnectionTo(B), BC = B.GetConnectionTo(C);
+        double len = A.DistanceTo(B).Average(B.DistanceTo(C));
+        double distanceTops = B.DistanceTo(D);
 
-        AB?.SetLength(length1, AB.Vertex1 == B);
-        BC?.SetLength(length1, BC.Vertex1 == B);
+        double radBA = Math.Atan2(A.Y - B.Y, A.X - B.X), radBC = Math.Atan2(C.Y - B.Y, C.X - B.X);
+        double radBD = radBA.Average(radBC);
 
-        Segment? AD = A.GetConnectionTo(D), CD = C.GetConnectionTo(D);
-        AD?.SetLength(length2, AD.Vertex1 == A);
-        CD?.SetLength(length2, CD.Vertex1 == C);
+        A.X = B.X + len * Math.Cos(radBA);
+        A.Y = B.Y + len * Math.Sin(radBA);
+        C.X = B.X + len * Math.Cos(radBC);
+        C.Y = B.Y + len * Math.Sin(radBC);
+        D.X = B.X + distanceTops * Math.Cos(radBD);
+        D.Y = B.Y + distanceTops * Math.Sin(radBD);
+
     }
 
     /// <summary>
@@ -118,7 +122,7 @@ public partial class Quadrilateral
     }
 
     /// <summary>
-    /// AB represents the Slope of the parallel pair. C is locked
+    /// AB represents the Slope of the parallel pair. C is locked.
     /// </summary>
     /// <param name="A"></param>
     /// <param name="B"></param>
@@ -128,11 +132,30 @@ public partial class Quadrilateral
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
 
-        var len = B.DistanceTo(C).Average(A.DistanceTo(D));
+        var otherSegments = new[] { Con1, Con2, Con3, Con4 }.Where(c => c != A.GetConnectionTo(B)! && c != C.GetConnectionTo(D));
+        var len = otherSegments.Average(c => c.Length);
+        var bottomLenHalved = C.DistanceTo(D) / 2;
+
+        var center = A.GetConnectionTo(B)!.MiddleFormula.PointOnRatio;
+        // Move the center to the other, projected segment
+        var transformed = new Point(center.X + len * Math.Cos(radBA + Math.PI / 2), center.Y + len * Math.Sin(radBA + Math.PI / 2));
+
+        C.X = transformed.X + bottomLenHalved * Math.Cos(radBA);
+        C.Y = transformed.Y + bottomLenHalved * Math.Sin(radBA);
+        D.X = transformed.X - bottomLenHalved * Math.Cos(radBA);
+        D.Y = transformed.Y - bottomLenHalved * Math.Sin(radBA);
+        if ((HasAsSide(A, D) && C.DistanceTo(A) < C.DistanceTo(D)) || (HasAsSide(A, C) && D.DistanceTo(A) < C.DistanceTo(A)))
+        {
+            var temp = (Point)D;
+            D.X = C.X;
+            D.Y = C.Y;
+            C.X = temp.X;
+            C.Y = temp.Y;
+        }
     }
 
     /// <summary>
-    /// AB represents the Slope of the parallel pair. ABC (or BAC) = 90deg.
+    /// AB represents the Slope of the parallel pair. ABC (or BAD) = 90deg.
     /// </summary>
     /// <param name="A"></param>
     /// <param name="B"></param>
@@ -141,18 +164,27 @@ public partial class Quadrilateral
     {
         var D = new[] { Vertex1, Vertex2, Vertex3, Vertex4 }.Where(j => j != A && j != B && j != C).ElementAt(0);
         var radBA = Math.Atan2(B.Y - A.Y, B.X - A.X);
+        var sideLen = A.DistanceTo(C).Min(A.DistanceTo(D));
 
-        if (C.IsConnectedTo(A))
+        if (HasAsSide(A, C))
         {
-            
+            C.X = B.X + sideLen * Math.Cos(radBA + Math.PI / 2);
+            C.Y = B.Y + sideLen * Math.Sin(radBA + Math.PI / 2);
+            var ray = new RayFormula(C, Math.Tan(radBA));
+            var point = ray.GetClosestOnFormula(D) ?? new Point();
+            D.X = point.X;
+            D.Y = point.Y;
         }
         else
         {
-
+            D.X = B.X + sideLen * Math.Cos(radBA + Math.PI / 2);
+            D.Y = B.Y + sideLen * Math.Sin(radBA + Math.PI / 2);
+            var ray = new RayFormula(D, Math.Tan(radBA));
+            var point = ray.GetClosestOnFormula(C) ?? new Point();
+            C.X = point.X;
+            C.Y = point.Y;
         }
 
-        D.X = C.X + D.DistanceTo(C) * Math.Cos(radBA);
-        D.Y = C.Y + D.DistanceTo(C) * Math.Sin(radBA);
     }
     public void ForceType(QuadrilateralType type, Vertex A, Vertex B, Vertex C)
     {
@@ -177,7 +209,7 @@ public partial class Quadrilateral
             a = A; b = B; c = C; d = D;
 
             A.DispatchOnMovedEvents(); B.DispatchOnMovedEvents(); C.DispatchOnMovedEvents(); D.DispatchOnMovedEvents();
-            Log.Write($"Attempt: {(Point)A}-{a}, {(Point)B}-{b}, {(Point)C}-{c}, {(Point)D}-{d}");
+            Log.Write($"Attempt");
 
         } while (!a.RoughlyEquals(A) || !b.RoughlyEquals(B) || !c.RoughlyEquals(C) || !d.RoughlyEquals(D));
     }

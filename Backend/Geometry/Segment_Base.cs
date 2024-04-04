@@ -245,6 +245,7 @@ public partial class Segment : DraggableGraphic
 
     }
 
+    public bool IsMadeOf(Vertex v1, Vertex v2) => (v1 == Vertex1 && v2 == Vertex2) || (v1 == Vertex2 && v2 == Vertex1);
 }
 
 public enum SegmentTextDisplay

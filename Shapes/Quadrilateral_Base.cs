@@ -141,6 +141,11 @@ public partial class Quadrilateral : DraggableGraphic
         return new((Vertex1.X + Vertex2.X + Vertex3.X + Vertex4.X) / 4, (Vertex1.Y + Vertex2.Y + Vertex3.Y + Vertex4.Y) / 4);
     }
 
+    public bool HasAsSide(Vertex v1, Vertex v2)
+    {
+        return Con1.IsMadeOf(v1, v2) || Con2.IsMadeOf(v1, v2) || Con3.IsMadeOf(v1, v2) || Con4.IsMadeOf(v1, v2);
+    }
+
     public override void Render(DrawingContext context)
     {
         var geom = new PathGeometry();
