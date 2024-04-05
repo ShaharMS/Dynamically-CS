@@ -245,35 +245,15 @@ public partial class Vertex
                 }
             }
         }
-        // Fourth case - connection a line and forming a quadrilateral
-        foreach (Vertex other1 in this.Relations.ToArray())
+        // Fourth case - connecting a line and forming a quadrilateral
+        foreach (Vertex other1 in this.Relations.Where(x => x != joint))
         {
-            if (other1 == joint) continue;
-            foreach (Vertex other2 in joint.Relations.ToArray())
+            foreach (Vertex other2 in joint.Relations.Where(x => x != this))
             {
-                if (other2 == this) continue;
-                if (other1 == other2) continue;
-                if (other1.IsConnectedTo(other2))
-                {
-                    var hasQuad = false;
-                    var currentQuads = Roles.Access<Quadrilateral>(Role.QUAD_Corner);
-                    foreach (var q in currentQuads)
-                    {
-                        if (q.IsDefinedBy(this, joint, other1, other2))
-                        {
-                            hasQuad = true;
-                            break;
-                        }
-                    }
-                    if (!hasQuad)
-                    {
-                        var con2 = other1.GetConnectionTo(this);
-                        var con3 = other2.GetConnectionTo(joint);
-                        if (con2 == null || con3 == null) continue;
-                        if (con2.Formula.Intersect(con3.Formula) != null) continue;
-                        _ = new Quadrilateral(this, joint, other2, other1);
-                    }
-                }
+                if (!other1.IsConnectedTo(other2)) continue;
+                if (Quadrilateral.All.Any(x => x.IsDefinedBy(this, joint, other1, other2))) continue;
+                if (other1.GetConnectionTo(other2)!.Formula.Intersects(segment.Formula)) continue;
+                _ = new Quadrilateral(this, joint, other1, other2);
             }
         }
     }
