@@ -224,25 +224,10 @@ public partial class Vertex
         foreach (Segment c in Connections.ToArray())
         {
             var other = c.Vertex1 == this ? c.Vertex2 : c.Vertex1;
-
-            
-
             if (other.IsConnectedTo(joint) /* this.IsConnectedTo(joint) is `true` */) // this joint is connected to other, and the just connected joint is also connected to it -> potentially new Triangle
             {
-                var hasTriangle = false;
-                var currentTriangles = Roles.Access<Triangle>(Role.TRIANGLE_Corner);
-                foreach (var t in currentTriangles)
-                {
-                    if (t.IsDefinedBy(this, other, joint))
-                    {
-                        hasTriangle = true;
-                        break;
-                    }
-                }
-                if (!hasTriangle)
-                {
-                    _ = new Triangle(this, other, joint);
-                }
+                if (Triangle.Exists(this, other, joint)) continue;
+                _ = new Triangle(this, other, joint);
             }
         }
         // Fourth case - connecting a line and forming a quadrilateral

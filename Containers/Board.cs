@@ -207,7 +207,7 @@ public class Board : DraggableGraphic
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
         if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
-        Log.WriteVar(e.Source, FocusedObject);
+        Log.WriteVar(e.Source, FocusedObject, HoveredObject);
 
         if (e.Source is Border && Selection != null)
         {

@@ -52,11 +52,12 @@ public partial class Circle : EllipseBase
 
     public Circle(Vertex center, double radius) : base(center, center, radius * 2)
     {
+        All.Add(this);
+
         this.Radius = radius;
         this.Center = center;
-        Formula = new CircleFormula(radius, center.X, center.Y);
 
-        All.Add(this);
+        Formula = new CircleFormula(radius, center.X, center.Y);
 
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnDragStart.Add(__circle_Moving);

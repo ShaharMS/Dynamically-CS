@@ -71,13 +71,15 @@ public partial class Quadrilateral : DraggableGraphic
 #pragma warning disable CS8618
     public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4) : base(j1.ParentBoard)
     {
+        All.Add(this);
+
         Vertex1 = j1;
         Vertex2 = j2;
         Vertex3 = j3;
         Vertex4 = j4;
 
-        
         var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
+        Log.WriteVar(sides);
         if (sides.Count == 0) return; // Don't do anything
         
         foreach (var j in new[] { Vertex1, Vertex2, Vertex3, Vertex4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
@@ -129,7 +131,6 @@ public partial class Quadrilateral : DraggableGraphic
         });
         OnDragged.Add(MainWindow.RegenAll);
 
-        All.Add(this);
         MainWindow.RegenAll(0,0,0,0);
         MainWindow.Instance.MainBoard.Children.Add(this);
     }
@@ -149,22 +150,26 @@ public partial class Quadrilateral : DraggableGraphic
     public override void Render(DrawingContext context)
     {
         var geom = new PathGeometry();
-        var figure = new PathFigure
+        var figure1 = new PathFigure
         {
-            StartPoint = Con1.Vertex1,
+            StartPoint = Opposites[0].Item1.Vertex1,
             IsClosed = true,
             IsFilled = true
         };
+        figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item1.Vertex1 });
+        figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item1.Vertex2 });
+        if (HasAsSide(Opposites[0].Item1.Vertex2, Opposites[0].Item2.Vertex1))
+        {
+            figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item2.Vertex1 });
+            figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item2.Vertex2 });
+        } else
+        {
+            figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item2.Vertex2 });
+            figure1.Segments?.Add(new LineSegment { Point = Opposites[0].Item2.Vertex1 });
+        }
+            
 
-        figure?.Segments?.Add(new LineSegment { Point = Con1.Vertex2 });
-        figure?.Segments?.Add(new LineSegment { Point = Con2.Vertex1 });
-        figure?.Segments?.Add(new LineSegment { Point = Con2.Vertex2 });
-        figure?.Segments?.Add(new LineSegment { Point = Con3.Vertex1 });
-        figure?.Segments?.Add(new LineSegment { Point = Con3.Vertex2 });
-        figure?.Segments?.Add(new LineSegment { Point = Con4.Vertex1 });
-        figure?.Segments?.Add(new LineSegment { Point = Con4.Vertex2 });
-
-        geom.Figures.Add(figure);
+        geom.Figures.Add(figure1);
 
         if (MainWindow.Instance.MainBoard.HoveredObject == this && (MainWindow.Instance.MainBoard.FocusedObject == this || MainWindow.Instance.MainBoard.FocusedObject is not IShape))
         {

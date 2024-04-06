@@ -49,7 +49,8 @@ public partial class Quadrilateral {
             }
         }
 
-        return new();
+
+        throw new ApplicationException("Cannot validate quadrialetral - vertices ");
     }
 
     static void AssignAngles(Quadrilateral quad)

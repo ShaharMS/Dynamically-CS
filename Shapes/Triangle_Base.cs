@@ -45,14 +45,11 @@ public partial class Triangle : DraggableGraphic
 
     public Triangle(Vertex j1, Vertex j2, Vertex j3) : base(j1.ParentBoard)
     {
-        if (Exists(j1, j2, j3)) return;
+        All.Add(this);
 
         Vertex1 = j1;
         Vertex2 = j2;
         Vertex3 = j3;
-
-        All.Add(this);
-
 
         Segment12 = Vertex1.Connect(Vertex2);
         Segment13 = Vertex1.Connect(Vertex3);
