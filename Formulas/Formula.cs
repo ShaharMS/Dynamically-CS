@@ -86,7 +86,7 @@ public abstract class Formula
 
     public virtual void UpdateFollowers()
     {
-        foreach(var vertex in Followers)
+        foreach(var vertex in Followers.ToList())
         {
             vertex.DispatchOnMovedEvents();
         }

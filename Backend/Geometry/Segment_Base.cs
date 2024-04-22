@@ -116,6 +116,7 @@ public partial class Segment : DraggableGraphic
         org2Y = t.Y;
         Formula = new SegmentFormula(this);
         MiddleFormula = new RatioOnSegmentFormula(Formula, 0.5);
+        RayFormula = new RayFormula(this);
 
         Label = new Label
         {
@@ -201,11 +202,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex1.Connections.Remove(this);
             Vertex1.Relations.Remove(Vertex2);
-            Vertex1.EffectedFormulas.Remove(Formula);
+            foreach (var f in new Formula[] { Formula, MiddleFormula, RayFormula }) Vertex1.EffectedFormulas.Remove(f);
             Vertex1 = by;
             Vertex1.Connections.Add(this);
             Vertex1.Relations.Add(Vertex2);
-            Vertex1.EffectedFormulas.Add(Formula);
+            foreach (var f in new Formula[] { Formula, MiddleFormula, RayFormula }) Vertex1.EffectedFormulas.Add(f);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }
@@ -213,11 +214,11 @@ public partial class Segment : DraggableGraphic
         {
             Vertex2.Connections.Remove(this);
             Vertex2.Relations.Remove(Vertex1);
-            Vertex2.EffectedFormulas.Remove(Formula);
+            foreach (var f in new Formula[] { Formula, MiddleFormula, RayFormula }) Vertex2.EffectedFormulas.Remove(f);
             Vertex2 = by;
             Vertex2.Connections.Add(this);
             Vertex2.Relations.Add(Vertex1);
-            Vertex2.EffectedFormulas.Add(Formula);
+            foreach (var f in new Formula[] { Formula, MiddleFormula, RayFormula }) Vertex2.EffectedFormulas.Add(f);
 
             Vertex1.CreateBoardRelationsWith(Vertex2, this);
         }

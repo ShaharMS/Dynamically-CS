@@ -103,6 +103,35 @@ public class RayFormula : Formula
         ReferencePoint = new Point(x1, y1);
     }
 
+    public RayFormula(Segment segment)
+    {
+        segment.Vertex1.OnMoved.Add((_, _, _, _) =>
+        {
+            RemoveFollower(segment.Vertex1);
+            Set(segment.Vertex1, segment.Vertex2);
+            Followers.Add(segment.Vertex1);
+            segment.Vertex1.PositioningByFormula.Add(UpdateJointPosition);
+        });
+        segment.Vertex2.OnMoved.Add((_, _, _, _) =>
+        {
+            RemoveFollower(segment.Vertex2);
+            Set(segment.Vertex1, segment.Vertex2);
+            Followers.Add(segment.Vertex2);
+            segment.Vertex2.PositioningByFormula.Add(UpdateJointPosition);
+        });
+
+        Slope = (segment.Vertex2.Y - segment.Vertex1.Y) / (segment.Vertex2.X - segment.Vertex1.X);
+        if (segment.Vertex1.X > 0)
+        {
+            YIntercept = segment.Vertex1.Y - (Slope * segment.Vertex1.X);
+        }
+        else
+        {
+            YIntercept = segment.Vertex1.Y + (Slope * segment.Vertex1.X);
+        }
+        ReferencePoint = segment.Vertex1;
+    }
+
     /// <summary>
     /// Keeps Slope
     /// </summary>

@@ -32,6 +32,7 @@ public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenu
             if (c.Vertex1 == this) c.Vertex2.RepositionText();
             else c.Vertex1.RepositionText();
         }
+
         RepositionText();
     }
 

@@ -20,18 +20,8 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.Vertex1.OnMoved.Add((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex1.CurrentlyDragging) return;
-                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
-                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
-                });
-                Subject.Vertex2.OnMoved.Add((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex2.CurrentlyDragging) return;
-                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
-                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
-                }); // TODO: fix this, OnMoved functions cant manipulate positions (testing, may be incorrect) (realization: Vertex2 isnt edited, only Vertex1, so everything is fine :) )
+                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
+                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
                 break;
             // Triangle
             case Role.TRIANGLE_Side:
@@ -55,18 +45,8 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.Vertex1.OnMoved.Remove((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex1.CurrentlyDragging) return;
-                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
-                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
-                });
-                Subject.Vertex2.OnMoved.Remove((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex2.CurrentlyDragging) return;
-                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
-                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
-                });
+                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(Subject.Vertex2);
+                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(Subject.Vertex1);
                 break;
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Remove((item as Triangle).__Disment);
@@ -90,31 +70,11 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
+                From.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(From.Vertex2);
+                From.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(From.Vertex1);
 
-                Subject.Vertex1.OnMoved.Remove((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex1.CurrentlyDragging) return;
-                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
-                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
-                });
-                Subject.Vertex2.OnMoved.Remove((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex2.CurrentlyDragging) return;
-                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
-                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
-                });
-                Subject.Vertex1.OnMoved.Add((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex1.CurrentlyDragging) return;
-                    Subject.Vertex2.X = Subject.Vertex1.X - (Subject.Vertex1.X - c1.Center.X) * 2;
-                    Subject.Vertex2.Y = Subject.Vertex1.Y - (Subject.Vertex1.Y - c1.Center.Y) * 2;
-                });
-                Subject.Vertex2.OnMoved.Add((cx, cy, _, _) =>
-                {
-                    if (!Subject.Vertex2.CurrentlyDragging) return;
-                    Subject.Vertex1.X = Subject.Vertex2.X - (Subject.Vertex2.X - c1.Center.X) * 2;
-                    Subject.Vertex1.Y = Subject.Vertex2.Y - (Subject.Vertex2.Y - c1.Center.Y) * 2;
-                });
+                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
+                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
                 break;
             // Triangle
             case Role.TRIANGLE_Side:

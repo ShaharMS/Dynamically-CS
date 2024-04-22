@@ -17,6 +17,7 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
 {
     public SegmentFormula Formula { get; set; }
     public RatioOnSegmentFormula MiddleFormula { get; }
+    public RayFormula RayFormula { get; }
 
     public SegmentContextMenuProvider Provider { get; }
 

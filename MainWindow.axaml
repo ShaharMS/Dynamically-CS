@@ -36,6 +36,11 @@
 					</MenuItem.Icon>
 				</MenuItem>
 				<Separator/>
+        <MenuItem Header="Circle">
+          <MenuItem.Icon>
+            <Image Source="avares://Dynamically/Assets/Light/Menu/circle.png"/>
+          </MenuItem.Icon>
+        </MenuItem>
 				<MenuItem Header="Triangles">
 					<MenuItem Header="Equilateral">
 						<MenuItem.Icon>

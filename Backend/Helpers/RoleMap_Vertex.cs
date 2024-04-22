@@ -29,8 +29,8 @@ public partial class RoleMap
                 Subject.OnMoved.Add(s1.__repositionLabel);
                 s1.Vertex1.Relations.Remove(s1.Vertex2);
                 s1.Vertex2.Relations.Remove(s1.Vertex1);
-                s1.Vertex1.EffectedFormulas.Add(s1.Formula);
-                s1.Vertex2.EffectedFormulas.Add(s1.Formula);
+                s1.Vertex1.EffectedFormulas.AddRange(new Formula[] { s1.Formula, s1.MiddleFormula, s1.RayFormula });
+                s1.Vertex2.EffectedFormulas.AddRange(new Formula[] { s1.Formula, s1.MiddleFormula, s1.RayFormula });
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.AddFollower(Subject);
@@ -93,8 +93,11 @@ public partial class RoleMap
                 Subject.OnDragged.Remove(s1.__reposition);
                 s1.Vertex1.Relations.Remove(s1.Vertex2);
                 s1.Vertex2.Relations.Remove(s1.Vertex1);
-                s1.Vertex1.EffectedFormulas.Remove(s1.Formula);
-                s1.Vertex2.EffectedFormulas.Remove(s1.Formula);
+                foreach (var f in new Formula[] { s1.Formula, s1.MiddleFormula, s1.RayFormula })
+                {
+                    s1.Vertex1.EffectedFormulas.Remove(f);
+                    s1.Vertex2.EffectedFormulas.Remove(f);
+                }
                 break;
             case Role.SEGMENT_On:
                 (item as Segment).Formula.RemoveFollower(Subject);

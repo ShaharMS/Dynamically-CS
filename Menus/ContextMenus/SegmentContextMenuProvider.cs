@@ -340,6 +340,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         item.Click += (sender, e) =>
         {
             Subject.Roles.RemoveFromRole(Role.CIRCLE_Chord, circle);
+            circle.Center.Connect(Subject.Vertex1, Subject.Vertex2);
             Subject.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
             // Don't wait for user gesture, update position right after click
             // Place the diameter at a position that makes sense - same Slope and a bit longer
