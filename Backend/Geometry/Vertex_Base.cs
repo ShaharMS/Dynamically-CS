@@ -174,16 +174,16 @@ public partial class Vertex : DraggableGraphic
         MainWindow.Instance.MainBoard.Children.Remove(this);
         MainWindow.Instance.MainBoard.Children.Remove(IdDisplay);
 
-        Roles.Clear();
         OnMoved.Clear();
         OnDragged.Clear();
 
-        foreach (var r in OnRemoved)
+        foreach (var r in OnRemoved.ToList())
         {
             r(sx, sy);
         }
 
         OnRemoved.Clear();
+        Roles.Clear();
 
         All.Remove(this);
 

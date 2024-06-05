@@ -60,10 +60,18 @@ public partial class RoleMap
                 }
                 break;
             case Role.TRIANGLE_CircumCircleCenter:
-                (item as Triangle).Circumcircle.OnRemoved.Add(() => (item as Triangle).Circumcircle = null);
+                var t1 = item as Triangle;
+                t1.Circumcircle.OnRemoved.Add(() => {
+                    t1.Circumcircle = null;
+                    t1.Provider.Regenerate();
+                });
                 break;
             case Role.TRIANGLE_InCircleCenter:
-                (item as Triangle).Incircle.OnRemoved.Add(() => (item as Triangle).Incircle = null);
+                var t2 = item as Triangle;
+                t2.Incircle.OnRemoved.Add(() => {
+                    t2.Incircle = null;
+                    t2.Provider.Regenerate();
+                });
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
@@ -132,10 +140,14 @@ public partial class RoleMap
 
                 break;
             case Role.TRIANGLE_CircumCircleCenter:
-                (item as Triangle).Circumcircle.OnRemoved.Remove(() => (item as Triangle).Circumcircle = null);
+                var t1 = item as Triangle;
+                // Circumcircle callback is already deallocated
+                t1.Provider.Regenerate();
                 break;
             case Role.TRIANGLE_InCircleCenter:
-                (item as Triangle).Incircle.OnRemoved.Remove(() => (item as Triangle).Incircle = null);
+                var t2 = item as Triangle;
+                // Incircle callback is already deallocated
+                t2.Provider.Regenerate();
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:

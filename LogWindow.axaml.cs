@@ -79,7 +79,6 @@ public partial class Log : Window
                 }
             }
         }
-
     }
 
     public static void Write(
@@ -93,6 +92,8 @@ public partial class Log : Window
         var str = string.Join(", ", p);
         __Write(filePath + ":" + lineNumber + ": " + str);
     }
+
+    public static void Warn(string message, [CallerFilePath] string filePath = "", [CallerLineNumber] int lineNumber = 0) => __Write($"[WARN] {filePath}:{lineNumber}: {message}");
 
     /// <summary>
     /// Pretty-prints up to 10 var-value pairs

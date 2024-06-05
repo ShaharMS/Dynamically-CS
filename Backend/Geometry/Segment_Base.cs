@@ -185,14 +185,13 @@ public partial class Segment : DraggableGraphic
         });
         OnDragged.Add(MainWindow.RegenAll);
 
-
         All.Add(this);
 
         MainWindow.Instance.MainBoard.Children.Insert(0, this);
 
-
         Vertex1.Roles.AddToRole(Role.SEGMENT_Corner, this);
         Vertex2.Roles.AddToRole(Role.SEGMENT_Corner, this);
+
         InvalidateVisual();
     }
 

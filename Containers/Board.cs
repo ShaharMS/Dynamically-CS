@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Dynamically.Containers;
@@ -63,17 +64,20 @@ public class Board : DraggableGraphic
         set  => _selection = value;
     }
 
+    public Window Window { get; private set; }
 
-    public Board() : base(null!)
+    public Board(Window window) : base(null!)
     {
         _focused = this;
         _hovered = this;
         Draggable = false;
         MouseOverCursor = Cursor.Default;
 
-        MainWindow.Instance.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
-        MainWindow.Instance.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
-        MainWindow.Instance.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
+        Window = window;
+
+        Window.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
+        Window.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
+        Window.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
     }
 
     public void Refresh()

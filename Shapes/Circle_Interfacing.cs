@@ -20,6 +20,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public void Dismantle()
     {
+        Center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
         foreach (var follower in Formula.Followers.ToArray())
         {
             follower.Roles.RemoveFromRole(Role.CIRCLE_On, this);
@@ -30,6 +31,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         EllipseBase.All.Remove(this);
 
         foreach (var l in OnRemoved) l();
+        OnRemoved.Clear();
 
         MainWindow.Instance.MainBoard.Children.Remove(Ring);
         MainWindow.Instance.MainBoard.Children.Remove(this);
@@ -41,6 +43,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
     public void __circle_Remove(double z, double x)
     {
         _ = z; _ = x;
+        Log.Write($"Removing circle {this}");
         Dismantle();
     }
     public void __circle_Moving()

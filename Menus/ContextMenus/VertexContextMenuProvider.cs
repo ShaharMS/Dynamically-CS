@@ -86,7 +86,8 @@ public class VertexContextMenuProvider : ContextMenuProvider
         Debugging = new List<Control>
         {
             Debug_DisplayRoles(),
-            Debug_Position()
+            Debug_BoardPosition(),
+            Debug_ScreenPosition()
         };
     }
 
@@ -583,11 +584,19 @@ public class VertexContextMenuProvider : ContextMenuProvider
         return roles;
     }
 
-    MenuItem Debug_Position()
+    MenuItem Debug_BoardPosition()
     {
         return new MenuItem
         {
-            Header = $"Position: ({((int)Subject.X)}, {((int)Subject.Y)})\nOn-Screen: ({Subject.ScreenX}, {Subject.ScreenY})"
+            Header = $"Position: ({((int)Subject.X)}, {((int)Subject.Y)})"
+        };
+    }
+
+    MenuItem Debug_ScreenPosition()
+    {
+        return new MenuItem
+        {
+            Header = $"On-Screen: ({Subject.ScreenX}, {Subject.ScreenY})"
         };
     }
 }

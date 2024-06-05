@@ -15,8 +15,20 @@ namespace Dynamically.Backend.Geometry;
 
 public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupportsAdjacency, IHasFormula<SegmentFormula>, IContextMenuSupporter<SegmentContextMenuProvider>, ISelectable, IMovementFreezable
 {
+ 
+    /// <summary>
+    /// A formula the updates whenever a vertex here is changed. The vertices of this segment are *not* followers of this formula.
+    /// </summary>
     public SegmentFormula Formula { get; set; }
+
+    /// <summary>
+    /// The formula used to calculate the middle of this segment.
+    /// </summary>
     public RatioOnSegmentFormula MiddleFormula { get; }
+
+    /// <summary>
+    /// The formula used to calculate the ray of this segment. The vertices of this segment are *not* followers of this formula.
+    /// </summary>
     public RayFormula RayFormula { get; }
 
     public SegmentContextMenuProvider Provider { get; }

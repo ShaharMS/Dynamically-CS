@@ -12,6 +12,8 @@ public class Tabs
 {
     public TabControl TabContainer;
 
+    public Window Window { get; private set; }
+
     public Board MainBoard
     {
         get => (Board)TabContainer.Items.OfType<TabItem>().First(item => item.Name == "__MainBoard").Content;
@@ -33,7 +35,7 @@ public class Tabs
         set => TabContainer.SelectedItem = value;
     }
 
-    public Tabs(TabControl container)
+    public Tabs(TabControl container, Window window)
     {
         TabContainer = container;
     }
@@ -43,7 +45,7 @@ public class Tabs
 
     public TabItem CreateNewTab(string name)
     {
-        var board = new Board();
+        var board = new Board(Window);
         var item = new TabItem
         {
             Header = name,

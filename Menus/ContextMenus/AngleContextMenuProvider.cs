@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
+using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Helpers.Containers;
@@ -41,6 +42,13 @@ public class AngleContextMenuProvider : ContextMenuProvider
         {
             Sgest_AngleBisector()
         };
+    }
+
+    public override void GenerateRecommendations()
+    {
+        Recommendations = new List<Control?> {
+            Recom_MakeRightAngle(),
+        }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
     public override void AddDebugInfo()
@@ -325,5 +333,48 @@ public class AngleContextMenuProvider : ContextMenuProvider
                 Items = retrieveBisectors()
             };
         }
+    }
+
+    // -------------------------------------------------------
+    // ----------------------Recommended----------------------
+    // -------------------------------------------------------
+
+    private MenuItem? Recom_MakeRightAngle()
+    {
+        if (Subject.Degrees < 80 || Subject.Degrees > 100 || Subject.Degrees.RoughlyEquals(90)) return null;
+
+        var m = new MenuItem
+        {
+            Header = $"{(Subject.Degrees.IsBoundedBy(85, 95) ? "★ " : "")}Make Right Angle"
+        };
+        m.Click += (sender, e) =>
+        {
+            // Grab the two vertices, and manipulate them symmetrically
+            // But first, find out how to manipulate:
+
+            var l1 = Subject.Center.GetConnectionTo(Subject.Vertex1)!.Length;
+            var l2 = Subject.Center.GetConnectionTo(Subject.Vertex2)!.Length;
+
+            var d1 = Subject.Center.DegreesTo(Subject.Vertex1);
+            var d2 = Subject.Center.DegreesTo(Subject.Vertex2);
+
+            // If the first segment is "deeper" than the second, we drag it closer for 95deg, and further for 85deg
+            int direction = (d1 > d2) && (d1 < 270 && d1 > 90) ? 1 : -1;
+
+            var offset = (90 - Subject.Degrees) / 2;
+            Log.WriteVar(d1, d2, direction, offset);
+
+            Subject.Vertex1.X = Subject.Center.X + l1 * Math.Cos((d1 + direction * offset) * Math.PI / 180);
+            Subject.Vertex1.Y = Subject.Center.Y + l1 * Math.Sin((d1 + direction * offset) * Math.PI / 180);
+
+            Subject.Vertex2.X = Subject.Center.X + l2 * Math.Cos((d2 - direction * offset) * Math.PI / 180);
+            Subject.Vertex2.Y = Subject.Center.Y + l2 * Math.Sin((d2 - direction * offset) * Math.PI / 180);
+
+            Subject.Vertex1.DispatchOnMovedEvents();
+            Subject.Vertex2.DispatchOnMovedEvents();
+            Subject.Provider.Regenerate();
+            
+        };
+        return m;
     }
 }

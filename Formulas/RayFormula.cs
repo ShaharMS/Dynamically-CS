@@ -107,20 +107,15 @@ public class RayFormula : Formula
     {
         segment.Vertex1.OnMoved.Add((_, _, _, _) =>
         {
-            RemoveFollower(segment.Vertex1);
             Set(segment.Vertex1, segment.Vertex2);
-            Followers.Add(segment.Vertex1);
-            segment.Vertex1.PositioningByFormula.Add(UpdateJointPosition);
         });
         segment.Vertex2.OnMoved.Add((_, _, _, _) =>
         {
-            RemoveFollower(segment.Vertex2);
             Set(segment.Vertex1, segment.Vertex2);
-            Followers.Add(segment.Vertex2);
-            segment.Vertex2.PositioningByFormula.Add(UpdateJointPosition);
         });
 
-        Slope = (segment.Vertex2.Y - segment.Vertex1.Y) / (segment.Vertex2.X - segment.Vertex1.X);
+        ReferencePoint = segment.Vertex1;
+        _slope = (segment.Vertex2.Y - segment.Vertex1.Y) / (segment.Vertex2.X - segment.Vertex1.X);
         if (segment.Vertex1.X > 0)
         {
             YIntercept = segment.Vertex1.Y - (Slope * segment.Vertex1.X);
@@ -129,7 +124,6 @@ public class RayFormula : Formula
         {
             YIntercept = segment.Vertex1.Y + (Slope * segment.Vertex1.X);
         }
-        ReferencePoint = segment.Vertex1;
     }
 
     /// <summary>
@@ -138,6 +132,7 @@ public class RayFormula : Formula
     /// <param name="point"></param>
     public void ChangePositionByPoint(Point point)
     {
+        ReferencePoint = point;
         if (point.X > 0)
         {
             YIntercept = point.Y - (Slope * point.X);
@@ -146,12 +141,12 @@ public class RayFormula : Formula
         {
             YIntercept = point.Y + (Slope * point.X);
         }
-        ReferencePoint = point;
     }
 
     public void Set(Point p1, Point p2)
     {
-        Slope = (p2.Y - p1.Y) / (p2.X - p1.X);
+        ReferencePoint = p1;
+        _slope = (p2.Y - p1.Y) / (p2.X - p1.X);
         if (p1.X > 0)
         {
             YIntercept = p1.Y - (Slope * p1.X);
@@ -160,18 +155,19 @@ public class RayFormula : Formula
         {
             YIntercept = p1.Y + (Slope * p1.X);
         }
-        ReferencePoint = p1;
     }
 
     public void Set(double yIntercept, double slope)
     {
-        YIntercept = yIntercept;
-        Slope = slope;
         ReferencePoint = new Point(0, yIntercept);
+        _yIntercept = yIntercept;
+        Slope = slope;
     }
 
     public void Set(Point pointOnRay, double slope)
     {
+        _slope = slope;
+        ReferencePoint = pointOnRay;
         if (pointOnRay.X > 0)
         {
             YIntercept = pointOnRay.Y - (slope * pointOnRay.X);
@@ -180,8 +176,6 @@ public class RayFormula : Formula
         {
             YIntercept = pointOnRay.Y + (slope * pointOnRay.X);
         }
-        Slope = slope;
-        ReferencePoint = pointOnRay;
     }
 
     public Point? Intersect(RayFormula formula)

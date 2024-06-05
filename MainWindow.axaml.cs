@@ -40,9 +40,9 @@ public partial class MainWindow : Window
         Debug = true;
         Instance = this;
         MainPanel = Instance.Find<DockPanel>("Display");
-        WindowTabs = new Tabs(Instance.Find<TabControl>("Tabs"));
+        WindowTabs = new Tabs(Instance.Find<TabControl>("Tabs"), this);
         TopMenu = new TopMenu(Instance.Find<Menu>("Menu"), this);
-        var ca = new Board
+        var ca = new Board(this)
         {
             Name = "MainBoard"
         };
