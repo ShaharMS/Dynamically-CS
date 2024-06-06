@@ -160,6 +160,19 @@ public partial class Angle : DraggableGraphic
         Point? previous = null;
         if (!Degrees.RoughlyEquals(90))
         {
+            // Draw a triangle between the two angle edges, and the center, for easier clicking.
+            var geom = new PathGeometry();
+            var figure = new PathFigure()
+            {
+                StartPoint = Center,
+                IsFilled = true,
+                IsClosed = true
+            };
+            figure.Segments?.Add(new LineSegment { Point = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end)) });
+            figure.Segments?.Add(new LineSegment { Point = new Point(Center.X + DefaultDistance * Math.Cos(start), Center.Y + DefaultDistance * Math.Sin(start)) });
+            geom.Figures.Add(figure);
+            context.DrawGeometry(new SolidColorBrush(Colors.Black, 0.01), null, geom);
+
             for (double i = start; i <= start + Radians; i += Math.PI / 36)
             {
                 if (previous == null)
@@ -171,7 +184,7 @@ public partial class Angle : DraggableGraphic
                     var point = new Point(Center.X + DefaultDistance * Math.Cos(i), Center.Y + DefaultDistance * Math.Sin(i));
                     context.DrawLine(new Pen(UIColors.ConnectionColor, 2), previous.Value, point);
                     // padding for easier clicking
-                    context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), previous.Value, point);
+                    context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 2), previous.Value, point);
                     previous = point;
                 }
             }
@@ -192,6 +205,7 @@ public partial class Angle : DraggableGraphic
             context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), p1, p2);
             context.DrawLine(new Pen(UIColors.ConnectionColor, 2), p3, p2);
             context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), p3, p2);
+            context.DrawRectangle(new SolidColorBrush(Colors.Black, 0.01), null, new Rect(Center, p2));
         }
 
 

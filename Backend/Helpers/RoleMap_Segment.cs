@@ -20,8 +20,8 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
-                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
+                Subject.Vertex1.Connect(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
+                Subject.Vertex2.Connect(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
                 break;
             // Triangle
             case Role.TRIANGLE_Side:
@@ -45,8 +45,8 @@ public partial class RoleMap
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
 
-                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(Subject.Vertex2);
-                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(Subject.Vertex1);
+                Subject.Vertex1.GetConnectionTo(c1.Center)?.RayFormula.RemoveFollower(Subject.Vertex2);
+                Subject.Vertex2.GetConnectionTo(c1.Center)?.RayFormula.RemoveFollower(Subject.Vertex1);
                 break;
             case Role.TRIANGLE_Side:
                 Subject.OnRemoved.Remove((item as Triangle).__Disment);
@@ -70,11 +70,11 @@ public partial class RoleMap
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
-                From.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(From.Vertex2);
-                From.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.RemoveFollower(From.Vertex1);
+                From.Vertex1.GetConnectionTo(c1.Center)?.RayFormula.RemoveFollower(From.Vertex2);
+                From.Vertex2.GetConnectionTo(c1.Center)?.RayFormula.RemoveFollower(From.Vertex1);
 
-                Subject.Vertex1.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
-                Subject.Vertex2.GetConnectionTo(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
+                Subject.Vertex1.Connect(c1.Center)!.RayFormula.AddFollower(Subject.Vertex2);
+                Subject.Vertex2.Connect(c1.Center)!.RayFormula.AddFollower(Subject.Vertex1);
                 break;
             // Triangle
             case Role.TRIANGLE_Side:

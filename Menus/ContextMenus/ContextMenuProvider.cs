@@ -13,8 +13,13 @@ namespace Dynamically.Menus.ContextMenus;
 
 public class ContextMenuProvider
 {
+
+#pragma warning disable CS8618
+
     protected dynamic _sub;
     public string Name;
+#pragma warning restore CS8618
+
     public virtual List<Control> Items
     {
         get
@@ -83,11 +88,6 @@ public class ContextMenuProvider
 #pragma warning disable CS8618
     public ContextMenu Menu;
 #pragma warning restore CS8618
-
-    private void Menu_ContextRequested(object? sender, ContextRequestedEventArgs e)
-    {
-        GetAdjacentElements();
-    }
 
     public virtual void GenerateDefaults()
     {

@@ -108,7 +108,10 @@
 			</MenuItem>
 		</Menu>
     <TabControl Margin="5" Name="Tabs">
-      <TabItem Header="Main Board" Name="__MainBoard">
+      <TabItem Name="__MainBoard">
+        <TabItem.Header>
+          <Label Content="Main Board" Background="Black"/>
+        </TabItem.Header>
       </TabItem>
     </TabControl>
 	</DockPanel>

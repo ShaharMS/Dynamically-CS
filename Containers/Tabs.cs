@@ -1,4 +1,5 @@
 ﻿using Avalonia.Controls;
+using Avalonia.Media;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -48,8 +49,13 @@ public class Tabs
         var board = new Board(Window);
         var item = new TabItem
         {
-            Header = name,
-            Content = board
+            Header = new Label
+            {
+                Content = name,
+                Background = new SolidColorBrush(Colors.Black),
+            },
+            Content = board,
+
         };
 
         TabContainer.Items = OpenTabs.Concat(new[] { item }).ToArray();

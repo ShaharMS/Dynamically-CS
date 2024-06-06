@@ -288,6 +288,15 @@ public class Board : DraggableGraphic
 
     public override void Render(DrawingContext context)
     {
-
+        Log.WriteVar(Window.Width, Window.Height, ScreenX, ScreenX);
+        context.DrawRectangle(UIColors.BoardColor, null, new Rect(0, 0, Window.Width - ScreenX, Window.Height - ScreenY));
+        for (double i = -ScreenX; i < Window.Width - ScreenX; i += UIDesign.BoardSquareSize)
+        {
+            context.DrawLine(new Pen(UIColors.BoardSquaresColor, 1), new Point(i, -ScreenY), new Point(i, Window.Height));
+        }
+        for (double i = -ScreenY; i < Window.Height - ScreenY; i += UIDesign.BoardSquareSize)
+        {
+            context.DrawLine(new Pen(UIColors.BoardSquaresColor, 1), new Point(-ScreenX, i), new Point(Window.Width, i));
+        }
     }
 }

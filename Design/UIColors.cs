@@ -28,4 +28,7 @@ public class UIColors
 
     public static IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);
     public static IBrush SolutionTableFill = new SolidColorBrush(Colors.Black);
+
+    public static IBrush BoardSquaresColor = new SolidColorBrush(Colors.RoyalBlue, 0.5);
+    public static IBrush BoardColor = new SolidColorBrush(Colors.Black);
 }
