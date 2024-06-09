@@ -20,7 +20,6 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         Subject = triangle;
         Menu = menu;
         Name = Subject.ToString(true);
-        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();

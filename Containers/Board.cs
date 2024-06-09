@@ -10,6 +10,7 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
+using Dynamically.Menus.ContextMenus;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -21,19 +22,19 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Containers;
 
-public class Board : DraggableGraphic
+public partial class Board : DraggableGraphic
 {
 
-    public static double MouseX
+    public double MouseX
     {
         get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).X ?? -1;
     }
-    public static double MouseY
+    public double MouseY
     {
         get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).Y ?? -1;
     }
 
-    public static PointerEventArgs Mouse
+    public PointerEventArgs Mouse
     {
         get => MainWindow.Mouse;
     }
@@ -66,6 +67,8 @@ public class Board : DraggableGraphic
 
     public Window Window { get; private set; }
 
+    public BoardContextMenuProvider Provider { get; private set; }
+
     public Board(Window window) : base(null!)
     {
         _focused = this;
@@ -74,6 +77,10 @@ public class Board : DraggableGraphic
         MouseOverCursor = Cursor.Default;
 
         Window = window;
+
+        ContextMenu = new ContextMenu();
+        Provider = new BoardContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
 
         Window.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
         Window.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
@@ -213,12 +220,12 @@ public class Board : DraggableGraphic
         if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
         Log.WriteVar(e.Source, FocusedObject, HoveredObject);
 
-        if (e.Source is Border && Selection != null)
+        if (e.Source is Board && Selection != null)
         {
             Selection.Cancel();
             FocusedObject = this;
         }
-        if (e.Source is not Border || FocusedObject is not DraggableGraphic || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
+        if (e.Source is not Board || FocusedObject is not DraggableGraphic || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
 
         if (FocusedObject is Selection selection)
         {

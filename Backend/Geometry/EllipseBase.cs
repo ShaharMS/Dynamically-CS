@@ -123,7 +123,7 @@ internal class Ring : DraggableGraphic
 
         OnMoved.Add((double _, double _, double _, double _) =>
             {
-                double mx = Board.MouseX, my = Board.MouseY;
+                double mx = ParentBoard.MouseX, my = ParentBoard.MouseY;
                 mx -= ((Board)Parent!).X;
                 my -= ((Board)Parent!).Y;
                 this.SetPosition(0, 0);

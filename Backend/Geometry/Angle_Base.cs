@@ -153,6 +153,27 @@ public partial class Angle : DraggableGraphic
         if ((Degrees > 180 && !Large) || (Degrees < 180 && Large)) Degrees = 360 - Degrees;
         Radians = Degrees.ToRadians();
 
+        switch (TextDisplayMode)
+        {
+            case AngleTextDisplay.DEGREES_EXACT:
+                Label.Content = Math.Round(Degrees, 3);
+                break;
+            case AngleTextDisplay.DEGREES_ROUND:
+                Label.Content = Math.Round(Degrees);
+                break;
+            case AngleTextDisplay.RADIANS_EXACT:
+                Label.Content = Math.Round(Radians, 3);
+                break;
+            case AngleTextDisplay.RADIANS_ROUND:
+                Label.Content = Math.Round(Radians);
+                break;
+            case AngleTextDisplay.DEGREES_GIVEN:
+            case AngleTextDisplay.RADIANS_GIVEN:
+            case AngleTextDisplay.PARAM:
+            case AngleTextDisplay.NONE:
+                break;
+        }
+
         var order = Tools.OrderRadiansBySmallArc(Center.RadiansTo(Vertex1), Center.RadiansTo(Vertex2));
         if (Large) order = order.Reverse().ToArray();
         var start = order[0];
@@ -212,26 +233,6 @@ public partial class Angle : DraggableGraphic
 
 
 
-        switch (TextDisplayMode)
-        {
-            case AngleTextDisplay.DEGREES_EXACT:
-                Label.Content = Math.Round(Degrees, 3);
-                break;
-            case AngleTextDisplay.DEGREES_ROUND:
-                Label.Content = Math.Round(Degrees);
-                break;
-            case AngleTextDisplay.RADIANS_EXACT:
-                Label.Content = Math.Round(Radians, 3);
-                break;
-            case AngleTextDisplay.RADIANS_ROUND:
-                Label.Content = Math.Round(Radians);
-                break;
-            case AngleTextDisplay.DEGREES_GIVEN:
-            case AngleTextDisplay.RADIANS_GIVEN:
-            case AngleTextDisplay.PARAM:
-            case AngleTextDisplay.NONE:
-                break;
-        }
         Canvas.SetLeft(Label, Center.X + (DefaultDistance * 0.95 * Math.Cos(start + Radians / 2) - Label.GuessTextWidth() / 2) * (Large ? -1 : 1));
         Canvas.SetTop(Label, Center.Y + (DefaultDistance * 0.95 * Math.Sin(start + Radians / 2) - Label.Height / 2) * (Large ? -1 : 1));
     }

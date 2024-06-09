@@ -24,7 +24,6 @@ public class CircleContextMenuProvider : ContextMenuProvider
         Subject = circle;
         Menu = menu;
         Name = Subject.ToString(true);
-        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
@@ -122,7 +121,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
@@ -139,7 +138,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 

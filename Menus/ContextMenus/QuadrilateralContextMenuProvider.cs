@@ -21,7 +21,6 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
         Menu = menu;
         Name = Subject.ToString(true);
 
-        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();

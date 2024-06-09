@@ -39,6 +39,7 @@ public class Tabs
     public Tabs(TabControl container, Window window)
     {
         TabContainer = container;
+        Window = window;
     }
 
 

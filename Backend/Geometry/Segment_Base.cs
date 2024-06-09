@@ -169,8 +169,6 @@ public partial class Segment : DraggableGraphic
 
             X = 0; Y = 0;
 
-            Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
-            Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
             InvalidateVisual();
         });
 
@@ -229,7 +227,8 @@ public partial class Segment : DraggableGraphic
     {
         // Label
         Label.RenderTransform = new RotateTransform(Math.Atan(Formula.Slope) * 180 / Math.PI);
-        
+        Canvas.SetLeft(Label, MiddleFormula.PointOnRatio.X - Label.GuessTextWidth() / 2);
+        Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
 
         // Graphic is cleared
         var pen = new Pen

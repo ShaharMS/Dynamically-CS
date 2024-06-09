@@ -34,7 +34,6 @@ public class VertexContextMenuProvider : ContextMenuProvider
         Menu = menu;
         Name = Subject.ToString(true);
 
-        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
@@ -359,7 +358,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
@@ -378,7 +377,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Board.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
             MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 

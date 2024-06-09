@@ -20,7 +20,6 @@ public class AngleContextMenuProvider : ContextMenuProvider
         Subject = angle;
         Menu = menu;
         Name = Subject.ToString(true);
-        GetAdjacentElements();
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();

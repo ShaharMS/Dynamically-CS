@@ -107,10 +107,12 @@ public class RayFormula : Formula
     {
         segment.Vertex1.OnMoved.Add((_, _, _, _) =>
         {
+            if (Followers.ContainsMany(segment.Vertex1, segment.Vertex2)) Log.Warn("A ray defined by a segment should not have the segment's vertex as a follower. This may cause errors.");
             Set(segment.Vertex1, segment.Vertex2);
         });
         segment.Vertex2.OnMoved.Add((_, _, _, _) =>
         {
+            if (Followers.ContainsMany(segment.Vertex1, segment.Vertex2)) Log.Warn("A ray defined by a segment should not have the segment's vertex as a follower. This may cause errors.");
             Set(segment.Vertex1, segment.Vertex2);
         });
 

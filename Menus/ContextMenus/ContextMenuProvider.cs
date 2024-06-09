@@ -24,7 +24,6 @@ public class ContextMenuProvider
     {
         get
         {
-            GetAdjacentElements();
             GenerateDefaults();
             GenerateSuggestions();
             GenerateRecommendations();
@@ -107,22 +106,6 @@ public class ContextMenuProvider
     public virtual void AddDebugInfo()
     {
         Debugging.Clear();
-    }
-
-    public virtual void GetAdjacentElements() {
-        AdjacentElements.Clear();
-        var list = new List<ISupportsAdjacency>();
-        if (MainWindow.Mouse == null) return;
-        var mouse = MainWindow.Mouse.GetPosition(MainWindow.Instance.MainBoard);
-        list = list.Concat(Vertex.All).Concat(Segment.All).Concat(Circle.All).Concat(Triangle.All).Concat(Quadrilateral.All).ToList();
-        foreach (var item in list) {
-            if (!item.Equals(_sub) && item.Overlaps(mouse)) {
-                AdjacentElements.Add(new MenuItem {
-                    Header = item is IStringifyable ? ((IStringifyable)item).ToString(true) : item.ToString(),
-                    Items = ((dynamic)item).Provider.ItemsWithoutAdjacents
-                });
-            }
-        }  
     }
 
     public virtual void Regenerate()

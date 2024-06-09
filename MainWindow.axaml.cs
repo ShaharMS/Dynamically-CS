@@ -81,8 +81,7 @@ public partial class MainWindow : Window
         RegenAll(0, 0, 0, 0);
 
         _ = new BottomNote("Application Started!");
-        MainBoard.Children.Add(new SolutionTable(MainBoard, true));
-        MainBoard.Children.Add(new MathTextBox());
+        //MainBoard.Children.Add(new SolutionTable(MainBoard, true));
 
     }
 

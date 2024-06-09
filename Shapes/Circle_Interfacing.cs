@@ -7,6 +7,7 @@ using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -57,7 +58,21 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         Formula.Moving = false;
     }
 
+    public void __circle_handleDiameter(Vertex dominant, Vertex moving)
+    {
+        var angle = dominant.RadiansTo(Center);
+        var dist = dominant.DistanceTo(Center);
 
+        double nx = dominant.X + dist * 2 * Math.Cos(angle),
+               ny = dominant.Y + dist * 2 * Math.Sin(angle),
+               ox = moving.X, oy = moving.Y;
+
+        if (!moving.RoughlyEquals(new Point(nx, ny)))
+        {
+            moving.X = nx; moving.Y = ny;
+            moving.DispatchOnMovedEvents(ox, oy);
+        }
+    }
 
 
 

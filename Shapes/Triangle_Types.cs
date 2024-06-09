@@ -51,7 +51,7 @@ public partial class Triangle
             else if (other1.Anchored)
             {
                 var ray = new RayFormula(pos, other1);
-                var p = ray.GetClosestOnFormula(new Point(Board.MouseX, Board.MouseY));
+                var p = ray.GetClosestOnFormula(new Point(ParentBoard.MouseX, ParentBoard.MouseY));
                 if (p != null)
                 {
                     moved.X = p.Value.X; moved.Y = p.Value.Y;
@@ -62,7 +62,7 @@ public partial class Triangle
             else if (other2.Anchored)
             {
                 var ray = new RayFormula(pos, other2);
-                var p = ray.GetClosestOnFormula(new Point(Board.MouseX, Board.MouseY));
+                var p = ray.GetClosestOnFormula(new Point(ParentBoard.MouseX, ParentBoard.MouseY));
                 if (p != null)
                 {
                     moved.X = p.Value.X; moved.Y = p.Value.Y;
