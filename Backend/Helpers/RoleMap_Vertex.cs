@@ -48,8 +48,8 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                Subject.OnMoved.Add((item as Circle).__circle_OnChange);
                 Subject.OnDragStart.Add((item as Circle).__circle_Moving);
+                Subject.OnMoved.Add((item as Circle).__circle_OnChange);
                 Subject.OnDragged.Add((item as Circle).__circle_StopMoving);
                 Subject.OnRemoved.Add((item as Circle).__circle_Remove);
                 Subject.EffectedFormulas.Add((item as Circle).Formula);

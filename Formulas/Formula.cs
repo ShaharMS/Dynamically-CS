@@ -41,8 +41,10 @@ public abstract class Formula
 
     public Formula()
     {
-        OnMoved.Add((curX, curY, preX, preY) => {
-            foreach (var joint in Followers) {
+        OnMoved.Add((curX, curY, preX, preY) =>
+        {
+            foreach (var joint in Followers)
+            {
                 // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
                 if (MainWindow.Instance.MainBoard.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;

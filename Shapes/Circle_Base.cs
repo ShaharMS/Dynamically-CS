@@ -61,13 +61,10 @@ public partial class Circle : EllipseBase
 
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnDragStart.Add(__circle_Moving);
-        OnMoved.Add((x, y, px, py) =>
-        {
-            double pcx = this.Center.X, pcy = this.Center.Y;
-            this.Center.X += x - px;
-            this.Center.Y += y - py;
-            this.Center.DispatchOnMovedEvents(pcx, pcy);
-            this.SetPosition(0, 0);
+        OnDragStart.Add(() => {
+            double offsetX = ParentBoard.MouseX - Center.X;
+            double offsetY = ParentBoard.MouseY - Center.Y;
+            Center.ForceStartDrag(ParentBoard.Mouse, -offsetX, -offsetY);
         });
         OnMoved.Add(__circle_OnChange);
         OnDragged.Add(__circle_StopMoving);

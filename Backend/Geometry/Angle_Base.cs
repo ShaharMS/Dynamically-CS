@@ -189,10 +189,6 @@ public partial class Angle : DraggableGraphic
                 IsFilled = true,
                 IsClosed = true
             };
-            figure.Segments?.Add(new LineSegment { Point = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end)) });
-            figure.Segments?.Add(new LineSegment { Point = new Point(Center.X + DefaultDistance * Math.Cos(start), Center.Y + DefaultDistance * Math.Sin(start)) });
-            geom.Figures.Add(figure);
-            context.DrawGeometry(new SolidColorBrush(Colors.Black, 0.01), null, geom);
 
             for (double i = start; i <= start + Radians; i += Math.PI / 36)
             {
@@ -204,6 +200,7 @@ public partial class Angle : DraggableGraphic
                 {
                     var point = new Point(Center.X + DefaultDistance * Math.Cos(i), Center.Y + DefaultDistance * Math.Sin(i));
                     context.DrawLine(new Pen(UIColors.ConnectionColor, 2), previous.Value, point);
+                    figure.Segments?.Add(new LineSegment { Point = point });
                     // padding for easier clicking
                     context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 2), previous.Value, point);
                     previous = point;
@@ -213,9 +210,11 @@ public partial class Angle : DraggableGraphic
             {
                 var p = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end));
                 context.DrawLine(new Pen(UIColors.ConnectionColor, 2), previous.Value, p);
+                figure.Segments?.Add(new LineSegment { Point = p });
                 context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.ConnectionGraphicWidth * 1.5), previous.Value, p);
             }
-
+            geom.Figures.Add(figure);
+            context.DrawGeometry(new SolidColorBrush(Colors.Black, 0.01), null, geom);
         }
         else
         {

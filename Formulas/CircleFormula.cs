@@ -29,7 +29,6 @@ public class CircleFormula : Formula
         {
             var prev = _centerX;
             _centerX = value;
-            foreach (var l in OnChange) l();
             foreach (var l in OnMoved) l(value, _centerY, prev, _centerY);
         }
     }
@@ -128,8 +127,6 @@ public class CircleFormula : Formula
 
     public override (double X, double Y) UpdateJointPosition(double inputX, double inputY)
     {
-        if (!Moving) return base.UpdateJointPosition(inputX, inputY);
-
-        return (inputX, inputY);
+        return base.UpdateJointPosition(inputX, inputY);
     }
 }

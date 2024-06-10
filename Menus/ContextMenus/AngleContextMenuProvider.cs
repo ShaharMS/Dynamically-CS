@@ -31,6 +31,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
         Defaults = new List<Control>
         {
             Defaults_Label(),
+            Defaults_Invert(),
+            Defaults_CreateInverted(),
             Defaults_Remove()
         };
     }
@@ -47,6 +49,7 @@ public class AngleContextMenuProvider : ContextMenuProvider
     {
         Recommendations = new List<Control?> {
             Recom_MakeRightAngle(),
+            Recom_MakeFlatAngle()
         }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
@@ -266,6 +269,33 @@ public class AngleContextMenuProvider : ContextMenuProvider
             }
         };
     }
+
+    MenuItem Defaults_Invert()
+    {
+        var invert = new MenuItem
+        {
+            Header = "Invert Angle"
+        };
+        invert.Click += (sender, e) =>
+        {
+            Subject.Large = !Subject.Large;
+        };
+        return invert;
+    }
+
+    MenuItem Defaults_CreateInverted()
+    {
+        var swap = new MenuItem
+        {
+            Header = "Create Inverted Angle"
+        };
+        swap.Click += (sender, e) =>
+        {
+            _ = new Angle(Subject.Vertex1, Subject.Center, Subject.Vertex2, !Subject.Large);
+        };
+        return swap;
+    }
+
     MenuItem Defaults_Remove()
     {
         var remove = new MenuItem
@@ -292,7 +322,10 @@ public class AngleContextMenuProvider : ContextMenuProvider
             {
                 Header = "Create Bisector",
             };
-            item.Click += (_, _) => Subject.GenerateBisector();
+            item.Click += (_, _) => {
+                Subject.GenerateBisector();
+                Regenerate();
+            };
             return item;
         }
         else if (Subject.BisectorRay.Followers.Count == 1)
@@ -372,7 +405,45 @@ public class AngleContextMenuProvider : ContextMenuProvider
             Subject.Vertex1.DispatchOnMovedEvents();
             Subject.Vertex2.DispatchOnMovedEvents();
             Subject.Provider.Regenerate();
-            
+
+        };
+        return m;
+    }
+    private MenuItem? Recom_MakeFlatAngle()
+    {
+        if (Subject.Degrees < 170 || Subject.Degrees > 190 || Subject.Degrees.RoughlyEquals(180)) return null;
+
+        var m = new MenuItem
+        {
+            Header = $"{(Subject.Degrees.IsBoundedBy(175, 185) ? "★ " : "")}Make Flat Angle"
+        };
+        m.Click += (sender, e) =>
+        {
+            // Grab the two vertices, and manipulate them symmetrically
+            // But first, find out how to manipulate:
+
+            var l1 = Subject.Center.GetConnectionTo(Subject.Vertex1)!.Length;
+            var l2 = Subject.Center.GetConnectionTo(Subject.Vertex2)!.Length;
+
+            var d1 = Subject.Center.DegreesTo(Subject.Vertex1);
+            var d2 = Subject.Center.DegreesTo(Subject.Vertex2);
+
+            // If the first segment is "deeper" than the second, we drag it closer for 95deg, and further for 85deg
+            int direction = (d1 > d2) && (d1 < 270 && d1 > 180) ? 1 : -1;
+
+            var offset = (180 - Subject.Degrees) / 2;
+            Log.WriteVar(d1, d2, direction, offset);
+
+            Subject.Vertex1.X = Subject.Center.X + l1 * Math.Cos((d1 + direction * offset) * Math.PI / 180);
+            Subject.Vertex1.Y = Subject.Center.Y + l1 * Math.Sin((d1 + direction * offset) * Math.PI / 180);
+
+            Subject.Vertex2.X = Subject.Center.X + l2 * Math.Cos((d2 - direction * offset) * Math.PI / 180);
+            Subject.Vertex2.Y = Subject.Center.Y + l2 * Math.Sin((d2 - direction * offset) * Math.PI / 180);
+
+            Subject.Vertex1.DispatchOnMovedEvents();
+            Subject.Vertex2.DispatchOnMovedEvents();
+            Subject.Provider.Regenerate();
+
         };
         return m;
     }

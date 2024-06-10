@@ -69,10 +69,10 @@ public partial class DraggableGraphic : Canvas
         }
     }
 
-    public void ForceStartDrag(dynamic args)
+    public void ForceStartDrag(dynamic args, double offsetX = 0, double offsetY = 0)
     {
         CurrentlyDragging = true;
-        _startPosition = new Point(args.GetPosition(null).X, args.GetPosition(null).Y - MainWindow.Instance.MainBoard.GetPosition().Y);
+        _startPosition = new Point(args.GetPosition(null).X + offsetX - ParentBoard.GetPosition().X, args.GetPosition(null).Y + offsetY - ParentBoard.GetPosition().Y);
         _startMousePosition = args.GetPosition(null);
         args.Pointer.Capture(this);
 

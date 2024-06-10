@@ -17,6 +17,6 @@ public partial class Board : IContextMenuSupporter<BoardContextMenuProvider>, IS
 
     public string ToString(bool descriptive)
     {
-        return descriptive ? "Board: " + ToString() : ToString();
+        return descriptive ? "Board - " + ToString() : ToString();
     }
 }
