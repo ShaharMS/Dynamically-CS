@@ -14,6 +14,26 @@ public partial class Quadrilateral {
 
     public static List<(Vertex, Vertex)> GetValidQuadrilateralSides(Vertex A, Vertex B, Vertex C, Vertex D)
     {
+        // First check: vertices not on single line
+        var triplets = new[] {(A, B, C), (A, C, D), (A, D, B), (B, C, D)};
+        foreach (var (a, b, c) in triplets)
+        {
+            var segments = new[] { (a.GetConnectionTo(b), c), (b.GetConnectionTo(c), a), (c.GetConnectionTo(a), b) };
+            foreach (var (segment, potential) in segments)
+            {
+                if (segment == null) continue;
+                if (segment.RayFormula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
+                if (segment.Formula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
+                if (segment.MiddleFormula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
+
+                // second case - within circles
+                if (segment.Roles.Has(Role.CIRCLE_Diameter) && potential.Roles.Has(Role.CIRCLE_Center))
+                {
+
+                }
+            }
+        }
+
         var candidates = new List<((Vertex, Vertex), (Vertex, Vertex))>();
 
         foreach (var pairs in new[] {((A, B), (C, D)), ((A, C), (B, D)), ((A, D), (B, C))}) {
@@ -50,7 +70,7 @@ public partial class Quadrilateral {
         }
 
 
-        throw new ApplicationException("Cannot validate quadrialetral - vertices ");
+        return new List<(Vertex, Vertex)>(); // Not a valid quadrilateral
     }
 
     static void AssignAngles(Quadrilateral quad)
