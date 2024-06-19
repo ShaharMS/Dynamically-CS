@@ -171,12 +171,12 @@ class Tools
         if (a1.Intersect(a2).Any()) return false;
 
         // Case 2: Circum & Incircle
-        var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
-        var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        if (e1.Intersect(e2).Any()) return false;
-        e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
-        e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
-        if (e1.Intersect(e2).Any()) return false;
+        //var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        //var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        //if (e1.Intersect(e2).Any()) return false;
+        //e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        //e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        //if (e1.Intersect(e2).Any()) return false;
 
         // Case 3: corners of the same Triangle
         var b1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);

@@ -14,6 +14,7 @@ using System.Linq;
 using Dynamically.Menus.ContextMenus;
 using Avalonia.Controls;
 using System.Globalization;
+using System.Threading;
 
 namespace Dynamically.Shapes;
 
@@ -108,9 +109,49 @@ public partial class Triangle : DraggableGraphic
         var stats = GetCircleStats();
 
         var circle = new Circle(new Vertex(ParentBoard, stats.x, stats.y), stats.r);
-        circle.Center.Draggable = false;
-        circle.Draggable = false;
+        //circle.Center.Draggable = false;
+        //circle.Draggable = false;
         Incircle = circle;
+        Action<double, double, double, double> __drag = null!, __endDrag = null!;
+        var __startDrag = () =>
+        {
+            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
+            {
+                j.OnMoved.Remove(__RecalculateInCircle);
+            }
+            circle.Center.OnMoved.Add(__drag);
+            circle.Center.OnDragged.Add(__endDrag);
+        };
+
+        __endDrag = (double _, double _, double _, double _) =>
+        {
+            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
+            {
+                j.OnMoved.Add(__RecalculateInCircle);
+            }
+            circle.Center.OnMoved.Remove(__drag);
+            circle.Center.OnDragged.Remove(__endDrag);
+        };
+
+        __drag = (double x, double y, double px, double py) =>
+        {
+            Point current = new Point(x, y), expected = GetIncircleCenter();
+            while (!current.RoughlyEquals(expected))
+            {
+                var dx = current.X - expected.X;
+                var dy = current.Y - expected.Y;
+                foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
+                {
+                    j.X += dx;
+                    j.Y += dy;
+                }
+                expected = GetIncircleCenter();
+            }
+            circle.Radius = GetCircleStats().r;
+            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 }) j.DispatchOnMovedEvents();
+        };
+
+        circle.Center.OnDragStart.Add(__startDrag);
 
         circle.Center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
 

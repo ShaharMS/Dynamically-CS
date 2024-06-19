@@ -71,7 +71,6 @@ public partial class Quadrilateral : DraggableGraphic
 #pragma warning disable CS8618
     public Quadrilateral(Vertex j1, Vertex j2, Vertex j3, Vertex j4) : base(j1.ParentBoard)
     {
-        All.Add(this);
 
         Vertex1 = j1;
         Vertex2 = j2;
@@ -81,7 +80,9 @@ public partial class Quadrilateral : DraggableGraphic
         var sides = Quadrilateral.GetValidQuadrilateralSides(j1, j2, j3, j4);
         Log.WriteVar(sides);
         if (sides.Count == 0) return; // Don't do anything
-        
+
+        All.Add(this);
+
         foreach (var j in new[] { Vertex1, Vertex2, Vertex3, Vertex4 }) j.Roles.AddToRole(Role.QUAD_Corner, this);
 
         for (int i = 0; i < 4; i++) {

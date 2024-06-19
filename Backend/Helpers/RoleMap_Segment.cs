@@ -14,6 +14,15 @@ public partial class RoleMap
     {
         switch (role)
         {
+            // Angle
+            case Role.ANGLE_Bisector:
+                var a1 = item as Angle;
+                Subject.OnRemoved.Add((V1, V2) =>
+                {
+                    if (a1.Center == V1) V2.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                    else V1.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                });
+                break;
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
@@ -39,6 +48,15 @@ public partial class RoleMap
     {
         switch (role)
         {
+            // Angle
+            case Role.ANGLE_Bisector:
+                var a1 = item as Angle;
+                Subject.OnRemoved.Remove((V1, V2) =>
+                {
+                    if (a1.Center == V1) V2.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                    else V1.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                });
+                break;
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;
@@ -65,6 +83,22 @@ public partial class RoleMap
 
         switch (role)
         {
+            // Angle
+            case Role.ANGLE_Bisector:
+                var a1 = item as Angle;
+                From.OnRemoved.Remove((V1, V2) =>
+                {
+                    if (a1.Center == V1) V2.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                    else V1.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                });
+
+                Subject.OnRemoved.Add((V1, V2) =>
+                {
+                    if (a1.Center == V1) V2.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                    else V1.Roles.RemoveFromRole(Role.RAY_On, a1.BisectorRay);
+                });
+                break;
+
             // Circle
             case Role.CIRCLE_Diameter:
                 var c1 = item as Circle;

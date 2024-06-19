@@ -338,9 +338,9 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
+            Subject.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
             Subject.Roles.RemoveFromRole(Role.CIRCLE_Chord, circle);
             circle.Center.Connect(Subject.Vertex1, Subject.Vertex2);
-            Subject.Roles.AddToRole(Role.CIRCLE_Diameter, circle);
             // Don't wait for user gesture, update position right after click
             // Place the diameter at a position that makes sense - same Slope and a bit longer
             var slope = Subject.Formula.Slope;
@@ -375,8 +375,16 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         {
             if (Subject.Formula.Intersects(element.Formula))
             {
-                if (element is Segment seg && (seg.SharesJointWith(Subject) || seg.Formula.Followers.Intersect(Subject.Formula.Followers).Count() == 1)) continue;
-                if (element is Circle c && (c.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2) || Subject.Formula.Followers.Intersect(c.Formula.Followers).Count() >= (Subject.Formula.Intersect(c.Formula)?.Length ?? 0))) continue;
+                if (element is Segment seg && (
+                    seg.SharesJointWith(Subject) || 
+                    seg.Formula.Followers.Intersect(Subject.Formula.Followers).Any() ||
+                    Subject.Formula.Followers.ContainsMany(seg.Vertex1, seg.Vertex2) ||
+                    seg.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2))) continue;
+                if (element is Circle c && (
+                    c.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2) || 
+                    Subject.Formula.Followers.Intersect(c.Formula.Followers).Count() >= (Subject.Formula.Intersect(c.Formula)?.Length ?? 0) ||
+                    Subject.Formula.Followers.Contains(c.Center) ||
+                    c.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2))) continue;
                 var item = new MenuItem
                 {
                     Header = $"Mark Intersection(s) With {(element is IStringifyable ? element.ToString(true) : element.ToString())}"

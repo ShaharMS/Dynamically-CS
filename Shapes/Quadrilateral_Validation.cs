@@ -14,22 +14,30 @@ public partial class Quadrilateral {
 
     public static List<(Vertex, Vertex)> GetValidQuadrilateralSides(Vertex A, Vertex B, Vertex C, Vertex D)
     {
+        Log.Write("Checking quadrilateral: " + A + " " + B + " " + C + " " + D);
         // First check: vertices not on single line
         var triplets = new[] {(A, B, C), (A, C, D), (A, D, B), (B, C, D)};
         foreach (var (a, b, c) in triplets)
         {
+            Log.WriteVar(a, b, c);
             var segments = new[] { (a.GetConnectionTo(b), c), (b.GetConnectionTo(c), a), (c.GetConnectionTo(a), b) };
             foreach (var (segment, potential) in segments)
             {
+                Log.WriteVar(segment, potential);
                 if (segment == null) continue;
+                // first case - vertex on line
                 if (segment.RayFormula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
                 if (segment.Formula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
                 if (segment.MiddleFormula.Followers.Contains(potential)) return new List<(Vertex, Vertex)>();
-
+                Log.WriteVar(segment.Roles.Underlying);
                 // second case - within circles
                 if (segment.Roles.Has(Role.CIRCLE_Diameter) && potential.Roles.Has(Role.CIRCLE_Center))
                 {
-
+                    foreach (var circle in segment.Roles.Access<Circle>(Role.CIRCLE_Diameter))
+                    {
+                        Log.WriteVar(circle, potential);
+                        if (circle.Contains(potential)) return new List<(Vertex, Vertex)>();
+                    }
                 }
             }
         }

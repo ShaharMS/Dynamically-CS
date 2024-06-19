@@ -295,7 +295,7 @@ public partial class Board : DraggableGraphic
 
     public override void Render(DrawingContext context)
     {
-        Log.WriteVar(Window.Width, Window.Height, ScreenX, ScreenX);
+        //Log.WriteVar(Window.Width, Window.Height, ScreenX, ScreenX);
         context.DrawRectangle(UIColors.BoardColor, null, new Rect(0, 0, Window.Width - ScreenX, Window.Height - ScreenY));
         for (double i = -ScreenX; i < Window.Width - ScreenX; i += UIDesign.BoardSquareSize)
         {
