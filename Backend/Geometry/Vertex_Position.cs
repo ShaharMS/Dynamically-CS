@@ -32,7 +32,6 @@ public partial class Vertex
     int safety = 0;
     double epsilon = 0.70710678118; //0.5 * sqrt(2), for a diagonal of 0.5px
 
-    double lastX = double.NaN, lastY = double.NaN;
 
     bool dispatchingOnMoved = false;
 
@@ -44,7 +43,6 @@ public partial class Vertex
     /// <param name="py"></param>
     public override void DispatchOnMovedEvents(double? px = null, double? py = null)
     {
-        if (X.RoughlyEquals(lastX) && Y.RoughlyEquals(lastY)) return;
         double x = X, y = Y;
         px ??= X;
         py ??= Y;
@@ -86,7 +84,5 @@ public partial class Vertex
             dispatchingOnMoved = false; 
         }
         Reposition();
-        lastX = X;
-        lastY = Y;
     }
 }

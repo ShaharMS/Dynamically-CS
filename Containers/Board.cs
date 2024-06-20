@@ -24,6 +24,21 @@ namespace Dynamically.Containers;
 
 public partial class Board : DraggableGraphic
 {
+    /// <summary>
+    /// Saved in a separate list as well for convenience
+    /// </summary>
+    public List<Vertex> Vertices { get; private set; } = new();
+    public List<DraggableGraphic> Items { get; private set; } = new();
+
+    public Dictionary<Type, List<DraggableGraphic>> ItemsByType { get; private set; } = new()
+    {
+        {typeof(Vertex), new List<DraggableGraphic>() },
+        {typeof(Segment), new List<DraggableGraphic>() },
+        {typeof(Angle), new List<DraggableGraphic>() },
+        {typeof(Circle), new List<DraggableGraphic>() },
+        {typeof(Triangle), new List<DraggableGraphic>() },
+        {typeof(Quadrilateral), new List<DraggableGraphic>() }
+    };
 
     public double MouseX
     {
@@ -85,6 +100,14 @@ public partial class Board : DraggableGraphic
         Window.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
         Window.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
         Window.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
+    }
+
+    public void AddChild(DraggableGraphic child)
+    {
+        if (child is Vertex vertex) Vertices.Add(vertex);
+        Items.Add(child);
+        ItemsByType[child.GetType()].Add(child);
+        Children.Add(child);
     }
 
     public void Refresh()
