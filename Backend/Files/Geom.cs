@@ -15,10 +15,12 @@ public class Geom : IFileFormat
 
     public static string Extension => "geom";
 
-
     public static byte[] Save(Board board)
     {
         var builder = new MemoryStream();
+
+        // Write the expected amount of bytes at position 0.
+        builder.Write(BitConverter.GetBytes(0x00_00_00_00_00_00_00_00));
 
         // Mark the file as a GEOM file
         builder.Write(BitConverter.GetBytes(MagicNumber));
