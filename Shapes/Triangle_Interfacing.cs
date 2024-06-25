@@ -2,6 +2,7 @@
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Formulas;
 using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,10 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>, ISelectable, IMovementFreezable
+public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsAdjacency, IContextMenuSupporter<TriangleContextMenuProvider>, ISelectable, IMovementFreezable, IHasFormula<TriangleIncircleFormula>
 {
     public TriangleContextMenuProvider Provider { get; }
+    public TriangleIncircleFormula Formula { get; set; }
 
     public void Dismantle()
     {
@@ -22,11 +24,6 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         if (Vertex1.GotRemoved) Vertex1.Disconnect(Vertex2, Vertex3);
         if (Vertex2.GotRemoved) Vertex2.Disconnect(Vertex1, Vertex3);
         if (Vertex3.GotRemoved) Vertex3.Disconnect(Vertex2, Vertex1);
-
-        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
-        {
-            j.OnMoved.Remove(__RecalculateInCircle);
-        }
 
         if (Incircle != null)
         {
@@ -44,19 +41,6 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
         Triangle.All.Remove(this);
         MainWindow.Instance.MainBoard.Children.Remove(this);
-    }
-
-
-    public void __RecalculateInCircle(double ux, double uy, double px, double py)
-    {
-        var stats = GetCircleStats();
-        if (Incircle == null) return;
-        Incircle.Center.X = stats.x; // No need to validate movement, this value "doesn't matter"
-        Incircle.Center.Y = stats.y;
-        Incircle.Radius = stats.r;
-        Incircle.UpdateFormula();
-        Incircle.InvalidateVisual();
-        foreach (var listener in Incircle.Center.OnMoved) listener(Incircle.Center.X, Incircle.Center.Y, px, py);
     }
 
     public void __Disment(Vertex z, Vertex x)

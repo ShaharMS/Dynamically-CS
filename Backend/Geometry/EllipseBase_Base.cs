@@ -137,7 +137,6 @@ public partial class EllipseBase : DraggableGraphic, IDrawable
         {
             Draggable = Draggable
         };
-        Roles = new RoleMap(this);
 
         Focal1.OnMoved.Add(__focal_redraw);
         Focal2.OnMoved.Add(__focal_redraw);

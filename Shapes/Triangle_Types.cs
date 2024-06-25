@@ -229,7 +229,7 @@ public partial class Triangle
         C.X = B.X + dist * Math.Cos(radBC - remainingGap / 2 * oppose); 
         C.Y = B.Y + dist * Math.Sin(radBC - remainingGap / 2 * oppose); 
 
-        EQ_temp_incircle_center = new Point(GetCircleStats().x, GetCircleStats().y);
+        EQ_temp_incircle_center = new Point(Formula.CenterX, Formula.CenterY);
     }
 
     public void MakeIsoscelesRightRelativeToABC(Vertex A, Vertex B, Vertex C) {

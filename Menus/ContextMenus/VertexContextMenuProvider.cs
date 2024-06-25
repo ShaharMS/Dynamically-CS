@@ -21,6 +21,8 @@ using System.Reactive.Subjects;
 using Avalonia.Media;
 using System.Threading;
 using Avalonia.Interactivity;
+using CSharpMath.Atom.Atoms;
+using System.Data;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -419,6 +421,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         if (veryCloseTo.Count == 0) return null;
         if (veryCloseTo.Count == 1)
         {
+            if (veryCloseTo[0].Id == '_') return null;
             var m = new MenuItem
             {
                 Header = $"Merge With {veryCloseTo[0]}",
@@ -449,6 +452,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         var list = new List<MenuItem>();
         foreach (var cj in veryCloseTo)
         {
+            if (cj.Id == '_') continue;
             var m = new MenuItem
             {
                 Header = $"Merge With {cj}",
@@ -514,7 +518,24 @@ public class VertexContextMenuProvider : ContextMenuProvider
                         {
                             if (veryCloseTo[0] == t.Incircle)
                             {
-                                t.Incircle?.Roles.AddToRole(Role.VERTEX_On, Subject);
+                                // TODO: Workaround, reveisit later
+                                var circle = new Circle(Subject.GetMock(), t.Incircle.Radius);
+                                t.Incircle.Formula.OnChange.Add(() =>
+                                {
+                                    if (!circle.Radius.RoughlyEquals(t.Incircle.Radius)) circle.Radius = t.Incircle.Radius;
+                                });
+                                
+                                t.Incircle?.Center.Roles.AddToRole(Role.CIRCLE_On, circle);
+                                t.ParentBoard.Children.Remove(circle);
+                                t.ParentBoard.Children.Remove(circle.Ring);
+
+                                // Still add the role, just quietly
+                                if (Subject.Roles.Underlying.ContainsKey(Role.CIRCLE_On)) Subject.Roles.Underlying[Role.CIRCLE_On].Add(t.Incircle!);
+                                else
+                                {
+                                    Subject.Roles.Underlying[Role.CIRCLE_On] = new List<object> { t.Incircle! };
+                                    Subject.Roles.Count++;
+                                }
                             }
                         }
                     }

@@ -47,7 +47,6 @@ public partial class Triangle : DraggableGraphic
     public Triangle(Vertex j1, Vertex j2, Vertex j3) : base(j1.ParentBoard)
     {
         All.Add(this);
-
         Vertex1 = j1;
         Vertex2 = j2;
         Vertex3 = j3;
@@ -66,9 +65,14 @@ public partial class Triangle : DraggableGraphic
         Provider = new TriangleContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
+        Formula = new TriangleIncircleFormula(this, null);
+
+
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((x, y, px, py) =>
         {
+            Log.WriteVar(x, y, px, py);
+            Log.WriteVar(ParentBoard.MouseX, ParentBoard.MouseY);
             if (Vertex1.Anchored || Vertex2.Anchored || Vertex3.Anchored)
             {
                 this.SetPosition(0, 0);
@@ -106,94 +110,17 @@ public partial class Triangle : DraggableGraphic
 
     public Circle GenerateInCircle()
     {
-        var stats = GetCircleStats();
-
-        var circle = new Circle(new Vertex(ParentBoard, stats.x, stats.y), stats.r);
+        var circle = new Circle(new Vertex(ParentBoard, Formula.CenterX, Formula.CenterY), Formula.Radius);
         //circle.Center.Draggable = false;
         //circle.Draggable = false;
         Incircle = circle;
-        Action<double, double, double, double> __drag = null!, __endDrag = null!;
-        var __startDrag = () =>
-        {
-            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
-            {
-                j.OnMoved.Remove(__RecalculateInCircle);
-            }
-            circle.Center.OnMoved.Add(__drag);
-            circle.Center.OnDragged.Add(__endDrag);
-        };
-
-        __endDrag = (double _, double _, double _, double _) =>
-        {
-            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
-            {
-                j.OnMoved.Add(__RecalculateInCircle);
-            }
-            circle.Center.OnMoved.Remove(__drag);
-            circle.Center.OnDragged.Remove(__endDrag);
-        };
-
-        __drag = (double x, double y, double px, double py) =>
-        {
-            Point current = new Point(x, y), expected = GetIncircleCenter();
-            while (!current.RoughlyEquals(expected))
-            {
-                var dx = current.X - expected.X;
-                var dy = current.Y - expected.Y;
-                foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
-                {
-                    j.X += dx;
-                    j.Y += dy;
-                }
-                expected = GetIncircleCenter();
-            }
-            circle.Radius = GetCircleStats().r;
-            foreach (var j in new[] { Vertex1, Vertex2, Vertex3 }) j.DispatchOnMovedEvents();
-        };
-
-        circle.Center.OnDragStart.Add(__startDrag);
+        Formula.Circle = circle;
 
         circle.Center.Roles.AddToRole(Role.TRIANGLE_InCircleCenter, this);
-
-        foreach (var j in new[] { Vertex1, Vertex2, Vertex3 })
-        {
-            j.OnMoved.Add(__RecalculateInCircle);
-        }
 
         Provider.Regenerate();
 
         return circle;
-    }
-
-    Stats GetCircleStats()
-    {
-        // Calculate the lengths of the Triangle sides
-        double a = Vertex2.DistanceTo(Vertex3);
-        double b = Vertex1.DistanceTo(Vertex3);
-        double c = Vertex1.DistanceTo(Vertex2);
-
-        // Calculate the semiperimeter of the Triangle
-        double s = (a + b + c) / 2;
-
-        // Calculate the Radius of the inscribed circle
-        double radius = Math.Sqrt((s - a) * (s - b) * (s - c) / s);
-
-        // Calculate the coordinates of the Center of the inscribed circle
-        double centerX = (a * Vertex1.X + b * Vertex2.X + c * Vertex3.X) / (a + b + c);
-        double centerY = (a * Vertex1.Y + b * Vertex2.Y + c * Vertex3.Y) / (a + b + c);
-
-        return new Stats
-        {
-            x = centerX,
-            y = centerY,
-            r = radius
-        };
-    }
-
-    public Point GetIncircleCenter()
-    {
-        var s = GetCircleStats();
-        return new Point(s.x, s.y);
     }
 
     public List<(TriangleType type, string details, double confidence)> SuggestTypes()
@@ -223,8 +150,7 @@ public partial class Triangle : DraggableGraphic
     }
     public override double GetClosenessToCenter(Point point)
     {
-        var stats = GetCircleStats();
-        return point.DistanceTo(stats.x, stats.y);
+        return point.DistanceTo(Formula.Center);
     }
 
     public override void Render(DrawingContext context)

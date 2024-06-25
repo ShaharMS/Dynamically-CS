@@ -33,9 +33,9 @@ public partial class RoleMap
         return Underlying.GetEnumerator();
     }
 
-    public Either<Vertex, EllipseBase, Segment> Subject;
+    public Either<Vertex, Circle /*May exist later*/, Segment> Subject;
 
-    public int Count { get; private set; }
+    public int Count { get; set; }
     public List<object> this[Role role]
     {
         get => Access<object>(role);
@@ -47,7 +47,7 @@ public partial class RoleMap
         }
     }
 
-    public RoleMap(Either<Vertex, EllipseBase, Segment> subject) : base()
+    public RoleMap(Either<Vertex, Circle, Segment> subject) : base()
     {
         Subject = subject;
         Count = 0;
@@ -149,7 +149,6 @@ public partial class RoleMap
         if (Underlying[role].Count == 1) Count++;
 
         if (Subject.Is<Vertex>())  Vertex__AddToRole(role, item, Subject.L());
-        else if (Subject.Is<EllipseBase>()) EllipseBase__AddToRole(role, item, Subject.M());
         else Segment__AddToRole(role, item, Subject.R());
 
         return item;
@@ -162,7 +161,6 @@ public partial class RoleMap
         Underlying[role].Remove(item);
 
         if (Subject.Is<Vertex>()) Vertex__RemoveFromRole(role, item, Subject.L());
-        else if (Subject.Is<EllipseBase>()) EllipseBase__RemoveFromRole(role, item, Subject.M());
         else Segment__RemoveFromRole(role, item, Subject.R());
         
 
@@ -192,7 +190,6 @@ public partial class RoleMap
                 if (Underlying[role].Count == 1) Count++;
 
                 if (Subject.Is<Vertex>()) Vertex__TransferRole(Roles.Subject.L(), role, item, Subject.L());
-                else if (Subject.Is<EllipseBase>()) EllipseBase__TransferRole(Roles.Subject.M(), role, item, Subject.M());
                 else Segment__TransferRole(Roles.Subject.R(), role, item, Subject.R());
             }
         }

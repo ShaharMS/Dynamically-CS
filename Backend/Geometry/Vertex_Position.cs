@@ -81,4 +81,18 @@ public partial class Vertex
         }
         Reposition();
     }
+
+    /// <summary>
+    /// Returns a mock Vertex, exactly similar to this one, but invisible.
+    /// </summary>
+    /// <returns></returns>
+    public Vertex GetMock()
+    {
+        var v = new Vertex(ParentBoard, X, Y);
+        v.Id = '_';
+        ParentBoard.Children.Remove(v.IdDisplay);
+        ParentBoard.Children.Remove(v);
+        OnMoved.Add((double _, double _, double _, double _) => { v.X = X; v.Y = Y; });
+        return v;
+    }
 }

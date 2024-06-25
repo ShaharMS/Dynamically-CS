@@ -77,6 +77,7 @@ public partial class DraggableGraphic : Canvas
         args.Pointer.Capture(this);
 
         DispatchOnDragStartEvents();
+        Log.Write("Drag Started");
     }
 
     protected override void OnPointerEnter(PointerEventArgs e)
@@ -96,7 +97,13 @@ public partial class DraggableGraphic : Canvas
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
+        if (e.GetCurrentPoint(this).Properties.IsRightButtonPressed) 
+        { 
+            CurrentlyDragging = false;
+            e.Pointer?.Capture(null);
 
+            DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
+        }
         if (Draggable && e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
         {
             CurrentlyDragging = true;
@@ -120,6 +127,7 @@ public partial class DraggableGraphic : Canvas
             DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
 
         }
+        Log.Write("Drag Ended");
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)

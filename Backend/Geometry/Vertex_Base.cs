@@ -88,7 +88,7 @@ public partial class Vertex : DraggableGraphic
         Formula = new PointFormula(this);
 
 
-        MainWindow.Instance.MainBoard.Children.Add(IdDisplay);
+        ParentBoard.Children.Add(IdDisplay);
 
         X = x;
         Y = y;
@@ -106,7 +106,7 @@ public partial class Vertex : DraggableGraphic
 
         All.Add(this);
 
-        MainWindow.Instance.MainBoard.Children.Add(this);
+        ParentBoard.Children.Add(this);
 
         Width = Height = UIDesign.JointGraphicCircleRadius * 2;
     }

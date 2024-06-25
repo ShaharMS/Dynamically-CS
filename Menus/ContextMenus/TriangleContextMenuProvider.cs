@@ -88,7 +88,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         rotate.Click += (sender, e) =>
         {
             Point p1 = new(Subject.Vertex1.X, Subject.Vertex1.Y), p2 = new(Subject.Vertex2.X, Subject.Vertex2.Y), p3 = new(Subject.Vertex3.X, Subject.Vertex3.Y);
-            Point rotationCenter = Subject.GetIncircleCenter();
+            Point rotationCenter = Subject.Formula.Center;
             double dist1 = Subject.Vertex1.DistanceTo(rotationCenter), dist2 = Subject.Vertex2.DistanceTo(rotationCenter), dist3 = Subject.Vertex3.DistanceTo(rotationCenter);
             double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
 

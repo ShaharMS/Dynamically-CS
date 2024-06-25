@@ -9,7 +9,7 @@ namespace Dynamically.Backend.Geometry;
 
 public enum Role
 {
-    // Vertex, EllipseBase
+    // Vertex
 
     VERTEX_On,
 
