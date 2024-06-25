@@ -7,6 +7,7 @@ using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Helpers.Containers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Containers;
+using Dynamically.Formulas;
 using Dynamically.Shapes;
 using System;
 using System.Collections.Generic;
@@ -173,7 +174,13 @@ public class CircleContextMenuProvider : ContextMenuProvider
                 item.Click += (_, _) =>
                 {
                     Point[] intersections = Subject.Formula.Intersect(element.Formula);
-                    List<Vertex> existing = Subject.Formula.Followers.Intersect((List<Vertex>)element.Formula.Followers).ToList();
+                    List<Vertex> existing = Subject.Formula.Followers
+                        .Where(x => x is Vertex)
+                        .Cast<Vertex>()
+                        .Intersect(((IHasFormula<Formula>)element).Formula.Followers
+                            .Where(x => x is Vertex)
+                            .Cast<Vertex>()
+                        ).ToList();
                     foreach (var p in intersections)
                     {
                         if (existing.ContainsRoughly(p)) continue;

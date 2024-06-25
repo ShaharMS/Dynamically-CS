@@ -304,7 +304,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                 j2.Disconnect(j1, joint);
                 var con = j1.Connect(joint);
                 j2.Roles.AddToRole(Role.SEGMENT_On, con);
-                foreach (var f in followers.ToHashSet())
+                foreach (Vertex f in followers.Where(x => x is Vertex).Cast<Vertex>().ToHashSet())
                 {
                     f.Roles.AddToRole(Role.SEGMENT_On, con);
                 }
@@ -400,7 +400,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
                     else
                     { // element is Circle
                         Point[] intersections = Subject.Formula.Intersect(element.Formula);
-                        List<Vertex> existing = Subject.Formula.Followers.Intersect((List<Vertex>)element.Formula.Followers).ToList();
+                        List<Vertex> existing = Subject.Formula.Followers.Intersect(((List<ICanFollowFormula>)element.Formula.Followers)).Where(x => x is Vertex).Cast<Vertex>().ToList();
                         foreach (var p in intersections)
                         {
                             if (existing.ContainsRoughly(p)) continue;

@@ -1,7 +1,9 @@
 using Avalonia;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
+using Dynamically.Backend.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +14,7 @@ public abstract class Formula
 {
     public List<Action> OnChange = new();
     public List<Action<double, double, double, double>> OnMoved = new();
-    public List<Vertex> Followers = new();
+    public List<ICanFollowFormula> Followers = new();
 
     public bool QueueRemoval = false;
     public abstract double[] SolveForX(double y);
@@ -43,30 +45,30 @@ public abstract class Formula
     {
         OnMoved.Add((curX, curY, preX, preY) =>
         {
-            foreach (var joint in Followers)
+            foreach (var obj in Followers)
             {
                 // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
-                if (MainWindow.Instance.MainBoard.Selection?.EncapsulatedElements.Contains(joint) ?? false) continue;
-                joint.X = joint.X - preX + curX;
-                joint.Y = joint.Y - preY + curY;
-                joint.DispatchOnMovedEvents(joint.X + preX - curX, joint.Y + preY - curY);
+                if (obj is DraggableGraphic draggable && (MainWindow.Instance.MainBoard.Selection?.EncapsulatedElements.Contains(draggable) ?? false)) continue;
+                obj.X = obj.X - preX + curX;
+                obj.Y = obj.Y - preY + curY;
+                obj.DispatchOnMovedEvents(obj.X + preX - curX, obj.Y + preY - curY);
             }
         });
         OnChange.Add(UpdateFollowers);
     }
 
-    public virtual void AddFollower(Vertex joint)
+    public virtual void AddFollower(ICanFollowFormula obj)
     {
-        Followers.Add(joint);
-        joint.PositioningByFormula.Add(UpdateJointPosition);
-        joint.DispatchOnMovedEvents();
+        Followers.Add(obj);
+        obj.PositioningByFormula.Add(UpdateJointPosition);
+        obj.DispatchOnMovedEvents();
     }
 
-    public virtual void RemoveFollower(Vertex joint)
+    public virtual void RemoveFollower(ICanFollowFormula obj)
     {
-        Followers.Remove(joint);
-        joint.PositioningByFormula.Remove(UpdateJointPosition);
+        Followers.Remove(obj);
+        obj.PositioningByFormula.Remove(UpdateJointPosition);
     }
 
     public virtual void RemoveAllFollowers()
@@ -88,9 +90,9 @@ public abstract class Formula
 
     public virtual void UpdateFollowers()
     {
-        foreach(var vertex in Followers.ToList())
+        foreach(var obj in Followers.ToList())
         {
-            vertex.DispatchOnMovedEvents();
+            obj.DispatchOnMovedEvents();
         }
     }
 }

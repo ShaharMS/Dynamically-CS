@@ -328,12 +328,12 @@ public class AngleContextMenuProvider : ContextMenuProvider
             };
             return item;
         }
-        else if (Subject.BisectorRay.Followers.Count == 1)
+        else if (Subject.BisectorRay.Followers.Count == 1 && Subject.BisectorRay.Followers[0] is Vertex vertex)
         {
             return new MenuItem
             {
-                Header = $"Angle Bisector {Subject.Center.GetConnectionTo(Subject.BisectorRay.Followers[0])}",
-                Items = Subject.Center.GetConnectionTo(Subject.BisectorRay.Followers[0])?.Provider.Items ?? new List<Control> {
+                Header = $"Angle Bisector {Subject.Center.GetConnectionTo(vertex)}",
+                Items = Subject.Center.GetConnectionTo(vertex)?.Provider.Items ?? new List<Control> {
                     new Label {
                         Content = "Error: Angle bisector not found."
                     }
@@ -347,15 +347,18 @@ public class AngleContextMenuProvider : ContextMenuProvider
                 var items = new List<MenuItem>();
                 foreach (var follower in Subject.BisectorRay.Followers)
                 {
-                    items.Add(new MenuItem
+                    if (follower is Vertex vertex)
                     {
-                        Header = $"Angle Bisector {Subject.Center.GetConnectionTo(follower)}",
-                        Items = Subject.Center.GetConnectionTo(follower)?.Provider.Items ?? new List<Control> {
+                        items.Add(new MenuItem
+                        {
+                            Header = $"Angle Bisector {Subject.Center.GetConnectionTo(vertex)}",
+                            Items = Subject.Center.GetConnectionTo(vertex)?.Provider.Items ?? new List<Control> {
                             new Label {
                                 Content = "Error: Angle bisector not found."
                             }
                         }
-                    });
+                        });
+                    }
                 }
                 return items;
             };

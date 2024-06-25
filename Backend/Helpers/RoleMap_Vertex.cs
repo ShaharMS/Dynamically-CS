@@ -208,7 +208,7 @@ public partial class RoleMap
                 break;
             case Role.CIRCLE_Center:
                 From.EffectedFormulas.Remove((item as Circle).Formula);
-                Subject.EffectedFormulas.Remove((item as Circle).Formula);
+                Subject.EffectedFormulas.Add((item as Circle).Formula);
                 (item as Circle).Set(Subject, (item as Circle).Radius);
                 foreach (Vertex joint in Subject.Relations)
                 {

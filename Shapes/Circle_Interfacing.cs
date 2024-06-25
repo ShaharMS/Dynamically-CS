@@ -24,7 +24,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         Center.Roles.RemoveFromRole(Role.CIRCLE_Center, this);
         foreach (var follower in Formula.Followers.ToArray())
         {
-            follower.Roles.RemoveFromRole(Role.CIRCLE_On, this);
+            if (follower is Vertex vertex) vertex.Roles.RemoveFromRole(Role.CIRCLE_On, this);
         }
         Formula.QueueRemoval = true;
         onResize.Clear();

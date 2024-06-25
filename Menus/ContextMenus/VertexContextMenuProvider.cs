@@ -507,7 +507,19 @@ public class VertexContextMenuProvider : ContextMenuProvider
             {
                 if (veryCloseTo[0] is Circle)
                 {
-                    Subject.Roles.AddToRole(Role.CIRCLE_On, veryCloseTo[0] as Circle);
+                    // To prevent a stack overflow, in case of a circum-circle mounted on an incircle,
+                    // We have to mount the circle on the vertex instead of the other way around
+                    if (Subject.Roles.Has(Role.TRIANGLE_CircumCircleCenter)) {
+                        foreach (Triangle t in Subject.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter))
+                        {
+                            if (veryCloseTo[0] == t.Incircle)
+                            {
+                                t.Incircle?.Roles.AddToRole(Role.VERTEX_On, Subject);
+                            }
+                        }
+                    }
+                    else
+                        Subject.Roles.AddToRole(Role.CIRCLE_On, veryCloseTo[0] as Circle);
                 }
                 else if (veryCloseTo[0] is Segment)
                 {

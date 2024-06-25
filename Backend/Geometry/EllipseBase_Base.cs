@@ -2,6 +2,7 @@
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend;
+using Dynamically.Backend.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ using Dynamically.Design;
 
 namespace Dynamically.Backend.Geometry;
 
-public class EllipseBase : DraggableGraphic, IDrawable
+public partial class EllipseBase : DraggableGraphic, IDrawable
 {
 
     public static readonly List<EllipseBase> All = new();
@@ -47,6 +48,72 @@ public class EllipseBase : DraggableGraphic, IDrawable
         }
     }
 
+    public double CenterX
+    {
+        get => (Focal1.X + Focal2.X) / 2;
+        set
+        {
+            if (Anchored) return;
+            else if (Focal1.Anchored || Focal2.Anchored) 
+            { 
+                var anc = Focal1.Anchored ? Focal1 : Focal2;
+                var other = Focal1.Anchored ? Focal2 : Focal1;
+
+                var dist = anc.DistanceTo(value, CenterY);
+                var angle = anc.RadiansTo(value, CenterY);
+
+                other.X = anc.X + 2 * dist * Math.Cos(angle);
+                other.Y = anc.Y + 2 * dist * Math.Sin(angle);
+                other.DispatchOnMovedEvents();
+            }
+            else
+            {
+                Focal1.X = value - (Focal1.X - Focal2.X) / 2;
+                Focal2.X = value + (Focal1.X - Focal2.X) / 2;
+                Focal1.DispatchOnMovedEvents();
+                Focal2.DispatchOnMovedEvents();
+            }
+        }
+    }
+    public double CenterY 
+    {
+        get => (Focal1.Y + Focal2.Y) / 2;
+        set
+        {
+            if (Anchored) return;
+            else if (Focal1.Anchored || Focal2.Anchored) 
+            { 
+                var anc = Focal1.Anchored ? Focal1 : Focal2;
+                var other = Focal1.Anchored ? Focal2 : Focal1;
+
+                var dist = anc.DistanceTo(CenterX, value);
+                var angle = anc.RadiansTo(CenterX, value);
+
+                other.X = anc.X + 2 * dist * Math.Cos(angle);
+                other.Y = anc.Y + 2 * dist * Math.Sin(angle);
+
+                other.DispatchOnMovedEvents();
+            }
+            else
+            {
+                Focal1.Y = value - (Focal1.Y - Focal2.Y) / 2;
+                Focal2.Y = value + (Focal1.Y - Focal2.Y) / 2;
+                Focal1.DispatchOnMovedEvents();
+                Focal2.DispatchOnMovedEvents();
+            }
+        }
+    }
+
+    public Point Center => new(CenterX, CenterY);
+    /// <summary>
+    /// Ellipse's semi-major axis
+    /// </summary>
+    public double A => DistanceSum / 2;
+
+    public double B => Math.Sqrt(DistanceSum.Pow(2) / 4 - C.Pow(2));
+
+    public double C => Focal1.DistanceTo(Focal2) / 2;
+
     public override bool Draggable
     {
         set
@@ -55,6 +122,8 @@ public class EllipseBase : DraggableGraphic, IDrawable
             if (Ring != null) Ring.Draggable = value;
         }
     }
+
+    public bool Anchored => Focal1.Anchored && Focal2.Anchored;
 
     public double DistanceSum { get; set; }
 
@@ -68,7 +137,7 @@ public class EllipseBase : DraggableGraphic, IDrawable
         {
             Draggable = Draggable
         };
-        All.Add(this);
+        Roles = new RoleMap(this);
 
         Focal1.OnMoved.Add(__focal_redraw);
         Focal2.OnMoved.Add(__focal_redraw);
@@ -80,6 +149,9 @@ public class EllipseBase : DraggableGraphic, IDrawable
 
         MainWindow.Instance.MainBoard.Children.Insert(0, this);
         MainWindow.Instance.MainBoard.Children.Insert(0, Ring);
+
+        All.Add(this);
+
         InvalidateVisual();
     }
 
@@ -118,7 +190,6 @@ internal class Ring : DraggableGraphic
     public Ring(EllipseBase el) : base(el.ParentBoard)
     {
 
-        All.Add(this);
         Ellipse = el;
 
         OnMoved.Add((double _, double _, double _, double _) =>
@@ -133,6 +204,8 @@ internal class Ring : DraggableGraphic
                 foreach (var l in Ellipse.OnMoved) l(X, Y, X, Y);
             });
         OnDragged.Add(MainWindow.RegenAll);
+
+        All.Add(this);
 
     }
 

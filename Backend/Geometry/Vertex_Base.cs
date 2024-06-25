@@ -85,7 +85,7 @@ public partial class Vertex : DraggableGraphic
         else Id = id;
 
         Roles = new RoleMap(this);
-
+        Formula = new PointFormula(this);
 
 
         MainWindow.Instance.MainBoard.Children.Add(IdDisplay);

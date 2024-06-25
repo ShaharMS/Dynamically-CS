@@ -9,7 +9,10 @@ namespace Dynamically.Backend.Geometry;
 
 public enum Role
 {
-    // Vertex
+    // Vertex, EllipseBase
+
+    VERTEX_On,
+
     RAY_On,
 
     SEGMENT_Corner,
@@ -41,6 +44,9 @@ public enum Role
 
     QUAD_Side,
     QUAD_Hypotenuse,
+
+    // EllipseBase
+
 
     /// <summary>
     /// Used only in internal RoleMap class.

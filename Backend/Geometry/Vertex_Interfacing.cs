@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Formulas;
 using Dynamically.Menus.ContextMenus;
 using Dynamically.Shapes;
 using System;
@@ -12,14 +13,22 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Backend.Geometry;
 
-public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable, IMovementFreezable
+public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable, IMovementFreezable, IHasFormula<PointFormula>, ICanFollowFormula
 {
+    public override double X { get => base.X; set { if (dispatchingOnMoved) Log.Warn($"Cannot edit Vertex {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
+    public override double Y { get => base.Y; set { if (dispatchingOnMoved) Log.Warn($"Cannot edit Vertex {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
+
+    List<Func<double, double, (double X, double Y)>> _positioningByFormula = new();
+    public List<Func<double, double, (double X, double Y)>> PositioningByFormula => _positioningByFormula;
+
     /// <summary>
     /// This is used to associate joints with the shapes & formulas they're on. <br/>
     /// for example, given a circle, and a Triangle formed with one joint being the Center, 
     /// the joint's <c>Roles</c> map would contain the circle and the Triangle. <br />
     /// </summary>
     public RoleMap Roles { get; set; }
+
+    public PointFormula Formula { get; set; }
 
     public VertexContextMenuProvider Provider { get; }
 
@@ -87,4 +96,26 @@ public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenu
 
         return true;
     }
+
+    public bool Contains(Vertex joint)
+    {
+        return this == joint;
+    }
+
+    public bool Contains(Segment segment)
+    {
+        return false;
+    }
+
+    public bool HasMounted(Vertex joint)
+    {
+        return Formula.Followers.Contains(joint);
+    }
+
+    public bool HasMounted(Segment segment)
+    {
+        return Formula.Followers.Contains(segment.Vertex1) && Formula.Followers.Contains(segment.Vertex2);
+    }
+
+
 }
