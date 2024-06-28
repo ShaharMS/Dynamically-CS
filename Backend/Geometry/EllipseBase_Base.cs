@@ -146,8 +146,8 @@ public partial class EllipseBase : DraggableGraphic, IDrawable
         Focal1.OnRemoved.Add(__remove);
         Focal1.OnRemoved.Add(__remove);
 
-        MainWindow.Instance.MainBoard.Children.Insert(0, this);
-        MainWindow.Instance.MainBoard.Children.Insert(0, Ring);
+        ParentBoard.Children.Insert(0, this);
+        ParentBoard.Children.Insert(0, Ring);
 
         All.Add(this);
 
@@ -177,8 +177,8 @@ public partial class EllipseBase : DraggableGraphic, IDrawable
     private void __remove(double z, double x)
     {
         _ = z; _ = x;
-        MainWindow.Instance.MainBoard.Children.Remove(this);
-        MainWindow.Instance.MainBoard.Children.Remove(Ring);
+        ParentBoard.Children.Remove(this);
+        ParentBoard.Children.Remove(Ring);
     }
 }
 internal class Ring : DraggableGraphic

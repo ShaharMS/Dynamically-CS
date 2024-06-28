@@ -151,7 +151,7 @@ public partial class Board : DraggableGraphic
 
         void EvalConnection(object? sender, PointerEventArgs args)
         {
-            var pos = args.GetPosition(null);
+            var pos = args.GetPosition(this);
             bool attached = false;
 
             foreach (var j in filtered)

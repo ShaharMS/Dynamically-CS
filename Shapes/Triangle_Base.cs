@@ -71,8 +71,7 @@ public partial class Triangle : DraggableGraphic
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((x, y, px, py) =>
         {
-            Log.WriteVar(x, y, px, py);
-            Log.WriteVar(ParentBoard.MouseX, ParentBoard.MouseY);
+
             if (Vertex1.Anchored || Vertex2.Anchored || Vertex3.Anchored)
             {
                 this.SetPosition(0, 0);

@@ -155,7 +155,7 @@ public partial class DraggableGraphic : Canvas
         var pen = new Pen(brush, 2);
 
         // Create a rectangle to draw based on X and Y properties
-        var rect = new Rect(new Point(X, Y), new Size(100, 100));
+        var rect = new Rect(new Point(0, 0), new Size(100, 100));
 
         // Draw the rectangle
         context.DrawRectangle(brush, pen, rect);

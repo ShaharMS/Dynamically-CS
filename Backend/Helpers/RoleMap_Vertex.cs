@@ -78,7 +78,6 @@ public partial class RoleMap
                     t2.Incircle.Center.CurrentlyDragging = false;
                     t2.ForceStartDrag(t2.ParentBoard.Mouse, -t2.ParentBoard.MouseX + t2.X, -t2.ParentBoard.MouseY + t2.Y);
                 });
-                t2.Incircle.Center.OnMoved.Add((_, _, _, _) => Log.WriteVar(t2.X, t2.Y));
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:

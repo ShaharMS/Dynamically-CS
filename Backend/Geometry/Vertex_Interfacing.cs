@@ -48,7 +48,7 @@ public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenu
 
     public override bool Overlaps(Point point)
     {
-        return X - Width / 2 < point.X && Y - Width / 2 + MainWindow.Instance.MainBoard.GetPosition().Y < point.Y && X + Width / 2 > point.X && Y + MainWindow.Instance.MainBoard.GetPosition().Y + Height / 2 > point.Y;
+        return X - Width / 2 < point.X && Y - Width / 2 < point.Y && X + Width / 2 > point.X && Y + Height / 2 > point.Y;
     }
 
     public override double Area()

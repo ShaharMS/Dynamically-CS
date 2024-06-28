@@ -67,6 +67,7 @@ public partial class MainWindow : Window
 
         var q1 = new Quadrilateral(new Vertex(MainBoard, 600, 350), new Vertex(MainBoard, 900, 300), new Vertex(MainBoard, 600, 450), new Vertex(MainBoard, 900, 600));
 
+        var a1 = new Arc(new Vertex(MainBoard, 250, 400), 230);
 
         _ = new Angle(j0, j, j11);
 
