@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Dynamically.Backend.Graphics;
+namespace Dynamically.Backend;
 
-public static class GraphicTools
+public static class GraphicsExtensions
 {
     public static double GuessTextWidth(this Label label, string? text = null)
     {

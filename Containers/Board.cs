@@ -49,11 +49,9 @@ public partial class Board : DraggableGraphic
     {
         get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).Y ?? -1;
     }
+    public Point MousePosition => new(MouseX, MouseY);
 
-    public PointerEventArgs Mouse
-    {
-        get => MainWindow.Mouse;
-    }
+    public PointerEventArgs Mouse { get; private set; }
 
     private DraggableGraphic _focused;
     public DraggableGraphic FocusedObject
@@ -101,6 +99,15 @@ public partial class Board : DraggableGraphic
         Window.AddHandler(PointerPressedEvent, TryStartSelection, RoutingStrategies.Bubble);
         Window.AddHandler(PointerPressedEvent, SetCurrentFocus, RoutingStrategies.Bubble);
         Window.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
+    
+        Window.AddHandler(PointerMovedEvent, UpdateMouseInfo, RoutingStrategies.Bubble);
+    }
+
+    public void UpdateMouseInfo(object? sender, PointerEventArgs e) => Mouse = e;
+
+    public void AddChild(Control control)
+    {
+        Children.Add(control);
     }
 
     public void AddChild(DraggableGraphic child)
@@ -109,6 +116,26 @@ public partial class Board : DraggableGraphic
         Items.Add(child);
         ItemsByType[child.GetType()].Add(child);
         Children.Add(child);
+    }
+
+    public void AddChildAt(DraggableGraphic child, int index)
+    {
+        if (child is Vertex vertex) Vertices.Insert(index, vertex);
+        Items.Insert(index, child);
+        ItemsByType[child.GetType()].Insert(index, child);
+        Children.Insert(index, child);
+    }
+
+    public void RemoveChild(Control control)
+    {
+        Children.Remove(control);
+    }
+    public void RemoveChild(DraggableGraphic child)
+    {
+        if (child is Vertex vertex) Vertices.Remove(vertex);
+        Items.Remove(child);
+        ItemsByType[child.GetType()].Remove(child);
+        Children.Remove(child);
     }
 
     public void Refresh()
@@ -143,7 +170,7 @@ public partial class Board : DraggableGraphic
         filtered.Remove(potential);
 
 
-        potential.ForceStartDrag(MainWindow.Mouse);
+        potential.ForceStartDrag(Mouse);
         var current = potential;
 
         var alreadyDisconnected = new List<Vertex>();
@@ -197,14 +224,14 @@ public partial class Board : DraggableGraphic
 #pragma warning restore CS8604 // Possible null reference argument.
             }
 
-            MainWindow.Instance.PointerMoved -= EvalConnection;
-            MainWindow.Instance.PointerReleased -= Finish;
+            Window.PointerMoved -= EvalConnection;
+            Window.PointerReleased -= Finish;
 
             MainWindow.RegenAll(0,0,0,0);
         }
 
-        MainWindow.Instance.PointerMoved += EvalConnection;
-        MainWindow.Instance.PointerReleased += Finish;
+        Window.PointerMoved += EvalConnection;
+        Window.PointerReleased += Finish;
     }
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
@@ -269,14 +296,14 @@ public partial class Board : DraggableGraphic
         {
             if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             {
-                MainWindow.Instance.PointerMoved -= a;
+                Window.PointerMoved -= a;
                 Selection?.Cancel();
                 return;
             }
             Selection = new Selection(pos, this);
-            MainWindow.Instance.PointerMoved -= a;
+            Window.PointerMoved -= a;
         };
-        MainWindow.Instance.PointerMoved += a;
+        Window.PointerMoved += a;
     }
 
     private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from MainWindow

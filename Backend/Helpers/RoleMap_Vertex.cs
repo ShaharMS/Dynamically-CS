@@ -53,9 +53,7 @@ public partial class RoleMap
                 }
                 break;
             case Role.CIRCLE_Center:
-                Subject.OnDragStart.Add((item as Circle).__circle_Moving);
                 Subject.OnMoved.Add((item as Circle).__circle_OnChange);
-                Subject.OnDragged.Add((item as Circle).__circle_StopMoving);
                 Subject.OnRemoved.Add((item as Circle).__circle_Remove);
                 Subject.EffectedFormulas.Add((item as Circle).Formula);
                 foreach (Vertex joint in Subject.Relations) {
@@ -138,8 +136,6 @@ public partial class RoleMap
                 break;
             case Role.CIRCLE_Center:
                 (item as Circle).Center.OnMoved.Remove((item as Circle).__circle_OnChange);
-                (item as Circle).Center.OnDragStart.Remove((item as Circle).__circle_Moving);
-                (item as Circle).Center.OnDragged.Remove((item as Circle).__circle_StopMoving);
                 (item as Circle).Center.OnRemoved.Remove((item as Circle).__circle_Remove);
                 (item as Circle).Center.EffectedFormulas.Remove((item as Circle).Formula);
                 foreach (Vertex joint in Subject.Relations) {

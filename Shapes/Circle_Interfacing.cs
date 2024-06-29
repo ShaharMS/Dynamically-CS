@@ -34,8 +34,8 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         foreach (var l in OnRemoved) l();
         OnRemoved.Clear();
 
-        MainWindow.Instance.MainBoard.Children.Remove(Ring);
-        MainWindow.Instance.MainBoard.Children.Remove(this);
+        ParentBoard.RemoveChild(Ring);
+        ParentBoard.RemoveChild(this);
     }
     public void __circle_OnChange(double z, double x, double c, double v)
     {
@@ -46,16 +46,6 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
         _ = z; _ = x;
         Log.Write($"Removing circle {this}");
         Dismantle();
-    }
-    public void __circle_Moving()
-    {
-        if (CurrentlyDragging) Formula.Moving = true;
-    }
-    public void __circle_StopMoving(double z, double x, double c, double v)
-    {
-
-        _ = z; _ = x; _ = c; _ = v;
-        Formula.Moving = false;
     }
 
     public void __circle_handleDiameter(Vertex dominant, Vertex moving)

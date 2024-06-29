@@ -19,8 +19,6 @@ public partial class MainWindow : Window
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
     public static MainWindow Instance { get; private set; }
-    public static PointerEventArgs Mouse { get; set; }
-
     public static bool Debug { get; set; } = true;
 
     private static DockPanel MainPanel;
@@ -70,9 +68,6 @@ public partial class MainWindow : Window
         var a1 = new Arc(new Vertex(MainBoard, 250, 400), 230);
 
         _ = new Angle(j0, j, j11);
-
-        AddHandler(PointerMovedEvent, (o, a) => { Mouse = a;}, RoutingStrategies.Tunnel);
-
 
 
         foreach (DraggableGraphic obj in Vertex.All.ToList<DraggableGraphic>().Concat(Segment.All).Concat(Ring.All)) obj.OnDragged.Add(RegenAll);

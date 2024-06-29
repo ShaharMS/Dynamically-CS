@@ -40,7 +40,7 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         }
 
         Triangle.All.Remove(this);
-        MainWindow.Instance.MainBoard.Children.Remove(this);
+        ParentBoard.RemoveChild(this);
     }
 
     public void __Disment(Vertex z, Vertex x)

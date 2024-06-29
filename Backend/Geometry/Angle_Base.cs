@@ -134,7 +134,7 @@ public partial class Angle : DraggableGraphic
 
 
 
-        MainWindow.Instance.MainBoard.Children.Insert(0, this);
+        ParentBoard.AddChildAt(this, 0);
 
         BisectorRay = new RayFormula(Center, Math.Tan(GetBisectorRadians()));
 
@@ -284,7 +284,7 @@ public partial class Angle : DraggableGraphic
     public void RemoveFromBoard()
     {
         All.Remove(this);
-        MainWindow.Instance.MainBoard.Children.Remove(this);
+        ParentBoard.RemoveChild(this);
     }
 }
 

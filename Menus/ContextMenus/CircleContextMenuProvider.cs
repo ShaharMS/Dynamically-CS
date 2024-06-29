@@ -122,9 +122,9 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            Subject.ParentBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
 
         return item;
@@ -139,9 +139,9 @@ public class CircleContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            Subject.ParentBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
             var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);

@@ -227,10 +227,10 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         c.Click += (o, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.SEGMENT_On, Subject);
 
-            j.ForceStartDrag(MainWindow.Mouse);
+            j.ForceStartDrag(Subject.ParentBoard.Mouse);
         };
 
         return c;
@@ -244,7 +244,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         };
         m.Click += (o, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.SEGMENT_Center, Subject);
         };
 

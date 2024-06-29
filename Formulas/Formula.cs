@@ -49,7 +49,7 @@ public abstract class Formula
             {
                 // If a formula moves an element encapsulated within the Instance selection,
                 // We get double movement. to prevent this:
-                if (obj is DraggableGraphic draggable && (MainWindow.Instance.MainBoard.Selection?.EncapsulatedElements.Contains(draggable) ?? false)) continue;
+                if (obj is DraggableGraphic draggable && (draggable.ParentBoard.Selection?.EncapsulatedElements.Contains(draggable) ?? false)) continue;
                 obj.X = obj.X - preX + curX;
                 obj.Y = obj.Y - preY + curY;
                 obj.DispatchOnMovedEvents(obj.X + preX - curX, obj.Y + preY - curY);

@@ -83,7 +83,6 @@ public partial class Triangle : DraggableGraphic
             Vertex1.Y += y - py;
             Vertex2.Y += y - py;
             Vertex3.Y += y - py;
-            EQ_temp_incircle_center = new Point(EQ_temp_incircle_center.X + x - px, EQ_temp_incircle_center.Y + y - py);
             Vertex1.DispatchOnMovedEvents();
             Vertex2.DispatchOnMovedEvents();
             Vertex3.DispatchOnMovedEvents();
@@ -94,7 +93,7 @@ public partial class Triangle : DraggableGraphic
         });
         OnDragged.Add(MainWindow.RegenAll);
 
-        MainWindow.Instance.MainBoard.Children.Add(this);
+        ParentBoard.AddChild(this);
 
         MainWindow.RegenAll(0, 0, 0, 0);
         Provider.Regenerate();
@@ -147,10 +146,6 @@ public partial class Triangle : DraggableGraphic
 
         return l;
     }
-    public override double GetClosenessToCenter(Point point)
-    {
-        return point.DistanceTo(Formula.Center);
-    }
 
     public override void Render(DrawingContext context)
     {
@@ -167,7 +162,7 @@ public partial class Triangle : DraggableGraphic
 
         geom.Figures.Add(figure);
 
-        if (MainWindow.Instance.MainBoard.HoveredObject == this && (MainWindow.Instance.MainBoard.FocusedObject == this || MainWindow.Instance.MainBoard.FocusedObject is not IShape))
+        if (ParentBoard.HoveredObject == this && (ParentBoard.FocusedObject == this || ParentBoard.FocusedObject is not IShape))
         {
             context.DrawGeometry(UIColors.ShapeHoverFill, null, geom);
         }

@@ -146,7 +146,7 @@ public partial class Segment : DraggableGraphic
         };
 
 
-        MainWindow.Instance.MainBoard.Children.Add(Label);
+        ParentBoard.AddChild(Label);
 
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((_, _, _, _) =>

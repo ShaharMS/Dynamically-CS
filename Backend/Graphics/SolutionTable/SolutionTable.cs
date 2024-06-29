@@ -116,7 +116,7 @@ public class SolutionTable : Canvas
 
 
         Children.Add(border);
-        MainWindow.Instance.MainBoard.Children.Add(Handle);
+        ParentBoard.AddChild(Handle);
 
         for (int i = 0; i < 4; i++) AddRow(
             new TableRow(this)

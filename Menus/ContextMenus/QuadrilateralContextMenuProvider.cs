@@ -91,7 +91,7 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
             Point p1 = new Point(Subject.Vertex1.X, Subject.Vertex1.Y), p2 = new Point(Subject.Vertex2.X, Subject.Vertex2.Y), p3 = new Point(Subject.Vertex3.X, Subject.Vertex3.Y), p4 = new Point(Subject.Vertex4.X, Subject.Vertex4.Y);
             Point rotationCenter = Subject.GetCentroid();
             double dist1 = Subject.Vertex1.DistanceTo(rotationCenter), dist2 = Subject.Vertex2.DistanceTo(rotationCenter), dist3 = Subject.Vertex3.DistanceTo(rotationCenter), dist4 = Subject.Vertex4.DistanceTo(rotationCenter);
-            double initialRotationRad = rotationCenter.RadiansTo(MainWindow.Mouse.GetPosition(null));
+            double initialRotationRad = rotationCenter.RadiansTo(Subject.ParentBoard.MousePosition);
 
             double rad1 = rotationCenter.RadiansTo(p1), rad2 = rotationCenter.RadiansTo(p2), rad3 = rotationCenter.RadiansTo(p3), rad4 = rotationCenter.RadiansTo(p4);
 
@@ -107,12 +107,12 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
 
             void Finish(object? sender, PointerPressedEventArgs arg)
             {
-                MainWindow.Instance.PointerMoved -= Move;
-                MainWindow.Instance.PointerPressed -= Finish;
+                Subject.ParentBoard.Window.PointerMoved -= Move;
+                Subject.ParentBoard.Window.PointerPressed -= Finish;
             }
 
-            MainWindow.Instance.PointerMoved += Move;
-            MainWindow.Instance.PointerPressed += Finish;
+            Subject.ParentBoard.Window.PointerMoved += Move;
+            Subject.ParentBoard.Window.PointerPressed += Finish;
         };
 
 

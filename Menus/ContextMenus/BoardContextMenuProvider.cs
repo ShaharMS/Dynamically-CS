@@ -54,7 +54,7 @@ public class BoardContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            _ = new Vertex(Subject, Subject.Mouse.GetPosition(null));
+            _ = new Vertex(Subject, Subject.MousePosition);
         };
         return item;
     }
@@ -67,8 +67,8 @@ public class BoardContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var p = Subject.Mouse.GetPosition(null);
-            _ = new Segment(new Vertex(Subject, new Avalonia.Point(p.X - 50, p.Y + 10)), new Vertex(Subject, new Avalonia.Point(p.X + 50, p.Y - 10)));
+            var p = Subject.MousePosition;
+            _ = new Segment(new Vertex(Subject, p), new Vertex(Subject, p));
         };
         return item;
     }
@@ -81,8 +81,8 @@ public class BoardContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var p = Subject.Mouse.GetPosition(null);
-            _ = new Circle(new Vertex(Subject, new Avalonia.Point(p.X, p.Y)), 100);
+            var p = Subject.MousePosition;
+            _ = new Circle(new Vertex(Subject, p), 100);
         };
         return item;
     }
@@ -95,7 +95,7 @@ public class BoardContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var p = Subject.Mouse.GetPosition(null);
+            var p = Subject.MousePosition;
             _ = new Triangle(
                 new Vertex(Subject, new Avalonia.Point(p.X - 100, p.Y)),
                 new Vertex(Subject, new Avalonia.Point(p.X + 100, p.Y)),
@@ -112,7 +112,7 @@ public class BoardContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var p = Subject.Mouse.GetPosition(null);
+            var p = Subject.MousePosition;
             _ = new Quadrilateral(
                 new Vertex(Subject, new Avalonia.Point(p.X + 100, p.Y)),
                 new Vertex(Subject, new Avalonia.Point(p.X - 100, p.Y)),

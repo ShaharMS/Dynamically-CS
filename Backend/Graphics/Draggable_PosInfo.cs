@@ -55,9 +55,4 @@ public partial class DraggableGraphic
     {
         return Width * Height;
     }
-
-    public virtual double GetClosenessToCenter(Point point)
-    {
-        return point.DistanceTo(ScreenX, ScreenY);
-    }
 }

@@ -17,8 +17,8 @@ public partial class DraggableGraphic
     public bool IsPressed { get; set; }
     public new bool IsFocused
     {
-        get => MainWindow.Instance.MainBoard.FocusedObject == this;
-        set => MainWindow.Instance.MainBoard.FocusedObject = this;
+        get => ParentBoard.FocusedObject == this;
+        set => ParentBoard.FocusedObject = this;
     }
 
     public DraggableGraphic(Board board)

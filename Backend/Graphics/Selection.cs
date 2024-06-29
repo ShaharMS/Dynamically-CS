@@ -56,8 +56,8 @@ public class Selection : DraggableGraphic, IStringifyable
         Provider = new SelectionContextMenuProvider(this, ContextMenu);
         ContextMenu.Items = Provider.Items;
 
-        MainWindow.Instance.PointerMoved += EvalSelection;
-        MainWindow.Instance.PointerReleased += FinishSelection;
+        ParentBoard.PointerMoved += EvalSelection;
+        ParentBoard.PointerReleased += FinishSelection;
     }
 
     public Selection(Point start, Point end, Board parent) : base(parent)
@@ -104,8 +104,8 @@ public class Selection : DraggableGraphic, IStringifyable
 
         ParentBoard.FocusedObject = this;
 
-        MainWindow.Instance.PointerMoved -= EvalSelection;
-        MainWindow.Instance.PointerReleased -= FinishSelection;
+        ParentBoard.PointerMoved -= EvalSelection;
+        ParentBoard.PointerReleased -= FinishSelection;
     }
 
     private void EvalSelection(object? sender, PointerEventArgs e)
@@ -142,8 +142,8 @@ public class Selection : DraggableGraphic, IStringifyable
 
     public void Cancel()
     {
-        MainWindow.Instance.PointerMoved -= EvalSelection;
-        MainWindow.Instance.PointerReleased -= FinishSelection;
+        ParentBoard.PointerMoved -= EvalSelection;
+        ParentBoard.PointerReleased -= FinishSelection;
         ParentBoard.Children.Remove(this);
         ParentBoard.Selection = null;
         EncapsulatedElements.Clear();

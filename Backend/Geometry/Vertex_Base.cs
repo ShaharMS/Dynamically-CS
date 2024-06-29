@@ -171,8 +171,8 @@ public partial class Vertex : DraggableGraphic
 
         IDGenerator.Remove(this);
 
-        MainWindow.Instance.MainBoard.Children.Remove(this);
-        MainWindow.Instance.MainBoard.Children.Remove(IdDisplay);
+        ParentBoard.RemoveChild(this);
+        ParentBoard.RemoveChild(IdDisplay);
 
         OnMoved.Clear();
         OnDragged.Clear();

@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 namespace Dynamically.Formulas;
 public class CircleFormula : Formula
 {
-    public bool Moving { get; set; }
     double _radius;
     public double Radius
     {

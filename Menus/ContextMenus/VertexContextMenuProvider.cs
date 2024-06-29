@@ -170,8 +170,8 @@ public class VertexContextMenuProvider : ContextMenuProvider
 
         connect.Click += (s, args) =>
         {
-            var potential = new Vertex(Subject.ParentBoard, MainWindow.Mouse.GetPosition(null));
-            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, potential);
+            var potential = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
+            Subject.ParentBoard.HandleCreateConnection(Subject, potential);
         };
 
         return connect;
@@ -360,9 +360,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            Subject.ParentBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
 
         return item;
@@ -379,9 +379,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
         };
         item.Click += (sender, e) =>
         {
-            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.Mouse.GetPosition(null));
+            var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            MainWindow.Instance.MainBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            Subject.ParentBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
             var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);

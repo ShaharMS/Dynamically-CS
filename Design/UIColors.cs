@@ -9,26 +9,26 @@ namespace Dynamically.Design;
 
 public class UIColors
 {
-    public static IBrush ShapeHoverFill = new SolidColorBrush(Color.FromUInt32(0x22FFFFFF));
-    public static IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0x00000000));
-    public static IBrush ConnectionColor = new SolidColorBrush(Colors.White);
-    public static IBrush JointOutlineColor = new SolidColorBrush(Colors.White);
-    public static IBrush JointFillColor = new SolidColorBrush(Colors.Black);
-    public static IBrush BottomNoteFill = new SolidColorBrush(Color.FromUInt32(0x66000000));
-    public static IBrush BottomNoteColor = new SolidColorBrush(Colors.White);
-    public static IBrush SelectionFill = new SolidColorBrush(Color.FromUInt32(0x220000FF));
-    public static Pen SelectionOutline = new Pen
+    public static readonly IBrush ShapeHoverFill = new SolidColorBrush(Color.FromUInt32(0x22FFFFFF));
+    public static readonly IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0x00000000));
+    public static readonly IBrush ConnectionColor = new SolidColorBrush(Colors.White);
+    public static readonly IBrush JointOutlineColor = new SolidColorBrush(Colors.White);
+    public static readonly IBrush JointFillColor = new SolidColorBrush(Colors.Black);
+    public static readonly IBrush BottomNoteFill = new SolidColorBrush(Color.FromUInt32(0x66000000));
+    public static readonly IBrush BottomNoteColor = new SolidColorBrush(Colors.White);
+    public static readonly IBrush SelectionFill = new SolidColorBrush(Color.FromUInt32(0x220000FF));
+
+    public static Pen SelectionOutline => new()
     {
         Brush = new SolidColorBrush(Colors.White),
         DashStyle = DashStyle.Dash,
         Thickness = UIDesign.SelectionOutlineWidth
     };
+    public static Pen ConnectionPen => new() { Brush = ConnectionColor, Thickness = UIDesign.ConnectionGraphicWidth };
 
-    public static IBrush BigScreenBackground = new SolidColorBrush(Colors.Black);
 
-    public static IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);
-    public static IBrush SolutionTableFill = new SolidColorBrush(Colors.Black);
-
-    public static IBrush BoardSquaresColor = new SolidColorBrush(Colors.RoyalBlue, 0.5);
-    public static IBrush BoardColor = new SolidColorBrush(Colors.Black);
+    public static readonly IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);
+    public static readonly IBrush SolutionTableFill = new SolidColorBrush(Colors.Black);
+    public static readonly IBrush BoardSquaresColor = new SolidColorBrush(Colors.RoyalBlue, 0.5);
+    public static readonly IBrush BoardColor = new SolidColorBrush(Colors.Black);
 }

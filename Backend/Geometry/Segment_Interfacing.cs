@@ -1,6 +1,5 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
-using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
 using Dynamically.Menus.ContextMenus;

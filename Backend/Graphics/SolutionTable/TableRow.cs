@@ -73,7 +73,7 @@ public class TableRow : Canvas
         
         border.SetPosition(0, 0);
         Children.Add(border);
-        MainWindow.Instance.MainBoard.Children.Add(Handle);
+        MainWindow.Instance.MainBoard.AddChild(Handle);
     }
 
     public void AttemptMovement()
