@@ -38,6 +38,11 @@ public partial class RoleMap
             case Role.SEGMENT_Center:
                 (item as Segment).MiddleFormula.AddFollower(Subject);
                 break;
+            // Arc
+            case Role.ARC_On:
+                (item as Arc).Formula.AddFollower(Subject);
+                break;
+
             // Circle
             case Role.CIRCLE_On:
                 (item as Circle).Formula.AddFollower(Subject);

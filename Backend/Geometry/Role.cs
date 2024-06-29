@@ -19,6 +19,10 @@ public enum Role
     SEGMENT_On,
     SEGMENT_Center,
 
+    ARC_Center,
+    ARC_Corner,
+    ARC_On,
+
     CIRCLE_Center,
     CIRCLE_On,
 
@@ -37,6 +41,11 @@ public enum Role
     CIRCLE_Diameter,
     CIRCLE_Chord,
     CIRCLE_Tangent,
+
+    ARC_Radius,
+    ARC_Diameter,
+    ARC_Chord,
+    ARC_Tangent,
 
     TRIANGLE_Side,
     TRIANGLE_AngleBisector,

@@ -23,8 +23,7 @@ public partial class Circle : EllipseBase
 
     public static new readonly List<Circle> All = new();
 
-
-    public Vertex Center;
+    public new Vertex Center;
 
     public List<Action<double, double>> onResize = new();
 

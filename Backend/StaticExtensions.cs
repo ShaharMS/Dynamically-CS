@@ -15,110 +15,75 @@ namespace Dynamically.Backend;
 
 public static class StaticExtensions
 {
-    public static double DistanceTo(this Point from, Point to)
-    {
-        double x = from.X - to.X;
-        double y = from.Y - to.Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public static double DistanceTo(this Vertex from, Vertex to)
-    {
-        double x = from.X - to.X;
-        double y = from.Y - to.Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public static double DistanceTo(this Vertex from, Point to)
-    {
-        double x = from.X - to.X;
-        double y = from.Y - to.Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public static double DistanceTo(this Vertex from, double X, double Y)
-    {
-        double x = from.X - X;
-        double y = from.Y - Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-    public static double DistanceTo(this Point from, double X, double Y)
-    {
-        double x = from.X - X;
-        double y = from.Y - Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public static double DistanceTo(this (double, double) from, (double, double) to)
-    {
-        double x = from.Item1 - to.Item1;
-        double y = from.Item2 - to.Item2;
-        return Math.Sqrt(x * x + y * y);
-    }
-
-    public static double DistanceTo(this (double, double) from, Point to)
-    {
-        double x = from.Item1 - to.X;
-        double y = from.Item2 - to.Y;
-        return Math.Sqrt(x * x + y * y);
-    }
-    public static double DistanceTo(this (double, double) from, Vertex to)
-    {
-        double x = from.Item1 - to.X;
-        double y = from.Item2 - to.Y;
-        return Math.Sqrt(x * x + y * y);
-    }
     public static double DistanceTo(this (double, double) from, double X, double Y)
     {
         double x = from.Item1 - X;
         double y = from.Item2 - Y;
         return Math.Sqrt(x * x + y * y);
     }
+    public static double DistanceTo(this Point from, Vertex to) => DistanceTo(from, to.X, to.Y);
+    public static double DistanceTo(this Point from, Point to) => DistanceTo((from.X, from.Y), to.X, to.Y);
+    public static double DistanceTo(this Point from, double X, double Y) => DistanceTo((from.X, from.Y), X, Y);
+    public static double DistanceTo(this Point from, (double, double) to) => DistanceTo(from, to.Item1, to.Item2);
 
-    public static double DistanceTo(this Formula from, Point p)
-    {
-        return from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p) ?? new Point(double.NaN, double.NaN)) : double.NaN;
-    }
+    public static double DistanceTo(this Vertex from, Vertex to) => DistanceTo((from.X, from.Y), (to.X, to.Y));
+    public static double DistanceTo(this Vertex from, Point to) => DistanceTo((from.X, from.Y), to.X, to.Y);
+    public static double DistanceTo(this Vertex from, double X, double Y) => DistanceTo(from, X, Y);
+    public static double DistanceTo(this Vertex from, (double, double) to) => DistanceTo((from.X, from.Y), to.Item1, to.Item2);
 
-    public static double DistanceTo(this Formula from, Vertex j)
+    public static double DistanceTo(this (double, double) from, Point to) => DistanceTo(from, to.X, to.Y);
+    public static double DistanceTo(this (double, double) from, Vertex to) => DistanceTo(from, (to.X, to.Y));
+    public static double DistanceTo(this (double, double) from, (double, double) to) => DistanceTo(from, to.Item1, to.Item2);
+
+    public static double DistanceTo(this Formula from, Point p) => from.GetClosestOnFormula(p) != null ? p.DistanceTo(from.GetClosestOnFormula(p) ?? new Point(double.NaN, double.NaN)) : double.NaN;
+    public static double DistanceTo(this Formula from, Vertex j) => DistanceTo(from, j);
+    public static double DistanceTo(this Formula from, double X, double Y) => DistanceTo(from, new Point(X, Y));
+    public static double DistanceTo(this Formula from, (double, double) p) => DistanceTo(from, new Point(p.Item1, p.Item2));
+    
+    public static double DegreesTo(this (double, double) from, double X, double Y) 
     {
-        return DistanceTo(from, j);
-    }
-    public static double DistanceTo(this Formula from, double X, double Y)
-    {
-        return DistanceTo(from, new Point(X, Y));
-    }
-    public static double DegreesTo(this Point from, Point to)
-    {
-        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
+        double angleInRadians = Math.Atan2(Y - from.Item2, X - from.Item1);
         double angleInDegrees = angleInRadians * (180.0 / Math.PI);
         if (angleInDegrees < 0) angleInDegrees += 360;
         return angleInDegrees;
     }
+    
+    public static double DegreesTo(this Point from, Vertex to) => DegreesTo((from.X, from.Y), to.X, to.Y);
+    public static double DegreesTo(this Point from, Point to) => DegreesTo((from.X, from.Y), to.X, to.Y);
+    public static double DegreesTo(this Point from, double x, double y) => DegreesTo((from.X, from.Y), new Point(x, y));
+    public static double DegreesTo(this Point from, (double, double) to) => DegreesTo((from.X, from.Y), to.Item1, to.Item2);
 
-    public static double DegreesTo(this Vertex from, Point to)
-    {
-        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
-        double angleInDegrees = angleInRadians * (180.0 / Math.PI);
-        if (angleInDegrees < 0) angleInDegrees += 360;
-        return angleInDegrees;
-    }
+    public static double DegreesTo(this Vertex from, Vertex to) => DegreesTo((from.X, from.Y), (to.X, to.Y));
+    public static double DegreesTo(this Vertex from, Point to) => DegreesTo((from.X, from.Y), to.X, to.Y);
+    public static double DegreesTo(this Vertex from, double x, double y) => DegreesTo((from.X, from.Y), new Point(x, y));
+    public static double DegreesTo(this Vertex from, (double, double) to) => DegreesTo((from.X, from.Y), to.Item1, to.Item2);
 
-    public static double RadiansTo(this Point from, Point to)
+    public static double DegreesTo(this (double, double) from, Point to) => DegreesTo(from, to.X, to.Y);
+    public static double DegreesTo(this (double, double) from, Vertex to) => DegreesTo(from, (to.X, to.Y));
+    public static double DegreesTo(this (double, double) from, (double, double) to) => DegreesTo(from, to.Item1, to.Item2);
+
+
+    public static double RadiansTo(this (double, double) from, double X, double Y) 
     {
-        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
+        double angleInRadians = Math.Atan2(Y - from.Item2, X - from.Item1);
         if (angleInRadians < 0) angleInRadians += Math.PI * 2;
         return angleInRadians;
     }
+    
+    public static double RadiansTo(this Point from, Vertex to) => RadiansTo((from.X, from.Y), to.X, to.Y);
+    public static double RadiansTo(this Point from, Point to) => RadiansTo((from.X, from.Y), to.X, to.Y);
+    public static double RadiansTo(this Point from, double x, double y) => RadiansTo((from.X, from.Y), new Point(x, y));
+    public static double RadiansTo(this Point from, (double, double) to) => RadiansTo((from.X, from.Y), to.Item1, to.Item2);
 
-    public static double RadiansTo(this Vertex from, Point to)
-    {
-        double angleInRadians = Math.Atan2(to.Y - from.Y, to.X - from.X);
-        if (angleInRadians < 0) angleInRadians += Math.PI * 2;
-        return angleInRadians;
-    }
-    public static double RadiansTo(this Point from, double x, double y) => RadiansTo(from, new Point(x, y));
-    public static double RadiansTo(this Vertex from, double x, double y) => RadiansTo(from, new Point(x, y));
+    public static double RadiansTo(this Vertex from, Vertex to) => RadiansTo((from.X, from.Y), (to.X, to.Y));
+    public static double RadiansTo(this Vertex from, Point to) => RadiansTo((from.X, from.Y), to.X, to.Y);
+    public static double RadiansTo(this Vertex from, double x, double y) => RadiansTo((from.X, from.Y), new Point(x, y));
+    public static double RadiansTo(this Vertex from, (double, double) to) => RadiansTo((from.X, from.Y), to.Item1, to.Item2);
+
+    public static double RadiansTo(this (double, double) from, Point to) => RadiansTo(from, to.X, to.Y);
+    public static double RadiansTo(this (double, double) from, Vertex to) => RadiansTo(from, (to.X, to.Y));
+    public static double RadiansTo(this (double, double) from, (double, double) to) => RadiansTo(from, to.Item1, to.Item2);
+
 
     public static double Pow(this double b, double exponent)
     {

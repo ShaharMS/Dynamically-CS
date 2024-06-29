@@ -36,6 +36,7 @@ public partial class Board : DraggableGraphic
         {typeof(Segment), new List<DraggableGraphic>() },
         {typeof(Angle), new List<DraggableGraphic>() },
         {typeof(Circle), new List<DraggableGraphic>() },
+        {typeof(Arc), new List<DraggableGraphic>() },
         {typeof(Triangle), new List<DraggableGraphic>() },
         {typeof(Quadrilateral), new List<DraggableGraphic>() }
     };

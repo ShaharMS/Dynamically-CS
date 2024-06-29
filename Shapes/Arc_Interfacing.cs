@@ -1,10 +1,11 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Media;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using Dynamically.Formulas;
+using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,9 +14,13 @@ using System.Threading.Tasks;
 
 namespace Dynamically.Shapes;
 
-public partial class Arc : IHasFormula<CircleFormula>
+public partial class Arc : IHasFormula<ArcFormula>, IShape, IStringifyable, IDismantable, IDrawable, IMovementFreezable, ISelectable, ISupportsAdjacency, IContextMenuSupporter<ArcContextMenuProvider>
 {
-    public CircleFormula Formula { get; set; }
+    public ArcFormula Formula { get; set; }
+
+    public CircleFormula CircleFormula { get; set; }
+
+    public ArcContextMenuProvider Provider { get; }
 
     public bool Contains(Vertex joint)
     {
@@ -40,5 +45,33 @@ public partial class Arc : IHasFormula<CircleFormula>
     public override double Area()
     {
         return Radius * Radius * Math.PI * (TotalDegrees / 360);
+    }
+
+public override string ToString()
+    {
+        return $"◠${StartEdge}${EndEdge}";
+    }
+    public string ToString(bool descriptive)
+    {
+        return descriptive ? "Arc - " + ToString() : ToString();
+    }
+
+    public void Dismantle()
+    {
+        ParentBoard.Children.Remove(this);
+    }
+
+    public void Reposition()
+    {
+    }
+
+    public bool IsMovable()
+    {
+        return Center.IsMovable() && StartEdge.IsMovable() && EndEdge.IsMovable();
+    }
+
+    public bool EncapsulatedWithin(Rect rect)
+    {
+        return Center.EncapsulatedWithin(rect) && StartEdge.EncapsulatedWithin(rect) && EndEdge.EncapsulatedWithin(rect);
     }
 }

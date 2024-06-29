@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Dynamically.Formulas;
 public class CircleFormula : Formula
 {
-    public bool Moving;
+    public bool Moving { get; set; }
     double _radius;
     public double Radius
     {
@@ -45,20 +45,13 @@ public class CircleFormula : Formula
         }
     }
 
-    public void QuietSet(double radius, double centerX, double centerY)
-    {
-        _radius = radius;
-        _centerX = centerX;
-        _centerY = centerY;
-    }
+
     public CircleFormula(double radius, double centerX, double centerY) : base()
     {
         Radius = radius;
         CenterX = centerX;
         CenterY = centerY;
     }
-
-    public CircleFormula(double radius, Point center) : this(radius, center.X, center.Y) { }
 
     public Point[] Intersect(RayFormula formula) => formula.Intersect(this);
     public Point[] Intersect(SegmentFormula formula) => formula.Intersect(this);

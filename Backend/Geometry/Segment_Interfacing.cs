@@ -107,7 +107,7 @@ public partial class Segment : IDrawable, IDismantable, IStringifyable, ISupport
     public void Dismantle()
     {
         Vertex1.Disconnect(Vertex2);
-        MainWindow.Instance.MainBoard.Children.Remove(Label);
+        ParentBoard.Children.Remove(Label);
     }
 #pragma warning restore IDE1006
     public bool EncapsulatedWithin(Rect rect)

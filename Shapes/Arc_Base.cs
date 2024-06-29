@@ -1,4 +1,5 @@
 ﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Media;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
@@ -6,6 +7,7 @@ using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using Dynamically.Formulas;
+using Dynamically.Menus.ContextMenus;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,8 @@ namespace Dynamically.Shapes;
 
 public partial class Arc : DraggableGraphic
 {
+    public static List<Arc> All = new();
+
     double _startDegrees;
     public double StartDegrees
     {
@@ -39,22 +43,10 @@ public partial class Arc : DraggableGraphic
     }
     public double TotalDegrees => Math.Abs(EndDegrees - StartDegrees);
 
-    bool _showEdges = true;
-    public bool ShowEdges
-    {
-        get => _showEdges;
-        set
-        {
-            _showEdges = value;
-            InvalidateVisual();
-        }
-    }
-
     public Vertex StartEdge { get; set; }
     public Vertex EndEdge { get; set; }
 
     public Vertex Center { get; set; }
-
     public double Radius { get; set; }
 
     public Arc(Vertex center, double radius) : this(center, radius, 0, 180) { }
@@ -68,15 +60,16 @@ public partial class Arc : DraggableGraphic
         Radius = radius;
         ParentBoard.Children.Insert(0, this);
 
-        Formula = new CircleFormula(Radius, center.X, center.Y);
+        Formula = new ArcFormula(this);
+        CircleFormula = new CircleFormula(Radius, center.X, center.Y);
 
         StartEdge = new Vertex(ParentBoard, center.X + Radius * Math.Cos(StartDegrees * Math.PI / 180), center.Y + Radius * Math.Sin(StartDegrees * Math.PI / 180));
         EndEdge = new Vertex(ParentBoard, center.X + Radius * Math.Cos(EndDegrees * Math.PI / 180), center.Y + Radius * Math.Sin(EndDegrees * Math.PI / 180));
 
         Log.WriteVar(StartEdge, EndEdge);
 
-        Formula.AddFollower(StartEdge);
-        Formula.AddFollower(EndEdge);
+        CircleFormula.AddFollower(StartEdge);
+        CircleFormula.AddFollower(EndEdge);
 
         StartEdge.OnMoved.Add((_, _, _, _) => StartDegrees = center.DegreesTo(StartEdge));
         EndEdge.OnMoved.Add((_, _, _, _) => EndDegrees = center.DegreesTo(EndEdge));
@@ -87,9 +80,19 @@ public partial class Arc : DraggableGraphic
             Center.ForceStartDrag(ParentBoard.Mouse, -offsetX, -offsetY);
         });
 
+        OnDragged.Add(MainWindow.RegenAll);
+
+        All.Add(this);
+
+        ContextMenu = new ContextMenu();
+        Provider = new ArcContextMenuProvider(this, ContextMenu);
+        ContextMenu.Items = Provider.Items;
+
         Center.OnMoved.Add((_, _, _, _) => {
             Formula.CenterX = Center.X;
             Formula.CenterY = Center.Y;
+            CircleFormula.CenterX = Center.X;
+            CircleFormula.CenterY = Center.Y;
         });
         
         InvalidateVisual();
