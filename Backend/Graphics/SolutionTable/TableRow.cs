@@ -4,7 +4,6 @@ using Avalonia.Controls;
 using CSharpMath.Atom.Atoms;
 using CSharpMath.Avalonia;
 using CSharpMath.Editor;
-using Dynamically.Backend.Helpers.Containers;
 using Dynamically.Design;
 using System;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynamically.Containers;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 

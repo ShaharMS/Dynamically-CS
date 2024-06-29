@@ -1,14 +1,14 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
-using Dynamically.Backend.Helpers.Containers;
 using Dynamically.Backend.Interfaces;
+using Dynamically.Backend.Roles;
 using Dynamically.Containers;
 using Dynamically.Formulas;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
+using Dynamically.Geometry.Basics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -123,7 +123,7 @@ public class ArcContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            Subject.ParentBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            Subject.ParentBoard.HandleCreateSegment(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
         };
 
         return item;
@@ -140,7 +140,7 @@ public class ArcContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, Subject);
-            Subject.ParentBoard.HandleCreateConnection(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
+            Subject.ParentBoard.HandleCreateSegment(Subject.Center, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { Subject })));
 
             var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - Subject.Center.X) * 2, j.Y - (j.Y - Subject.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, Subject);

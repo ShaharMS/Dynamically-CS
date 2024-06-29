@@ -3,12 +3,14 @@ using Avalonia.Input;
 using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
-using Dynamically.Backend.Helpers.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Geometry.Basics;
+using Dynamically.Containers;
+
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -332,8 +334,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
         {
             return new MenuItem
             {
-                Header = $"Angle Bisector {Subject.Center.GetConnectionTo(vertex)}",
-                Items = Subject.Center.GetConnectionTo(vertex)?.Provider.Items ?? new List<Control> {
+                Header = $"Angle Bisector {Subject.Center.GetSegmentTo(vertex)}",
+                Items = Subject.Center.GetSegmentTo(vertex)?.Provider.Items ?? new List<Control> {
                     new Label {
                         Content = "Error: Angle bisector not found."
                     }
@@ -351,8 +353,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
                     {
                         items.Add(new MenuItem
                         {
-                            Header = $"Angle Bisector {Subject.Center.GetConnectionTo(vertex)}",
-                            Items = Subject.Center.GetConnectionTo(vertex)?.Provider.Items ?? new List<Control> {
+                            Header = $"Angle Bisector {Subject.Center.GetSegmentTo(vertex)}",
+                            Items = Subject.Center.GetSegmentTo(vertex)?.Provider.Items ?? new List<Control> {
                             new Label {
                                 Content = "Error: Angle bisector not found."
                             }
@@ -387,8 +389,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
             // Grab the two vertices, and manipulate them symmetrically
             // But first, find out how to manipulate:
 
-            var l1 = Subject.Center.GetConnectionTo(Subject.Vertex1)!.Length;
-            var l2 = Subject.Center.GetConnectionTo(Subject.Vertex2)!.Length;
+            var l1 = Subject.Center.GetSegmentTo(Subject.Vertex1)!.Length;
+            var l2 = Subject.Center.GetSegmentTo(Subject.Vertex2)!.Length;
 
             var d1 = Subject.Center.DegreesTo(Subject.Vertex1);
             var d2 = Subject.Center.DegreesTo(Subject.Vertex2);
@@ -425,8 +427,8 @@ public class AngleContextMenuProvider : ContextMenuProvider
             // Grab the two vertices, and manipulate them symmetrically
             // But first, find out how to manipulate:
 
-            var l1 = Subject.Center.GetConnectionTo(Subject.Vertex1)!.Length;
-            var l2 = Subject.Center.GetConnectionTo(Subject.Vertex2)!.Length;
+            var l1 = Subject.Center.GetSegmentTo(Subject.Vertex1)!.Length;
+            var l2 = Subject.Center.GetSegmentTo(Subject.Vertex2)!.Length;
 
             var d1 = Subject.Center.DegreesTo(Subject.Vertex1);
             var d2 = Subject.Center.DegreesTo(Subject.Vertex2);

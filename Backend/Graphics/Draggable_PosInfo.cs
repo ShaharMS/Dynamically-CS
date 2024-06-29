@@ -2,6 +2,7 @@
 using Avalonia.Rendering;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.VisualTree;
+using Dynamically.Backend.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;

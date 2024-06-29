@@ -4,8 +4,8 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Dynamically;
-using Dynamically.Backend;
 using Dynamically.Backend.Graphics;
+using Dynamically.Backend.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 

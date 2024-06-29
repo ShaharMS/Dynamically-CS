@@ -2,7 +2,6 @@
 using CSharpMath.Avalonia;
 using CSharpMath.Atom;
 using CSharpMath.Rendering.FrontEnd;
-using Dynamically.Backend.Helpers.Containers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +12,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Controls.Presenters;
 using Avalonia.Media;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;
 

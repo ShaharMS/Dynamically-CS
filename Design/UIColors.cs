@@ -11,9 +11,9 @@ public class UIColors
 {
     public static readonly IBrush ShapeHoverFill = new SolidColorBrush(Color.FromUInt32(0x22FFFFFF));
     public static readonly IBrush ShapeFill = new SolidColorBrush(Color.FromUInt32(0x00000000));
-    public static readonly IBrush ConnectionColor = new SolidColorBrush(Colors.White);
-    public static readonly IBrush JointOutlineColor = new SolidColorBrush(Colors.White);
-    public static readonly IBrush JointFillColor = new SolidColorBrush(Colors.Black);
+    public static readonly IBrush SegmentColor = new SolidColorBrush(Colors.White);
+    public static readonly IBrush VertexOutlineColor = new SolidColorBrush(Colors.White);
+    public static readonly IBrush VertexFillColor = new SolidColorBrush(Colors.Black);
     public static readonly IBrush BottomNoteFill = new SolidColorBrush(Color.FromUInt32(0x66000000));
     public static readonly IBrush BottomNoteColor = new SolidColorBrush(Colors.White);
     public static readonly IBrush SelectionFill = new SolidColorBrush(Color.FromUInt32(0x220000FF));
@@ -24,7 +24,7 @@ public class UIColors
         DashStyle = DashStyle.Dash,
         Thickness = UIDesign.SelectionOutlineWidth
     };
-    public static Pen ConnectionPen => new() { Brush = ConnectionColor, Thickness = UIDesign.ConnectionGraphicWidth };
+    public static Pen SegmentPen => new() { Brush = SegmentColor, Thickness = UIDesign.SegmentGraphicWidth };
 
 
     public static readonly IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);

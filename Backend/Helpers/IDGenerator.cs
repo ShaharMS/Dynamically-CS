@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Geometry.Basics;
+
 
 namespace Dynamically.Backend.Helpers;
 
@@ -18,9 +20,9 @@ public class IDGenerator
         do
         {
             changed = false;
-            foreach (var joint in ids)
+            foreach (var vertex in ids)
             {
-                if (joint.Id == letter)
+                if (vertex.Id == letter)
                 {
                     changed = true;
                     letter++;
@@ -40,9 +42,9 @@ public class IDGenerator
 
     public static bool Has(char id)
     {
-        foreach (var joint in ids)
+        foreach (var vertex in ids)
         {
-            if (joint.Id == id) return true;
+            if (vertex.Id == id) return true;
         }
         return false;
     }

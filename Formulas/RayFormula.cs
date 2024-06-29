@@ -1,5 +1,5 @@
 ﻿using Avalonia;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using Dynamically.Backend.Geometry;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Formats.Asn1.AsnWriter;
 using Dynamically.Backend.Helpers;
-using Dynamically.Backend;
+using Dynamically.Geometry.Basics;
 
 namespace Dynamically.Formulas;
 

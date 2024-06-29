@@ -7,11 +7,14 @@ using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using Dynamically.Containers;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Dynamically.Menus.ContextMenus;
+using Dynamically.Backend.Helpers;
+using Dynamically.Geometry.Basics;
+
 
 namespace Dynamically.Backend.Graphics;
 

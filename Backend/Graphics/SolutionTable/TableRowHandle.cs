@@ -7,6 +7,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using CSharpMath.Atom.Atoms;
+using Dynamically.Backend.Helpers;
 using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;

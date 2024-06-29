@@ -1,8 +1,8 @@
 namespace Dynamically.Formulas;
 
 using Avalonia;
-using Dynamically.Backend;
-using Dynamically.Shapes;
+using Dynamically.Backend.Helpers;
+using Dynamically.Geometry;
 using System;
 using System.Linq;
 

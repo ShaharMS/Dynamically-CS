@@ -1,5 +1,4 @@
 using Avalonia;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Helpers;
@@ -61,14 +60,14 @@ public abstract class Formula
     public virtual void AddFollower(ICanFollowFormula obj)
     {
         Followers.Add(obj);
-        obj.PositioningByFormula.Add(UpdateJointPosition);
+        obj.PositioningByFormula.Add(UpdateVertexPosition);
         obj.DispatchOnMovedEvents();
     }
 
     public virtual void RemoveFollower(ICanFollowFormula obj)
     {
         Followers.Remove(obj);
-        obj.PositioningByFormula.Remove(UpdateJointPosition);
+        obj.PositioningByFormula.Remove(UpdateVertexPosition);
     }
 
     public virtual void RemoveAllFollowers()
@@ -77,7 +76,7 @@ public abstract class Formula
         foreach (var f in c) RemoveFollower(f);
     }
 
-    public virtual (double X, double Y) UpdateJointPosition(double inputX, double inputY)
+    public virtual (double X, double Y) UpdateVertexPosition(double inputX, double inputY)
     {
         var X = inputX; var Y = inputY;
         var pos = GetClosestOnFormula(inputX, inputY);

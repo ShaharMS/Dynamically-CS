@@ -1,14 +1,16 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
-using Dynamically.Shapes;
+using Dynamically.Backend.Helpers;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Geometry.Basics;
+
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -264,9 +266,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     ir.Click += (sender, e) =>
                     {
                         var ang = details.Split(",")[0].Remove(0, 1);
-                        var main = Vertex.GetJointById(ang[1]);
-                        var v1 = Vertex.GetJointById(ang[0]);
-                        var v2 = Vertex.GetJointById(ang[2]);
+                        var main = Vertex.GetVertexById(ang[1]);
+                        var v1 = Vertex.GetVertexById(ang[0]);
+                        var v2 = Vertex.GetVertexById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.ISOSCELES_RIGHT, v1, main, v2);
                         Regenerate();
@@ -281,19 +283,19 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     };
                     iso.Click += (sender, e) =>
                     {
-                        var joints = string.Join("", details.Split(" = "));
+                        var vertices = string.Join("", details.Split(" = "));
                         var dict = new Dictionary<char, int>();
-                        foreach (char c in joints) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
+                        foreach (char c in vertices) _ = (dict.ContainsKey(c) ? dict[c]++ : dict[c] = 1);
                         Vertex? main = null, v1 = null, v2 = null;
 
                         foreach (KeyValuePair<char, int> pair in dict)
                         {
                             if (pair.Value == 1)
                             {
-                                if (v1 == null) v1 = Vertex.GetJointById(pair.Key);
-                                else if (v2 == null) v2 = Vertex.GetJointById(pair.Key);
+                                if (v1 == null) v1 = Vertex.GetVertexById(pair.Key);
+                                else if (v2 == null) v2 = Vertex.GetVertexById(pair.Key);
                             }
-                            else main = Vertex.GetJointById(pair.Key);
+                            else main = Vertex.GetVertexById(pair.Key);
                         }
 
                         if (v1 == null || main == null || v2 == null) return;
@@ -311,9 +313,9 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                     r.Click += (sender, e) =>
                     {
                         var ang = details.Remove(0, 1);
-                        var main = Vertex.GetJointById(ang[1]);
-                        var v1 = Vertex.GetJointById(ang[0]);
-                        var v2 = Vertex.GetJointById(ang[2]);
+                        var main = Vertex.GetVertexById(ang[1]);
+                        var v1 = Vertex.GetVertexById(ang[0]);
+                        var v2 = Vertex.GetVertexById(ang[2]);
                         if (v1 == null || main == null || v2 == null) return;
                         Subject.ForceType(TriangleType.RIGHT, v1, main, v2);
                         Regenerate();

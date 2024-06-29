@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
-using Dynamically.Backend;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using System.Diagnostics;
+using Dynamically.Geometry.Basics;
 
 namespace Dynamically.Backend.Helpers;
 
@@ -35,67 +35,37 @@ class Tools
         segments_intersect = ((t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1));
     }
 
-    public static Circle CircleFrom3Joints(Vertex joint1, Vertex joint2, Vertex joint3)
+    public static Circle CircleFrom3Vertices(Vertex vertex1, Vertex vertex2, Vertex vertex3)
     {
 
 
         // Get the perpendicular bisector of (X1, y1) and (x2, y2).
-        double x1 = (joint2.X + joint1.X) / 2;
-        double y1 = (joint2.Y + joint1.Y) / 2;
-        double dy1 = joint2.X - joint1.X;
-        double dx1 = -(joint2.Y - joint1.Y);
+        double x1 = (vertex2.X + vertex1.X) / 2;
+        double y1 = (vertex2.Y + vertex1.Y) / 2;
+        double dy1 = vertex2.X - vertex1.X;
+        double dx1 = -(vertex2.Y - vertex1.Y);
 
         // Get the perpendicular bisector of (x2, y2) and (x3, y3).
-        double x2 = (joint3.X + joint2.X) / 2;
-        double y2 = (joint3.Y + joint2.Y) / 2;
-        double dy2 = joint3.X - joint2.X;
-        double dx2 = -(joint3.Y - joint2.Y);
+        double x2 = (vertex3.X + vertex2.X) / 2;
+        double y2 = (vertex3.Y + vertex2.Y) / 2;
+        double dy2 = vertex3.X - vertex2.X;
+        double dx2 = -(vertex3.Y - vertex2.Y);
 
         // See where the lines intersect.
         Point intersection;
         FindIntersection(new Point(x1, y1), new Point(x1 + dx1, y1 + dy1), new Point(x2, y2), new Point(x2 + dx2, y2 + dy2), out _, out intersection);
 
         var center = intersection;
-        double dx = center.X - joint1.X;
-        double dy = center.Y - joint1.Y;
+        double dx = center.X - vertex1.X;
+        double dy = center.Y - vertex1.Y;
         var radius = Math.Sqrt(dx * dx + dy * dy);
-        var c = new Vertex(joint1.ParentBoard, center.X, center.Y);
+        var c = new Vertex(vertex1.ParentBoard, center.X, center.Y);
         Circle circle = new(c, radius);
         c.Roles.AddToRole(Role.CIRCLE_Center, circle);
-        foreach (var joint in new[] { joint1, joint2, joint3 })
+        foreach (var vertex in new[] { vertex1, vertex2, vertex3 })
         {
-            joint.Roles.AddToRole(Role.CIRCLE_On, circle);
+            vertex.Roles.AddToRole(Role.CIRCLE_On, circle);
         }
-
-        return circle;
-    }
-
-    public static Circle CircleFrom3Points(Point joint1, Point joint2, Point joint3)
-    {
-
-        // Get the perpendicular bisector of (X1, y1) and (x2, y2).
-        double x1 = (joint2.X + joint1.X) / 2;
-        double y1 = (joint2.Y + joint1.Y) / 2;
-        double dy1 = joint2.X - joint1.X;
-        double dx1 = -(joint2.Y - joint1.Y);
-
-        // Get the perpendicular bisector of (x2, y2) and (x3, y3).
-        double x2 = (joint3.X + joint2.X) / 2;
-        double y2 = (joint3.Y + joint2.Y) / 2;
-        double dy2 = joint3.X - joint2.X;
-        double dx2 = -(joint3.Y - joint2.Y);
-
-        // See where the lines intersect.
-        Point intersection;
-        FindIntersection(new Point(x1, y1), new Point(x1 + dx1, y1 + dy1), new Point(x2, y2), new Point(x2 + dx2, y2 + dy2), out _, out intersection);
-
-        var center = intersection;
-        double dx = center.X - joint1.X;
-        double dy = center.Y - joint1.Y;
-        var radius = Math.Sqrt(dx * dx + dy * dy);
-
-        var c = new Vertex(MainWindow.Instance.WindowTabs.CurrentBoard, center.X, center.Y);
-        Circle circle = new(c, radius);
 
         return circle;
     }
@@ -112,9 +82,9 @@ class Tools
         return angle;
     }
 
-    public static double GetDegreesBetweenConnections(Segment s1, Segment s2, bool canGetLarge = false)
+    public static double GetDegreesBetweenSegments(Segment s1, Segment s2, bool canGetLarge = false)
     {
-        var common = s1.GetSharedJoint(s2);
+        var common = s1.GetSharedVertex(s2);
         if (common == null) return double.NaN;
         var others = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s2.Vertex1, s2.Vertex2 };
         others.Remove(common);
@@ -142,9 +112,9 @@ class Tools
         return angle;
     }
 
-    public static double GetRadiansBetweenConnections(Segment s1, Segment s2, bool canGetLarge = false)
+    public static double GetRadiansBetweenSegments(Segment s1, Segment s2, bool canGetLarge = false)
     {
-        var common = s1.GetSharedJoint(s2);
+        var common = s1.GetSharedVertex(s2);
         if (common == null) return double.NaN;
         var others = new HashSet<Vertex> { s1.Vertex1, s1.Vertex2, s2.Vertex1, s2.Vertex2 };
         others.Remove(common);
@@ -160,69 +130,69 @@ class Tools
         return angle;
     }
 
-    public static bool QualifiesForMerge(Vertex j1, Vertex j2)
+    public static bool QualifiesForMerge(Vertex vertex1, Vertex vertex2)
     {
         // Case 1: CIRCLE_center & CIRCLE_on
-        var a1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
-        var a2 = j2.Roles.Access<Circle>(Role.CIRCLE_On);
+        var a1 = vertex1.Roles.Access<Circle>(Role.CIRCLE_Center);
+        var a2 = vertex2.Roles.Access<Circle>(Role.CIRCLE_On);
         if (a1.Intersect(a2).Any()) return false;
-        a1 = j1.Roles.Access<Circle>(Role.CIRCLE_On);
-        a2 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
+        a1 = vertex1.Roles.Access<Circle>(Role.CIRCLE_On);
+        a2 = vertex2.Roles.Access<Circle>(Role.CIRCLE_Center);
         if (a1.Intersect(a2).Any()) return false;
 
         // Case 2: Circum & Incircle
-        //var e1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
-        //var e2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        //var e1 = vertex1.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        //var e2 = vertex2.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
         //if (e1.Intersect(e2).Any()) return false;
-        //e1 = j2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
-        //e2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
+        //e1 = vertex2.Roles.Access<Triangle>(Role.TRIANGLE_CircumCircleCenter);
+        //e2 = vertex1.Roles.Access<Triangle>(Role.TRIANGLE_InCircleCenter);
         //if (e1.Intersect(e2).Any()) return false;
 
         // Case 3: corners of the same Triangle
-        var b1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
-        var b2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+        var b1 = vertex1.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+        var b2 = vertex2.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
         if (b1.Intersect(b2).Any()) return false;
 
         // Case 4: Triangle corner & in\Circumcircle Center
-        var c1 = j1.Roles.Access<Circle>(Role.CIRCLE_Center);
-        var c2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        var c1 = vertex1.Roles.Access<Circle>(Role.CIRCLE_Center);
+        var c2 = vertex2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Any()) return false;
-        c1 = j2.Roles.Access<Circle>(Role.CIRCLE_Center);
-        c2 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
+        c1 = vertex2.Roles.Access<Circle>(Role.CIRCLE_Center);
+        c2 = vertex1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>();
         if (c1.Intersect(c2).Any()) return false;
 
         // Case 5: Triangle corner & in/Circumcircle on
 
-        var d1 = j1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
-        if (d1.Contains(j2)) return false;
-        var d2 = j2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
-        if (d2.Contains(j1)) return false;
+        var d1 = vertex1.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        if (d1.Contains(vertex2)) return false;
+        var d2 = vertex2.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => new[] { t.Incircle, t.Circumcircle }).SelectMany(item => item).Where(c => c != null).Cast<Circle>().Select(c => c.Formula.Followers).SelectMany(item => item);
+        if (d2.Contains(vertex1)) return false;
 
         return true;
     }
 
-    public static bool QualifiesForMount(Vertex j, dynamic shape)
+    public static bool QualifiesForMount(Vertex vertex, dynamic shape)
     {
         if (shape is Circle circle)
         {
             // Case C1: Center & its circle
-            var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
+            var a1 = vertex.Roles.Access<Circle>(Role.CIRCLE_Center);
             if (a1.Contains(circle)) return false;
 
             // Case C2: Triangle corner & Incircle
-            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => t.Incircle).Where(item => item != null).Cast<Circle>();
+            var b1 = vertex.Roles.Access<Triangle>(Role.TRIANGLE_Corner).Select(t => t.Incircle).Where(item => item != null).Cast<Circle>();
             if (b1.Contains(circle)) return false;
         }
 
         if (shape is Segment segment)
         {
             // Case S1: Center & circle chord (stack overflow)
-            var a1 = j.Roles.Access<Circle>(Role.CIRCLE_Center);
+            var a1 = vertex.Roles.Access<Circle>(Role.CIRCLE_Center);
             var a2 = segment.Roles.Access<Circle>(Role.CIRCLE_Chord);
             if (a1.Intersect(a2).Any()) return false;
 
             // Case S2: Triangle corner & side
-            var b1 = j.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
+            var b1 = vertex.Roles.Access<Triangle>(Role.TRIANGLE_Corner);
             var b2 = segment.Roles.Access<Triangle>(Role.TRIANGLE_Side);
             if (b1.Intersect(b2).Any()) return false;
         }

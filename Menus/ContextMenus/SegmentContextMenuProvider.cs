@@ -1,19 +1,19 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
 using Dynamically.Containers;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Text;
 using System.Threading.Tasks;
+using Dynamically.Geometry.Basics;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -262,47 +262,47 @@ public class SegmentContextMenuProvider : ContextMenuProvider
         List<Vertex> candidatesj1 = new(), candidatesj2 = new();
         foreach (Vertex j in Subject.Vertex1.Relations)
         {
-            if (Tools.QualifiesForStraighten(Subject.Vertex2, j, Subject.Vertex1) && Math.Abs(Subject.Vertex1.DegreesTo(j) - Subject.Vertex2.DegreesTo(Subject.Vertex1)) < Settings.ConnectionStraighteningAngleOffset) candidatesj1.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.Vertex2, j, Subject.Vertex1) && Math.Abs(Subject.Vertex1.DegreesTo(j) - Subject.Vertex2.DegreesTo(Subject.Vertex1)) < Settings.SegmentStraighteningAngleOffset) candidatesj1.Add(j);
         }
         foreach (Vertex j in Subject.Vertex2.Relations)
         {
-            if (Tools.QualifiesForStraighten(Subject.Vertex1, j, Subject.Vertex2) && Math.Abs(Subject.Vertex2.DegreesTo(j) - Subject.Vertex1.DegreesTo(Subject.Vertex2)) < Settings.ConnectionStraighteningAngleOffset) candidatesj2.Add(j);
+            if (Tools.QualifiesForStraighten(Subject.Vertex1, j, Subject.Vertex2) && Math.Abs(Subject.Vertex2.DegreesTo(j) - Subject.Vertex1.DegreesTo(Subject.Vertex2)) < Settings.SegmentStraighteningAngleOffset) candidatesj2.Add(j);
         }
 
         var items = new List<MenuItem>();
 
-        foreach (var joint in candidatesj1)
+        foreach (var vertex in candidatesj1)
         {
             var item = new MenuItem
             {
-                Header = $"Straighten {(joint.Id > Subject.Vertex2.Id ? $"{Subject.Vertex2.Id}{joint.Id}" : $"{joint.Id}{Subject.Vertex2.Id}")}"
+                Header = $"Straighten {(vertex.Id > Subject.Vertex2.Id ? $"{Subject.Vertex2.Id}{vertex.Id}" : $"{vertex.Id}{Subject.Vertex2.Id}")}"
             };
             item.Click += (sender, e) =>
             {
                 Vertex j1 = Subject.Vertex1, j2 = Subject.Vertex2;
-                j1.Disconnect(j2, joint);
-                j1.Roles.AddToRole(Role.SEGMENT_On, j2.Connect(joint));
+                j1.Disconnect(j2, vertex);
+                j1.Roles.AddToRole(Role.SEGMENT_On, j2.Connect(vertex));
             };
             items.Add(item);
         }
 
-        foreach (var joint in candidatesj2)
+        foreach (var vertex in candidatesj2)
         {
             var item = new MenuItem
             {
-                Header = $"Straighten {(joint.Id > Subject.Vertex1.Id ? $"{Subject.Vertex1.Id}{joint.Id}" : $"{joint.Id}{Subject.Vertex1.Id}")}"
+                Header = $"Straighten {(vertex.Id > Subject.Vertex1.Id ? $"{Subject.Vertex1.Id}{vertex.Id}" : $"{vertex.Id}{Subject.Vertex1.Id}")}"
             };
             item.Click += (sender, e) =>
             {
                 Vertex j1 = Subject.Vertex1, j2 = Subject.Vertex2;
                 var followers = Subject.Formula.Followers.ToList().Concat(Subject.MiddleFormula.Followers);
-                var prev = j2.GetConnectionTo(joint);
+                var prev = j2.GetSegmentTo(vertex);
                 if (prev != null)
                 {
                     followers = followers.Concat(prev.Formula.Followers).Concat(prev.MiddleFormula.Followers);
                 }
-                j2.Disconnect(j1, joint);
-                var con = j1.Connect(joint);
+                j2.Disconnect(j1, vertex);
+                var con = j1.Connect(vertex);
                 j2.Roles.AddToRole(Role.SEGMENT_On, con);
                 foreach (Vertex f in followers.Where(x => x is Vertex).Cast<Vertex>().ToHashSet())
                 {
@@ -347,12 +347,14 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             var ray = new RayFormula(circle.Center, slope);
 
             var j1pos = ray.GetClosestOnFormula(Subject.Vertex1);
+            if (j1pos == null) return;
             double px = Subject.Vertex1.X, py = Subject.Vertex1.Y;
             Subject.Vertex1.X = j1pos.Value.X;
             Subject.Vertex1.Y = j1pos.Value.Y;
             Subject.Vertex1.DispatchOnMovedEvents(px, py);
 
             var j2pos = ray.GetClosestOnFormula(Subject.Vertex2);
+            if (j2pos == null) return;
             px = Subject.Vertex2.X;  py = Subject.Vertex2.Y;
             Subject.Vertex2.X = j2pos.Value.X;
             Subject.Vertex2.Y = j2pos.Value.Y;
@@ -376,7 +378,7 @@ public class SegmentContextMenuProvider : ContextMenuProvider
             if (Subject.Formula.Intersects(element.Formula))
             {
                 if (element is Segment seg && (
-                    seg.SharesJointWith(Subject) || 
+                    seg.SharesVertexWith(Subject) || 
                     seg.Formula.Followers.Intersect(Subject.Formula.Followers).Any() ||
                     Subject.Formula.Followers.ContainsMany(seg.Vertex1, seg.Vertex2) ||
                     seg.Formula.Followers.ContainsMany(Subject.Vertex1, Subject.Vertex2))) continue;

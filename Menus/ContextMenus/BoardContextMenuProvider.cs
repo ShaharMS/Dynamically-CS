@@ -1,12 +1,14 @@
 ﻿using Avalonia.Controls;
 using Dynamically.Backend.Geometry;
 using Dynamically.Containers;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
+using Dynamically.Geometry.Basics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -113,11 +115,10 @@ public class BoardContextMenuProvider : ContextMenuProvider
         item.Click += (sender, e) =>
         {
             var p = Subject.MousePosition;
-            _ = new Quadrilateral(
-                new Vertex(Subject, new Avalonia.Point(p.X + 100, p.Y)),
-                new Vertex(Subject, new Avalonia.Point(p.X - 100, p.Y)),
-                new Vertex(Subject, new Avalonia.Point(p.X, p.Y - 100)),
-                new Vertex(Subject, new Avalonia.Point(p.X, p.Y + 100)));
+            _ = new Quadrilateral(new Vertex(Subject, new Avalonia.Point(p.X + 100, p.Y)),
+                                  new Vertex(Subject, new Avalonia.Point(p.X - 100, p.Y)),
+                                  new Vertex(Subject, new Avalonia.Point(p.X, p.Y - 100)),
+                                  new Vertex(Subject, new Avalonia.Point(p.X, p.Y + 100)));
         };
         return item;
     }

@@ -2,7 +2,7 @@
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Interfaces;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;

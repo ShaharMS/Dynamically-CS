@@ -9,11 +9,10 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Dynamically.Backend.Geometry;
 using Dynamically.Backend.Graphics;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using Avalonia;
 using Dynamically.Containers;
 using Dynamically.Backend.Helpers;
-using Dynamically.Backend;
 using System.Collections;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Formulas;
@@ -21,8 +20,10 @@ using System.Reactive.Subjects;
 using Avalonia.Media;
 using System.Threading;
 using Avalonia.Interactivity;
-using CSharpMath.Atom.Atoms;
 using System.Data;
+using Dynamically.Geometry.Basics;
+using Dynamically.Backend.Roles;
+
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -30,9 +31,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
 {
 
     public Vertex Subject { get => _sub; set => _sub = value; }
-    public VertexContextMenuProvider(Vertex joint, ContextMenu menu)
+    public VertexContextMenuProvider(Vertex vertex, ContextMenu menu)
     {
-        Subject = joint;
+        Subject = vertex;
         Menu = menu;
         Name = Subject.ToString(true);
 
@@ -77,8 +78,8 @@ public class VertexContextMenuProvider : ContextMenuProvider
     {
         Recommendations = new List<Control?>
         {
-            Recom_MergeJoints(),
-            Recom_MountJoints()
+            Recom_MergeVertices(),
+            Recom_MountVertex()
         }.FindAll((c) => c != null).Cast<Control>().ToList();
     }
 
@@ -171,7 +172,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         connect.Click += (s, args) =>
         {
             var potential = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
-            Subject.ParentBoard.HandleCreateConnection(Subject, potential);
+            Subject.ParentBoard.HandleCreateSegment(Subject, potential);
         };
 
         return connect;
@@ -180,15 +181,16 @@ public class VertexContextMenuProvider : ContextMenuProvider
     {
         var options = new List<MenuItem>();
 
-        foreach (var c in Subject.Connections)
+        foreach (var vertex in Subject.Relations)
         {
             var item = new MenuItem();
-            if (c.Vertex1 == Subject) item.Header = c.Vertex2 + $" ({c})";
-            else item.Header = c.Vertex2 + $" ({c})";
+            var segment = vertex.GetSegmentTo(Subject)!;
+            if (segment.Vertex1 == Subject) item.Header = segment.Vertex2 + $" ({segment})";
+            else item.Header = segment.Vertex2 + $" ({segment})";
 
             item.Click += (sender, e) =>
             {
-                c.Vertex1.Disconnect(c.Vertex2);
+                segment.Vertex1.Disconnect(segment.Vertex2);
             };
 
             options.Add(item);
@@ -197,7 +199,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         var dis = new MenuItem
         {
             Header = "Disconnect From...",
-            IsEnabled = Subject.Connections.Count > 0,
+            IsEnabled = Subject.Relations.Count > 0,
             Items = options
         };
 
@@ -261,7 +263,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
             {
                 if (Subject == j1 || Subject == j2 || j1 == j2) continue;
                 if (Angle.Exists(Subject, j1, j2)) continue;
-                items.Add(($"{j1}{Subject}{j2}", (Subject.IsConnectedTo(j1) ? 0.5 : 0) + (Subject.IsConnectedTo(j2) ? 0.5 : 0)));
+                items.Add(($"{j1}{Subject}{j2}", (Subject.HasSegmentWith(j1) ? 0.5 : 0) + (Subject.HasSegmentWith(j2) ? 0.5 : 0)));
             }
         }
         items.Sort((a, b) => b.Item2.CompareTo(a.Item2));
@@ -294,9 +296,9 @@ public class VertexContextMenuProvider : ContextMenuProvider
             var arr = ac.Text.ToCharArray();
             if (arr.Length == 3)
             {
-                var j1 = Vertex.GetJointById(arr[0]);
-                var c = Vertex.GetJointById(arr[1]);
-                var j2 = Vertex.GetJointById(arr[2]);
+                var j1 = Vertex.GetVertexById(arr[0]);
+                var c = Vertex.GetVertexById(arr[1]);
+                var j2 = Vertex.GetVertexById(arr[2]);
                 if (j1 != null && j2 != null && c != null && j1 != j2 && j1 != c && j2 != c)
                 {
                     _ = new Angle(j1, c, j2);
@@ -362,7 +364,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            Subject.ParentBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            Subject.ParentBoard.HandleCreateSegment(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
         };
 
         return item;
@@ -381,7 +383,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
         {
             var j = new Vertex(Subject.ParentBoard, Subject.ParentBoard.MousePosition);
             j.Roles.AddToRole(Role.CIRCLE_On, circle);
-            Subject.ParentBoard.HandleCreateConnection(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
+            Subject.ParentBoard.HandleCreateSegment(Subject, j, RoleMap.QuickCreateMap((Role.CIRCLE_On, new[] { circle })));
 
             var j1 = new Vertex(Subject.ParentBoard, j.X - (j.X - circle.Center.X) * 2, j.Y - (j.Y - circle.Center.Y) * 2);
             j1.Roles.AddToRole(Role.CIRCLE_On, circle);
@@ -409,12 +411,12 @@ public class VertexContextMenuProvider : ContextMenuProvider
         }
     }
 
-    MenuItem? Recom_MergeJoints()
+    MenuItem? Recom_MergeVertices()
     {
         List<Vertex> veryCloseTo = new();
         foreach (var j in Vertex.All)
         {
-            if (j != Subject && Subject.DistanceTo(j) <= Settings.JointMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
+            if (j != Subject && Subject.DistanceTo(j) <= Settings.VertexMergeDistance && Tools.QualifiesForMerge(Subject, j)) veryCloseTo.Add(j);
         }
         veryCloseTo.Sort(new C(Subject));
 
@@ -490,12 +492,12 @@ public class VertexContextMenuProvider : ContextMenuProvider
     }
 
 
-    MenuItem? Recom_MountJoints()
+    MenuItem? Recom_MountVertex()
     {
         List<dynamic> veryCloseTo = new();
         foreach (var container in new List<dynamic>().Concat(Circle.All).Concat(Segment.All)) // container is IHasFormula<Formula>
         {
-            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.JointMountDistance && Tools.QualifiesForMount(Subject, container))
+            if (!container.Contains(Subject) && !container.HasMounted(Subject) && container.Formula.DistanceTo(Subject) < Settings.VertexMountDistance && Tools.QualifiesForMount(Subject, container))
             {
                 veryCloseTo.Add(container);
             }
@@ -548,7 +550,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
                 }
                 else Log.Write($"{Subject} cannot mount on {veryCloseTo[0]}");
                 Subject.UpdateBoardRelations();
-                foreach (Segment c in Subject.Connections) c.Provider.Regenerate();
+                foreach (var vertex in Subject.Relations) vertex.GetSegmentTo(Subject)!.Provider.Regenerate();
                 Regenerate();
             };
             return m;
@@ -573,7 +575,7 @@ public class VertexContextMenuProvider : ContextMenuProvider
                 }
                 else Log.Write($"{Subject} cannot mount on {cs}");
                 Subject.UpdateBoardRelations();
-                foreach (Segment c in Subject.Connections) c.Provider.Regenerate();
+                foreach (var vertex in Subject.Relations) vertex.GetSegmentTo(Subject)!.Provider.Regenerate();
                 Regenerate();
             };
             list.Add(m);

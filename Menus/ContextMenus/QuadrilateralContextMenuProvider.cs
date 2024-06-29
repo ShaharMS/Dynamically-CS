@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
-using Dynamically.Backend;
-using Dynamically.Shapes;
+using Dynamically.Backend.Helpers;
+using Dynamically.Geometry;
 
 namespace Dynamically.Menus.ContextMenus;
 
@@ -15,9 +15,9 @@ public class QuadrilateralContextMenuProvider : ContextMenuProvider
 {
 
     public Quadrilateral Subject {get => _sub; set => _sub = value; }
-    public QuadrilateralContextMenuProvider(Quadrilateral joint, ContextMenu menu)
+    public QuadrilateralContextMenuProvider(Quadrilateral quadrilateral, ContextMenu menu)
     {
-        Subject = joint;
+        Subject = quadrilateral;
         Menu = menu;
         Name = Subject.ToString(true);
 

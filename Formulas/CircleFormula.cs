@@ -1,6 +1,6 @@
 ﻿using Avalonia;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
+using Dynamically.Backend.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -117,8 +117,8 @@ public class CircleFormula : Formula
         foreach (var l in OnChange) l();
     }
 
-    public override (double X, double Y) UpdateJointPosition(double inputX, double inputY)
+    public override (double X, double Y) UpdateVertexPosition(double inputX, double inputY)
     {
-        return base.UpdateJointPosition(inputX, inputY);
+        return base.UpdateVertexPosition(inputX, inputY);
     }
 }

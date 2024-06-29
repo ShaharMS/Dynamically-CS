@@ -11,7 +11,7 @@ using Dynamically.Backend.Helpers;
 using Dynamically.Backend.Interfaces;
 using Dynamically.Design;
 using Dynamically.Menus.ContextMenus;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,6 +19,7 @@ using System.Reactive.Subjects;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Dynamically.Geometry.Basics;
 
 namespace Dynamically.Containers;
 
@@ -101,6 +102,8 @@ public partial class Board : DraggableGraphic
         Window.AddHandler(PointerMovedEvent, SetCurrentHover, RoutingStrategies.Bubble);
     
         Window.AddHandler(PointerMovedEvent, UpdateMouseInfo, RoutingStrategies.Bubble);
+
+        Mouse = null!;
     }
 
     public void UpdateMouseInfo(object? sender, PointerEventArgs e) => Mouse = e;
@@ -156,7 +159,7 @@ public partial class Board : DraggableGraphic
         }
     }
 
-    public void HandleCreateConnection(Vertex from, Vertex potential, Dictionary<Role, List<object>>? requiresRoles = null)
+    public void HandleCreateSegment(Vertex from, Vertex potential, Dictionary<Role, List<object>>? requiresRoles = null)
     {
         var filtered = new List<Vertex>();
         if (requiresRoles != null)
@@ -174,10 +177,10 @@ public partial class Board : DraggableGraphic
         var current = potential;
 
         var alreadyDisconnected = new List<Vertex>();
-        foreach (var j in filtered) if (!j.IsConnectedTo(from)) alreadyDisconnected.Add(j);
+        foreach (var j in filtered) if (!j.HasSegmentWith(from)) alreadyDisconnected.Add(j);
         from.Connect(current);
 
-        void EvalConnection(object? sender, PointerEventArgs args)
+        void EvalSegment(object? sender, PointerEventArgs args)
         {
             var pos = args.GetPosition(this);
             bool attached = false;
@@ -202,8 +205,8 @@ public partial class Board : DraggableGraphic
                 current = potential;
             }
 
-            if (current != potential && from.IsConnectedTo(potential)) from.Disconnect(potential);
-            else if (current == potential && !from.IsConnectedTo(potential)) from.Connect(potential);
+            if (current != potential && from.HasSegmentWith(potential)) from.Disconnect(potential);
+            else if (current == potential && !from.HasSegmentWith(potential)) from.Connect(potential);
 
         }
 
@@ -214,23 +217,23 @@ public partial class Board : DraggableGraphic
                 Log.Write(current, potential, potential.Hidden);
                 potential.RemoveFromBoard();
 #pragma warning disable CS8604 // Possible null reference argument.
-                current.CreateBoardRelationsWith(from, from.GetConnectionTo(current));
+                current.CreateBoardRelationsWith(from, from.GetSegmentTo(current));
 #pragma warning restore CS8604 // Possible null reference argument.
             } else
             {
                 if (!Vertex.All.Contains(potential)) Vertex.All.Add(potential); // Todo - shouldnt be necessary, need to resolve later
 #pragma warning disable CS8604 // Possible null reference argument.
-                potential.CreateBoardRelationsWith(from, from.GetConnectionTo(potential));
+                potential.CreateBoardRelationsWith(from, from.GetSegmentTo(potential));
 #pragma warning restore CS8604 // Possible null reference argument.
             }
 
-            Window.PointerMoved -= EvalConnection;
+            Window.PointerMoved -= EvalSegment;
             Window.PointerReleased -= Finish;
 
             MainWindow.RegenAll(0,0,0,0);
         }
 
-        Window.PointerMoved += EvalConnection;
+        Window.PointerMoved += EvalSegment;
         Window.PointerReleased += Finish;
     }
 
@@ -253,7 +256,7 @@ public partial class Board : DraggableGraphic
         }
 
         if (FocusedObject is Board) Log.Write("No object is focused");
-        else if (FocusedObject is Vertex joint) Log.Write($"{joint.Id} Is Focused");
+        else if (FocusedObject is Vertex vertex) Log.Write($"{vertex.Id} Is Focused");
         else if (FocusedObject is Segment connection) Log.Write($"{connection} Is Focused");
         else if (FocusedObject is Angle angle) Log.Write($"{angle} Is Focused");
         else if (FocusedObject is Circle circle) Log.Write($"Circle {circle} Is Focused");
@@ -330,13 +333,6 @@ public partial class Board : DraggableGraphic
                 child.ZIndex = 1000000000;
             }
         }
-        /*
-        if (HoveredObject is MainBoard) Log.Write("No object is hovered");
-        else if (HoveredObject is Vertex joint) Log.Write($"{joint.Id} Is Hovered");
-        else if (HoveredObject is Segment connection) Log.Write($"{connection.Vertex1.Id}{connection.Vertex2.Id} Is Hovered");
-        else if (HoveredObject is IShape shape) Log.Write($"{shape.GetType().Name} {shape} Is Hovered");
-        else if (HoveredObject is EllipseBase Ellipse) Log.Write($"Ellipse {Ellipse.Focal1.Id}{Ellipse.Focal2.Id} Is Hovered");
-        */
     }
 
     public override double Area()

@@ -1,16 +1,16 @@
 ﻿using Avalonia.Controls;
-using Dynamically.Backend.Geometry;
-using Dynamically.Shapes;
+using Dynamically.Geometry;
 using Dynamically.Containers;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Dynamically.Backend;
 using System.Linq;
 using Dynamically.Backend.Graphics;
 using Dynamically.Backend.Graphics.SolutionTable;
 using Dynamically.Backend.Latex;
 using Dynamically.Menus;
 using System;
+using Dynamically.Geometry.Basics;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically;
 

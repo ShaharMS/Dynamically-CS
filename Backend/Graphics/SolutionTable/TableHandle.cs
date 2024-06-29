@@ -6,6 +6,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Dynamically.Backend.Helpers;
 using Dynamically.Design;
 
 namespace Dynamically.Backend.Graphics.SolutionTable;

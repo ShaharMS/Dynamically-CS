@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Catalyst;
 using Catalyst.Models;
-using Dynamically.Backend;
+using Dynamically.Backend.Helpers;
 using Microsoft.Extensions.Logging;
 using Mosaik.Core;
 using Version = Mosaik.Core.Version;

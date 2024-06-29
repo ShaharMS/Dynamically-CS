@@ -1,7 +1,7 @@
 ﻿using Avalonia;
-using Dynamically.Backend;
 using Dynamically.Backend.Geometry;
-using Dynamically.Shapes;
+using Dynamically.Backend.Helpers;
+using Dynamically.Geometry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,7 +58,7 @@ public class TriangleIncircleFormula : Formula
         Triangle.Vertex3.Y += y - currentCenter.Y;
     }
 
-    public override (double X, double Y) UpdateJointPosition(double inputX, double inputY)
+    public override (double X, double Y) UpdateVertexPosition(double inputX, double inputY)
     {
         if (Circle != null) Circle.Radius = Radius;
         return (Center.X, Center.Y);

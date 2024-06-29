@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dynamically.Containers;
+using Dynamically.Backend.Helpers;
 
 namespace Dynamically.Backend.Graphics;
 
@@ -109,7 +110,7 @@ public partial class DraggableGraphic : Canvas
             CurrentlyDragging = true;
             _startPosition = new Point(X, Y);
             _startMousePosition = e.GetPosition(null);
-            e.Pointer.Capture(this);
+            e.Pointer?.Capture(this);
 
             DispatchOnDragStartEvents();
         }
