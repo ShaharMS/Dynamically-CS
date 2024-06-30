@@ -182,7 +182,7 @@ public partial class Segment : DraggableGraphic
             Vertex2.InvalidateVisual();
             Reposition();
         });
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
         All.Add(this);
 
@@ -228,15 +228,9 @@ public partial class Segment : DraggableGraphic
         Canvas.SetTop(Label, MiddleFormula.PointOnRatio.Y - Label.Height / 2);
 
         // Graphic is cleared
-        var pen = new Pen
-        {
-            Brush = UIColors.SegmentColor,
-            Thickness = UIDesign.SegmentGraphicWidth,
-        };
-        if (IsAuxiliary) pen.DashStyle = DashStyle.Dash;
-        context.DrawLine(pen, new Point(Vertex1.X, Vertex1.Y), new Point(Vertex2.X, Vertex2.Y));
+        context.DrawLine(UIColors.SegmentPen, new Point(Vertex1.X, Vertex1.Y), new Point(Vertex2.X, Vertex2.Y));
         // padding for easier dragging
-        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.SegmentGraphicWidth * 1.5);
+        var pen2 = new Pen(new SolidColorBrush(Colors.Black, 0.01), Settings.SegmentGraphicWidth * 1.5);
         context.DrawLine(pen2, new Point(Vertex1.X, Vertex1.Y), new Point(Vertex2.X, Vertex2.Y));
 
     }

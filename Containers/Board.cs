@@ -44,11 +44,11 @@ public partial class Board : DraggableGraphic
 
     public double MouseX
     {
-        get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).X ?? -1;
+        get => Mouse?.GetPosition(this).X ?? -1;
     }
     public double MouseY
     {
-        get => Mouse?.GetPosition(MainWindow.Instance.MainBoard).Y ?? -1;
+        get => Mouse?.GetPosition(this).Y ?? -1;
     }
     public Point MousePosition => new(MouseX, MouseY);
 
@@ -80,11 +80,11 @@ public partial class Board : DraggableGraphic
         set  => _selection = value;
     }
 
-    public Window Window { get; private set; }
+    public AppWindow Window { get; private set; }
 
     public BoardContextMenuProvider Provider { get; private set; }
 
-    public Board(Window window) : base(null!)
+    public Board(AppWindow window) : base(null!)
     {
         _focused = this;
         _hovered = this;
@@ -117,7 +117,7 @@ public partial class Board : DraggableGraphic
     {
         if (child is Vertex vertex) Vertices.Add(vertex);
         Items.Add(child);
-        ItemsByType[child.GetType()].Add(child);
+        if (child is not Ring) ItemsByType[child.GetType()].Add(child);
         Children.Add(child);
     }
 
@@ -125,7 +125,7 @@ public partial class Board : DraggableGraphic
     {
         if (child is Vertex vertex) Vertices.Insert(index, vertex);
         Items.Insert(index, child);
-        ItemsByType[child.GetType()].Insert(index, child);
+        if (child is not Ring) ItemsByType[child.GetType()].Insert(index, child);
         Children.Insert(index, child);
     }
 
@@ -137,7 +137,7 @@ public partial class Board : DraggableGraphic
     {
         if (child is Vertex vertex) Vertices.Remove(vertex);
         Items.Remove(child);
-        ItemsByType[child.GetType()].Remove(child);
+        if (child is not Ring) ItemsByType[child.GetType()].Remove(child);
         Children.Remove(child);
     }
 
@@ -230,7 +230,7 @@ public partial class Board : DraggableGraphic
             Window.PointerMoved -= EvalSegment;
             Window.PointerReleased -= Finish;
 
-            MainWindow.RegenAll(0,0,0,0);
+            AppWindow.RegenAll(0,0,0,0);
         }
 
         Window.PointerMoved += EvalSegment;
@@ -239,7 +239,7 @@ public partial class Board : DraggableGraphic
 
     private void SetCurrentFocus(object? sender, PointerPressedEventArgs e)
     {
-        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
+        if (Window.WindowTabs.CurrentBoard != this) return;
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
         if (e.Source is not DraggableGraphic)
         {
@@ -271,7 +271,7 @@ public partial class Board : DraggableGraphic
 
     private void TryStartSelection(object? sender, PointerPressedEventArgs e)
     {
-        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
+        if (Window.WindowTabs.CurrentBoard != this) return;
         Log.WriteVar(e.Source, FocusedObject, HoveredObject);
 
         if (e.Source is Board && Selection != null)
@@ -279,7 +279,7 @@ public partial class Board : DraggableGraphic
             Selection.Cancel();
             FocusedObject = this;
         }
-        if (e.Source is not Board || FocusedObject is not DraggableGraphic || e.Source is ResizableBorder || e.Source is LightDismissOverlayLayer) return;
+        if (e.Source is not Board || FocusedObject is not DraggableGraphic || e.Source is LightDismissOverlayLayer) return;
 
         if (FocusedObject is Selection selection)
         {
@@ -309,9 +309,9 @@ public partial class Board : DraggableGraphic
         Window.PointerMoved += a;
     }
 
-    private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from MainWindow
+    private void SetCurrentHover(object? sender, PointerEventArgs e) // Called from AppWindow
     {
-        if (MainWindow.Instance.WindowTabs.CurrentBoard != this) return;
+        if (Window.WindowTabs.CurrentBoard != this) return;
 
         HoveredObject = this;
         foreach (var child in Children)
@@ -344,11 +344,11 @@ public partial class Board : DraggableGraphic
     {
         //Log.WriteVar(Window.Width, Window.Height, ScreenX, ScreenX);
         context.DrawRectangle(UIColors.BoardColor, null, new Rect(0, 0, Window.Width - ScreenX, Window.Height - ScreenY));
-        for (double i = -ScreenX; i < Window.Width - ScreenX; i += UIDesign.BoardSquareSize)
+        for (double i = -ScreenX; i < Window.Width - ScreenX; i += Settings.BoardSquareSize)
         {
             context.DrawLine(new Pen(UIColors.BoardSquaresColor, 1), new Point(i, -ScreenY), new Point(i, Window.Height));
         }
-        for (double i = -ScreenY; i < Window.Height - ScreenY; i += UIDesign.BoardSquareSize)
+        for (double i = -ScreenY; i < Window.Height - ScreenY; i += Settings.BoardSquareSize)
         {
             context.DrawLine(new Pen(UIColors.BoardSquaresColor, 1), new Point(-ScreenX, i), new Point(Window.Width, i));
         }

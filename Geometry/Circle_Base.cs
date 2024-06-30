@@ -59,13 +59,14 @@ public partial class Circle : EllipseBase
 
         Formula = new CircleFormula(radius, center.X, center.Y);
 
-        OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnDragStart.Add(() => {
             double offsetX = ParentBoard.MouseX - Center.X;
             double offsetY = ParentBoard.MouseY - Center.Y;
             Center.ForceStartDrag(ParentBoard.Mouse, -offsetX, -offsetY);
         });
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragStart.Add(() => { CurrentlyDragging = false; });
+        OnDragged.Add(AppWindow.RegenAll);
+        Ring.OnMoved.Add((_, _, _, _) => { UpdateFormula(); });
 
 
         ContextMenu = new ContextMenu();

@@ -42,6 +42,9 @@
 		<Compile Update="LogWindow.axaml.cs">
 		  <DependentUpon>LogWindow.axaml</DependentUpon>
 		</Compile>
+		<Compile Update="AppWindow.axaml.cs">
+		  <DependentUpon>AppWindow.axaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>

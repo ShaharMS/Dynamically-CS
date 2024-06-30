@@ -13,7 +13,7 @@ namespace Dynamically.Backend.Graphics;
 
 public class BottomNote : Canvas
 {
-    public BottomNote(string note)
+    public BottomNote(string note, AppWindow window)
     {
         var label = new Label
         {
@@ -26,21 +26,21 @@ public class BottomNote : Canvas
         Children.Add(label);
         Background = UIColors.BottomNoteFill;
 
-        this.SetPosition(MainWindow.Instance.Width / 2 - label.Width / 2, MainWindow.Instance.Height - 150);
+        this.SetPosition(window.Width / 2 - label.Width / 2, window.Height - 150);
 
         EventHandler pos = null!;
         pos = (_, _) => 
         {
-            this.SetPosition(MainWindow.Instance.Width / 2 - label.Width / 2, MainWindow.Instance.Height - 150);
-            MainWindow.Instance.LayoutUpdated -= pos;
+            this.SetPosition(window.Width / 2 - label.Width / 2, window.Height - 150);
+            window.LayoutUpdated -= pos;
         };
 
-        MainWindow.Instance.LayoutUpdated += pos;
+        window.LayoutUpdated += pos;
 
-        MainWindow.Instance.WindowTabs.CurrentBoard.Children.Add(this);
+        window.WindowTabs.CurrentBoard.Children.Add(this);
         DispatcherTimer.Run(() =>
         {
-            MainWindow.Instance.WindowTabs.CurrentBoard.Children.Remove(this);
+            window.WindowTabs.CurrentBoard.Children.Remove(this);
             return false;
         }, new TimeSpan(0, 0, 10));
     }

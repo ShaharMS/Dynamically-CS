@@ -13,7 +13,7 @@ public class Tabs
 {
     public TabControl TabContainer;
 
-    public Window Window { get; private set; }
+    public AppWindow Window { get; private set; }
 
     public Board MainBoard
     {
@@ -36,7 +36,7 @@ public class Tabs
         set => TabContainer.SelectedItem = value;
     }
 
-    public Tabs(TabControl container, Window window)
+    public Tabs(TabControl container, AppWindow window)
     {
         TabContainer = container;
         Window = window;

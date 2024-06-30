@@ -100,7 +100,7 @@ public partial class Vertex : DraggableGraphic
 
         OnDragStart.Add(() => { if (!IsMovable()) CurrentlyDragging = false; });
         OnMoved.Add((double _, double _, double _, double _) => Reposition());
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
         InvalidateVisual();
         RepositionText();
@@ -109,7 +109,7 @@ public partial class Vertex : DraggableGraphic
 
         ParentBoard.Children.Add(this);
 
-        Width = Height = UIDesign.VertexGraphicCircleRadius * 2;
+        Width = Height = Settings.VertexGraphicCircleRadius * 2;
     }
 
     public void RepositionText()
@@ -153,8 +153,8 @@ public partial class Vertex : DraggableGraphic
     {
         // Graphic is cleared
         var brush = UIColors.VertexFillColor;
-        var pen = new Pen(UIColors.VertexOutlineColor, UIDesign.VertexGraphicCircleRadius / 2.5);
-        context.DrawEllipse(brush, pen, new Point(0, 0), UIDesign.VertexGraphicCircleRadius, UIDesign.VertexGraphicCircleRadius);
+        var pen = new Pen(UIColors.VertexOutlineColor, Settings.VertexGraphicCircleRadius / 2.5);
+        context.DrawEllipse(brush, pen, new Point(0, 0), Settings.VertexGraphicCircleRadius, Settings.VertexGraphicCircleRadius);
         context.FillRectangle(new SolidColorBrush(Colors.Red), new Rect(-1, -1, 2, 2));
     }
 
@@ -181,11 +181,10 @@ public partial class Vertex : DraggableGraphic
 
         All.Remove(this);
 
-        MainWindow.RegenAll(0, 0, 0, 0);
+        AppWindow.RegenAll(0, 0, 0, 0);
     }
 
     public static implicit operator Point(Vertex vertex) { return new Point(vertex.X, vertex.Y); }
-    public static implicit operator Vertex(Point point) { return new Vertex(MainWindow.Instance.WindowTabs.CurrentBoard, point.X, point.Y); }
 
 
     public static Vertex? GetVertexById(char id)

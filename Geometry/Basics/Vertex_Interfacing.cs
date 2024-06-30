@@ -17,8 +17,8 @@ namespace Dynamically.Geometry.Basics;
 
 public partial class Vertex : IDrawable, IContextMenuSupporter<VertexContextMenuProvider>, IStringifyable, ISupportsAdjacency, ISelectable, IMovementFreezable, IHasFormula<PointFormula>, ICanFollowFormula
 {
-    public override double X { get => base.X; set { if (dispatchingOnMoved) Log.Warn($"Cannot edit Vertex {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
-    public override double Y { get => base.Y; set { if (dispatchingOnMoved) Log.Warn($"Cannot edit Vertex {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
+    public override double X { get => base.X; set { if (DispatchingOnMovedEvents) throw new Exception($"Cannot edit Vertex {this}'s X position in an OnMoved function."); else if (!Anchored) base.X = value; } }
+    public override double Y { get => base.Y; set { if (DispatchingOnMovedEvents) throw new Exception($"Cannot edit Vertex {this}'s Y position in an OnMoved function."); else if (!Anchored) base.Y = value; } }
 
     List<Func<double, double, (double X, double Y)>> _positioningByFormula = new();
     public List<Func<double, double, (double X, double Y)>> PositioningByFormula => _positioningByFormula;

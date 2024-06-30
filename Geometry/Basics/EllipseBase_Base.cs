@@ -200,7 +200,7 @@ internal class Ring : DraggableGraphic
 
                 foreach (var l in Ellipse.OnMoved) l(X, Y, X, Y);
             });
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
         All.Add(this);
 

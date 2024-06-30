@@ -91,11 +91,11 @@ public partial class Triangle : DraggableGraphic
             Segment23.Reposition();
             this.SetPosition(0, 0);
         });
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
         ParentBoard.AddChild(this);
 
-        MainWindow.RegenAll(0, 0, 0, 0);
+        AppWindow.RegenAll(0, 0, 0, 0);
         Provider.Regenerate();
     }
     public Circle GenerateCircumCircle()

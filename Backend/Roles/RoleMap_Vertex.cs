@@ -74,15 +74,13 @@ public partial class RoleMap
             case Role.TRIANGLE_InCircleCenter:
                 var t2 = item as Triangle;
                 t2.Incircle.OnRemoved.Add(() => {
+                    t2.Incircle.Center.OnDragStart.Remove(t2.__triangleMoveThroughIncircleCenter);
                     t2.Incircle = null;
                     t2.Provider.Regenerate();
+                    t2.Formula.RemoveFollower(Subject);
                 });
                 t2.Formula.AddFollower(Subject);
-                t2.Incircle.Center.OnDragStart.Add(() =>
-                {
-                    t2.Incircle.Center.CurrentlyDragging = false;
-                    t2.ForceStartDrag(t2.ParentBoard.Mouse, -t2.ParentBoard.MouseX + t2.X, -t2.ParentBoard.MouseY + t2.Y);
-                });
+                t2.Incircle.Center.OnDragStart.Add(t2.__triangleMoveThroughIncircleCenter);
                 break;
             // Triangle
             case Role.TRIANGLE_Corner:
@@ -157,10 +155,7 @@ public partial class RoleMap
                 var t2 = item as Triangle;
                 // Incircle callback is already deallocated
                 t2.Formula.RemoveFollower(Subject);
-                t2.Incircle.Center.OnDragStart.Remove(() =>
-                {
-                    t2.ForceStartDrag(t2.ParentBoard.Mouse, -t2.ParentBoard.MouseX, -t2.ParentBoard.MouseY);
-                });
+                t2.Incircle.Center.OnDragStart.Remove(t2.__triangleMoveThroughIncircleCenter);
                 t2.Provider.Regenerate();
                 break;
             // Triangle

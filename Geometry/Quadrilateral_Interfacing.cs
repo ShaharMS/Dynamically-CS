@@ -31,7 +31,7 @@ public partial class Quadrilateral : IDismantable, IShape, IStringifyable, ISupp
         }
 
         All.Remove(this);
-        MainWindow.RegenAll(0, 0, 0, 0);
+        AppWindow.RegenAll(0, 0, 0, 0);
         ParentBoard.RemoveChild(this);
     }
 

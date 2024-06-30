@@ -25,7 +25,7 @@ public class AngleContextMenuProvider : ContextMenuProvider
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
-        if (MainWindow.Debug) AddDebugInfo();
+        if (Settings.Debug) AddDebugInfo();
     }
 
     public override void GenerateDefaults()

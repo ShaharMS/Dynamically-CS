@@ -13,61 +13,17 @@ namespace Dynamically.Menus;
 
 public class TopMenu
 {
-    public static Menu Instance = MainWindow.Instance.Find<Menu>("TopMenu");
-    
-    public static void applyDefaultStyling()
+    public Menu Options { get; set; }
+    public AppWindow Window { get; set; }
+
+    public TopMenu(Menu menu, AppWindow window)
     {
-        //BackgroundColor = null;
-        //BorderColor = null;
-        //TextColor = null;
-    }
-
-
-    /// <summary>
-    /// Default:
-    /// <code>Brushes.LightGray</code>
-    /// set to <c>null</c> for auto default
-    /// </summary>
-    public static IBrush? BackgroundColor
-    {
-        get => Instance.Background ?? Brushes.LightGray;
-        set => Instance.Background = value ?? Brushes.LightGray;
-    }
-
-    /// <summary>
-    /// Default:
-    /// <code>Brushes.DimGray</code>
-    /// set to <c>null</c> for auto default
-    /// </summary>
-    public static IBrush? BorderColor
-    {
-        get => Instance.BorderBrush ?? Brushes.DimGray;
-        set => Instance.BorderBrush = value ?? Brushes.DimGray;
-    }
-
-    /// <summary>
-    /// Default:
-    /// <code>Brushes.Black</code>
-    /// set to <c>null</c> for auto default
-    /// </summary>
-    public static IBrush? TextColor
-    {
-        get => Instance.Foreground ?? Brushes.Black;
-        set => Instance.Foreground = value ?? Brushes.Black;
-    }
-
-
-    public Menu Menu { get; set; }
-    public MainWindow Parent { get; set; }
-
-    public TopMenu(Menu menu, MainWindow window)
-    {
-        Menu = menu;
-        Parent = window;
+        Options = menu;
+        Window = window;
 
         // Event Listeners
 
-        foreach (var item in Flatten(Menu.Items.OfType<MenuItem>()))
+        foreach (var item in Flatten(Options.Items.OfType<MenuItem>()))
         {
             switch (item.Header)
             {
@@ -90,13 +46,14 @@ public class TopMenu
 
     public void AddNewBoard(object? sender, RoutedEventArgs e)
     {
-        Parent.WindowTabs.CreateNewTab($"Board {Parent.WindowTabs.OpenTabs.Length}");
+        Window.WindowTabs.CreateNewTab($"Board {Window.WindowTabs.OpenTabs.Length}");
     }
 
     public void SelectAll(object? sender, RoutedEventArgs e)
     {
-        var pos = Parent.WindowTabs.CurrentBoard.GetPosition();
-        Parent.WindowTabs.CurrentBoard.Selection?.Cancel();
-        Parent.WindowTabs.CurrentBoard.Selection = new Selection(new Avalonia.Point(0, 0), new Avalonia.Point(Parent.Width - pos.X, Parent.Height - pos.Y), Parent.WindowTabs.CurrentBoard);
+        Window.WindowTabs.CurrentBoard.Selection?.Cancel();
+
+        var pos = Window.WindowTabs.CurrentBoard.GetPosition();
+        Window.WindowTabs.CurrentBoard.Selection = new Selection(new Avalonia.Point(-pos.X, -pos.Y), new Avalonia.Point(Window.Width, Window.Height), Window.WindowTabs.CurrentBoard);
     }
 }

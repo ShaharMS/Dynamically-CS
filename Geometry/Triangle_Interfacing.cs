@@ -61,6 +61,11 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
         Provider.Regenerate();
     }
 
+    public void __triangleMoveThroughIncircleCenter()
+    {
+        if (Incircle != null) Incircle.Center.CurrentlyDragging = false;
+        ForceStartDrag(ParentBoard.Mouse, -ParentBoard.MouseX + X, -ParentBoard.MouseY + Y);
+    }
 
     public override string ToString()
     {

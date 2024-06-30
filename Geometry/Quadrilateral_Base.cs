@@ -130,9 +130,9 @@ public partial class Quadrilateral : DraggableGraphic
             Segment4?.Reposition();
             this.SetPosition(0, 0);
         });
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
-        MainWindow.RegenAll(0,0,0,0);
+        AppWindow.RegenAll(0,0,0,0);
         ParentBoard.AddChild(this);
     }
 #pragma warning restore CS8618

@@ -15,7 +15,7 @@ namespace Dynamically.Backend.Graphics;
 public partial class DraggableGraphic : Canvas
 {
     public virtual bool Draggable { get; set; }
-    public bool CurrentlyDragging;
+    public bool CurrentlyDragging { get; set; }
     public List<Action<double, double, double, double>> OnMoved = new();
     public List<Action<double, double, double, double>> OnDragged = new();
 

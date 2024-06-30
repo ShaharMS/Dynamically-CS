@@ -25,7 +25,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
-        if (MainWindow.Debug) AddDebugInfo();
+        if (Settings.Debug) AddDebugInfo();
     }
 
     public override void GenerateDefaults()
@@ -247,7 +247,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.EQUILATERAL:
                     var eq = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Equilateral",
+                        Header = $"{(Settings.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Equilateral",
                         Tag = confidence
                     };
                     eq.Click += (sender, e) =>
@@ -260,7 +260,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES_RIGHT:
                     var ir = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles-Right {details}",
+                        Header = $"{(Settings.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles-Right {details}",
                         Tag = confidence
                     };
                     ir.Click += (sender, e) =>
@@ -278,7 +278,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.ISOSCELES:
                     var iso = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles {details}",
+                        Header = $"{(Settings.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Isosceles {details}",
                         Tag = confidence
                     };
                     iso.Click += (sender, e) =>
@@ -307,7 +307,7 @@ public class TriangleContextMenuProvider : ContextMenuProvider
                 case TriangleType.RIGHT:
                     var r = new MenuItem
                     {
-                        Header = $"{(MainWindow.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Right {details}",
+                        Header = $"{(Settings.Debug ? "(" + string.Format("{0:0.00}", confidence) + ") " : "")}{(confidence > 0.95 ? "★ " : "")}Make Right {details}",
                         Tag = confidence
                     };
                     r.Click += (sender, e) =>

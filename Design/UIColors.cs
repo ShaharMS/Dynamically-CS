@@ -22,9 +22,9 @@ public class UIColors
     {
         Brush = new SolidColorBrush(Colors.White),
         DashStyle = DashStyle.Dash,
-        Thickness = UIDesign.SelectionOutlineWidth
+        Thickness = Settings.SelectionOutlineWidth
     };
-    public static Pen SegmentPen => new() { Brush = SegmentColor, Thickness = UIDesign.SegmentGraphicWidth };
+    public static Pen SegmentPen => new() { Brush = SegmentColor, Thickness = Settings.SegmentGraphicWidth };
 
 
     public static readonly IBrush SolutionTableBorder = new SolidColorBrush(Colors.White);

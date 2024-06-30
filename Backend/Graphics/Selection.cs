@@ -83,10 +83,10 @@ public class Selection : DraggableGraphic, IStringifyable
             foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnMovedEvents();
         });
         OnDragStart.Add(() => {
-            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDragStartEvents();
+            foreach (var item in EncapsulatedElements) item.DispatchOnDragStartEvents();
         });
         OnDragged.Add((_, _, _, _) => {
-            foreach (var item in EncapsulatedElements) if (item is Vertex) item.DispatchOnDraggedEvents();
+            foreach (var item in EncapsulatedElements) item.DispatchOnDraggedEvents();
         });
 
         ContextMenu = new ContextMenu();

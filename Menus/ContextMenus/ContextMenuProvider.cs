@@ -40,7 +40,7 @@ public class ContextMenuProvider
                 new TextSeparator("Others", list);
                 list = list.Concat(AdjacentElements.ToList()).ToList();
             }
-            if (MainWindow.Debug)
+            if (Settings.Debug)
             {
                 AddDebugInfo();
                 new TextSeparator("Debug", list);
@@ -67,7 +67,7 @@ public class ContextMenuProvider
             list = list.Concat(Suggestions.ToList()).ToList();
             new TextSeparator("Recommended", list);
             list = list.Concat(Recommendations.ToList()).ToList();
-            if (MainWindow.Debug)
+            if (Settings.Debug)
             {
                 AddDebugInfo();
                 new TextSeparator("Debug", list);
@@ -114,6 +114,6 @@ public class ContextMenuProvider
         GenerateSuggestions();
         GenerateRecommendations();
         // Adjacent elements retrieved at click time
-        if (MainWindow.Debug) AddDebugInfo();
+        if (Settings.Debug) AddDebugInfo();
     }
 }

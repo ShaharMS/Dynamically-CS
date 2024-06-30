@@ -29,7 +29,7 @@ public class CircleContextMenuProvider : ContextMenuProvider
         GenerateDefaults();
         GenerateSuggestions();
         GenerateRecommendations();
-        if (MainWindow.Debug) AddDebugInfo();
+        if (Settings.Debug) AddDebugInfo();
     }
 
     public override void GenerateDefaults()

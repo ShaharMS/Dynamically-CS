@@ -52,6 +52,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
 
     public void __circle_handleDiameter(Vertex dominant, Vertex moving)
     {
+        if (Center.CurrentlyDragging) return;
         var angle = dominant.RadiansTo(Center);
         var dist = dominant.DistanceTo(Center);
 
@@ -60,7 +61,7 @@ public partial class Circle : IDismantable, IShape, IStringifyable, ISupportsAdj
                ox = moving.X, oy = moving.Y;
 
         if (!moving.RoughlyEquals(new Point(nx, ny)))
-        {
+        { // Second clause is to protect from cases where the entire diameter moves.
             moving.X = nx; moving.Y = ny;
             moving.DispatchOnMovedEvents(ox, oy);
         }

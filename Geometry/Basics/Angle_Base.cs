@@ -203,7 +203,7 @@ public partial class Angle : DraggableGraphic
                     context.DrawLine(new Pen(UIColors.SegmentColor, 2), previous.Value, point);
                     figure.Segments?.Add(new LineSegment { Point = point });
                     // padding for easier clicking
-                    context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.SegmentGraphicWidth * 2), previous.Value, point);
+                    context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), Settings.SegmentGraphicWidth * 2), previous.Value, point);
                     previous = point;
                 }
             }
@@ -212,7 +212,7 @@ public partial class Angle : DraggableGraphic
                 var p = new Point(Center.X + DefaultDistance * Math.Cos(end), Center.Y + DefaultDistance * Math.Sin(end));
                 context.DrawLine(new Pen(UIColors.SegmentColor, 2), previous.Value, p);
                 figure.Segments?.Add(new LineSegment { Point = p });
-                context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.SegmentGraphicWidth * 1.5), previous.Value, p);
+                context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), Settings.SegmentGraphicWidth * 1.5), previous.Value, p);
             }
             geom.Figures.Add(figure);
             context.DrawGeometry(new SolidColorBrush(Colors.Black, 0.01), null, geom);
@@ -223,9 +223,9 @@ public partial class Angle : DraggableGraphic
             var p2 = new Point(Center.X + Math.Sqrt(2) * DefaultDistance / 2 * Math.Cos(start + Math.PI / 4), Center.Y + Math.Sqrt(2) * DefaultDistance / 2 * Math.Sin(start + Math.PI / 4));
             var p3 = new Point(Center.X + DefaultDistance / 2 * Math.Cos(end), Center.Y + DefaultDistance / 2 * Math.Sin(end));
             context.DrawLine(new Pen(UIColors.SegmentColor, 2), p1, p2);
-            context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.SegmentGraphicWidth * 1.5), p1, p2);
+            context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), Settings.SegmentGraphicWidth * 1.5), p1, p2);
             context.DrawLine(new Pen(UIColors.SegmentColor, 2), p3, p2);
-            context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), UIDesign.SegmentGraphicWidth * 1.5), p3, p2);
+            context.DrawLine(new Pen(new SolidColorBrush(Colors.Black, 0.01), Settings.SegmentGraphicWidth * 1.5), p3, p2);
             context.DrawRectangle(new SolidColorBrush(Colors.Black, 0.01), null, new Rect(Center, p2));
         }
 

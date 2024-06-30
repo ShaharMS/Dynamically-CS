@@ -29,8 +29,11 @@ public partial class Vertex
     int safety = 0;
     double epsilon = 0.70710678118; //0.5 * sqrt(2), for a diagonal of 0.5px
 
-
-    bool dispatchingOnMoved = false;
+    /// <summary>
+    /// While OnMoved events are dispatched, X and Y values will not modify, and warn you when an attempt is made.
+    /// This is used to prevent stack overflows.
+    /// </summary>
+    public bool DispatchingOnMovedEvents = false;
 
     /// <summary>
     /// Dispatches OnMoved events & updates position according to existing formulas. 
@@ -73,12 +76,12 @@ public partial class Vertex
                 safety++;
             } while (initialX != null && initialY != null && (initialX.Value, initialY.Value).DistanceTo(X, Y) > epsilon);
             safety = 0;
-            dispatchingOnMoved = true;
+            DispatchingOnMovedEvents = true;
             foreach (var listener in OnMoved)
             {
                 listener(X, Y, (double)px, (double)py);
             }
-            dispatchingOnMoved = false; 
+            DispatchingOnMovedEvents = false; 
         }
         Reposition();
     }

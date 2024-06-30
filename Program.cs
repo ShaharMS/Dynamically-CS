@@ -7,6 +7,9 @@ namespace Dynamically;
 
 class Program
 {
+#pragma warning disable CS8618
+    public static AppWindow Initial { get; set; }
+#pragma warning restore CS8618
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
     // yet and stuff might break.
@@ -39,14 +42,15 @@ class Program
     // Avalonia configuration, don't remove; also used by visual designer.
     public static AppBuilder BuildAvaloniaApp()
     {
-        if (!MainWindow.Debug) 
+        if (!Settings.Debug) 
             return AppBuilder.Configure<App>().UsePlatformDetect().LogToTrace();
         
         return AppBuilder.Configure<App>()
                 .UsePlatformDetect()
                 .AfterSetup((_) =>
                 {
-                    var mainWindow = new MainWindow();
+                    Initial = new AppWindow();
+                    var mainWindow = Initial;
 
                     var screen = mainWindow.Screens.Primary; // Get the primary screen
 
@@ -54,7 +58,7 @@ class Program
                     var windowWidth = screen.WorkingArea.Width;
                     var windowHeight = screen.WorkingArea.Height;
 
-                    // Set the size and position of the MainWindow
+                    // Set the size and position of the AppWindow
                     if (HasConsole)
                     {
                         //Console.SetWindowSize(windowWidth / 3 / 9, windowHeight / 22);

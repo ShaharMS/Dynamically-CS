@@ -5,7 +5,6 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using System.Linq;
 using Dynamically.Backend.Graphics;
-using Dynamically.Backend.Graphics.SolutionTable;
 using Dynamically.Backend.Latex;
 using Dynamically.Menus;
 using System;
@@ -14,41 +13,29 @@ using Dynamically.Backend.Helpers;
 
 namespace Dynamically;
 
-public partial class MainWindow : Window
+public partial class AppWindow : Window
 {
 
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public static MainWindow Instance { get; private set; }
-    public static bool Debug { get; set; } = true;
-
-    private static DockPanel MainPanel;
 
     public Board MainBoard { get; private set; }
     public Tabs WindowTabs { get; private set; }
-
     public TopMenu TopMenu { get; private set; }
 
-
-
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-    public MainWindow()
+    public AppWindow()
     {
         InitializeComponent();
         Console.WriteLine("Hey There!");
-        Debug = true;
-        Instance = this;
-        MainPanel = Instance.Find<DockPanel>("Display");
-        WindowTabs = new Tabs(Instance.Find<TabControl>("Tabs"), this);
-        TopMenu = new TopMenu(Instance.Find<Menu>("Menu"), this);
+        WindowTabs = new Tabs(this.Find<TabControl>("Tabs"), this);
+        TopMenu = new TopMenu(this.Find<Menu>("Menu"), this);
         var ca = new Board(this)
         {
             Name = "MainBoard"
         };
         MainBoard = ca;
         MainBoard.SetPosition(0, 0);
-        Instance.Find<TabItem>("__MainBoard").Content = MainBoard;
-
-        Menus.TopMenu.applyDefaultStyling();
+        this.Find<TabItem>("__MainBoard").Content = MainBoard;
 
         var j0 = new Vertex(MainBoard, 130, 30);
         var j = new Vertex(MainBoard, 30, 30);
@@ -76,8 +63,7 @@ public partial class MainWindow : Window
          
         RegenAll(0, 0, 0, 0);
 
-        _ = new BottomNote("Application Started!");
-        //MainBoard.Children.Add(new SolutionTable(MainBoard, true));
+        _ = new BottomNote("Application Started!", this);
 
     }
 

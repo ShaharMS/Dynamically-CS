@@ -82,7 +82,7 @@ public partial class Arc : DraggableGraphic
             Center.ForceStartDrag(ParentBoard.Mouse, -offsetX, -offsetY);
         });
 
-        OnDragged.Add(MainWindow.RegenAll);
+        OnDragged.Add(AppWindow.RegenAll);
 
         All.Add(this);
 
@@ -105,7 +105,7 @@ public partial class Arc : DraggableGraphic
     Pen pen = new Pen
     {
         Brush = UIColors.SegmentColor,
-        Thickness = UIDesign.SegmentGraphicWidth,
+        Thickness = Settings.SegmentGraphicWidth,
         LineCap = PenLineCap.Round,
         LineJoin = PenLineJoin.Round
     };
@@ -125,7 +125,7 @@ public partial class Arc : DraggableGraphic
             IsLargeArc = StartDegrees > EndDegrees == TotalDegrees > 180
         });
 
-        context.DrawGeometry(null, new Pen(UIColors.SegmentColor, UIDesign.SegmentGraphicWidth), new PathGeometry()
+        context.DrawGeometry(null, UIColors.SegmentPen, new PathGeometry()
         {
             Figures = { figure }
         });
