@@ -15,7 +15,17 @@ namespace Dynamically.Backend.Graphics;
 public partial class DraggableGraphic : Canvas
 {
     public virtual bool Draggable { get; set; }
-    public bool CurrentlyDragging { get; set; }
+
+    bool _dragging = false;
+    public bool CurrentlyDragging 
+    {
+        get => _dragging;
+        set
+        {
+            _dragging = value;
+            if (_dragging) Log.Write($"Started Dragging: {this}"); else Log.Write($"Stopped Dragging: {this}");
+        }
+    }
     public List<Action<double, double, double, double>> OnMoved = new();
     public List<Action<double, double, double, double>> OnDragged = new();
 
@@ -78,7 +88,6 @@ public partial class DraggableGraphic : Canvas
         args.Pointer.Capture(this);
 
         DispatchOnDragStartEvents();
-        Log.Write("Drag Started");
     }
 
     protected override void OnPointerEnter(PointerEventArgs e)
@@ -113,6 +122,7 @@ public partial class DraggableGraphic : Canvas
             e.Pointer?.Capture(this);
 
             DispatchOnDragStartEvents();
+
         }
     }
 
@@ -128,7 +138,6 @@ public partial class DraggableGraphic : Canvas
             DispatchOnDraggedEvents(X, Y, _startPosition.X, _startPosition.Y);
 
         }
-        Log.Write("Drag Ended");
     }
 
     protected override void OnPointerMoved(PointerEventArgs e)

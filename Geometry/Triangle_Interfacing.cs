@@ -63,7 +63,13 @@ public partial class Triangle : IDismantable, IShape, IStringifyable, ISupportsA
 
     public void __triangleMoveThroughIncircleCenter()
     {
-        if (Incircle != null) Incircle.Center.CurrentlyDragging = false;
+        if (Incircle != null)
+        {
+            if ((ParentBoard.Selection?.EncapsulatedElements.Contains(Incircle!) ?? false) && 
+                (Circumcircle != null && 
+                    (ParentBoard.Selection?.EncapsulatedElements.Contains(Circumcircle.Center) ?? false))) return;
+            Incircle.Center.CurrentlyDragging = false;
+        }
         ForceStartDrag(ParentBoard.Mouse, -ParentBoard.MouseX + X, -ParentBoard.MouseY + Y);
     }
 
